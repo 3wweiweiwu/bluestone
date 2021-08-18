@@ -1,0 +1,44 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Program",
+      "program": "${workspaceFolder}/bin/www.js",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug",
+      "program": "${workspaceFolder}/bin/www",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/babel-node",
+      // "env": {
+      //   "BABEL_ENV": "development"
+      // },
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    },
+    {
+      "name": "Debug Mocha",
+      "request": "launch",
+      "type": "node",
+      "program": "${workspaceFolder}/node_modules/.bin/_mocha",
+      "stopOnEntry": false,
+      "args": ["--compilers", "js:babel-register"],
+      "cwd": ".",
+      "runtimeExecutable": null,
+      "runtimeArgs": ["--nolazy"],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "sourceMaps": true
+    }
+  ]
+}
