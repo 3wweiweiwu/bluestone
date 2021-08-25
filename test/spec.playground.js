@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer-core')
 
-const fs = require('fs/promises')
+const fs = require('fs').promises
 const singlefileScript = require('single-file/cli/back-ends/common/scripts')
 const path = require('path')
 
@@ -104,6 +104,7 @@ describe('POC', () => {
 
 
         });
+
         await page.goto('https://www.walmart.com/blocked?url=L20vc2hvcC1hbGwtYmFjay10by1zY2hvb2w/X2JlX3NoZWxmX2lkPTcyOTYxODImY2F0X2lkPTAmZmFjZXQ9c2hlbGZfaWQlM0E3Mjk2MTgyJTdDJTdDc3BlY2lhbF9vZmZlcnMlM0FDbGVhcmFuY2UlN0MlN0NzcGVjaWFsX29mZmVycyUzQVJlZHVjZWQrUHJpY2UlN0MlN0NzcGVjaWFsX29mZmVycyUzQVJvbGxiYWNrJTdDJTdDc3BlY2lhbF9vZmZlcnMlM0FTcGVjaWFsK0J1eSZwcz02MA==&uuid=25bf3b90-fc8d-11eb-9539-636bc3131218&vid=24a00ff1-fc8d-11eb-bd2a-4f755b4ec043&g=b');
         console.log()
 
@@ -410,5 +411,19 @@ describe('POC', () => {
     it('should extract attribute and assign that to a variable ')
     it("should be able to assert information on the fly")
     it('should automatically insert wait for each element based on the real-world workflow')
-
+    it('should detect browser target change', async () => {
+        let option = {
+            "executablePath": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+            headless: false
+        }
+        const browser = await puppeteer.launch(option)
+        const page = await browser.newPage();
+        browser.on('targetchanged', target => {
+            console.log('')
+            console.log('hello world')
+        })
+        await page.waitForFunction(() => {
+            return false
+        });
+    })
 })

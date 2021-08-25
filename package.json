@@ -16,7 +16,8 @@
     "pug": "2.0.0-beta11",
     "puppeteer": "^10.2.0",
     "puppeteer-core": "^10.2.0",
-    "single-file": "git+https://github.com/gildas-lormeau/SingleFile.git"
+    "single-file": "git+https://github.com/gildas-lormeau/SingleFile.git",
+    "swagger-ui-express": "^4.1.6"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.3",
@@ -28,6 +29,9 @@
     "@babel/preset-env": "^7.15.0",
     "@babel/register": "^7.15.3",
     "babel-loader": "^8.2.2",
+    "chai": "^4.3.4",
+    "chai-http": "^4.3.0",
+    "supertest": "^6.1.6",
     "webpack": "^5.50.0"
   }
 }
