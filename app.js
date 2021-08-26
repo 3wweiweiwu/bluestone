@@ -7,11 +7,12 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const recordRouter = require('./routes/record')
-
+const { WorkflowRecord } = require('./controller/record/class/index')
 
 var app = express();
 
 app.locals.puppeteerControl = null
+app.locals.workflow = new WorkflowRecord()
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

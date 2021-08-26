@@ -15,7 +15,7 @@ module.exports = {
         '/record':
         {
             post: {
-                summary: 'start recording',
+                summary: 'start recording and launch a new browser',
                 responses: {
                     200: {
                         content: {
@@ -25,7 +25,7 @@ module.exports = {
                 }
             },
             delete: {
-                summary: 'stop recording',
+                summary: 'stop recording and kill existing browser',
                 responses: {
                     200: {
                         content: {

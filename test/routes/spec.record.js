@@ -7,4 +7,11 @@ describe('post /api/record', () => {
         res = await testSupport.endRecord()
         assert.strictEqual(res.status, 200)
     }).timeout(3000)
+    it('test', async () => {
+        let res = await testSupport.startRecord()
+        assert.strictEqual(res.status, 200)
+        await page.waitForFunction(() => {
+            return false
+        });
+    }).timeout(3000)
 })
