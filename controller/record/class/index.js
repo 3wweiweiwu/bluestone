@@ -53,6 +53,16 @@ class RecordingStep {
  */
 
 
+class ArgummentInfo {
+    /**
+     * @param {string} argumentValue
+     * @param {string} argumentText
+     */
+    constructor(argumentText, argumentValue) {
+        this.text = argumentText
+        this.value = argumentValue
+    }
+}
 class Operation {
     /**
      * Create a new opeartion
@@ -64,7 +74,11 @@ class Operation {
         this.argument = ''
         this.text = operationName
         if (operationArguments == null) operationArguments = []
-        this.operationArguments = operationArguments
+        /**
+         * @type {Array<ArgummentInfo>}
+         */
+        this.operationArguments = operationArguments.map(argumentText => { return new ArgummentInfo(argumentText, '') })
+
         this.operationId = operationId
     }
 }
@@ -74,6 +88,13 @@ class PugDropDownInfo {
      * @param {string} id 
      * @param {string} text 
      */
+    constructor(id, text, url) {
+        this.id = id
+        this.text = text
+        this.url = url
+    }
+}
+class PugTextInputInfo {
     constructor(id, text, url) {
         this.id = id
         this.text = text
@@ -92,6 +113,7 @@ class WorkflowRecord {
                 browserSelection: {
                     currentSelector: '',
                     selectorPicture: '',
+                    currentInnerText: 'default'
                 },
                 userSelection: {
                     currentGroup: '',
@@ -102,7 +124,7 @@ class WorkflowRecord {
                     assert: {
                         text: 'Verify',
                         operations: [
-                            new Operation(WorkflowRecord.inbuiltOperation.textEqual, 'Text Equal', ['Please specify the text', 'this is a test'])
+                            new Operation(WorkflowRecord.inbuiltOperation.textEqual, 'Text Equal', ['Please specify the text'])
                         ]
                     },
                     waitTill: {
@@ -132,7 +154,8 @@ class WorkflowRecord {
     static inbuiltQueryKey = {
         currentGroup: 'currentGroup',
         currentOperation: 'currentOperation',
-        currentArgument: 'currentArgument'
+        currentArgument: 'currentArgument',
+        currentArgumentIndex: 'currentArgumentIndex'
     }
     /**
      * return a list of group info for the pug to consume 
@@ -171,6 +194,11 @@ class WorkflowRecord {
         if (operation.operationArguments == null) {
             return []
         }
+
+        //if operation is equal, we should automatically populate the argument based on the inner text of current value
+        if (operation.operationId == WorkflowRecord.inbuiltOperation.textEqual) {
+            operation.operationArguments[0].value = this.ui.spy.browserSelection.currentInnerText
+        }
         return operation.operationArguments
     }
     getCurrentGroup() {
@@ -183,7 +211,10 @@ class WorkflowRecord {
     }
 
 
-    //based on current selector info, return current selector we have
+    /**
+     *  based on current selector info, return current selector we have 
+     * @returns {Operation}
+     */
     getCurrentOperation() {
         //check group info
         if (this.ui.spy.userSelection.currentGroup == null || this.ui.spy.userSelection.currentGroup == '') {
@@ -232,9 +263,21 @@ class WorkflowRecord {
         if (queryKeys.length == 0) {
             return
         }
-        queryKeys.forEach(key => {
+        //handle update for current group and current operation
+        if (queryKeys.length == 1) {
+            let key = queryKeys[0]
             this.__updateUserInputForSpy(key, query[key])
-        })
+        }
+        //handle update for arguments
+        if (queryKeys.includes(WorkflowRecord.inbuiltQueryKey.currentArgument) && queryKeys.includes(WorkflowRecord.inbuiltQueryKey.currentArgumentIndex)) {
+            //update ui value
+            let currentArgumentIndex = query[WorkflowRecord.inbuiltQueryKey.currentArgumentIndex]
+            let currentQueryKeyForValue = query[WorkflowRecord.inbuiltQueryKey.currentArgument]
+            this.getCurrentOperation().operationArguments[currentArgumentIndex].value = currentQueryKeyForValue
+            //update user selection value
+            this.ui.spy.userSelection.currentArgument[currentArgumentIndex] = currentQueryKeyForValue
+        }
+
     }
     __updateUserInputForSpy(key, value) {
         switch (key) {
@@ -243,6 +286,9 @@ class WorkflowRecord {
                 break;
             case WorkflowRecord.inbuiltQueryKey.currentOperation:
                 this.ui.spy.userSelection.currentOperation = value
+                this.ui.spy.userSelection.currentArgument = this.getCurrentOperation().operationArguments.map(argument => {
+                    return argument.value
+                })
                 break;
             default:
                 break;
