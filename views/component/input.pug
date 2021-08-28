@@ -1,0 +1,14 @@
+mixin input-arguments(queryKey,operationArguments)
+    - queryKey = queryKey
+    - operationArguments = operationArguments || []
+
+    each argument, index in operationArguments
+        - inputId=queryKey+"_"+index
+        label(for=inputId)=argument
+            div(class="input-group")
+                input(type="text" queryKey=queryKey index=index class="form-control" id=inputId onChange="redirectInputOnChange(event)")
+
+    
+
+
+

@@ -10,9 +10,11 @@ module.exports = function (recordRepo) {
      */
     function logEvent(eventDetail) {
         // let closetLocator = findClosestLocator(activeLocatorElements, eventDetail)
-        let event = new RecordingStep(eventDetail)
-        recordRepo.addStep(event)
-        console.log(JSON.stringify(recordRepo))
+        if (recordRepo.isRecording) {
+            let event = new RecordingStep(eventDetail)
+            recordRepo.addStep(event)
+            console.log(JSON.stringify(recordRepo))
+        }
 
     }
     return logEvent

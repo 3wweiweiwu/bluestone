@@ -1,0 +1,50 @@
+//- collapse
+mixin collapse(id)
+	.panel-group(id="collapse"+id, role="tablist", aria-multiselectable="true")
+		block
+
+//- collapse-item
+mixin collapse-item(type,title,parent,expanded,id)
+	.panel(class="panel-"+type)
+		.panel-heading(role="tab", id="heading"+title)
+			h4.panel-title
+				a(data-toggle="collapse", data-parent="#collapse"+parent, href="?collapse"+id+"=toggle", aria-expanded="true" ,aria-controls="collapseOne")
+					= title
+		unless expanded
+			.panel-collapse.collapse(id="collapse"+id, role="tabpanel", aria-labelledby="heading"+title)
+				.panel-body
+					block
+		else
+			.panel-collapse.collapse.in(id="collapse"+id, role="tabpanel", aria-labelledby="heading"+title)
+				.panel-body
+					block
+
+//- collapse-item-default
+mixin collapse-item-default(title,parent,expanded,id)
+	+collapse-item("default",title,parent,expanded)
+		block
+
+//- collapse-item-primary
+mixin collapse-item-primary(title,parent,expanded,id)
+	+collapse-item("primary",title,parent,expanded)
+		block
+
+//- collapse-item-info
+mixin collapse-item-info(title,parent,expanded,id)
+	+collapse-item("info",title,parent,expanded)
+		block
+
+//- collapse-item-success
+mixin collapse-item-success(title,parent,expanded,id)
+	+collapse-item("success",title,parent,expanded)
+		block
+
+//- collapse-item-warning
+mixin collapse-item-warning(title,parent,expanded,id)
+	+collapse-item("warning",title,parent,expanded)
+		block
+
+//- collapse-item-danger
+mixin collapse-item-danger(title,parent,expanded,id)
+	+collapse-item("danger",title,parent,expanded)
+		block

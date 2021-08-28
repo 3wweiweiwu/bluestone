@@ -1,0 +1,13 @@
+extends ../node_modules/pug-bootstrap/_bootstrap.pug
+include ./component/input.pug
+block body	 
+	h1='Blue stone Agent'
+	h2='current selector:'+currentSelector
+	p
+		+dropdown(currentGroup,groups)
+	p
+		+dropdown(currentOperation,operations)='' 
+	p
+		+input-arguments(argumentsQueryKey,argumentList)='' 
+
+	script(src="/javascript/redirectInput.js")
