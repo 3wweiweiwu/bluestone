@@ -252,7 +252,6 @@ describe('POC', () => {
             });
         }
 
-        page.on('')
         page.exposeFunction('drawBorderOverElement', drawBorderOverElement)
 
         //register click event
@@ -426,4 +425,24 @@ describe('POC', () => {
             return false
         });
     })
+    it('should launch browser and take screenshot', async () => {
+        let option = {
+            "executablePath": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+            headless: false,
+            defaultViewport: null
+        }
+        const browser = await puppeteer.launch(option)
+
+        const page = await browser.newPage();           // open new tab
+        await page.goto('https://google.com');          // go to site
+
+        // Далее #hplogo - требуемый нам селектор
+        await page.waitForSelector('#hplogo');          // wait for the selector to load
+        const element = await page.$('#hplogo');        // declare a variable with an ElementHandle
+        let pos = await element.boundingBox()
+        await element.screenshot({ path: 'google.png' }); // take screenshot element in puppeteer
+        await page.screenshot({ path: 'hplogo.png', clip: { x: pos.x, height: pos.height, y: pos.y, width: pos.width } })
+        await browser.close();                          // close browser
+
+    }).timeout(60000)
 })

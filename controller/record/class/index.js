@@ -26,10 +26,12 @@ var TYPES = {
 /**
  * @typedef step
  * @property {'click'|'change'|'dblclick'|'keydown'|'goto'} command
- * @property {number} target
+ * @property {string} target
  * @property {number} parameter
  * @property {Array<ExistingSelector>} matchedSelector
  * @property {number} timeoutMs
+ * @property {string} targetInnerText
+ * @property {string} targetPicPath
  */
 class RecordingStep {
     /**     * 
@@ -38,8 +40,10 @@ class RecordingStep {
     constructor(recordingStep) {
         this.command = recordingStep.command
         this.target = recordingStep.target
-        this.matchedSelector = recordingStep.matchedSelector
+        this.matchedSelectors = recordingStep.matchedSelector
         this.parameter = recordingStep.parameter
+        this.targetInnerText = recordingStep.targetInnerText
+        this.targetPicPath = recordingStep.targetPicPath
         this.meta = {}
     }
 }
@@ -104,7 +108,9 @@ class PugTextInputInfo {
 class WorkflowRecord {
     constructor() {
         this.name = ''
-        /** @type {Array<recordingStep>} */
+        /** 
+         * @type {Array<RecordingStep>} 
+         */
         this.steps = []
         this.lastOperationTimestamp = Date.now()
         this.__isRecording = true
@@ -113,7 +119,11 @@ class WorkflowRecord {
                 browserSelection: {
                     currentSelector: '',
                     selectorPicture: '',
-                    currentInnerText: 'default'
+                    currentInnerText: 'default',
+                    x: 0,
+                    y: 0,
+                    width: 0,
+                    height: 0
                 },
                 userSelection: {
                     currentGroup: '',
@@ -125,6 +135,7 @@ class WorkflowRecord {
                         text: 'Verify',
                         operations: [
                             new Operation(WorkflowRecord.inbuiltOperation.textEqual, 'Text Equal', ['Please specify the text'])
+                            // TODO: add a way to check input number or text
                         ]
                     },
                     waitTill: {
@@ -134,10 +145,19 @@ class WorkflowRecord {
                             new Operation(WorkflowRecord.inbuiltOperation.itemInvisible, 'Element Invisible', ['wait time in seconds'])
                         ]
                     },
+                    inbuiltFunction: {
+                        text: 'Run In-built function',
+                        operations: [
+                            new Operation(WorkflowRecord.inbuiltOperation.hover, 'Hover over current element', []),
+                        ]
+                    },
                     customizedFunctions: {
                         text: 'Run Customized Function',
                         operations: []
                     }
+                },
+                validation: {
+                    btnAddStep: ''
                 }
 
             }
@@ -148,14 +168,20 @@ class WorkflowRecord {
 
         textEqual: 'textEqual',
         itemVisible: 'itemVisible',
-        itemInvisible: 'itemInvisible'
+        itemInvisible: 'itemInvisible',
+        hover: 'hover'
 
+    }
+    static inbuiltId = {
+        spy: 'bluestone_inbrowser_console'
     }
     static inbuiltQueryKey = {
         currentGroup: 'currentGroup',
         currentOperation: 'currentOperation',
         currentArgument: 'currentArgument',
-        currentArgumentIndex: 'currentArgumentIndex'
+        currentArgumentIndex: 'currentArgumentIndex',
+        btnAddStep: 'btnAddStep',
+        btnCancel: 'btnCancel'
     }
     /**
      * return a list of group info for the pug to consume 
@@ -198,6 +224,7 @@ class WorkflowRecord {
         //if operation is equal, we should automatically populate the argument based on the inner text of current value
         if (operation.operationId == WorkflowRecord.inbuiltOperation.textEqual) {
             operation.operationArguments[0].value = this.ui.spy.browserSelection.currentInnerText
+            this.ui.spy.userSelection.currentArgument[0] = this.ui.spy.browserSelection.currentInnerText
         }
         return operation.operationArguments
     }
@@ -253,6 +280,13 @@ class WorkflowRecord {
         return this.__isRecording
     }
     /**
+     * add current event to the list
+     * @param {RecordingStep} event 
+     */
+    addStep(event) {
+        this.steps.push(event)
+    }
+    /**
      * Based on req.query and update the variable
      * @param {*} query 
      * @returns 
@@ -290,11 +324,41 @@ class WorkflowRecord {
                     return argument.value
                 })
                 break;
+            case WorkflowRecord.inbuiltQueryKey.btnAddStep:
+                this.__validateOverallFormForSpy()
+                break;
             default:
                 break;
+        }
+    }
+    __validateOverallFormForSpy() {
+        this.ui.spy.validation.btnAddStep = ''
+        //check group info
+        if (this.ui.spy.userSelection.currentGroup == null || this.ui.spy.userSelection.currentGroup == '') {
+            this.ui.spy.validation.btnAddStep = `Please input group info`
+            return
+        }
+
+        //check operation info
+        if (this.ui.spy.userSelection.currentOperation == null || this.ui.spy.userSelection.currentOperation == '') {
+            this.ui.spy.validation.btnAddStep = `Please input operation info`
+            return
+        }
+        //all argument need to be populated
+        let emptyArgumentIndex = this.ui.spy.userSelection.currentArgument.findIndex(item => {
+            return item == null || item == ''
+        })
+        if (emptyArgumentIndex != -1) {
+            this.ui.spy.validation.btnAddStep = `Please enter value for argument #${emptyArgumentIndex}`
+            return
+        }
+
+        if (this.ui.spy.validation.btnAddStep == '') {
+            //TODO: add step to the record
+            return
         }
     }
 
 }
 
-module.exports = { WorkflowRecord }
+module.exports = { WorkflowRecord, RecordingStep }

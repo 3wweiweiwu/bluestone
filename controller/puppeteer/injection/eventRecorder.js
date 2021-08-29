@@ -19,8 +19,10 @@ Object.keys(EVENTCONST).forEach(item => {
     document.addEventListener(item, event => {
         const selector = finder(event.target)
         const position = event.target.getBoundingClientRect()
+        const targetInnerText = event.target.innerText
         let parameter = null
         let command = item
+        let targetPicPath = ''
         switch (item) {
             case EVENTCONST.change:
                 parameter = event.target.value
@@ -34,12 +36,13 @@ Object.keys(EVENTCONST).forEach(item => {
                     case 'Escape':
                         break;
                     default:
-                        //if we see combo key ctrl-q, we will extract the attribute
+                        //if we see combo key ctrl-q, we will call in-browser plugin
                         if (event.ctrlKey && event.key === 'q') {
                             command = null
                             parameter = null
                             break
                         }
+                        //otherwise, we are not going to record any other operation
                         return
                 }
                 break;
@@ -50,6 +53,8 @@ Object.keys(EVENTCONST).forEach(item => {
             command: command,
             target: selector,
             parameter: parameter,
+            targetInnerText: targetInnerText,
+            targetPicPath: targetPicPath,
             pos: {
                 x: position.x,
                 y: position.y,
@@ -66,4 +71,40 @@ Object.keys(EVENTCONST).forEach(item => {
 
         console.log(JSON.stringify(event))
     })
+})
+
+//draw rectangle and return the selector and inner text of element mouse hover on
+document.addEventListener('mouseover', event => {
+    if (!window.isRecording()) return
+
+    const selector = finder(event.target)
+    const innerText = event.target.innerText
+    let position = {}
+    try {
+        position = event.target.getBoundingClientRect()
+    } catch (error) {
+        console.log(error)
+    }
+    console.log(`${innerText}`)
+
+
+    window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width)
+    const previousStyle = event.target.style.border
+    event.target.setAttribute('previousBorder', previousStyle)
+    event.target.style.border = "3px solid #FF0000"
+
+})
+
+document.addEventListener("mouseout", event => {
+    if (!window.isRecording()) return
+    try {
+        const previousStyle = event.target.getAttribute('previousBorder')
+        if (previousStyle != null) {
+            event.target.style.border = previousStyle
+            event.target.removeAttribute('previousBorder')
+        }
+    } catch (error) {
+
+    }
+
 })
