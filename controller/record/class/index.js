@@ -1,3 +1,4 @@
+const path = require('path')
 /**
  * @typedef {string} CommandType
  **/
@@ -15,7 +16,7 @@
 /**
  * @enum {CommandType}
  */
-var TYPES = {
+var COMMAND_TYPE = {
     click: 'click',
     change: 'change',
     dblclick: 'dblclick',
@@ -163,6 +164,9 @@ class WorkflowRecord {
             }
         }
 
+    }
+    set spyBrowserSelectionPicPath(picturePath = '') {
+        this.ui.spy.browserSelection.selectorPicture = picturePath
     }
     static inbuiltOperation = {
 
@@ -313,6 +317,11 @@ class WorkflowRecord {
         }
 
     }
+    /**
+     * This is place where we handle single query call for the ui input
+     * @param {string} key 
+     * @param {string} value 
+     */
     __updateUserInputForSpy(key, value) {
         switch (key) {
             case WorkflowRecord.inbuiltQueryKey.currentGroup:
@@ -326,6 +335,9 @@ class WorkflowRecord {
                 break;
             case WorkflowRecord.inbuiltQueryKey.btnAddStep:
                 this.__validateOverallFormForSpy()
+                break;
+            case WorkflowRecord.inbuiltQueryKey.btnCancel:
+                this.isRecording = true
                 break;
             default:
                 break;
@@ -358,7 +370,15 @@ class WorkflowRecord {
             return
         }
     }
+    /**
+     * returns the picture path for current step
+     */
+    getPicPath() {
+        let fileName = Date.now().toString() + ".png"
+        let filePath = path.join(__dirname, '../../../public/temp/componentPic', fileName)
+        return filePath
 
+    }
 }
 
-module.exports = { WorkflowRecord, RecordingStep }
+module.exports = { WorkflowRecord, RecordingStep, COMMAND_TYPE }

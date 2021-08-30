@@ -437,8 +437,8 @@ describe('POC', () => {
         await page.goto('https://google.com');          // go to site
 
         // Далее #hplogo - требуемый нам селектор
-        await page.waitForSelector('#hplogo');          // wait for the selector to load
-        const element = await page.$('#hplogo');        // declare a variable with an ElementHandle
+        await page.waitForSelector('.ktLKi');          // wait for the selector to load
+        const element = await page.$('.ktLKi');        // declare a variable with an ElementHandle
         let pos = await element.boundingBox()
         await element.screenshot({ path: 'google.png' }); // take screenshot element in puppeteer
         await page.screenshot({ path: 'hplogo.png', clip: { x: pos.x, height: pos.height, y: pos.y, width: pos.width } })

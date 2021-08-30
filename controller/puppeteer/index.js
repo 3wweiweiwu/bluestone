@@ -25,7 +25,7 @@ async function startRecording(record) {
             finderScript.innerHTML = eventRecorderScript
             document.body.appendChild(finderScript);
 
-        }, 300)
+        }, 800)
 
     }
     await page.evaluateOnNewDocument(registerEvent, eventRecorderScript)
@@ -38,13 +38,13 @@ async function startRecording(record) {
                 //add iframe
                 setTimeout(() => {
                     let bluestone_inbrowser_console = document.getElementById('bluestone_inbrowser_console')
-                    console.log(bluestone_inbrowser_console)
+                    // console.log(bluestone_inbrowser_console)
                     if (bluestone_inbrowser_console != null) return
                     bluestone_inbrowser_console = document.createElement("iframe");
                     bluestone_inbrowser_console.setAttribute('id', 'bluestone_inbrowser_console')
                     bluestone_inbrowser_console.setAttribute('src', 'http://localhost:3600/spy')
                     document.body.appendChild(bluestone_inbrowser_console);
-                }, 300);
+                }, 800);
 
             })
         } catch (error) {
@@ -55,6 +55,9 @@ async function startRecording(record) {
 
     //record goto operation
     browser.on('targetchanged', target => {
+        if (target.url().includes('http://localhost:3600/spy')) {
+            return
+        }
         let eventStep = new RecordingStep({ command: 'goto', target: target.url() })
         logEvent(record)(eventStep)
 

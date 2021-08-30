@@ -69,39 +69,41 @@ Object.keys(EVENTCONST).forEach(item => {
         // new CustomEvent('eventDetected', { detail: eventDetail });
         window.logEvent(eventDetail)
 
-        console.log(JSON.stringify(event))
+        // console.log(JSON.stringify(event))
     })
 })
 
 //draw rectangle and return the selector and inner text of element mouse hover on
 document.addEventListener('mouseover', event => {
-    if (!window.isRecording()) return
+    if (window.isRecording()) {
+        const selector = finder(event.target)
+        const innerText = event.target.innerText
+        let position = {}
+        try {
+            position = event.target.getBoundingClientRect()
+        } catch (error) {
+            console.log(error)
+        }
 
-    const selector = finder(event.target)
-    const innerText = event.target.innerText
-    let position = {}
-    try {
-        position = event.target.getBoundingClientRect()
-    } catch (error) {
-        console.log(error)
+
+
+        window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width)
+        const previousStyle = event.target.style.backgroundColor
+        event.target.setAttribute('previousBackground', previousStyle)
+        event.target.style.backgroundColor = 'rgba(140, 99, 255,0.7)'
     }
-    console.log(`${innerText}`)
 
 
-    window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width)
-    const previousStyle = event.target.style.border
-    event.target.setAttribute('previousBorder', previousStyle)
-    event.target.style.border = "3px solid #FF0000"
 
 })
 
 document.addEventListener("mouseout", event => {
     if (!window.isRecording()) return
     try {
-        const previousStyle = event.target.getAttribute('previousBorder')
+        const previousStyle = event.target.getAttribute('previousBackground')
         if (previousStyle != null) {
-            event.target.style.border = previousStyle
-            event.target.removeAttribute('previousBorder')
+            event.target.style.backgroundColor = previousStyle
+            event.target.removeAttribute('previousBackground')
         }
     } catch (error) {
 

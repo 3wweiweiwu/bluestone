@@ -1,4 +1,6 @@
-const { RecordingStep } = require('../../record/class/index')
+const { RecordingStep, COMMAND_TYPE } = require('../../record/class/index')
+
+const jimp = require('jimp')
 /**
  * 
  * @param {import('../../record/class/index').WorkflowRecord} recordRepo 
@@ -9,29 +11,40 @@ module.exports = function (recordRepo, page) {
      * Log browser event to the cache
      * @param {import('../../record/class').RecordingStep} eventDetail 
      */
-    function logEvent(eventDetail) {
+    async function logEvent(eventDetail) {
 
-        //if event command is null, call the in-browser console
-        if (eventDetail.command == null) {
-            recordRepo.isRecording = false
-            //add current event to the recorder
-            page.screenshot({
-                path: 'hello1.png', clip: {
-                    x: recordRepo.ui.spy.browserSelection.x,
-                    y: recordRepo.ui.spy.browserSelection.y,
-                    height: recordRepo.ui.spy.browserSelection.height,
-                    width: recordRepo.ui.spy.browserSelection.width
-                }
-            })
+        //goto command does not generate a locator, we w
+
+        let picturePath = ''
+        //handle screenshot
+        if (page != null) {
+            picturePath = recordRepo.getPicPath()
+            page.screenshot({ path: picturePath, captureBeyondViewport: false })
+                .then(() => {
+                    if (eventDetail.command == COMMAND_TYPE.goto) return Promise.reject('GOTO')
+                    return jimp.read(picturePath)
+                })
+                .then(pic => {
+                    return pic.crop(eventDetail.pos.x, eventDetail.pos.y, eventDetail.pos.width, eventDetail.pos.height);
+                })
+                .then(pic => {
+                    return pic.writeAsync(picturePath)
+                })
                 .catch(err => {
                     console.log(err)
                 })
+        }
 
 
+        //if event command is null, call the in-browser console
+        if (eventDetail.command == null) {
+            recordRepo.spyBrowserSelectionPicPath = picturePath
+            recordRepo.isRecording = false
             console.log('pause recording and call in-browser agent')
 
         }
         if (recordRepo.isRecording) {
+            eventDetail.targetPicPath = picturePath
             let event = new RecordingStep(eventDetail)
             recordRepo.addStep(event)
             console.log(JSON.stringify(recordRepo.steps))
