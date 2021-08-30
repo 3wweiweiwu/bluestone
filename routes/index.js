@@ -15,6 +15,7 @@ router.get('/spy', function (req, res, next) {
     operations: workflow.getOperationInfoForPug(),
     argumentList: workflow.getArgumentsInfoForPug(),
     currentSelector: workflow.ui.spy.browserSelection.currentSelector,
+    currentSelectorPic: workflow.getSpySelectorPictureForPug(),
     currentGroup: workflow.getCurrentGroupText(),
     currentOperation: workflow.getCurrentOperationText(),
     argumentsQueryKey: WorkflowRecord.inbuiltQueryKey.currentArgument,

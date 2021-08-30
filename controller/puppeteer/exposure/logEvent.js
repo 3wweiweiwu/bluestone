@@ -25,7 +25,16 @@ module.exports = function (recordRepo, page) {
                     return jimp.read(picturePath)
                 })
                 .then(pic => {
-                    return pic.crop(eventDetail.pos.x, eventDetail.pos.y, eventDetail.pos.width, eventDetail.pos.height);
+
+                    if (eventDetail.command == null) {
+                        //for in-browser agent call
+                        return pic.crop(recordRepo.ui.spy.browserSelection.x, recordRepo.ui.spy.browserSelection.y, recordRepo.ui.spy.browserSelection.width, recordRepo.ui.spy.browserSelection.height);
+                    }
+                    else {
+                        //for ordinary event, just crop as usual
+                        return pic.crop(eventDetail.pos.x, eventDetail.pos.y, eventDetail.pos.width, eventDetail.pos.height);
+                    }
+
                 })
                 .then(pic => {
                     return pic.writeAsync(picturePath)

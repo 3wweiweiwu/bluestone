@@ -3,7 +3,12 @@ include ./component/input.pug
 block body	 
 	h1='Blue stone Agent'
 	h2='current selector:'+currentSelector
-	
+	h2='Picture'
+
+
+	+img-responsive("temp/componentPic/"+currentSelectorPic,"Responsive Image")
+
+
 	+dropdown(currentGroup,groups)
 
 	+dropdown(currentOperation,operations)='' 

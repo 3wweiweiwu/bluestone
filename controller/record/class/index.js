@@ -379,6 +379,10 @@ class WorkflowRecord {
         return filePath
 
     }
+    getSpySelectorPictureForPug() {
+        let pictureName = path.basename(this.ui.spy.browserSelection.selectorPicture)
+        return pictureName
+    }
 }
 
 module.exports = { WorkflowRecord, RecordingStep, COMMAND_TYPE }
