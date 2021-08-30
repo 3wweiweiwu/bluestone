@@ -45,6 +45,7 @@ class RecordingStep {
         this.parameter = recordingStep.parameter
         this.targetInnerText = recordingStep.targetInnerText
         this.targetPicPath = recordingStep.targetPicPath
+        this.timeoutMs = recordingStep.timeoutMs
         this.meta = {}
     }
 }
@@ -75,6 +76,7 @@ class Operation {
      * @param {string} operationName 
      * @param {Array<string>} operationArguments 
      */
+    //TODO: add a basic check and seperate number from string
     constructor(operationId, operationName, operationArguments) {
         this.argument = ''
         this.text = operationName
@@ -86,6 +88,18 @@ class Operation {
 
         this.operationId = operationId
     }
+    /**
+     * Generate argument string example "hello","world","1"
+     * @returns {string}
+     */
+    GenerateArgument() {
+        let argValueList = this.operationArguments.map(argument => {
+            return `"${argument.value}"`
+        })
+        let argStr = argValueList.join(',')
+        return argStr
+    }
+
 }
 class PugDropDownInfo {
     /**
@@ -124,7 +138,9 @@ class WorkflowRecord {
                     x: 0,
                     y: 0,
                     width: 0,
-                    height: 0
+                    height: 0,
+                    lastOperationTime: Date.now(),
+                    lastOperationTimeoutMs: 0
                 },
                 userSelection: {
                     currentGroup: '',
@@ -240,7 +256,12 @@ class WorkflowRecord {
 
         return this.ui.spy.group[this.ui.spy.userSelection.currentGroup]
     }
-
+    /**
+     * Set Last operation time
+     */
+    setLastOperationTime() {
+        this.ui.spy.browserSelection.lastOperationTime = Date.now()
+    }
 
     /**
      *  based on current selector info, return current selector we have 
@@ -289,6 +310,7 @@ class WorkflowRecord {
      */
     addStep(event) {
         this.steps.push(event)
+        this.setLastOperationTime()
     }
     /**
      * Based on req.query and update the variable
@@ -335,6 +357,19 @@ class WorkflowRecord {
                 break;
             case WorkflowRecord.inbuiltQueryKey.btnAddStep:
                 this.__validateOverallFormForSpy()
+                //if validation is done correctly, add current operation
+                if (this.ui.spy.validation.btnAddStep == '') {
+                    let currentOperation = this.getCurrentOperation()
+                    let command = currentOperation.operationId
+                    let target = this.ui.spy.browserSelection.currentSelector
+                    let targetInnerText = this.ui.spy.browserSelection.currentInnerText
+                    let targetPicPath = this.ui.spy.browserSelection.selectorPicture
+                    let timeoutMs = this.ui.spy.browserSelection.lastOperationTimeoutMs
+                    let parameter = currentOperation.GenerateArgument()
+                    let step = new RecordingStep({ command, parameter, target, timeoutMs, targetPicPath, targetInnerText })
+                    this.addStep(step)
+
+                }
                 break;
             case WorkflowRecord.inbuiltQueryKey.btnCancel:
                 this.isRecording = true
@@ -343,6 +378,12 @@ class WorkflowRecord {
                 break;
         }
     }
+    /**
+     * Validate current ui and see if all elements has been popoulated
+     * If all elements have been populated, this.ui.spy.validation.btnAddStep will equal to ''
+     * Otherwise, it will save validation error in this.ui.spy.validation.btnAddStep
+     * @returns 
+     */
     __validateOverallFormForSpy() {
         this.ui.spy.validation.btnAddStep = ''
         //check group info
@@ -365,10 +406,7 @@ class WorkflowRecord {
             return
         }
 
-        if (this.ui.spy.validation.btnAddStep == '') {
-            //TODO: add step to the record
-            return
-        }
+
     }
     /**
      * returns the picture path for current step

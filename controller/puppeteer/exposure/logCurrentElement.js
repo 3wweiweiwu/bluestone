@@ -14,6 +14,7 @@ module.exports = function (recordRepo) {
             recordRepo.ui.spy.browserSelection.y = y
             recordRepo.ui.spy.browserSelection.height = height
             recordRepo.ui.spy.browserSelection.width = width
+            recordRepo.ui.spy.browserSelection.lastOperationTimeoutMs = Date.now() - recordRepo.ui.spy.browserSelection.lastOperationTime
         }
 
     }

@@ -8,7 +8,7 @@ const fs = require('fs').promises
 const { RecordingStep, WorkflowRecord } = require('../record/class')
 /**
  * Create a new puppeteer browser instance
- * @param {import('../record/class/index').WorkflowRecord}
+ * @param {import('../record/class/index').WorkflowRecord} record
  */
 async function startRecording(record) {
     const browser = await puppeteer.launch(config.puppeteer)

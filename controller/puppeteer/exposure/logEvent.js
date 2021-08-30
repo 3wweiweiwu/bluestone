@@ -1,4 +1,4 @@
-const { RecordingStep, COMMAND_TYPE } = require('../../record/class/index')
+const { RecordingStep, COMMAND_TYPE, WorkflowRecord } = require('../../record/class/index')
 
 const jimp = require('jimp')
 /**
@@ -53,10 +53,21 @@ module.exports = function (recordRepo, page) {
 
         }
         if (recordRepo.isRecording) {
+            //If we don't have page element, this indicates that it is a non-UI operation,
+            //we will not calculate timeout
+            let timeoutMs = null
+            if (page != null) {
+                timeoutMs = Date.now() - recordRepo.ui.spy.browserSelection.lastOperationTime
+            }
+            eventDetail.timeoutMs = timeoutMs
+            //calculate timeout by subtracting current time to the time from previous step
+
             eventDetail.targetPicPath = picturePath
             let event = new RecordingStep(eventDetail)
+
             recordRepo.addStep(event)
             console.log(JSON.stringify(recordRepo.steps))
+            //update last operation time
         }
 
     }
