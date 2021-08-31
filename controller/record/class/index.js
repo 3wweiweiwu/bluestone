@@ -203,6 +203,9 @@ class WorkflowRecord {
         btnAddStep: 'btnAddStep',
         btnCancel: 'btnCancel'
     }
+    static inbuiltEvent = {
+        refresh: 'refresh'
+    }
     /**
      * return a list of group info for the pug to consume 
      */

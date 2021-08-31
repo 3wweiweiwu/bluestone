@@ -1,5 +1,6 @@
 extends ../node_modules/pug-bootstrap/_bootstrap.pug
 include ./component/input.pug
+include ./component/refresh.pug
 block body	 
 	h1='Blue stone Agent'
 	h2='current selector:'+currentSelector
@@ -19,5 +20,5 @@ block body
 
 	+a-btn-primary('?'+addStepQueryKey)='Add Step'
 	+a-btn-danger('?'+cancelQueryKey)='Cancel'
-
+	+refresh()
 	script(src="/javascript/redirectInput.js")

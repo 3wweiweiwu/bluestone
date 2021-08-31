@@ -13,7 +13,7 @@ var debug = require('debug')('pt-recorder:server');
 var http = require('http');
 
 
-const finder = require('@medv/finder/finder')
+
 /**
  * Get port from environment and store in Express.
  */
@@ -26,6 +26,8 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+const io = require('socket.io')(server)
+app.locals.io = io
 
 /**
  * Listen on provided port, on all network interfaces.

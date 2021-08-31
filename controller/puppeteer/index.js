@@ -9,8 +9,9 @@ const { RecordingStep, WorkflowRecord } = require('../record/class')
 /**
  * Create a new puppeteer browser instance
  * @param {import('../record/class/index').WorkflowRecord} record
+ * @param {import('socket.io').Server} io
  */
-async function startRecording(record) {
+async function startRecording(record, io) {
     const browser = await puppeteer.launch(config.puppeteer)
     const page = await browser.newPage();
 
@@ -29,7 +30,7 @@ async function startRecording(record) {
 
     }
     await page.evaluateOnNewDocument(registerEvent, eventRecorderScript)
-    await page.exposeFunction('logEvent', logEvent(record, page))
+    await page.exposeFunction('logEvent', logEvent(record, page, io))
     await page.exposeFunction('isRecording', isRecording(record))
     await page.exposeFunction('logCurrentElement', logCurrentElement(record))
     page.on('load', (event, WorkflowRecord) => {

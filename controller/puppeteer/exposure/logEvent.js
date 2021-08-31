@@ -5,8 +5,9 @@ const jimp = require('jimp')
  * 
  * @param {import('../../record/class/index').WorkflowRecord} recordRepo 
  * @param {import('puppeteer-core').Page} page
+ * @param {import('socket.io').Server} io
  */
-module.exports = function (recordRepo, page) {
+module.exports = function (recordRepo, page, io) {
     /**
      * Log browser event to the cache
      * @param {import('../../record/class').RecordingStep} eventDetail 
@@ -69,6 +70,15 @@ module.exports = function (recordRepo, page) {
             console.log(JSON.stringify(recordRepo.steps))
             //update last operation time
         }
+
+        setTimeout(() => {
+            try {
+                io.emit(WorkflowRecord.inbuiltEvent.refresh)
+            } catch (error) {
+                console.log(error)
+            }
+        }, 800);
+
 
     }
     return logEvent

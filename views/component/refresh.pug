@@ -1,0 +1,9 @@
+mixin refresh()
+    script(src="/javascript/socket.io.js")
+    script.
+        const  socket = io();
+
+        socket.on('refresh', function(data) {
+            console .log ('refresh!')
+            window.location.replace(`/spy`)
+        });
