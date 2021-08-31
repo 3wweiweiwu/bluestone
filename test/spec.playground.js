@@ -156,7 +156,62 @@ describe('POC', () => {
 
 
     }).timeout(50000000)
+    it("should compare the difference in between 3 evaluation approaches", async () => {
+        let option = {
+            "executablePath": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+            headless: false
+        }
+        const browser = await puppeteer.launch(option)
+        const page = await browser.newPage();
 
+        // await page.goto('https://www.walmart.com/blocked?url=L20vc2hvcC1hbGwtYmFjay10by1zY2hvb2w/X2JlX3NoZWxmX2lkPTcyOTYxODImY2F0X2lkPTAmZmFjZXQ9c2hlbGZfaWQlM0E3Mjk2MTgyJTdDJTdDc3BlY2lhbF9vZmZlcnMlM0FDbGVhcmFuY2UlN0MlN0NzcGVjaWFsX29mZmVycyUzQVJlZHVjZWQrUHJpY2UlN0MlN0NzcGVjaWFsX29mZmVycyUzQVJvbGxiYWNrJTdDJTdDc3BlY2lhbF9vZmZlcnMlM0FTcGVjaWFsK0J1eSZwcz02MA==&uuid=25bf3b90-fc8d-11eb-9539-636bc3131218&vid=24a00ff1-fc8d-11eb-bd2a-4f755b4ec043&g=b');
+        await page.goto('https://todomvc.com/examples/angularjs/#/');
+
+        //use puppeteer to get xpath
+        let startTime = Date.now()
+        for (let i = 0; i < 0; i++) {
+            let s1 = await page.evaluate(() => {
+                let i = 0
+                let result = []
+                document.evaluate('/html/body/ng-view/section/header/form/input', document).iterateNext()
+                return result
+            })
+        }
+        let endTime = Date.now()
+        console.log(`puppeteer evaluation time:${endTime - startTime}`)
+        //use browser to render xpath
+        startTime = Date.now()
+        let objec = { hello: 5 }
+        let log = function (s1) {
+            return function () {
+                s1.hello = s1.hello + 1
+            }
+        }
+        await page.exposeFunction('logFunc', log(objec))
+        await page.evaluate(() => {
+            for (let i = 0; i < 2000; i++) {
+                document.evaluate('/html/body/ng-view/section/header/form/input', document).iterateNext()
+                window.logFunc()
+            }
+        })
+        endTime = Date.now()
+        console.log(`puppeteer evaluation time:${endTime - startTime}`)
+        //use puppeteer.$x()
+        startTime = Date.now()
+
+        for (let i = 0; i < 0; i++) {
+            await page.$x('/html/body/ng-view/section/header/form/input')
+        }
+
+        endTime = Date.now()
+        console.log(`puppeteer.$x evaluation time:${endTime - startTime}`)
+
+        await page.waitForFunction(() => {
+            return false
+        });
+        //take xml from browser and evaluate that by ourselves
+
+    }).timeout(6000000)
     it('should return locator of the elemnent that I click', async () => {
         let option = {
             "executablePath": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
@@ -442,6 +497,7 @@ describe('POC', () => {
         let pos = await element.boundingBox()
         await element.screenshot({ path: 'google.png' }); // take screenshot element in puppeteer
         await page.screenshot({ path: 'hplogo.png', clip: { x: pos.x, height: pos.height, y: pos.y, width: pos.width } })
+
         await browser.close();                          // close browser
 
     }).timeout(60000)
