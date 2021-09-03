@@ -1,6 +1,9 @@
 module.exports = {
     todoPage: {
-        todoText: '/html/body/ng-view/section/header/form/input',
+        todoText: {
+            locators: ['/html/body/ng-view/section/header/form/input'],
+            screenshot: null
+        },
         todoHeader: 'xpath2'
     }
 
