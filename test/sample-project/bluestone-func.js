@@ -1,9 +1,9 @@
 let locators = require('./bluestone-locator')
-
+let func = require('./functions/logConsole')
 module.exports = {
-    todoPage: {
-        logConsole: {
-
-        }
+    logConsole: {
+        func: func,
+        locators: [locators.todoPage.todoText]
     }
+
 }

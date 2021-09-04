@@ -8,8 +8,10 @@
   },
   "dependencies": {
     "@medv/finder": "^2.0.0",
+    "acorn": "^8.4.1",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "eval": "^0.1.6",
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
     "jimp": "^0.16.1",
@@ -21,7 +23,8 @@
     "sharp": "^0.29.0",
     "single-file": "git+https://github.com/gildas-lormeau/SingleFile.git",
     "socket.io": "^4.2.0",
-    "swagger-ui-express": "^4.1.6"
+    "swagger-ui-express": "^4.1.6",
+    "ts-morph": "^12.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.3",
