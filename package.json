@@ -9,8 +9,11 @@
   "dependencies": {
     "@medv/finder": "^2.0.0",
     "acorn": "^8.4.1",
+    "acorn-extract-comments": "^0.2.0",
+    "acorn-walk": "^8.1.1",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "doctrine": "^3.0.0",
     "eval": "^0.1.6",
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
