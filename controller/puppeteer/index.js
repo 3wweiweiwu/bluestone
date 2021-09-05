@@ -6,6 +6,7 @@ const logCurrentElement = require('./exposure/logCurrentElement')
 const path = require('path')
 const fs = require('fs').promises
 const { RecordingStep, WorkflowRecord } = require('../record/class')
+const injectModuleScriptBlock = require('./help/injectModuleScriptBlock')
 /**
  * Create a new puppeteer browser instance
  * @param {import('../record/class/index').WorkflowRecord} record
@@ -17,19 +18,8 @@ async function startRecording(record, io) {
 
     //inject event watcher and expose supporting function
     let eventRecorderPath = path.join(__dirname, './injection/eventRecorder.js')
-    let eventRecorderScript = (await fs.readFile(eventRecorderPath)).toString()
-    let registerEvent = async function (eventRecorderScript) {
-        setTimeout(() => {
-            //add script block
-            let finderScript = document.createElement("script");
-            finderScript.setAttribute('type', 'module')
-            finderScript.innerHTML = eventRecorderScript
-            document.body.appendChild(finderScript);
+    await injectModuleScriptBlock(page, eventRecorderPath)
 
-        }, 800)
-
-    }
-    await page.evaluateOnNewDocument(registerEvent, eventRecorderScript)
     await page.exposeFunction('logEvent', logEvent(record, page, io))
     await page.exposeFunction('isRecording', isRecording(record))
     await page.exposeFunction('logCurrentElement', logCurrentElement(record))

@@ -1,4 +1,8 @@
 const path = require('path')
+const config = require('../../../config')
+
+
+
 /**
  * @typedef {string} CommandType
  **/
@@ -179,6 +183,9 @@ class WorkflowRecord {
 
             }
         }
+
+    }
+    initializeLocator = function () {
 
     }
     set spyBrowserSelectionPicPath(picturePath = '') {

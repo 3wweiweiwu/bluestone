@@ -1,12 +1,14 @@
+
 module.exports = {
     todoPage: {
         todoText: {
-            locators: ['/html/body/ng-view/section/header/form/input'],
+            locator: ['/html/body/ng-view/section/header/form/input'],
             screenshot: null
         },
     },
     commonPage: {
-        
+        locator: ['/html/body/ng-view/section/header/form/input1'],
+        screenshot: null
     }
 
 }
