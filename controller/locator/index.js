@@ -73,5 +73,6 @@ class LocatorManager {
             this.__iterateThroughObject(value, newPath)
         }
     }
+    //TODO: add a function to create a set for locators
 }
 module.exports = { LocatorManager, Locator }

@@ -1,6 +1,6 @@
 const path = require('path')
 const config = require('../../../config')
-
+const { LocatorManager } = require('../../locator/index')
 
 
 /**
@@ -126,6 +126,8 @@ class PugTextInputInfo {
 }
 class WorkflowRecord {
     constructor() {
+        //TODO: seperate step into another class
+        //TODO: seperate Ui spy into another class
         this.name = ''
         /** 
          * @type {Array<RecordingStep>} 
@@ -183,6 +185,9 @@ class WorkflowRecord {
 
             }
         }
+
+        this.locatorManager = new LocatorManager(config.code.locatorPath)
+
 
     }
     initializeLocator = function () {

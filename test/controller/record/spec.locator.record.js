@@ -5,6 +5,7 @@ describe('locator.record', () => {
     it('should recurse through sample project', (done) => {
         const bluestoneLocatorPath = path.join(__dirname, '../../sample-project/bluestone-locator.js')
         let locatorManager = new LocatorManager(bluestoneLocatorPath)
+        locatorManager.locatorPath = ''
         let baseline = {
             "locatorLibrary": [
                 {
@@ -27,8 +28,9 @@ describe('locator.record', () => {
                     ]
                 }
             ],
-            "locatorPath": "c:\\Users\\3wwei\\bluestone\\test\\sample-project\\bluestone-locator.js"
+            "locatorPath": ""
         }
+        locatorManager.locatorPath = ""
         assert.deepStrictEqual(JSON.parse(JSON.stringify(locatorManager)), baseline)
         done()
     })
