@@ -25,6 +25,7 @@ class LocatorManager {
         this.locatorLibrary = []
         this.locatorPath = locatorPath
         this.__parseLocator(locatorPath)
+        this.searchLocatorSet = this.RefreshSearchLocatorSet()
     }
     /**
      * Load bluestone-locator.js and return locatorLibrary function
@@ -73,6 +74,6 @@ class LocatorManager {
             this.__iterateThroughObject(value, newPath)
         }
     }
-    //TODO: add a function to create a set for locators
+
 }
 module.exports = { LocatorManager, Locator }
