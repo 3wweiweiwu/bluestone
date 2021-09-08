@@ -134,7 +134,7 @@ async function LocatorScanner() {
         for (let locatorOptionIndex = 0; locatorOptionIndex < currentLocatorOptions.length; locatorOptionIndex++) {
 
             currentLocator = currentLocatorOptions[locatorOptionIndex]
-            if (currentLocator[0] == '/') {
+            if (currentLocator.startsWith('/')) {
                 //current locator is xpath
 
                 currentElement = document.evaluate(currentLocator, document).iterateNext()

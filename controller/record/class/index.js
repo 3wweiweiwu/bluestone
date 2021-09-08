@@ -1,6 +1,6 @@
 const path = require('path')
 const config = require('../../../config')
-const { LocatorManager } = require('../../locator/index')
+const { LocatorManager, Locator } = require('../../locator/index')
 
 
 /**
@@ -45,7 +45,8 @@ class RecordingStep {
     constructor(recordingStep) {
         this.command = recordingStep.command
         this.target = recordingStep.target
-        this.matchedSelectors = recordingStep.matchedSelector
+        /** @type {Array<Locator>} */
+        this.potentialMatch = []
         this.parameter = recordingStep.parameter
         this.targetInnerText = recordingStep.targetInnerText
         this.targetPicPath = recordingStep.targetPicPath
@@ -324,8 +325,22 @@ class WorkflowRecord {
      * @param {RecordingStep} event 
      */
     addStep(event) {
+        event.potentialMatch = this.__findPotentialMatchForEvent(event.target)
         this.steps.push(event)
         this.setLastOperationTime()
+    }
+    /**
+     * look into current element and check if it is a potential match to a particular locator
+     * @param {RecordingStep} eventTarget 
+     */
+    __findPotentialMatchForEvent(eventTarget) {
+        let locatorLibrarySnapshot = JSON.parse(JSON.stringify(this.locatorManager.locatorLibrary))
+        let eventSelector = eventTarget
+        let potentialMatches = locatorLibrarySnapshot.filter(item => {
+            return item.selector == eventSelector
+        })
+
+        return potentialMatches
     }
     /**
      * Based on req.query and update the variable
