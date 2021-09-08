@@ -114,26 +114,26 @@ document.addEventListener("mouseout", event => {
 //This function will find all element in the page and report them back to record manager
 
 const Helper = {
-    "bluestone-locator": "bluestone-locator" //this is attribute that is used to store locator mapping
+    bsLocator: "bluestone-locator" //this is attribute that is used to store locator mapping
 }
 async function LocatorScanner() {
 
 
     /** @type {Array<import('../../locator/index').Locator>} */
     let currentLocatorList = await window.getLocator()
-
+    let startTime = Date.now()
 
     for (let i = 0; i < currentLocatorList.length; i++) {
-        currentLocatorList[i].visible = false
+        currentLocatorList[i].selector = ''
         let locator = currentLocatorList[i]
         let currentLocatorOptions = locator.Locator
         let currentElement = null
         let currentLocator
         //search through avialble option to find if anhing match
-        console.log(currentLocatorOptions.length)
-        for (let locatorOptionIndex = 0; locatorOptionIndex < currentLocatorOptions.length; locatorOptionIndex++) {
-            currentLocator = currentLocatorOptions[i]
 
+        for (let locatorOptionIndex = 0; locatorOptionIndex < currentLocatorOptions.length; locatorOptionIndex++) {
+
+            currentLocator = currentLocatorOptions[locatorOptionIndex]
             if (currentLocator[0] == '/') {
                 //current locator is xpath
 
@@ -151,16 +151,24 @@ async function LocatorScanner() {
 
         if (currentElement != null) {
             //UI elemnet found, update its attribute
-            let currentLocatorValue = currentElement.getAttribute(Helper['bluestone-locator'])
-            if (currentLocatorValue == null) {
-                currentElement.setAttribute(Helper['bluestone-locator'], currentLocator)
+            let currentBluestoneSelector = currentElement.getAttribute(Helper.bsLocator)
 
+            if (currentBluestoneSelector == null) {
+                currentBluestoneSelector = finder(currentElement)
+                currentElement.setAttribute(Helper.bsLocator, currentBluestoneSelector)
             }
-            currentLocatorList[i].visible = true
+            currentLocatorList[i].selector = currentBluestoneSelector
+
+
+
 
         }
     }
-    await window.setLocatorStatus(currentLocatorList)
+
+    let endTime = Date.now()
+
+    let timeSpan = endTime - startTime
+    await window.setLocatorStatus(currentLocatorList, timeSpan)
     setTimeout(LocatorScanner, 300);
 
 }

@@ -10,7 +10,7 @@ class Locator {
         this.Locator = locators
         this.screenshot = screenshot
         this.path = path
-        this.visible = false
+        this.selector = false
     }
 }
 

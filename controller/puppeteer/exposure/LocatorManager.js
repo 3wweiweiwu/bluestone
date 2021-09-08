@@ -21,9 +21,11 @@ function setLocatorStatus(recordRepo) {
     /**
      * Log browser event to the cache
      * @param {import('../../record/class').RecordingStep} eventDetail 
+     * @param {number} timeSpan time it takes to go through all locators
      */
-    async function setLocatorToBluestone(locatorStatus) {
-        return recordRepo.locatorManager.locatorLibrary = locatorStatus
+    async function setLocatorToBluestone(locatorStatus, timeSpan) {
+        recordRepo.locatorManager.locatorLibrary = locatorStatus
+
     }
     return setLocatorToBluestone
 }
