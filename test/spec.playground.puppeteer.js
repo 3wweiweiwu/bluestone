@@ -272,7 +272,7 @@ describe('POC', () => {
         let previousSelectors = []
 
 
-        let elementRegionDrawerPath = path.join(__dirname, './help/elementRegionDrawer.js')
+        let eerPath = path.join(__dirname, './help/elementRegionDrawer.js')
         let elementRegionDrawerScript = (await fs.readFile(elementRegionDrawerPath)).toString()
 
         let drawBorderOverElement = async function (selector) {

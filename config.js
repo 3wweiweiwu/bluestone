@@ -2,7 +2,8 @@ const path = require('path')
 module.exports = {
     puppeteer: {
         "executablePath": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
-        headless: false
+        headless: false,
+        defaultViewport: null
     },
     code: {
         funcPath: path.join(__dirname, './test/sample-project/bluestone-func.js'),

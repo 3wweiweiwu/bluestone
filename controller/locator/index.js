@@ -1,10 +1,8 @@
-const path = require('path')
-const config = require('../../config')
-const fs = require('fs')
+
 class Locator {
     /**
      * Initialize new locator object
-     * @param {string} locators xpath or css selector
+     * @param {Array<string>} locators xpath or css selector
      * @param {string} screenshot  path to the screenshot
      * @param {string} path  path specific locator object
      */
@@ -12,6 +10,7 @@ class Locator {
         this.Locator = locators
         this.screenshot = screenshot
         this.path = path
+        this.visible = false
     }
 }
 
@@ -22,10 +21,15 @@ class LocatorManager {
      */
     constructor(locatorPath) {
         /** @type {Array<Locator>} */
-        this.locatorLibrary = []
+        this.__locatorLibrary = []
         this.locatorPath = locatorPath
         this.__parseLocator(locatorPath)
-        this.searchLocatorSet = this.RefreshSearchLocatorSet()
+    }
+    get locatorLibrary() {
+        return this.__locatorLibrary
+    }
+    set locatorLibrary(locatorLibrary) {
+        this.__locatorLibrary = locatorLibrary
     }
     /**
      * Load bluestone-locator.js and return locatorLibrary function
@@ -67,7 +71,7 @@ class LocatorManager {
 
 
                 let newLocator = new Locator(value['locator'], value['screenshot'], newPath)
-                this.locatorLibrary.push(newLocator)
+                this.__locatorLibrary.push(newLocator)
                 continue
             }
 

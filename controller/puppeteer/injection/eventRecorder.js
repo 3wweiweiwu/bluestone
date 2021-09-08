@@ -110,3 +110,60 @@ document.addEventListener("mouseout", event => {
     }
 
 })
+
+//This function will find all element in the page and report them back to record manager
+
+const Helper = {
+    "bluestone-locator": "bluestone-locator" //this is attribute that is used to store locator mapping
+}
+async function LocatorScanner() {
+
+
+    /** @type {Array<import('../../locator/index').Locator>} */
+    let currentLocatorList = await window.getLocator()
+
+
+    for (let i = 0; i < currentLocatorList.length; i++) {
+        currentLocatorList[i].visible = false
+        let locator = currentLocatorList[i]
+        let currentLocatorOptions = locator.Locator
+        let currentElement = null
+        let currentLocator
+        //search through avialble option to find if anhing match
+        console.log(currentLocatorOptions.length)
+        for (let locatorOptionIndex = 0; locatorOptionIndex < currentLocatorOptions.length; locatorOptionIndex++) {
+            currentLocator = currentLocatorOptions[i]
+
+            if (currentLocator[0] == '/') {
+                //current locator is xpath
+
+                currentElement = document.evaluate(currentLocator, document).iterateNext()
+            }
+            else {
+                //current selector is css selector
+                currentElement = document.querySelector(currentLocator)
+            }
+            //if current locator find element, break current loop to save time
+            if (currentElement != null) {
+                break
+            }
+        }
+
+        if (currentElement != null) {
+            //UI elemnet found, update its attribute
+            let currentLocatorValue = currentElement.getAttribute(Helper['bluestone-locator'])
+            if (currentLocatorValue == null) {
+                currentElement.setAttribute(Helper['bluestone-locator'], currentLocator)
+
+            }
+            currentLocatorList[i].visible = true
+
+        }
+    }
+    await window.setLocatorStatus(currentLocatorList)
+    setTimeout(LocatorScanner, 300);
+
+}
+LocatorScanner()
+
+

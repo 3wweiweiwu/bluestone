@@ -1,3 +1,4 @@
+const fs = require('fs').promises
 /**
  * Create a module script block and run script there
  * @param {import('puppeteer-core').Page} page

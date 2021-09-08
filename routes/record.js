@@ -4,7 +4,7 @@ const puppeteerControl = require('../controller/puppeteer')
 
 /* GET home page. */
 router.post('/record', async function (req, res) {
-    req.app.locals.puppeteerControl = await puppeteerControl.startRecording(req.app.locals.workflow, req.app.locals.io)
+    req.app.locals.puppeteerControl = await puppeteerControl.startRecording(req.app.locals.workflow, req.app.locals.io, req.body.url)
     res.json()
 });
 router.delete('/record', async function (req, res) {

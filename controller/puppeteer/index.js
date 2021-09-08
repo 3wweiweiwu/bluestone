@@ -6,13 +6,19 @@ const logCurrentElement = require('./exposure/logCurrentElement')
 const path = require('path')
 const fs = require('fs').promises
 const { RecordingStep, WorkflowRecord } = require('../record/class')
+const { getLocator, setLocatorStatus } = require('./exposure/LocatorManager')
 const injectModuleScriptBlock = require('./help/injectModuleScriptBlock')
 /**
  * Create a new puppeteer browser instance
  * @param {import('../record/class/index').WorkflowRecord} record
  * @param {import('socket.io').Server} io
  */
-async function startRecording(record, io) {
+
+const ConstStr = {
+    'bluestone-locator': 'bluestone-locator', //This is attribute we used to store locator mapping info
+}
+
+async function startRecording(record, io, url = null) {
     const browser = await puppeteer.launch(config.puppeteer)
     const page = await browser.newPage();
 
@@ -23,6 +29,8 @@ async function startRecording(record, io) {
     await page.exposeFunction('logEvent', logEvent(record, page, io))
     await page.exposeFunction('isRecording', isRecording(record))
     await page.exposeFunction('logCurrentElement', logCurrentElement(record))
+    await page.exposeFunction('getLocator', getLocator(record))
+    await page.exposeFunction('setLocatorStatus', setLocatorStatus(record))
     page.on('load', (event, WorkflowRecord) => {
         try {
             page.evaluate(() => {
@@ -55,7 +63,7 @@ async function startRecording(record, io) {
 
     })
 
-
+    if (url != null) await page.goto(url)
     return { browser, page }
 }
 /**

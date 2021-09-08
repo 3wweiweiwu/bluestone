@@ -187,7 +187,7 @@ class WorkflowRecord {
         }
 
         this.locatorManager = new LocatorManager(config.code.locatorPath)
-
+        console.log()
 
     }
     initializeLocator = function () {
