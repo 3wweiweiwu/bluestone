@@ -33,7 +33,6 @@ var COMMAND_TYPE = {
  * @property {'click'|'change'|'dblclick'|'keydown'|'goto'} command
  * @property {string} target
  * @property {number} parameter
- * @property {Array<ExistingSelector>} matchedSelector
  * @property {number} timeoutMs
  * @property {string} targetInnerText
  * @property {string} targetPicPath
@@ -52,6 +51,8 @@ class RecordingStep {
         this.targetPicPath = recordingStep.targetPicPath
         this.timeoutMs = recordingStep.timeoutMs
         this.meta = {}
+        /** @type {Locator} */
+        this.finalMatch = null
     }
 }
 /**

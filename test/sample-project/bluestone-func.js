@@ -4,7 +4,7 @@ module.exports = {
 
     logConsole: {
         func: func.LogConsole,
-        locators: [locators.todoPage.todoText]
+        locators: [locators['Todo_Page/TODO_Text_Input'], locators['Todo_Page/todoText2']]
     }
 
 }
