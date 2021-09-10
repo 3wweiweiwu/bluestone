@@ -30,18 +30,46 @@ describe('customized function loader', () => {
         let output = acorn.parse(jsStr)
         walk.simple(output, {
             Literal(node) {
-                console.log(`Found a literal: ${node.value}`)
+                // console.log(`Found a literal: ${node.value}`)
+            }
+        })
+        walk.ancestor(output, {
+            Identifier(_, ancestors) {
+                if (_.name == 'func') {
+                    // console.log("This literal's ancestors are:", ancestors.map(n => n.type))
+                }
+
+            }
+        })
+        walk.ancestor(output, {
+            Identifier(_, ancestors) {
+                if (_.name == 'logConsole') {
+                    console.log("This literal's ancestors are:", ancestors.map(n => n.type))
+                }
+
+            }
+        })
+        walk.ancestor(output, {
+            Identifier(_, ancestors) {
+                if (_.name == 'func') {
+                    // console.log("This literal's ancestors are:", ancestors.map(n => n.type))
+                }
+
             }
         })
         walk.ancestor(output, {
             Literal(_, ancestors) {
-                console.log("This literal's ancestors are:", ancestors.map(n => n.type))
+                // console.log("This literal's ancestors are:", ancestors.map(n => n.type))
             }
         })
+        console.log('----------------------')
+        walk.fullAncestor(output, (node, ancestor) => {
+            // console.log(node.name)
+            //find out the function declaration
 
-        walk.full(output, node => {
-            console.log(`There's a ${node.type} node at ${node.ch}`)
+
         })
+        console.log()
     }).timeout(60000)
     it('should extract comment from supporting function', () => {
         let jsPath = path.join(__dirname, './sample-project/functions/logConsole.js')
