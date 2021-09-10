@@ -59,10 +59,8 @@ class AST {
             let libraryName = funcNode.value.object.name
             let methodName = s1.value.property.name
 
-            //based on libraryName, find out the file path
+            //TODO: based on library name, method name, parse informaton  to params, path and description
 
-            //based on the methodName, get the jsdoc
-            //from parent node, find out the property that contains func key
 
 
 
