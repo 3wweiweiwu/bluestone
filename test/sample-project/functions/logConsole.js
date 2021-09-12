@@ -1,12 +1,13 @@
 const locator = require('../bluestone-locator')
 const support = require('./support/support')
+const Browser = require('puppeteer-core').Browser
+const Page = require('puppeteer-core').Page
 /**
  * Log Result    
- * @param {string} text1 
- * @param {string} text2 
- * @param {import('puppeteer-core').Browser} browser
- * @param {import('puppeteer-core').Page} page
- * @requires locator.todoPage.todoText
+ * @param {string} text1 the text info 1
+ * @param {string} text2 the text info 2
+ * @param {Browser} browser puppeteer page object
+ * @param {Page} page puppeteer page object
  * 
  */
 exports.LogConsole = function (browser, page, text1, text2) {
@@ -21,8 +22,8 @@ exports.LogConsole = function (browser, page, text1, text2) {
 
 /**
  * test function
- * @param {import('puppeteer-core').Browser} browser
- * @param {import('puppeteer-core').Page} page
+ * @param {Browser} browser
+ * @param {Page} page
  */
 exports.testFunc = function (browser, page) {
 

@@ -1,3 +1,4 @@
+const Locator = require('../../locator/class/Locator')
 class FunctionAST {
     /**
      * 
@@ -6,7 +7,7 @@ class FunctionAST {
      * @param {string} description 
      * @param {Array<import('./JsDocTag')>} params 
      * @param {Function} mainFunc the main function to call during actual execution
-     * @param {Array<string>} locator locator to sync-up from
+     * @param {Array<Locator>} locator locator to sync-up from
      */
     constructor(path, name, description, params, locator, mainFunc) {
         this.path = path
@@ -17,3 +18,4 @@ class FunctionAST {
         this.mainFunc = mainFunc
     }
 }
+module.exports = FunctionAST
