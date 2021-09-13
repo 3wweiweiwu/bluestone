@@ -17,6 +17,11 @@ function getLocator(recordRepo) {
     }
     return getLocatorsFromBluestone
 }
+/**
+ * 
+ *  @param {import('../../record/class/index').WorkflowRecord} recordRepo 
+ * @returns 
+ */
 function setLocatorStatus(recordRepo) {
     /**
      * Log browser event to the cache
@@ -25,6 +30,8 @@ function setLocatorStatus(recordRepo) {
      */
     async function setLocatorToBluestone(locatorStatus, timeSpan) {
         recordRepo.locatorManager.locatorLibrary = locatorStatus
+        recordRepo.locatorManager.lastRefreshTime = timeSpan
+
 
     }
     return setLocatorToBluestone

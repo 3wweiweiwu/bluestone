@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const { WorkflowRecord } = require('../controller/record/class/index')
-
+const { hideSpy } = require('../controller/puppeteer/index')
 /* GET home page. */
 router.get('/spy', function (req, res, next) {
   /**
@@ -9,6 +9,7 @@ router.get('/spy', function (req, res, next) {
    */
   let workflow = req.app.locals.workflow
   workflow.updateUserInputForSpy(req.query)
+  hideSpy(req.app.locals.puppeteerControl.page, workflow.spyVisible)
   let variables = {
     title: 'Express',
     groups: workflow.getSpyGroupsInfoForPug(),

@@ -51,6 +51,9 @@ module.exports = function (recordRepo, page, io) {
             recordRepo.spyBrowserSelectionPicPath = picturePath
             recordRepo.isRecording = false
             console.log('pause recording and call in-browser agent')
+            //display mvt console
+            page.evaluate("document.querySelector('#bluestone_inbrowser_console').style.display='block'")
+            recordRepo.spyVisible = true
 
         }
         if (recordRepo.isRecording) {

@@ -158,10 +158,6 @@ async function LocatorScanner() {
                 currentElement.setAttribute(Helper.bsLocator, currentBluestoneSelector)
             }
             currentLocatorList[i].selector = currentBluestoneSelector
-
-
-
-
         }
     }
 

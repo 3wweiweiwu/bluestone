@@ -3,6 +3,8 @@ const config = require('../../config')
 const logEvent = require('./exposure/logEvent')
 const isRecording = require('./exposure/isRecordng')
 const logCurrentElement = require('./exposure/logCurrentElement')
+const isSpyVisible = require('./exposure/isSpyVisible')
+const setSpyVisible = require('./exposure/setSpyVisible')
 const path = require('path')
 const fs = require('fs').promises
 const { RecordingStep, WorkflowRecord } = require('../record/class')
@@ -31,6 +33,10 @@ async function startRecording(record, io, url = null) {
     await page.exposeFunction('logCurrentElement', logCurrentElement(record))
     await page.exposeFunction('getLocator', getLocator(record))
     await page.exposeFunction('setLocatorStatus', setLocatorStatus(record))
+    await page.exposeFunction('isSpyVisible', isSpyVisible(record))
+    await page.exposeFunction('setSpyVisible', setSpyVisible(record))
+
+
     page.on('load', (event, WorkflowRecord) => {
         try {
             page.evaluate(() => {
@@ -42,6 +48,16 @@ async function startRecording(record, io, url = null) {
                     bluestone_inbrowser_console = document.createElement("iframe");
                     bluestone_inbrowser_console.setAttribute('id', 'bluestone_inbrowser_console')
                     bluestone_inbrowser_console.setAttribute('src', 'http://localhost:3600/spy')
+                    //mark item as invisible 
+                    if (window.isSpyVisible() == false) {
+                        bluestone_inbrowser_console.style.display = 'none'
+                    }
+                    else {
+                        bluestone_inbrowser_console.style.display = 'block'
+                    }
+                    bluestone_inbrowser_console.style.position = 'fixed'
+                    bluestone_inbrowser_console.style.top = '50%'
+                    bluestone_inbrowser_console.style.left = `50%`
                     document.body.appendChild(bluestone_inbrowser_console);
                 }, 800);
 
@@ -74,4 +90,17 @@ async function endRecording(browser) {
     await browser.close()
 }
 
-module.exports = { startRecording, endRecording }
+/**
+ * hide in-browser spy
+ * @param {import('puppeteer').Page} page 
+ */
+async function hideSpy(page, isSpyVisible) {
+    if (isSpyVisible == true) return
+
+    //if spy is invisible, set attribute
+    await page.evaluate(() => {
+        document.querySelector("#bluestone_inbrowser_console").style.display = 'none'
+    })
+
+}
+module.exports = { startRecording, endRecording, hideSpy }

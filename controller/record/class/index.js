@@ -28,15 +28,7 @@ var COMMAND_TYPE = {
     goto: 'goto'
 }
 
-/**
- * @typedef step
- * @property {'click'|'change'|'dblclick'|'keydown'|'goto'} command
- * @property {string} target
- * @property {number} parameter
- * @property {number} timeoutMs
- * @property {string} targetInnerText
- * @property {string} targetPicPath
- */
+
 class RecordingStep {
     /**     * 
      * @param {step} recordingStep 
@@ -183,7 +175,8 @@ class WorkflowRecord {
                 },
                 validation: {
                     btnAddStep: ''
-                }
+                },
+                visible: false
 
             }
         }
@@ -194,6 +187,12 @@ class WorkflowRecord {
     }
     initializeLocator = function () {
 
+    }
+    set spyVisible(isVisible) {
+        this.ui.spy.visible = isVisible
+    }
+    get spyVisible() {
+        return this.ui.spy.visible
     }
     set spyBrowserSelectionPicPath(picturePath = '') {
         this.ui.spy.browserSelection.selectorPicture = picturePath
@@ -404,6 +403,8 @@ class WorkflowRecord {
                 break;
             case WorkflowRecord.inbuiltQueryKey.btnCancel:
                 this.isRecording = true
+                this.spyVisible = false
+
                 break;
             default:
                 break;
