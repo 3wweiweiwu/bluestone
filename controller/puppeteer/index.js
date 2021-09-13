@@ -98,9 +98,13 @@ async function hideSpy(page, isSpyVisible) {
     if (isSpyVisible == true) return
 
     //if spy is invisible, set attribute
+    //the fist time we run it, page object may not be ready
+
     await page.evaluate(() => {
         document.querySelector("#bluestone_inbrowser_console").style.display = 'none'
     })
+
+
 
 }
 module.exports = { startRecording, endRecording, hideSpy }

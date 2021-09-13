@@ -1,4 +1,4 @@
-﻿Invoke-RestMethod -Method Get -Uri "http://localhost:3600/spy"
+﻿Invoke-RestMethod -Method Get -Uri "http://localhost:3600/spy" -TimeoutSec 60
 
 $body=@{url="https://todomvc.com/examples/angularjs/#/"}
 

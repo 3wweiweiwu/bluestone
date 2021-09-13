@@ -9,7 +9,10 @@ router.get('/spy', function (req, res, next) {
    */
   let workflow = req.app.locals.workflow
   workflow.updateUserInputForSpy(req.query)
-  hideSpy(req.app.locals.puppeteerControl.page, workflow.spyVisible)
+  if (req.app.locals.puppeteerControl) {
+    hideSpy(req.app.locals.puppeteerControl.page, workflow.spyVisible)
+  }
+
   let variables = {
     title: 'Express',
     groups: workflow.getSpyGroupsInfoForPug(),
