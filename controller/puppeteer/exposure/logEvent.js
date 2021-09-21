@@ -1,5 +1,5 @@
 const { RecordingStep, COMMAND_TYPE, WorkflowRecord } = require('../../record/class/index')
-
+const config = require('../../../config')
 const jimp = require('jimp')
 /**
  * 
@@ -54,6 +54,18 @@ module.exports = function (recordRepo, page, io) {
             //display mvt console
             page.evaluate("document.querySelector('#bluestone_inbrowser_console').style.display='block'")
             recordRepo.spyVisible = true
+            recordRepo.getActiveCustomFunctions()
+            let ptFuncPath = path.join(__dirname, '../../../ptLibrary/bluestone-func.js')
+            try {
+                await recordRepo.astManager.loadFunctions(ptFuncPath)
+                await recordRepo.astManager.loadFunctions(config.code.funcPath)
+            } catch (error) {
+                recordRepo.ui.spy.validation.btnAddStep = `Unable to load bluestone-func.js: ${error.toString()}`
+            }
+
+
+
+
 
         }
         if (recordRepo.isRecording) {
@@ -76,7 +88,7 @@ module.exports = function (recordRepo, page, io) {
 
         setTimeout(() => {
             try {
-                io.emit(WorkflowRecord.inbuiltEvent.refresh)
+                if (io) io.emit(WorkflowRecord.inbuiltEvent.refresh)
             } catch (error) {
                 console.log(error)
             }

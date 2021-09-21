@@ -40,6 +40,7 @@ Object.keys(EVENTCONST).forEach(item => {
                         if (event.ctrlKey && event.key === 'q') {
                             command = null
                             parameter = null
+                            console.log('call in-browser spy')
                             break
                         }
                         //otherwise, we are not going to record any other operation

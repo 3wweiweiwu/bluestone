@@ -4,6 +4,6 @@ mixin refresh()
         const  socket = io();
 
         socket.on('refresh', function(data) {
-            console .log ('refresh!')
+            console.log('refresh!')
             window.location.replace(`/spy`)
         });

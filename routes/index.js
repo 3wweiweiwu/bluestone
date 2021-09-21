@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const { WorkflowRecord } = require('../controller/record/class/index')
-const { hideSpy } = require('../controller/puppeteer/index')
+const { hideSpy, runCurrentOperation } = require('../controller/puppeteer/index')
 /* GET home page. */
 router.get('/spy', function (req, res, next) {
   /**
@@ -11,6 +11,7 @@ router.get('/spy', function (req, res, next) {
   workflow.updateUserInputForSpy(req.query)
   if (req.app.locals.puppeteerControl) {
     hideSpy(req.app.locals.puppeteerControl.page, workflow.spyVisible)
+    runCurrentOperation(req.app.locals.puppeteerControl.page, workflow.runCurrentOperation)
   }
 
   let variables = {
@@ -26,7 +27,9 @@ router.get('/spy', function (req, res, next) {
     argumentsQueryIndex: WorkflowRecord.inbuiltQueryKey.currentArgumentIndex,
     btnAddStepValidation: workflow.ui.spy.validation.btnAddStep,
     addStepQueryKey: WorkflowRecord.inbuiltQueryKey.btnAddStep,
-    cancelQueryKey: WorkflowRecord.inbuiltQueryKey.btnCancel
+    cancelQueryKey: WorkflowRecord.inbuiltQueryKey.btnCancel,
+    runQueryKey: WorkflowRecord.inbuiltQueryKey.btnRun,
+    result: workflow.ui.spy.result.text
   }
 
   res.render('spy.pug', variables);

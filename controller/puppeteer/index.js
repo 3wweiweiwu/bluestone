@@ -5,6 +5,7 @@ const isRecording = require('./exposure/isRecordng')
 const logCurrentElement = require('./exposure/logCurrentElement')
 const isSpyVisible = require('./exposure/isSpyVisible')
 const setSpyVisible = require('./exposure/setSpyVisible')
+const runPtFunc = require('./exposure/runPtFunc')
 const path = require('path')
 const fs = require('fs').promises
 const { RecordingStep, WorkflowRecord } = require('../record/class')
@@ -35,6 +36,7 @@ async function startRecording(record, io, url = null) {
     await page.exposeFunction('setLocatorStatus', setLocatorStatus(record))
     await page.exposeFunction('isSpyVisible', isSpyVisible(record))
     await page.exposeFunction('setSpyVisible', setSpyVisible(record))
+    await page.exposeFunction('runPtFunc', runPtFunc(record, browser, page, io))
 
 
     page.on('load', (event, WorkflowRecord) => {
@@ -56,8 +58,12 @@ async function startRecording(record, io, url = null) {
                         bluestone_inbrowser_console.style.display = 'block'
                     }
                     bluestone_inbrowser_console.style.position = 'fixed'
-                    bluestone_inbrowser_console.style.top = '50%'
-                    bluestone_inbrowser_console.style.left = `50%`
+                    bluestone_inbrowser_console.style['text-align'] = 'center'
+                    bluestone_inbrowser_console.style['width'] = '600px'
+                    bluestone_inbrowser_console.style['height'] = '400px'
+
+                    bluestone_inbrowser_console.style.top = '30%'
+                    bluestone_inbrowser_console.style.left = `30%`
                     document.body.appendChild(bluestone_inbrowser_console);
                 }, 800);
 
@@ -107,4 +113,21 @@ async function hideSpy(page, isSpyVisible) {
 
 
 }
-module.exports = { startRecording, endRecording, hideSpy }
+/**
+ * run current opeation if runCurrentOperation argument is true
+ * @param {import('puppeteer').Page} page 
+ */
+async function runCurrentOperation(page, runCurrentOperation) {
+    if (runCurrentOperation == false) return
+
+    //if spy is invisible, set attribute
+    //the fist time we run it, page object may not be ready
+
+    await page.evaluate(() => {
+        window.runPtFunc()
+    })
+
+
+
+}
+module.exports = { startRecording, endRecording, hideSpy, runCurrentOperation }

@@ -1,8 +1,11 @@
 const path = require('path')
 const config = require('../../../config')
 const { LocatorManager, Locator } = require('../../locator/index')
-
-
+const AstManager = require('../../ast')
+const FunctionAST = require('../../ast/class/Function')
+const JsDocTag = require('../../ast/class/JsDocTag')
+const { testTextEqual } = require('../../../ptLibrary/functions/inbuiltFunc')
+const _eval = require('eval')
 /**
  * @typedef {string} CommandType
  **/
@@ -38,67 +41,32 @@ class RecordingStep {
         this.target = recordingStep.target
         /** @type {Array<Locator>} */
         this.potentialMatch = []
-        this.parameter = recordingStep.parameter
+
+
         this.targetInnerText = recordingStep.targetInnerText
         this.targetPicPath = recordingStep.targetPicPath
         this.timeoutMs = recordingStep.timeoutMs
         this.meta = {}
         /** @type {Locator} */
         this.finalMatch = null
+        this.functionAst = recordingStep.functionAst
+        if (this.functionAst) {
+            this.parameter = JSON.parse(JSON.stringify(recordingStep.functionAst.params))
+        }
+
+
+
     }
 }
 /**
  * @typedef step
  * @property {'click'|'change'|'dblclick'|'keydown'|'goto'} command
  * @property {number} target
- * @property {number} parameter
  * @property {Array<ExistingSelector>} matchedSelector
  * @property {number} timeoutMs
+ * @property {import('../../ast/class/Function')} functionAst
  */
 
-
-class ArgummentInfo {
-    /**
-     * @param {string} argumentValue
-     * @param {string} argumentText
-     */
-    constructor(argumentText, argumentValue) {
-        this.text = argumentText
-        this.value = argumentValue
-    }
-}
-class Operation {
-    /**
-     * Create a new opeartion
-     * @param {string} operationId 
-     * @param {string} operationName 
-     * @param {Array<string>} operationArguments 
-     */
-    //TODO: add a basic check and seperate number from string
-    constructor(operationId, operationName, operationArguments) {
-        this.argument = ''
-        this.text = operationName
-        if (operationArguments == null) operationArguments = []
-        /**
-         * @type {Array<ArgummentInfo>}
-         */
-        this.operationArguments = operationArguments.map(argumentText => { return new ArgummentInfo(argumentText, '') })
-
-        this.operationId = operationId
-    }
-    /**
-     * Generate argument string example "hello","world","1"
-     * @returns {string}
-     */
-    GenerateArgument() {
-        let argValueList = this.operationArguments.map(argument => {
-            return `"${argument.value}"`
-        })
-        let argStr = argValueList.join(',')
-        return argStr
-    }
-
-}
 class PugDropDownInfo {
     /**
      * Return group info for the pug
@@ -129,6 +97,9 @@ class WorkflowRecord {
         this.steps = []
         this.lastOperationTimestamp = Date.now()
         this.__isRecording = true
+        this.astManager = new AstManager(config.code.locatorPath)
+        let ptFuncPath = path.join(__dirname, '../../../ptLibrary/bluestone-func.js')
+        this.astManager.loadFunctions(ptFuncPath)
         this.ui = {
             spy: {
                 browserSelection: {
@@ -151,21 +122,34 @@ class WorkflowRecord {
                     assert: {
                         text: 'Verify',
                         operations: [
-                            new Operation(WorkflowRecord.inbuiltOperation.textEqual, 'Text Equal', ['Please specify the text'])
-                            // TODO: add a way to check input number or text
+                            // new Operation(WorkflowRecord.inbuiltOperation.textEqual, 'Text Equal', ['Please specify the text'])
+                            new FunctionAST('', 'testTextEqual', 'Check Text Equal', [
+                                new JsDocTag({ description: 'puppeteer page', typeName: 'Page' }),
+                                new JsDocTag({ description: 'ElementSelector', typeName: 'ElementSelector' }),
+                                new JsDocTag({ description: 'text equals to', typeName: 'string' }),
+                            ], [], testTextEqual)
                         ]
                     },
                     waitTill: {
                         text: 'Wait Till',
                         operations: [
-                            new Operation(WorkflowRecord.inbuiltOperation.itemVisible, 'Element Visible', ['wait time in seconds']),
-                            new Operation(WorkflowRecord.inbuiltOperation.itemInvisible, 'Element Invisible', ['wait time in seconds'])
+                            new FunctionAST('', 'testElementVisible', 'Wait Element Visible', [
+                                new JsDocTag({ description: 'element handle signature', typeName: 'ElementHandle' }),
+                                new JsDocTag({ description: 'wait time in seconds', typeName: 'number' }),
+                            ], [], null),
+                            new FunctionAST('', 'testElementInvisible', 'Wait Element Invisible', [
+                                new JsDocTag({ description: 'element handle signature', typeName: 'ElementHandle' }),
+                                new JsDocTag({ description: 'wait time in seconds', typeName: 'number' }),
+                            ], [], null)
+
                         ]
                     },
                     inbuiltFunction: {
                         text: 'Run In-built function',
                         operations: [
-                            new Operation(WorkflowRecord.inbuiltOperation.hover, 'Hover over current element', []),
+                            new FunctionAST('', 'hoverMouse', 'Hover Mouse Over Element', [
+                                new JsDocTag({ description: 'element handle signature', typeName: 'ElementHandle' }),
+                            ], [], null)
                         ]
                     },
                     customizedFunctions: {
@@ -176,17 +160,50 @@ class WorkflowRecord {
                 validation: {
                     btnAddStep: ''
                 },
-                visible: false
+                visible: false,
+                result: { text: '' },
+                runCurrentOperation: true
 
             }
         }
 
         this.locatorManager = new LocatorManager(config.code.locatorPath)
-        console.log()
+
+
+
+        this.astManager.loadFunctions(config.code.funcPath)
+
+
 
     }
-    initializeLocator = function () {
+    get runCurrentOperation() {
+        return this.ui.spy.runCurrentOperation
+    }
+    set runCurrentOperation(willRun) {
+        this.ui.spy.runCurrentOperation = willRun
+    }
+    /**
+     * get active functions based on active elements on screen
+     * @returns {Array<import('../../ast/class/Function')>}
+     */
+    getActiveCustomFunctions() {
+        this.ui.spy.group.customizedFunctions.operations = []
+        let activeElements = this.locatorManager.getActiveSelectors()
+        //convert active elements into array of javascript string for the ease of the comparison
+        let jsonLocatorArray = activeElements.map(element => {
+            return JSON.stringify(element.Locator)
+        })
 
+        let activeFunctions = this.astManager.funcRepo.filter(func => {
+
+            let areAllLocatorActive = func.locators.every(loc => {
+                let strLocJson = JSON.stringify(loc.locator)
+                return jsonLocatorArray.includes(strLocJson)
+            })
+            return areAllLocatorActive
+        })
+
+        return activeFunctions
     }
     set spyVisible(isVisible) {
         this.ui.spy.visible = isVisible
@@ -199,7 +216,7 @@ class WorkflowRecord {
     }
     static inbuiltOperation = {
 
-        textEqual: 'textEqual',
+        textEqual: 'testTextEqual',
         itemVisible: 'itemVisible',
         itemInvisible: 'itemInvisible',
         hover: 'hover'
@@ -214,7 +231,8 @@ class WorkflowRecord {
         currentArgument: 'currentArgument',
         currentArgumentIndex: 'currentArgumentIndex',
         btnAddStep: 'btnAddStep',
-        btnCancel: 'btnCancel'
+        btnCancel: 'btnCancel',
+        btnRun: 'btnRun'
     }
     static inbuiltEvent = {
         refresh: 'refresh'
@@ -241,7 +259,7 @@ class WorkflowRecord {
         }
 
         let operationInfo = this.ui.spy.group[currentGroup].operations.map(item => {
-            return new PugDropDownInfo(item.operationId, item.text, `spy?${WorkflowRecord.inbuiltQueryKey.currentOperation}=${item.operationId}`)
+            return new PugDropDownInfo(item.name, item.description, `spy?${WorkflowRecord.inbuiltQueryKey.currentOperation}=${item.name}`)
         })
 
         return operationInfo
@@ -253,16 +271,35 @@ class WorkflowRecord {
 
         let operation = this.getCurrentOperation()
         if (operation == null) return []
-        if (operation.operationArguments == null) {
+        if (operation.params == null) {
             return []
         }
-
-        //if operation is equal, we should automatically populate the argument based on the inner text of current value
-        if (operation.operationId == WorkflowRecord.inbuiltOperation.textEqual) {
-            operation.operationArguments[0].value = this.ui.spy.browserSelection.currentInnerText
-            this.ui.spy.userSelection.currentArgument[0] = this.ui.spy.browserSelection.currentInnerText
-        }
-        return operation.operationArguments
+        let result = []
+        //add pugType property for the UI input
+        let uiIndex = 0
+        let operationArguments = operation.params.reduce((previousValue, currentValue, currentIndex) => {
+            let standardizedCurrentType = currentValue.typeName.name.toLowerCase()
+            if (standardizedCurrentType == 'string') {
+                currentValue['pugType'] = 'text'
+                previousValue.push(currentValue)
+                //if this is string for text equal, automatically populate value
+                if (operation.name == WorkflowRecord.inbuiltOperation.textEqual) {
+                    operation.params[currentIndex].value = this.ui.spy.browserSelection.currentInnerText
+                }
+                uiIndex++
+            }
+            else if (standardizedCurrentType == 'number') {
+                currentValue['pugType'] = 'number'
+                previousValue.push(currentValue)
+                uiIndex++
+            }
+            else {
+                console.log()
+                //mark params value to be page/browser/element
+            }
+            return previousValue
+        }, [])
+        return operationArguments
     }
     getCurrentGroup() {
         if (this.ui.spy.userSelection.currentGroup == null || this.ui.spy.userSelection.currentGroup == '') {
@@ -281,7 +318,7 @@ class WorkflowRecord {
 
     /**
      *  based on current selector info, return current selector we have 
-     * @returns {Operation}
+     * @returns {FunctionAST}
      */
     getCurrentOperation() {
         //check group info
@@ -294,7 +331,7 @@ class WorkflowRecord {
         }
 
         let operationInfo = this.ui.spy.group[this.ui.spy.userSelection.currentGroup].operations.find(item => {
-            return item.operationId == this.ui.spy.userSelection.currentOperation
+            return item.name == this.ui.spy.userSelection.currentOperation
         })
         return operationInfo
     }
@@ -310,7 +347,7 @@ class WorkflowRecord {
         let current = this.getCurrentOperation()
         let text = ''
         if (current != null) {
-            text = current.text
+            text = current.description
         }
         return text
     }
@@ -363,10 +400,34 @@ class WorkflowRecord {
             //update ui value
             let currentArgumentIndex = query[WorkflowRecord.inbuiltQueryKey.currentArgumentIndex]
             let currentQueryKeyForValue = query[WorkflowRecord.inbuiltQueryKey.currentArgument]
-            this.getCurrentOperation().operationArguments[currentArgumentIndex].value = currentQueryKeyForValue
+            let currentFunction = this.getCurrentOperation()
+            let argIndex = this.__convertUIIndex2ArgumentIndex(currentArgumentIndex, currentFunction)
+            currentFunction.params[argIndex].value = currentQueryKeyForValue
+
             //update user selection value
             this.ui.spy.userSelection.currentArgument[currentArgumentIndex] = currentQueryKeyForValue
         }
+
+    }
+    /**
+     * Convert UI Index to actual argument index
+     * @param {number} uiIndex 
+     * @param {FunctionAST} operation 
+     */
+    __convertUIIndex2ArgumentIndex(uiIndex, operation) {
+        let qualifiedArgCounter = -1
+        let convertedIndex = 0
+        for (let i = 0; i < operation.params.length + 1; i++) {
+            let typeName = operation.params[i].typeName.name.toLowerCase()
+            if (typeName == 'number' || typeName == 'string') {
+                qualifiedArgCounter++
+            }
+            if (qualifiedArgCounter == uiIndex) {
+                convertedIndex = i
+                break
+            }
+        }
+        return convertedIndex
 
     }
     /**
@@ -381,8 +442,8 @@ class WorkflowRecord {
                 break;
             case WorkflowRecord.inbuiltQueryKey.currentOperation:
                 this.ui.spy.userSelection.currentOperation = value
-                this.ui.spy.userSelection.currentArgument = this.getCurrentOperation().operationArguments.map(argument => {
-                    return argument.value
+                this.ui.spy.userSelection.currentArgument = this.getCurrentOperation().params.map(argument => {
+                    return argument.description
                 })
                 break;
             case WorkflowRecord.inbuiltQueryKey.btnAddStep:
@@ -390,15 +451,14 @@ class WorkflowRecord {
                 //if validation is done correctly, add current operation
                 if (this.ui.spy.validation.btnAddStep == '') {
                     let currentOperation = this.getCurrentOperation()
-                    let command = currentOperation.operationId
+                    let command = currentOperation.name
                     let target = this.ui.spy.browserSelection.currentSelector
                     let targetInnerText = this.ui.spy.browserSelection.currentInnerText
                     let targetPicPath = this.ui.spy.browserSelection.selectorPicture
                     let timeoutMs = this.ui.spy.browserSelection.lastOperationTimeoutMs
-                    let parameter = currentOperation.GenerateArgument()
-                    let step = new RecordingStep({ command, parameter, target, timeoutMs, targetPicPath, targetInnerText })
+                    let step = new RecordingStep({ command, target, timeoutMs, targetPicPath, targetInnerText, functionAst: currentOperation })
                     this.addStep(step)
-
+                    console.log(this.steps)
                 }
                 break;
             case WorkflowRecord.inbuiltQueryKey.btnCancel:
@@ -406,10 +466,22 @@ class WorkflowRecord {
                 this.spyVisible = false
 
                 break;
+            case WorkflowRecord.inbuiltQueryKey.btnRun:
+                this.runCurrentOperation = true
+                break;
             default:
                 break;
         }
     }
+    /**
+     * Based on the current element that is selected in in-browser spy, run function and output result to the validate view
+     */
+    __runCurrentFunc() {
+        let currentOperation = this.getCurrentOperation()
+
+        eval()
+    }
+
     /**
      * Validate current ui and see if all elements has been popoulated
      * If all elements have been populated, this.ui.spy.validation.btnAddStep will equal to ''

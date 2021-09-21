@@ -1,7 +1,7 @@
 const locator = require('../bluestone-locator')
 const support = require('./support/support')
-const Browser = require('puppeteer-core').Browser
-const Page = require('puppeteer-core').Page
+const { Browser, Page, ElementHandle } = require('puppeteer-core')
+
 /**
  * Log Result    
  * @param {string} text1 the text info 1

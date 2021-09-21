@@ -1,20 +1,30 @@
+/**
+ * @typedef TypeInfo
+ * @property {'string'|'number'|'Browser'|'Page'|'ElementHandle'} typeName
+ * @property {string} description
+ */
+
 class TagType {
-    constructor() {
-        this.type = ''
-        this.name = ''
+    /**
+     * Enter the type name
+     * @param {'Page'|'Browser'|'string'|'number'} typeName 
+     */
+    constructor(typeName) {
+        this.type = 'NameExpression'
+        this.name = typeName
     }
 }
 class JsDocTag {
     /**
+     *      
+     * @param {TypeInfo} typeInfo 
      * 
-     * @param {string} title 
-     * @param {string} description 
-     * @param {TagType} typeName 
      */
-    constructor(title, description, typeName) {
-        this.title = title
-        this.description = description
-        this.typeName = typeName
+    constructor(typeInfo) {
+        this.title = 'param'
+        this.description = typeInfo.description
+        this.typeName = new TagType(typeInfo.typeName)
+        this.value = null
     }
 }
 module.exports = JsDocTag

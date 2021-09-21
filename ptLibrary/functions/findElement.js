@@ -1,4 +1,5 @@
-
+const ElementSelector = require('../class/ElementSelector')
+const { Browser, Page, ElementHandle } = require('puppeteer-core')
 const Options = {
     /**@type {number} wait time in ms */
     timeout: 1000,
@@ -7,16 +8,14 @@ const Options = {
 }
 /**
  * Find a element within timeout period. If no element is found, a error will be thrown
- * @param {import('puppeteer').Browser} browser  
-* @param {import('puppeteer').Page} page 
- * @param {string} locatorName locator name
- * @param {*} LocatorRepo bluestone locator repo object
+*  @param {Page} page 
+ * @param {ElementSelector} elementSelector element selector object
  * @param {Options} option 
  * @returns {import('puppeteer').ElementHandle}
  */
-module.exports = async function (browser, page, LocatorRepo, locatorName, option = Options) {
+module.exports = async function (page, elementSelector, option = Options) {
     /**@type {Array<string>} */
-    let locatorOptions = LocatorRepo[locatorName].locator
+    let locatorOptions = elementSelector.locator
     //find locator option within timeout
     let startTime = Date.now()
     /**@type {import('puppeteer').ElementHandle} */
@@ -45,7 +44,7 @@ module.exports = async function (browser, page, LocatorRepo, locatorName, option
     } while (timeSpan < option.timeout && element == null);
 
     if (element == null) {
-        let info = `Unable to find UI element:${locatorName} in ${option.timeout}ms`
+        let info = `Unable to find UI element:${elementSelector.displayName} in ${option.timeout}ms`
         if (throwError) {
             return Promise.reject(info)
         }

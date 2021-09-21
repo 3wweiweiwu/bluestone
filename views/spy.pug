@@ -6,7 +6,7 @@ block body
 	h2='current selector:'+currentSelector
 	h2='Picture'
 
-
+	
 	+img-responsive("temp/componentPic/"+currentSelectorPic,"Responsive Image")
 
 
@@ -15,10 +15,15 @@ block body
 	+dropdown(currentOperation,operations)='' 
 
 	+input-arguments(argumentsQueryKey,argumentList,argumentsQueryIndex)='' 
+	+panel-info("Result")
+		p=result 
+
 	if btnAddStepValidation!=null && btnAddStepValidation!=''
 		+alert-danger(btnAddStepValidation)
-
-	+a-btn-primary('?'+addStepQueryKey)='Add Step'
+	
+	
+	+a-btn-primary('?'+runQueryKey)='Run Step'
+	+a-btn-success('?'+addStepQueryKey)='Add Step'
 	+a-btn-danger('?'+cancelQueryKey)='Cancel'
 	+refresh()
 	script(src="/javascript/redirectInput.js")

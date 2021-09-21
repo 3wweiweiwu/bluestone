@@ -4,15 +4,25 @@ const fs = require('fs')
 const acorn = require("acorn");
 const assert = require('assert');
 describe('AST class', () => {
+    it('should get require inforamtion for default library correctly', async () => {
+        let funcPath = path.join(__dirname, '../../../ptLibrary/bluestone-func.js')
+        let locatorPath = path.join(__dirname, '../../sample-project/bluestone-locator.js')
+        let astSummary = new AST(locatorPath, funcPath)
+        let jsStr = fs.readFileSync(funcPath).toString()
+        let ast = acorn.parse(jsStr)
+        let jsDocSummary = await astSummary.__getRequireInfo(ast, funcPath)
+        assert.deepEqual(jsDocSummary.repo.length, 1)
+    })
     it('should get require inforamtion correctly', async () => {
         let funcPath = path.join(__dirname, '../../sample-project/bluestone-func.js')
         let locatorPath = path.join(__dirname, '../../sample-project/bluestone-locator.js')
         let astSummary = new AST(locatorPath, funcPath)
         let jsStr = fs.readFileSync(funcPath).toString()
         let ast = acorn.parse(jsStr)
-        let jsDocSummary = await astSummary.__getRequireInfo(ast)
+        let jsDocSummary = await astSummary.__getRequireInfo(ast, funcPath)
         assert.deepEqual(jsDocSummary.repo.length, 2)
     })
+
     it('should extract current function library and method name', async () => {
         let funcPath = path.join(__dirname, '../../sample-project/bluestone-func.js')
         let locatorPath = path.join(__dirname, '../../sample-project/bluestone-locator.js')
@@ -27,7 +37,7 @@ describe('AST class', () => {
         let funcPath = path.join(__dirname, '../../sample-project/bluestone-func.js')
         let locatorPath = path.join(__dirname, '../../sample-project/bluestone-locator.js')
         let astSummary = new AST(locatorPath, funcPath)
-        await astSummary.loadFunctions()
+        await astSummary.loadFunctions(funcPath)
         assert.deepEqual(astSummary.funcRepo[0].name, 'LogConsole')
         assert.deepEqual(astSummary.funcRepo[0].description, 'Log Result')
         assert.deepEqual(astSummary.funcRepo[0].locators.length, 2)

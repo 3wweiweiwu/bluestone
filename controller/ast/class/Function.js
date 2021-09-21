@@ -17,5 +17,12 @@ class FunctionAST {
         this.locators = locator
         this.mainFunc = mainFunc
     }
+
+    /**
+     * Generate argument string based on the params
+     */
+    generateArgument() { 
+
+    }
 }
 module.exports = FunctionAST

@@ -1,4 +1,5 @@
 const Locator = require('./Locator')
+
 class LocatorManager {
     /**
      * Create Locator Manager Class
@@ -16,6 +17,16 @@ class LocatorManager {
     }
     set locatorLibrary(locatorLibrary) {
         this.__locatorLibrary = locatorLibrary
+    }
+    /**
+     * Return all active elements as an array
+     * @returns {Array<Locator>}
+     */
+    getActiveSelectors() {
+        let activeSelectors = this.locatorLibrary.filter(item => {
+            return item.selector != null && item.selector != ''
+        })
+        return activeSelectors
     }
     /**
      * Load bluestone-locator.js and return locatorLibrary function
