@@ -55,7 +55,8 @@ module.exports = function (recordRepo, browser, page, io) {
                 case "String":
                     break;
                 case "string":
-                    currentParam.push(`"${param.value}"`)
+
+                    currentParam.push(`decodeURIComponent("${encodeURIComponent(param.value)}")`)
                     break;
                 case "number":
                     currentParam.push(`${param.value}`)
@@ -67,8 +68,10 @@ module.exports = function (recordRepo, browser, page, io) {
 
         let argumentStr = currentParam.join(',')
         currentScope['mainFunc'] = currentOperation.mainFunc
-        //TODO: Fix multiple line issue
-        let res = _eval(`
+
+        let res = null
+        try {
+            res = _eval(`
             mainFunc(${argumentStr})
                             .then(result => {
                                 exports.res = result
@@ -79,19 +82,23 @@ module.exports = function (recordRepo, browser, page, io) {
                                 exports.err = err
                             })
                             `, 'runPtFunc.js', currentScope, false)
-        //wait till execution is completed
-        while (true) {
-            await page.waitForTimeout(1000)
-            if (res.res != null) {
-                recordRepo.ui.spy.result.isPass = true
-                recordRepo.ui.spy.result.text = res.res
-                break
+            //wait till execution is completed
+            while (true) {
+                await page.waitForTimeout(1000)
+                if (res.res != null) {
+                    recordRepo.ui.spy.result.isPass = true
+                    recordRepo.ui.spy.result.text = res.res
+                    break
+                }
+                if (res.err != null) {
+                    recordRepo.ui.spy.result.isPass = false
+                    recordRepo.ui.spy.result.text = res.err
+                    break
+                }
             }
-            if (res.err != null) {
-                recordRepo.ui.spy.result.isPass = false
-                recordRepo.ui.spy.result.text = res.err
-                break
-            }
+        } catch (error) {
+            recordRepo.ui.spy.result.isPass = false
+            recordRepo.ui.spy.result.text = `Error during runPtFunc.js: ${error.toString()}`
         }
         recordRepo.spyVisible = true
         //show spy window again

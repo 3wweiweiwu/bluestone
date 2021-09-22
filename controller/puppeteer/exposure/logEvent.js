@@ -53,8 +53,9 @@ module.exports = function (recordRepo, page, io) {
             recordRepo.spyBrowserSelectionPicPath = picturePath
             recordRepo.isRecording = false
             console.log('pause recording and call in-browser agent')
+            //TODO: convert screenshot function to await and remove this line
             //wait for 1s so that we ca take screenshot
-            page.waitForTimeout(1000)
+            await page.waitForTimeout(1000)
             //display mvt console
             page.evaluate("document.querySelector('#bluestone_inbrowser_console').style.display='block'")
             recordRepo.spyVisible = true
