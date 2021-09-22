@@ -3,7 +3,7 @@ let func = require('./functions/logConsole')
 module.exports = {
 
     logConsole: {
-        func: func.LogConsole,
+        func: func.failedFunction,
         locators: [locators['Todo_Page/TODO_Text_Input'], locators['Todo_Page/todoText2']]
     },
     notActiveFunc: {

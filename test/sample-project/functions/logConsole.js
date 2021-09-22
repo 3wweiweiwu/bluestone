@@ -10,7 +10,7 @@ const { Browser, Page, ElementHandle } = require('puppeteer-core')
  * @param {Page} page puppeteer page object
  * 
  */
-exports.LogConsole = function (browser, page, text1, text2) {
+exports.failedFunction = async function (browser, page, text1, text2) {
     //inline comment within logConsole function
     console.log(`text1:${text1} text2:${text2}`)
     /**

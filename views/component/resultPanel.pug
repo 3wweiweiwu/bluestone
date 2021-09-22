@@ -1,0 +1,18 @@
+include ../../node_modules/pug-bootstrap/components/panels
+mixin result-panel(isPass,header,content)
+	if isPass==null
+		+panel("primary",header)
+			p=content
+	
+	if isPass==true
+		+panel("success",header)
+			p=content
+
+	if isPass==false
+		+panel("danger",header)
+			p=content
+
+    
+
+
+

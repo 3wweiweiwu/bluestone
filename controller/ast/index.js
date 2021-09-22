@@ -26,6 +26,10 @@ class AST {
      * @param {FunctionAST} funcAst 
      */
     __addFuncAstToRepo(funcAst) {
+        //get rid of function whose id is similar to what we try to add
+        this.__funcRepo = this.__funcRepo.filter(item => {
+            return item.name != funcAst.name
+        })
         this.__funcRepo.push(funcAst)
     }
     get funcRepo() {

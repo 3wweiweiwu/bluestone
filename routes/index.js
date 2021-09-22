@@ -3,7 +3,7 @@ var router = express.Router();
 const { WorkflowRecord } = require('../controller/record/class/index')
 const { hideSpy, runCurrentOperation } = require('../controller/puppeteer/index')
 /* GET home page. */
-router.get('/spy', function (req, res, next) {
+router.get('/spy', async function (req, res, next) {
   /**
    * @type {import('../controller/record/class/index.js').WorkflowRecord}
    */
@@ -29,7 +29,7 @@ router.get('/spy', function (req, res, next) {
     addStepQueryKey: WorkflowRecord.inbuiltQueryKey.btnAddStep,
     cancelQueryKey: WorkflowRecord.inbuiltQueryKey.btnCancel,
     runQueryKey: WorkflowRecord.inbuiltQueryKey.btnRun,
-    result: workflow.ui.spy.result.text
+    result: workflow.ui.spy.result
   }
 
   res.render('spy.pug', variables);

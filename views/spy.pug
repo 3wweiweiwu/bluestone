@@ -1,6 +1,7 @@
 extends ../node_modules/pug-bootstrap/_bootstrap.pug
 include ./component/input.pug
 include ./component/refresh.pug
+include ./component/resultPanel.pug
 block body	 
 	h1='Blue stone Agent'
 	h2='current selector:'+currentSelector
@@ -15,8 +16,8 @@ block body
 	+dropdown(currentOperation,operations)='' 
 
 	+input-arguments(argumentsQueryKey,argumentList,argumentsQueryIndex)='' 
-	+panel-info("Result")
-		p=result 
+	
+	+result-panel(result.isPass,'Result',result.text)
 
 	if btnAddStepValidation!=null && btnAddStepValidation!=''
 		+alert-danger(btnAddStepValidation)

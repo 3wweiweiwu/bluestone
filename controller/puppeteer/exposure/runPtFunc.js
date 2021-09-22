@@ -37,7 +37,7 @@ module.exports = function (recordRepo, browser, page, io) {
         for (let i = 0; i < currentOperation.params.length; i++) {
             let param = currentOperation.params[i]
             //construct scope
-            switch (param.typeName.name) {
+            switch (param.type.name) {
                 case "Page":
                     currentScope['page'] = page
                     currentParam.push('page')
@@ -67,6 +67,7 @@ module.exports = function (recordRepo, browser, page, io) {
 
         let argumentStr = currentParam.join(',')
         currentScope['mainFunc'] = currentOperation.mainFunc
+        //TODO: Fix multiple line issue
         let res = _eval(`
             mainFunc(${argumentStr})
                             .then(result => {
@@ -82,10 +83,12 @@ module.exports = function (recordRepo, browser, page, io) {
         while (true) {
             await page.waitForTimeout(1000)
             if (res.res != null) {
+                recordRepo.ui.spy.result.isPass = true
                 recordRepo.ui.spy.result.text = res.res
                 break
             }
             if (res.err != null) {
+                recordRepo.ui.spy.result.isPass = false
                 recordRepo.ui.spy.result.text = res.err
                 break
             }

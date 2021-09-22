@@ -60,7 +60,7 @@ async function startRecording(record, io, url = null) {
                     bluestone_inbrowser_console.style.position = 'fixed'
                     bluestone_inbrowser_console.style['text-align'] = 'center'
                     bluestone_inbrowser_console.style['width'] = '600px'
-                    bluestone_inbrowser_console.style['height'] = '400px'
+                    bluestone_inbrowser_console.style['height'] = '600px'
 
                     bluestone_inbrowser_console.style.top = '30%'
                     bluestone_inbrowser_console.style.left = `30%`

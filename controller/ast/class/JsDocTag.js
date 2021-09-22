@@ -23,7 +23,7 @@ class JsDocTag {
     constructor(typeInfo) {
         this.title = 'param'
         this.description = typeInfo.description
-        this.typeName = new TagType(typeInfo.typeName)
+        this.type = new TagType(typeInfo.typeName)
         this.value = null
     }
 }

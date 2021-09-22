@@ -98,8 +98,7 @@ class WorkflowRecord {
         this.lastOperationTimestamp = Date.now()
         this.__isRecording = true
         this.astManager = new AstManager(config.code.locatorPath)
-        let ptFuncPath = path.join(__dirname, '../../../ptLibrary/bluestone-func.js')
-        this.astManager.loadFunctions(ptFuncPath)
+
         this.ui = {
             spy: {
                 browserSelection: {
@@ -119,41 +118,8 @@ class WorkflowRecord {
                     currentArgument: [],
                 },
                 group: {
-                    assert: {
-                        text: 'Verify',
-                        operations: [
-                            // new Operation(WorkflowRecord.inbuiltOperation.textEqual, 'Text Equal', ['Please specify the text'])
-                            new FunctionAST('', 'testTextEqual', 'Check Text Equal', [
-                                new JsDocTag({ description: 'puppeteer page', typeName: 'Page' }),
-                                new JsDocTag({ description: 'ElementSelector', typeName: 'ElementSelector' }),
-                                new JsDocTag({ description: 'text equals to', typeName: 'string' }),
-                            ], [], testTextEqual)
-                        ]
-                    },
-                    waitTill: {
-                        text: 'Wait Till',
-                        operations: [
-                            new FunctionAST('', 'testElementVisible', 'Wait Element Visible', [
-                                new JsDocTag({ description: 'element handle signature', typeName: 'ElementHandle' }),
-                                new JsDocTag({ description: 'wait time in seconds', typeName: 'number' }),
-                            ], [], null),
-                            new FunctionAST('', 'testElementInvisible', 'Wait Element Invisible', [
-                                new JsDocTag({ description: 'element handle signature', typeName: 'ElementHandle' }),
-                                new JsDocTag({ description: 'wait time in seconds', typeName: 'number' }),
-                            ], [], null)
-
-                        ]
-                    },
-                    inbuiltFunction: {
-                        text: 'Run In-built function',
-                        operations: [
-                            new FunctionAST('', 'hoverMouse', 'Hover Mouse Over Element', [
-                                new JsDocTag({ description: 'element handle signature', typeName: 'ElementHandle' }),
-                            ], [], null)
-                        ]
-                    },
                     customizedFunctions: {
-                        text: 'Run Customized Function',
+                        text: 'Run Customzied Function',
                         operations: []
                     }
                 },
@@ -161,7 +127,7 @@ class WorkflowRecord {
                     btnAddStep: ''
                 },
                 visible: false,
-                result: { text: '' },
+                result: { isPass: null, text: '' },
                 runCurrentOperation: true
 
             }
@@ -171,9 +137,54 @@ class WorkflowRecord {
 
 
 
-        this.astManager.loadFunctions(config.code.funcPath)
 
 
+
+
+    }
+    /**
+     * Based on the active functions, populate available functions in the group
+     * @param {Array<import('../../ast/class/Function')>} activeFunctions 
+     */
+    mapOperationToGroups(activeFunctions) {
+        const inBuiltFuncNames = [
+            'testTextEqual',
+            'testElementVisible',
+            'testElementInvisible',
+            'hoverMouse'
+        ]
+        //populate default list
+        let groupInfo = {
+            assert: {
+                text: 'Verify',
+                operations: [
+                    this.astManager.getFunction('testTextEqual')
+                ]
+            },
+            waitTill: {
+                text: 'Wait Till',
+                operations: [
+                    this.astManager.getFunction('testElementVisible'),
+                    this.astManager.getFunction('testElementInvisible')
+                ]
+            },
+            inbuiltFunction: {
+                text: 'Run In-built function',
+                operations: [
+                    this.astManager.getFunction('hoverMouse')
+                ]
+            },
+            customizedFunctions: {
+                text: this.ui.spy.group.customizedFunctions.text,
+                operations: []
+            }
+        }
+        //populate customized function
+        let customizedFunctions = activeFunctions.filter(item => {
+            return !inBuiltFuncNames.includes(item.name)
+        })
+        groupInfo.customizedFunctions.operations = customizedFunctions
+        this.ui.spy.group = groupInfo
 
     }
     get runCurrentOperation() {
@@ -278,7 +289,7 @@ class WorkflowRecord {
         //add pugType property for the UI input
         let uiIndex = 0
         let operationArguments = operation.params.reduce((previousValue, currentValue, currentIndex) => {
-            let standardizedCurrentType = currentValue.typeName.name.toLowerCase()
+            let standardizedCurrentType = currentValue.type.name.toLowerCase()
             if (standardizedCurrentType == 'string') {
                 currentValue['pugType'] = 'text'
                 previousValue.push(currentValue)
@@ -418,7 +429,7 @@ class WorkflowRecord {
         let qualifiedArgCounter = -1
         let convertedIndex = 0
         for (let i = 0; i < operation.params.length + 1; i++) {
-            let typeName = operation.params[i].typeName.name.toLowerCase()
+            let typeName = operation.params[i].type.name.toLowerCase()
             if (typeName == 'number' || typeName == 'string') {
                 qualifiedArgCounter++
             }

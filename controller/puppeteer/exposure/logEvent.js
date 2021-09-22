@@ -1,6 +1,7 @@
 const { RecordingStep, COMMAND_TYPE, WorkflowRecord } = require('../../record/class/index')
 const config = require('../../../config')
 const jimp = require('jimp')
+const path = require('path')
 /**
  * 
  * @param {import('../../record/class/index').WorkflowRecord} recordRepo 
@@ -8,6 +9,7 @@ const jimp = require('jimp')
  * @param {import('socket.io').Server} io
  */
 module.exports = function (recordRepo, page, io) {
+
     /**
      * Log browser event to the cache
      * @param {import('../../record/class').RecordingStep} eventDetail 
@@ -51,19 +53,23 @@ module.exports = function (recordRepo, page, io) {
             recordRepo.spyBrowserSelectionPicPath = picturePath
             recordRepo.isRecording = false
             console.log('pause recording and call in-browser agent')
+            //wait for 1s so that we ca take screenshot
+            page.waitForTimeout(1000)
             //display mvt console
             page.evaluate("document.querySelector('#bluestone_inbrowser_console').style.display='block'")
             recordRepo.spyVisible = true
-            recordRepo.getActiveCustomFunctions()
+
             let ptFuncPath = path.join(__dirname, '../../../ptLibrary/bluestone-func.js')
+            //populate group info
             try {
                 await recordRepo.astManager.loadFunctions(ptFuncPath)
                 await recordRepo.astManager.loadFunctions(config.code.funcPath)
+                let activeFuncs = recordRepo.getActiveCustomFunctions()
+                recordRepo.mapOperationToGroups(activeFuncs)
             } catch (error) {
-                recordRepo.ui.spy.validation.btnAddStep = `Unable to load bluestone-func.js: ${error.toString()}`
+                recordRepo.ui.spy.result.isPass = false
+                recordRepo.ui.spy.result.text = `Unable to load bluestone-func.js: ${error.toString()}`
             }
-
-
 
 
 
