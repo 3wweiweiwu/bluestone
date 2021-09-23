@@ -1,13 +1,13 @@
-extends ../node_modules/pug-bootstrap/_bootstrap.pug
+extends ./component/navigationHeader.pug
 include ./component/input.pug
 include ./component/refresh.pug
 include ./component/resultPanel.pug
-block body	 
+block content
+
+	script(src="/javascript/redirectInput.js")
 	h1='Blue stone Agent'
 	h2='current selector:'+currentSelector
 	h2='Picture'
-
-	
 	+img-responsive("temp/componentPic/"+currentSelectorPic,"Responsive Image")
 
 
@@ -27,4 +27,3 @@ block body
 	+a-btn-success('?'+addStepQueryKey)='Add Step'
 	+a-btn-danger('?'+cancelQueryKey)='Cancel'
 	+refresh()
-	script(src="/javascript/redirectInput.js")

@@ -3,6 +3,21 @@ var router = express.Router();
 const { WorkflowRecord } = require('../controller/record/class/index')
 const { hideSpy, runCurrentOperation } = require('../controller/puppeteer/index')
 /* GET home page. */
+router.get('/', async function (req, res) {
+  res.render('index.pug');
+})
+router.get('/workflow', async function (req, res) {
+  /**
+   * @type {import('../controller/record/class/index.js').WorkflowRecord}
+   */
+  let workflow = req.app.locals.workflow
+  let variables = {
+    workflow: workflow.getWorkflowForPug()
+  }
+  res.render('workflow.pug', variables);
+})
+
+
 router.get('/spy', async function (req, res, next) {
   /**
    * @type {import('../controller/record/class/index.js').WorkflowRecord}

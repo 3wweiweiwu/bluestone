@@ -1,6 +1,6 @@
 const { WorkflowRecord } = require('../../record/class/index')
 const { Page, Browser } = require('puppeteer-core')
-const ElementSelector = require('../../../ptLibrary/class/ElementSelector')
+
 
 const _eval = require('eval')
 /**
@@ -31,42 +31,10 @@ module.exports = function (recordRepo, browser, page, io) {
         //refresh page
 
         //eval tex
-        //construct argment for the function
-        let currentScope = {}
-        let currentParam = []
-        for (let i = 0; i < currentOperation.params.length; i++) {
-            let param = currentOperation.params[i]
-            //construct scope
-            switch (param.type.name) {
-                case "Page":
-                    currentScope['page'] = page
-                    currentParam.push('page')
-                    break;
-                case "Browser":
-                    currentScope['browser'] = browser
-                    currentParam.push('browser')
-                    break;
-                case "ElementSelector":
-                    let currentSelector = recordRepo.ui.spy.browserSelection.currentSelector
-                    let elementSelector = new ElementSelector([currentSelector], '', 'Selected UI element')
-                    currentParam.push('elementSelector')
-                    currentScope['elementSelector'] = elementSelector
-                    break;
-                case "String":
-                    break;
-                case "string":
-
-                    currentParam.push(`decodeURIComponent("${encodeURIComponent(param.value)}")`)
-                    break;
-                case "number":
-                    currentParam.push(`${param.value}`)
-                    break
-                default:
-                    break;
-            }
-        }
-
-        let argumentStr = currentParam.join(',')
+        let currentSelector = recordRepo.ui.spy.browserSelection.currentSelector
+        let argumentNContext = currentOperation.generateArgumentNContext(browser, page, currentSelector)
+        let argumentStr = argumentNContext.argumentStr
+        let currentScope = argumentNContext.currentScope
         currentScope['mainFunc'] = currentOperation.mainFunc
 
         let res = null

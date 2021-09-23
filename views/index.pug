@@ -1,5 +1,7 @@
-extends layout
+extends ../node_modules/pug-bootstrap/_bootstrap.pug
+block body
 
-block content
-  h1= title
-  p Welcome to #{title}
+  +navbar("Bluestone","dropdown_menu")
+    +nav_item("/spy","active")="Operation Editor"
+    +nav_item("index.html") About
+    +nav_item("index.html") Contact

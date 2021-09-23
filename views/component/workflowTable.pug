@@ -1,0 +1,35 @@
+//- table mixins
+mixin workflow-table(header,data,type)
+    - var type = type || ""
+    table.table(class=type)
+        thead
+            tr
+                th="#"
+                each head, i in header
+                    th #{head}
+        tbody
+            each row,j in data
+                tr
+                    td=j
+                    each col,k in row                        
+                        if col.includes('.png')
+                            td
+                                div(class='container-fluid')
+                                    +img-thumbnail("temp/componentPic/"+col,"UI Element")
+                        else
+                            td #{col}
+                    td
+                        +a-btn-primary('?'+runQueryKey)
+                            +icon("edit")
+                        +a-btn-info('?'+runQueryKey)
+                            +icon("arrow-up")
+                        +a-btn-danger('?'+runQueryKey)
+                            +icon("trash")                  
+                        +a-btn-info('?'+runQueryKey)
+                            +icon("arrow-down")
+
+
+
+
+mixin workflow-table-hover(header,data)
+    +workflow-table(header,data,"table-hover")

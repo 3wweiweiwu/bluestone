@@ -1,0 +1,4 @@
+extends ./component/navigationHeader.pug
+include ./component/workflowTable.pug
+block content
+    +workflow-table-hover(workflow.header,workflow.info)

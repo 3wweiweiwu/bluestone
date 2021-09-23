@@ -1,4 +1,18 @@
 const Locator = require('../../locator/class/Locator')
+const ElementSelector = require('../../../ptLibrary/class/ElementSelector')
+class ArgumentNContext {
+    /**
+     * 
+     * @param {*} currentScope 
+     * @param {string} argumentStr 
+     * @param {*} argDic
+     */
+    constructor(currentScope, argumentStr, argDic) {
+        this.currentScope = currentScope
+        this.argumentStr = argumentStr
+        this.argDic = argDic
+    }
+}
 class FunctionAST {
     /**
      * 
@@ -20,9 +34,53 @@ class FunctionAST {
 
     /**
      * Generate argument string based on the params
+     * @param {import('puppeteer-core').Browser} browser 
+     * @param {import('puppeteer-core').Page} page 
+     * @param {string} currentSelector 
+     * @returns 
      */
-    generateArgument() { 
+    generateArgumentNContext(browser, page, currentSelector) {
+        //construct argment for the function
+        let currentOperation = this
+        let currentScope = {}
+        let currentParam = []
+        let argDic = {}
+        for (let i = 0; i < currentOperation.params.length; i++) {
+            let param = currentOperation.params[i]
+            //construct scope
+            switch (param.type.name) {
+                case "Page":
+                    currentScope['page'] = page
+                    currentParam.push('page')
+                    break;
+                case "Browser":
+                    currentScope['browser'] = browser
+                    currentParam.push('browser')
+                    break;
+                case "ElementSelector":
 
+                    let elementSelector = new ElementSelector([currentSelector], '', 'Selected UI element')
+                    currentParam.push('elementSelector')
+                    currentScope['elementSelector'] = elementSelector
+                    break;
+                case "String":
+                    break;
+                case "string":
+
+                    currentParam.push(`decodeURIComponent("${encodeURIComponent(param.value)}")`)
+                    break;
+                case "number":
+                    currentParam.push(`${param.value}`)
+                    break
+                default:
+                    break;
+            }
+            argDic[param.description] = param.value
+        }
+
+        let argumentStr = currentParam.join(',')
+        let result = new ArgumentNContext(currentScope, argumentStr, argDic)
+        return result
     }
 }
 module.exports = FunctionAST

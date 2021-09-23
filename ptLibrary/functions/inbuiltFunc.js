@@ -5,9 +5,9 @@ const assert = require('assert')
 
 
 /**
- * Check if the text from selected element equal to value specified
+ * Test current text equal to desired value
 * @param {Page} page  
-* @param {string} desiredText 
+* @param {string} desiredText The desired text value
 * @param {ElementSelector} elementSelector
  */
 exports.testTextEqual = async function (page, elementSelector, desiredText) {

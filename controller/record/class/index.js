@@ -6,6 +6,7 @@ const FunctionAST = require('../../ast/class/Function')
 const JsDocTag = require('../../ast/class/JsDocTag')
 const { testTextEqual } = require('../../../ptLibrary/functions/inbuiltFunc')
 const _eval = require('eval')
+const WorkflowPug = require('../../ui/class/Workflow')
 /**
  * @typedef {string} CommandType
  **/
@@ -500,6 +501,7 @@ class WorkflowRecord {
      * @returns 
      */
     __validateOverallFormForSpy() {
+
         this.ui.spy.validation.btnAddStep = ''
         //check group info
         if (this.ui.spy.userSelection.currentGroup == null || this.ui.spy.userSelection.currentGroup == '') {
@@ -513,11 +515,13 @@ class WorkflowRecord {
             return
         }
         //all argument need to be populated
-        let emptyArgumentIndex = this.ui.spy.userSelection.currentArgument.findIndex(item => {
-            return item == null || item == ''
+        let currentOperation = this.getCurrentOperation()
+        let emptyArgumentIndex = currentOperation.params.findIndex(item => {
+            //find out empty argument only for string and number input becasue we won't take any other input type here
+            return (item.type.name == 'string' || item.type.name == 'number') && (item.value == null || item.value == '')
         })
         if (emptyArgumentIndex != -1) {
-            this.ui.spy.validation.btnAddStep = `Please enter value for argument #${emptyArgumentIndex}`
+            this.ui.spy.validation.btnAddStep = `Please enter value for argument`
             return
         }
 
@@ -535,6 +539,30 @@ class WorkflowRecord {
     getSpySelectorPictureForPug() {
         let pictureName = path.basename(this.ui.spy.browserSelection.selectorPicture)
         return pictureName
+    }
+    /**
+     * Create Info for workflow
+     */
+    getWorkflowForPug() {
+        let workflowHeader = ['Operation', 'target', 'Picture', '']
+        let workflowInfo = this.steps.map(step => {
+            let argStr = ''
+            if (step.functionAst != null) {
+                let currentOperation = step.functionAst.generateArgumentNContext()
+                argStr = currentOperation.argDic
+            }
+            let target = step.target
+            if (step.targetPicPath) {
+                target = path.basename(step.targetPicPath)
+            }
+            let workflowPug = new WorkflowPug(step.command, target, argStr)
+            let workflowPugArray = workflowPug.generatePugOutput()
+            return workflowPugArray
+        })
+        return {
+            header: workflowHeader,
+            info: workflowInfo
+        }
     }
 }
 
