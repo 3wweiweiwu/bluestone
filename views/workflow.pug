@@ -1,4 +1,5 @@
 extends ./component/navigationHeader.pug
 include ./component/workflowTable.pug
 block content
-    +workflow-table-hover(workflow.header,workflow.info)
+
+    +workflow-table(workflow.header,workflow.info,removeWorkflowQueryKey,upWorkflowQueryKey,downWorkflowQueryKey,editWorkflowQueryKey)

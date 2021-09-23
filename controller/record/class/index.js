@@ -481,9 +481,34 @@ class WorkflowRecord {
             case WorkflowRecord.inbuiltQueryKey.btnRun:
                 this.runCurrentOperation = true
                 break;
+            case WorkflowPug.inBuiltQueryKey.btnRemoveWorkflowStep:
+                this.steps.splice(value, 1)
+                break
+            case WorkflowPug.inBuiltQueryKey.btnMoveWorkflowUp:
+                this.__moveItemInArray(value, -1)
+                break
+            case WorkflowPug.inBuiltQueryKey.btnMoveWorkflowDown:
+                this.__moveItemInArray(value, 1)
+                break
+            case WorkflowPug.inBuiltQueryKey.btnEditWorkflow:
+                break
             default:
                 break;
         }
+    }
+    /**
+     * Based on the offset, update step sequence
+    * @param {string} fromIndex 
+    * @param {number} offset 
+     */
+    __moveItemInArray(fromIndex, offset) {
+        fromIndex = Number.parseInt(fromIndex)
+        let toIndex = fromIndex + offset
+        let arr = this.steps
+        var element = arr[fromIndex];
+        arr.splice(fromIndex, 1);
+        arr.splice(toIndex, 0, element);
+        this.steps = arr
     }
     /**
      * Based on the current element that is selected in in-browser spy, run function and output result to the validate view

@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const { WorkflowRecord } = require('../controller/record/class/index')
+const PugWorkflow = require('../controller/ui/class/Workflow')
 const { hideSpy, runCurrentOperation } = require('../controller/puppeteer/index')
 /* GET home page. */
 router.get('/', async function (req, res) {
@@ -11,8 +12,14 @@ router.get('/workflow', async function (req, res) {
    * @type {import('../controller/record/class/index.js').WorkflowRecord}
    */
   let workflow = req.app.locals.workflow
+  workflow.updateUserInputForSpy(req.query)
   let variables = {
-    workflow: workflow.getWorkflowForPug()
+    workflow: workflow.getWorkflowForPug(),
+    removeWorkflowQueryKey: PugWorkflow.inBuiltQueryKey.btnRemoveWorkflowStep,
+    upWorkflowQueryKey: PugWorkflow.inBuiltQueryKey.btnMoveWorkflowUp,
+    downWorkflowQueryKey: PugWorkflow.inBuiltQueryKey.btnMoveWorkflowDown,
+    editWorkflowQueryKey: PugWorkflow.inBuiltQueryKey.btnEditWorkflow,
+
   }
   res.render('workflow.pug', variables);
 })

@@ -1,6 +1,6 @@
 //- table mixins
-mixin workflow-table(header,data,type)
-    - var type = type || ""
+mixin workflow-table(header,data,removeWorkflowQueryKey,upWorkflowQueryKey,downWorkflowQueryKey,editWorkflowQueryKey)
+    - var type = "table-hover"
     table.table(class=type)
         thead
             tr
@@ -19,17 +19,14 @@ mixin workflow-table(header,data,type)
                         else
                             td #{col}
                     td
-                        +a-btn-primary('?'+runQueryKey)
+                        +a-btn-primary('?'+editWorkflowQueryKey+'='+j)
                             +icon("edit")
-                        +a-btn-info('?'+runQueryKey)
+                        +a-btn-info('?'+upWorkflowQueryKey+'='+j)
                             +icon("arrow-up")
-                        +a-btn-danger('?'+runQueryKey)
+                        +a-btn-danger('?'+removeWorkflowQueryKey+'='+j)
                             +icon("trash")                  
-                        +a-btn-info('?'+runQueryKey)
+                        +a-btn-info('?'+downWorkflowQueryKey+'='+j)
                             +icon("arrow-down")
 
 
 
-
-mixin workflow-table-hover(header,data)
-    +workflow-table(header,data,"table-hover")
