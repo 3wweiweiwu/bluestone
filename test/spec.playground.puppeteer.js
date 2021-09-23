@@ -70,7 +70,7 @@ describe('POC', () => {
         await browser.close();
     })
     it('should place icon in the middle of the screen all the time - still pending. still need a way to uniquely place icon or we should control icon in other panel ', async () => {
-        //TODO: uniquely place icon in the screen or we should just abandon the idea of same screen rendering. create another page to control this.
+
         let option = {
             "executablePath": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
             headless: false

@@ -22,29 +22,19 @@ module.exports = function (recordRepo, page, io) {
         //handle screenshot
         if (page != null) {
             picturePath = recordRepo.getPicPath()
-            page.screenshot({ path: picturePath, captureBeyondViewport: false })
-                .then(() => {
-                    if (eventDetail.command == COMMAND_TYPE.goto) return Promise.reject('GOTO')
-                    return jimp.read(picturePath)
-                })
-                .then(pic => {
+            await page.screenshot({ path: picturePath, captureBeyondViewport: false })
+            if (eventDetail.command == COMMAND_TYPE.goto) return Promise.reject('GOTO')
+            let pic = await jimp.read(picturePath)
+            if (eventDetail.command == null) {
+                //for in-browser agent call
+                pic = pic.crop(recordRepo.ui.spy.browserSelection.x, recordRepo.ui.spy.browserSelection.y, recordRepo.ui.spy.browserSelection.width, recordRepo.ui.spy.browserSelection.height);
+            }
+            else {
+                //for ordinary event, just crop as usual
+                pic = pic.crop(eventDetail.pos.x, eventDetail.pos.y, eventDetail.pos.width, eventDetail.pos.height);
+            }
+            await pic.writeAsync(picturePath)
 
-                    if (eventDetail.command == null) {
-                        //for in-browser agent call
-                        return pic.crop(recordRepo.ui.spy.browserSelection.x, recordRepo.ui.spy.browserSelection.y, recordRepo.ui.spy.browserSelection.width, recordRepo.ui.spy.browserSelection.height);
-                    }
-                    else {
-                        //for ordinary event, just crop as usual
-                        return pic.crop(eventDetail.pos.x, eventDetail.pos.y, eventDetail.pos.width, eventDetail.pos.height);
-                    }
-
-                })
-                .then(pic => {
-                    return pic.writeAsync(picturePath)
-                })
-                .catch(err => {
-                    console.log(err)
-                })
         }
 
 
@@ -53,9 +43,7 @@ module.exports = function (recordRepo, page, io) {
             recordRepo.spyBrowserSelectionPicPath = picturePath
             recordRepo.isRecording = false
             console.log('pause recording and call in-browser agent')
-            //TODO: convert screenshot function to await and remove this line
-            //wait for 1s so that we ca take screenshot
-            await page.waitForTimeout(1000)
+
             //display mvt console
             page.evaluate("document.querySelector('#bluestone_inbrowser_console').style.display='block'")
             recordRepo.spyVisible = true

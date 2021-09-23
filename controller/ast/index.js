@@ -9,9 +9,6 @@ const FunctionAST = require('./class/Function')
 const BsFunc = require('./class/BsFunc')
 const Locator = require('../locator/class/Locator')
 class AST {
-    //TODO: load function name, description
-    //TODO: output .js file
-    //TODO: modify locator path across the file
     /**
      * 
      * @param {string} locatorPath the path of the locator summary
@@ -70,7 +67,7 @@ class AST {
                 return info.libraryName == funcStaicInfo.libraryName && info.methodName == funcStaicInfo.methodName
             })
 
-            //TODO: based on library name, method name, parse informaton  to params, path and description
+
 
             let functionAst = new FunctionAST(methodDetail.filePath, methodDetail.methodName, methodDetail.methodDescription, methodDetail.jsDocTag, locators, mainFunc)
             this.__addFuncAstToRepo(functionAst)
