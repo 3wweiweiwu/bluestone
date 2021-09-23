@@ -491,9 +491,40 @@ class WorkflowRecord {
                 this.__moveItemInArray(value, 1)
                 break
             case WorkflowPug.inBuiltQueryKey.btnEditWorkflow:
+                let targetStep = this.steps[value]
+                this.__repopulateOperationUI(targetStep)
                 break
             default:
                 break;
+        }
+    }
+    /**
+     * Based on the current step, repopulate UI
+     * @param {RecordingStep} step 
+     */
+    __repopulateOperationUI(step) {
+        //TODO: make this function work
+        let currentGroupKeys = Object.keys(this.ui.spy.group)
+        let findOperation = false
+        for (let i = 0; i < currentGroupKeys.length; i++) {
+            let groupKey = currentGroupKeys[i]
+            /** @type {Array<FunctionAST>} */
+            let operations = this.ui.spy.group[groupKey].operations
+            let currentOperation = operations.find(item => {
+                return item.name == step.command
+            })
+
+            if (currentOperation != null) {
+                this.ui.spy.userSelection.currentGroup = groupKey
+                this.ui.spy.userSelection.currentOperation = step.functionAst.name
+                findOperation = true
+                break
+            }
+
+        }
+        if (!findOperation) {
+            this.ui.spy.result.isPass = false
+            this.ui.spy.result.text = `Unable to find function ${step.command}`
         }
     }
     /**
