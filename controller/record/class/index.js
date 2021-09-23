@@ -511,12 +511,17 @@ class WorkflowRecord {
             /** @type {Array<FunctionAST>} */
             let operations = this.ui.spy.group[groupKey].operations
             let currentOperation = operations.find(item => {
+                if (item == null) return false
                 return item.name == step.command
             })
 
             if (currentOperation != null) {
                 this.ui.spy.userSelection.currentGroup = groupKey
                 this.ui.spy.userSelection.currentOperation = step.functionAst.name
+                this.ui.spy.browserSelection.currentInnerText = step.targetInnerText
+                this.ui.spy.browserSelection.currentSelector = step.target
+                this.ui.spy.browserSelection.selectorPicture = step.targetPicPath
+                this.ui.spy.browserSelection.lastOperationTimeoutMs = step.timeoutMs
                 findOperation = true
                 break
             }
