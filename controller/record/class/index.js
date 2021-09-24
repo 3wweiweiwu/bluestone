@@ -43,7 +43,7 @@ class RecordingStep {
         /** @type {Array<Locator>} */
         this.potentialMatch = []
 
-
+        this.htmlPath = recordingStep.htmlPath
         this.targetInnerText = recordingStep.targetInnerText
         this.targetPicPath = recordingStep.targetPicPath
         this.timeoutMs = recordingStep.timeoutMs
@@ -65,6 +65,8 @@ class RecordingStep {
  * @property {number} target
  * @property {Array<ExistingSelector>} matchedSelector
  * @property {number} timeoutMs
+ * @property {string} htmlPath
+ * @property {string} targetPicPath
  * @property {import('../../ast/class/Function')} functionAst
  */
 
@@ -374,6 +376,7 @@ class WorkflowRecord {
      * @param {RecordingStep} event 
      */
     addStep(event) {
+        //TODO: handle change event, it should give us data
         event.potentialMatch = this.__findPotentialMatchForEvent(event.target)
         this.steps.push(event)
         this.setLastOperationTime()
@@ -586,6 +589,15 @@ class WorkflowRecord {
             return
         }
 
+
+    }
+    /**
+     * returns the picture path for current step
+     */
+    getHtmlPath() {
+        let fileName = Date.now().toString() + ".html"
+        let filePath = path.join(__dirname, '../../../public/temp/componentPic', fileName)
+        return filePath
 
     }
     /**

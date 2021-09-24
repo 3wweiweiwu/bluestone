@@ -3,6 +3,7 @@ var router = express.Router();
 const { WorkflowRecord } = require('../controller/record/class/index')
 const PugWorkflow = require('../controller/ui/class/Workflow')
 const { hideSpy, runCurrentOperation } = require('../controller/puppeteer/index')
+const config = require('../config')
 /* GET home page. */
 router.get('/', async function (req, res) {
   res.render('index.pug');

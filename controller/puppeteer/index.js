@@ -11,6 +11,7 @@ const fs = require('fs').promises
 const { RecordingStep, WorkflowRecord } = require('../record/class')
 const { getLocator, setLocatorStatus } = require('./exposure/LocatorManager')
 const injectModuleScriptBlock = require('./help/injectModuleScriptBlock')
+const singlefileScript = require('single-file/cli/back-ends/common/scripts')
 /**
  * Create a new puppeteer browser instance
  * @param {import('../record/class/index').WorkflowRecord} record
@@ -28,6 +29,12 @@ async function startRecording(record, io, url = null) {
     //inject event watcher and expose supporting function
     let eventRecorderPath = path.join(__dirname, './injection/eventRecorder.js')
     await injectModuleScriptBlock(page, eventRecorderPath)
+
+    //inject singlepage
+    const injectedScript = await singlefileScript.get(config.puppeteer);
+    await page.evaluateOnNewDocument(injectedScript)
+
+
 
     await page.exposeFunction('logEvent', logEvent(record, page, io))
     await page.exposeFunction('isRecording', isRecording(record))
@@ -74,18 +81,12 @@ async function startRecording(record, io, url = null) {
     })
 
 
-    //record goto operation
-    browser.on('targetchanged', target => {
-        if (target.url().includes('http://localhost:3600/spy')) {
-            return
-        }
-        let eventStep = new RecordingStep({ command: 'goto', target: target.url() })
-        logEvent(record)(eventStep)
+    await page.setBypassCSP(true)
 
-
-    })
 
     if (url != null) await page.goto(url)
+    let eventStep = new RecordingStep({ command: 'goto', target: url })
+    logEvent(record)(eventStep)
     return { browser, page }
 }
 /**

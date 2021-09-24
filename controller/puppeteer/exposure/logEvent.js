@@ -2,6 +2,7 @@ const { RecordingStep, COMMAND_TYPE, WorkflowRecord } = require('../../record/cl
 const config = require('../../../config')
 const jimp = require('jimp')
 const path = require('path')
+const fs = require('fs').promises
 /**
  * 
  * @param {import('../../record/class/index').WorkflowRecord} recordRepo 
@@ -18,8 +19,21 @@ module.exports = function (recordRepo, page, io) {
 
         //goto command does not generate a locator, we w
 
-        let picturePath = ''
+
+        //handle page capture
+        let htmlPath = ''
+        if (page != null) {
+            htmlPath = recordRepo.getHtmlPath()
+            let pageData = await page.evaluate(async (DEFAULT_OPTIONS) => {
+
+                const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
+                return pageData;
+            }, config.singlefile);
+            fs.writeFile(htmlPath, pageData.content)
+
+        }
         //handle screenshot
+        let picturePath = ''
         if (page != null) {
             picturePath = recordRepo.getPicPath()
             await page.screenshot({ path: picturePath, captureBeyondViewport: false })
@@ -74,6 +88,7 @@ module.exports = function (recordRepo, page, io) {
             //calculate timeout by subtracting current time to the time from previous step
 
             eventDetail.targetPicPath = picturePath
+            eventDetail.htmlPath = htmlPath
             let event = new RecordingStep(eventDetail)
 
             recordRepo.addStep(event)
