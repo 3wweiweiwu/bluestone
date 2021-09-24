@@ -503,7 +503,7 @@ class WorkflowRecord {
      * @param {RecordingStep} step 
      */
     __repopulateOperationUI(step) {
-        //TODO: make this function work
+
         let currentGroupKeys = Object.keys(this.ui.spy.group)
         let findOperation = false
         for (let i = 0; i < currentGroupKeys.length; i++) {

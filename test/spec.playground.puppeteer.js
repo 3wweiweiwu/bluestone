@@ -19,8 +19,9 @@ describe('POC', () => {
         const injectedScript = await singlefileScript.get(option);
         await page.evaluateOnNewDocument(injectedScript)
 
-
+        await page.setBypassCSP(true)
         await page.goto('https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#puppeteer-vs-puppeteer-core');
+
 
         //take a snapshot of current page
         let pageData = await page.evaluate(async options => {
@@ -34,7 +35,7 @@ describe('POC', () => {
                 compressHTML: false,
                 compressCSS: false,
                 loadDeferredImages: false,
-                loadDeferredImagesMaxIdleTime: 500,
+                loadDeferredImagesMaxIdleTime: 100,
                 loadDeferredImagesBlockCookies: false,
                 loadDeferredImagesBlockStorage: false,
                 loadDeferredImagesKeepZoomLevel: false,
@@ -46,8 +47,8 @@ describe('POC', () => {
                 filenameReplacementCharacter: "_",
                 maxResourceSizeEnabled: false,
                 maxResourceSize: 10,
-                removeAudioSrc: true,
-                removeVideoSrc: true,
+                removeAudioSrc: false,
+                removeVideoSrc: false,
                 backgroundSave: true,
                 removeAlternativeFonts: false,
                 removeAlternativeMedias: false,
@@ -58,9 +59,9 @@ describe('POC', () => {
                 userScriptEnabled: false,
                 saveFavicon: true,
                 includeBOM: false,
-                insertMetaCSP: true,
+                insertMetaCSP: false,
                 insertMetaNoIndex: false,
-                insertSingleFileComment: true
+                insertSingleFileComment: false
             };
             const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
             return pageData;
