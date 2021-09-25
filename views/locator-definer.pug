@@ -1,0 +1,9 @@
+extends ./component/navigationHeader.pug
+include ./component/workflowTable.pug
+block content
+    +nav-pills-justified([{text:"Home",href:"#"},{text:"Back",href:"?next=-1"},{text:"Next",href:"?next=1"}],0)
+    div(class="container")
+        div(class='row')
+        
+
+
