@@ -107,6 +107,7 @@ class WorkflowRecord {
                 browserSelection: {
                     currentSelector: '',
                     selectorPicture: '',
+                    selectorHtmlPath: '',
                     currentInnerText: 'default',
                     x: 0,
                     y: 0,
@@ -227,6 +228,9 @@ class WorkflowRecord {
     }
     set spyBrowserSelectionPicPath(picturePath = '') {
         this.ui.spy.browserSelection.selectorPicture = picturePath
+    }
+    set spyBrowserSelectionHtmlPath(htmlPath = '') {
+        this.ui.spy.browserSelection.selectorHtmlPath = htmlPath
     }
     static inbuiltOperation = {
 
@@ -471,7 +475,8 @@ class WorkflowRecord {
                     let targetInnerText = this.ui.spy.browserSelection.currentInnerText
                     let targetPicPath = this.ui.spy.browserSelection.selectorPicture
                     let timeoutMs = this.ui.spy.browserSelection.lastOperationTimeoutMs
-                    let step = new RecordingStep({ command, target, timeoutMs, targetPicPath, targetInnerText, functionAst: currentOperation })
+                    let htmlPath = this.ui.spy.browserSelection.selectorHtmlPath
+                    let step = new RecordingStep({ command, target, timeoutMs, targetPicPath, targetInnerText, functionAst: currentOperation, htmlPath: htmlPath })
                     this.addStep(step)
                     console.log(this.steps)
                 }

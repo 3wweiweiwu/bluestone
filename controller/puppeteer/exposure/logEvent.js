@@ -56,6 +56,7 @@ module.exports = function (recordRepo, page, io) {
         if (eventDetail.command == null) {
             recordRepo.spyBrowserSelectionPicPath = picturePath
             recordRepo.isRecording = false
+            recordRepo.spyBrowserSelectionHtmlPath = htmlPath
             console.log('pause recording and call in-browser agent')
 
             //display mvt console
