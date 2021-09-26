@@ -146,36 +146,42 @@ class WorkflowRecord {
 
 
     }
+    static inBuiltFunc = {
+        testTextEqual: 'testTextEqual',
+        testElementVisible: 'testElementVisible',
+        testElementInvisible: 'testElementInvisible',
+        hoverMouse: 'hoverMouse'
+    }
     /**
      * Based on the active functions, populate available functions in the group
      * @param {Array<import('../../ast/class/Function')>} activeFunctions 
      */
     mapOperationToGroups(activeFunctions) {
         const inBuiltFuncNames = [
-            'testTextEqual',
-            'testElementVisible',
-            'testElementInvisible',
-            'hoverMouse'
+            WorkflowRecord.inBuiltFunc.testTextEqual,
+            WorkflowRecord.inBuiltFunc.testElementVisible,
+            WorkflowRecord.inBuiltFunc.testElementInvisible,
+            WorkflowRecord.inBuiltFunc.hoverMouse
         ]
         //populate default list
         let groupInfo = {
             assert: {
                 text: 'Verify',
                 operations: [
-                    this.astManager.getFunction('testTextEqual')
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.testTextEqual)
                 ]
             },
             waitTill: {
                 text: 'Wait Till',
                 operations: [
-                    this.astManager.getFunction('testElementVisible'),
-                    this.astManager.getFunction('testElementInvisible')
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.testElementVisible),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.testElementInvisible)
                 ]
             },
             inbuiltFunction: {
                 text: 'Run In-built function',
                 operations: [
-                    this.astManager.getFunction('hoverMouse')
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.hoverMouse)
                 ]
             },
             customizedFunctions: {
@@ -589,7 +595,7 @@ class WorkflowRecord {
             //find out empty argument only for string and number input becasue we won't take any other input type here
             return (item.type.name == 'string' || item.type.name == 'number') && (item.value == null || item.value == '')
         })
-        if (emptyArgumentIndex != -1) {
+        if (emptyArgumentIndex != -1 && this.getCurrentOperation().name != WorkflowRecord.inBuiltFunc.testTextEqual) {
             this.ui.spy.validation.btnAddStep = `Please enter value for argument`
             return
         }
