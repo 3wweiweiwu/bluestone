@@ -1,6 +1,6 @@
 const { WorkflowRecord } = require('../../record/class/index')
 const { Page, Browser } = require('puppeteer-core')
-
+const openBluestoneTab = require('../activities/openBluestoneTab')
 
 const _eval = require('eval')
 /**
@@ -22,7 +22,8 @@ module.exports = function (recordRepo, browser, page, io) {
         let currentOperation = recordRepo.getCurrentOperation()
         //hide spy window
         let spyElement = await page.$('#bluestone_inbrowser_console')
-        await spyElement.evaluate((el) => el.style.display = 'none');
+
+        page.bringToFront()
         page.waitForTimeout(500)
 
 
@@ -72,7 +73,7 @@ module.exports = function (recordRepo, browser, page, io) {
         //show spy window again
         refreshSpy()
         page.waitForTimeout(500)
-        await spyElement.evaluate((el) => el.style.display = 'block');
+        await openBluestoneTab(browser, 'spy')
 
     }
 }

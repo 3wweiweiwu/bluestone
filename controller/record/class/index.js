@@ -7,6 +7,7 @@ const JsDocTag = require('../../ast/class/JsDocTag')
 const { testTextEqual } = require('../../../ptLibrary/functions/inbuiltFunc')
 const _eval = require('eval')
 const WorkflowPug = require('../../ui/class/Workflow')
+const { Page } = require('puppeteer-core')
 /**
  * @typedef {string} CommandType
  **/

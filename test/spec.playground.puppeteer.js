@@ -502,4 +502,26 @@ describe('POC', () => {
         await browser.close();                          // close browser
 
     }).timeout(60000)
+
+    it('should be able to manage pages launched by the browser', async () => {
+        let option = {
+            "executablePath": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+            headless: false,
+            defaultViewport: null
+        }
+        const browser = await puppeteer.launch(option)
+
+
+        const page = await browser.newPage();           // open new tab
+        await page.goto('https://google.com');          // go to site
+
+        // Далее #hplogo - требуемый нам селектор
+        let pages = await browser.pages()
+        const url = await page.url();
+        page.bringToFront();
+        console.log()
+
+        await browser.close();                          // close browser
+
+    }).timeout(60000)
 })

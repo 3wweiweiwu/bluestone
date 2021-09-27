@@ -11,14 +11,14 @@ require("@babel/register")({
 var app = require('../app');
 var debug = require('debug')('pt-recorder:server');
 var http = require('http');
-
+const config = require('../config')
 
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3600');
+var port = normalizePort(process.env.PORT || config.app.port);
 app.set('port', port);
 
 /**

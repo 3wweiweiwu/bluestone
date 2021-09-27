@@ -3,13 +3,15 @@ const config = require('../../../config')
 const jimp = require('jimp')
 const path = require('path')
 const fs = require('fs').promises
+const openBluestoneTab = require('../../puppeteer/activities/openBluestoneTab')
 /**
  * 
  * @param {import('../../record/class/index').WorkflowRecord} recordRepo 
- * @param {import('puppeteer-core').Page} page
+* @param {import('puppeteer-core').Browser} browser 
+* @param {import('puppeteer-core').Page} page
  * @param {import('socket.io').Server} io
  */
-module.exports = function (recordRepo, page, io) {
+module.exports = function (recordRepo, browser, page, io) {
 
     /**
      * Log browser event to the cache
@@ -60,7 +62,9 @@ module.exports = function (recordRepo, page, io) {
             console.log('pause recording and call in-browser agent')
 
             //display mvt console
-            page.evaluate("document.querySelector('#bluestone_inbrowser_console').style.display='block'")
+            await openBluestoneTab(browser, "spy")
+
+
             recordRepo.spyVisible = true
 
             let ptFuncPath = path.join(__dirname, '../../../ptLibrary/bluestone-func.js')

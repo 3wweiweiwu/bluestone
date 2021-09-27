@@ -36,7 +36,7 @@ async function startRecording(record, io, url = null) {
 
 
 
-    await page.exposeFunction('logEvent', logEvent(record, page, io))
+    await page.exposeFunction('logEvent', logEvent(record, browser, page, io))
     await page.exposeFunction('isRecording', isRecording(record))
     await page.exposeFunction('logCurrentElement', logCurrentElement(record))
     await page.exposeFunction('getLocator', getLocator(record))
@@ -45,40 +45,6 @@ async function startRecording(record, io, url = null) {
     await page.exposeFunction('setSpyVisible', setSpyVisible(record))
     await page.exposeFunction('runPtFunc', runPtFunc(record, browser, page, io))
 
-
-    page.on('load', (event, WorkflowRecord) => {
-        try {
-            page.evaluate(() => {
-                //add iframe
-                setTimeout(() => {
-                    let bluestone_inbrowser_console = document.getElementById('bluestone_inbrowser_console')
-                    // console.log(bluestone_inbrowser_console)
-                    if (bluestone_inbrowser_console != null) return
-                    bluestone_inbrowser_console = document.createElement("iframe");
-                    bluestone_inbrowser_console.setAttribute('id', 'bluestone_inbrowser_console')
-                    bluestone_inbrowser_console.setAttribute('src', 'http://localhost:3600/spy')
-                    //mark item as invisible 
-                    if (window.isSpyVisible() == false) {
-                        bluestone_inbrowser_console.style.display = 'none'
-                    }
-                    else {
-                        bluestone_inbrowser_console.style.display = 'block'
-                    }
-                    bluestone_inbrowser_console.style.position = 'fixed'
-                    bluestone_inbrowser_console.style['text-align'] = 'center'
-                    bluestone_inbrowser_console.style['width'] = '600px'
-                    bluestone_inbrowser_console.style['height'] = '600px'
-
-                    bluestone_inbrowser_console.style.top = '30%'
-                    bluestone_inbrowser_console.style.left = `30%`
-                    document.body.appendChild(bluestone_inbrowser_console);
-                }, 800);
-
-            })
-        } catch (error) {
-            console.log()
-        }
-    })
 
 
     await page.setBypassCSP(true)
@@ -98,7 +64,7 @@ async function endRecording(browser) {
 }
 
 /**
- * hide in-browser spy
+ * switch in-browser spy
  * @param {import('puppeteer').Page} page 
  */
 async function hideSpy(page, isSpyVisible) {
@@ -107,10 +73,7 @@ async function hideSpy(page, isSpyVisible) {
     //if spy is invisible, set attribute
     //the fist time we run it, page object may not be ready
 
-    await page.evaluate(() => {
-        document.querySelector("#bluestone_inbrowser_console").style.display = 'none'
-    })
-
+    await page.bringToFront()
 
 
 }
