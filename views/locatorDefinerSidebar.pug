@@ -1,7 +1,7 @@
 extends ../node_modules/pug-bootstrap/_bootstrap.pug
 include ./component/workflowTable.pug
 include ./component/input.pug
-
+include ./component/possibleLocatorTable.pug
 block body
     script(src="/javascript/redirectInput.js")
     link(rel='stylesheet',href='/stylesheets/style.css')
@@ -13,4 +13,5 @@ block body
             +input-arguments('locator-text',[{description:'Locator',pugType:"input",value:''}],'index')
         
         +a-btn-primary('?btnValidate')='Validate'
-
+    h4="Possible Locators"
+    +possible-locator-table([{path:"locator/Item/Name",pic:"1632792450295.png"}],possibleLocatorOkKey)

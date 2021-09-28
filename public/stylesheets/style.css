@@ -3,6 +3,13 @@
   width: 100%;
   align-items: stretch;
 }
+
+.img-thumbnail {
+  width: 100%;
+}
+.locator-pic {
+  height: 100px;
+}
 #topNav {
   top: 0;
   width: 20vw;

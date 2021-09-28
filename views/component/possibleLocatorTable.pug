@@ -1,0 +1,15 @@
+//- table mixins
+mixin possible-locator-table(possibleLocatorList)
+    - var type = "table-hover"
+    each locator,i in possibleLocatorList
+        div(class='row')
+            div(class='col-md-1')="Possible Locator:"+i
+            div(class='col-md-2')="Locator Path:"+locator.path
+            div(class='col-md-10 locator-pic')                
+                +img-thumbnail("temp/componentPic/"+locator.pic,"UI Element")
+            div(class='col-md-1') 
+                +a-btn-primary('?'+possibleLocatorOkKey+'='+j)
+                    +icon("ok")
+
+
+
