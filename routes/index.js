@@ -38,13 +38,25 @@ router.get('/locator-definer', async function (req, res) {
    */
   let workflow = req.app.locals.workflow
   workflow.updateUserInputForSpy(req.query)
+
+  let variables = {
+  }
+  res.render('locatorDefiner.pug', variables);
+
+})
+router.get('/locator-definer-sidebar', async function (req, res) {
+  /**
+   * @type {import('../controller/record/class/index.js').WorkflowRecord}
+   */
+  let workflow = req.app.locals.workflow
+  workflow.updateUserInputForSpy(req.query)
+
   let variables = {
 
   }
-  res.render('locator-definer.pug', variables);
+  res.render('locatorDefinerSidebar.pug', variables);
 
 })
-
 router.get('/spy', async function (req, res, next) {
   /**
    * @type {import('../controller/record/class/index.js').WorkflowRecord}

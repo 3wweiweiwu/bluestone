@@ -629,7 +629,7 @@ class WorkflowRecord {
      * Create Info for workflow
      */
     getWorkflowForPug() {
-        let workflowHeader = ['Operation', 'target', 'Picture', '']
+        let workflowHeader = ['Operation', 'target', 'Picture', 'Actions']
         let workflowInfo = this.steps.map(step => {
             let argStr = ''
             if (step.functionAst != null) {

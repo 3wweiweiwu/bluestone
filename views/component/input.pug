@@ -4,9 +4,10 @@ mixin input-arguments(queryKey,operationArguments,queryIndex)
 
     each argument, index in operationArguments
         - inputId=queryKey+"_"+index
-        label(for=inputId)=argument.description
-            div(class="input-group")
-                input(type=argument.pugType queryIndex=queryIndex queryKey=queryKey index=index class="form-control" id=inputId onChange="redirectInputOnChange(event)" value=argument.value)
+        
+        div(class="container-fluid")
+            label(for=inputId)=argument.description
+            input(type=argument.pugType queryIndex=queryIndex queryKey=queryKey index=index class="form-control" id=inputId onChange="redirectInputOnChange(event)" value=argument.value)
 
     
 

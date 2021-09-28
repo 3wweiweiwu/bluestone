@@ -1,0 +1,16 @@
+extends ../node_modules/pug-bootstrap/_bootstrap.pug
+include ./component/workflowTable.pug
+include ./component/input.pug
+
+block body
+    script(src="/javascript/redirectInput.js")
+    link(rel='stylesheet',href='/stylesheets/style.css')
+    
+    +nav-pills-justified([{text:"Home",href:"#"},{text:"Back",href:"?next=-1"},{text:"Next",href:"?next=1"}],0)
+    
+    div(class='row')
+        div(class='col-xs-9')                
+            +input-arguments('locator-text',[{description:'Locator',pugType:"input",value:''}],'index')
+        
+        +a-btn-primary('?btnValidate')='Validate'
+

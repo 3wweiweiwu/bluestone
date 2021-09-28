@@ -1,7 +1,8 @@
 extends ../../node_modules/pug-bootstrap/_bootstrap.pug
 block body
-    +navbar("Bluestone","dropdown_menu")
-        +nav_item("/spy")="Operation"
-        +nav_item("/workflow")="Workflow"
-        +nav_item("index.html")="Locator"
-    block content
+    div(id='topNav')
+        +navbar("Bluestone","dropdown_menu")
+            +nav_item("/spy")="Operation"
+            +nav_item("/workflow")="Workflow"
+            +nav_item("/locator-definer")="Locator"
+        block content
