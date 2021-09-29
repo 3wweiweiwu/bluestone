@@ -9,6 +9,7 @@ class WorkFlowPug {
         btnMoveWorkflowUp: 'WRKFLOW_UP',
         btnMoveWorkflowDown: 'WRKFLOW_DOWN',
         btnEditWorkflow: 'EDIT_WRKFLOW',
+        btnLocatorWorkflow: 'EDIT_LOCATOR'
     }
     /**
      * Generate Pug-compatible array format
