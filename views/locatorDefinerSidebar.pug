@@ -9,9 +9,13 @@ block body
     +nav-pills-justified([{text:"Default",href:"?default"},{text:"Back",href:"?next=-1"},{text:"Next",href:"?next=1"}],0)
     
     div(class='row')
-        div(class='col-xs-9')                
-            +input-arguments('locator-text',[{description:'Locator',pugType:"input",value:''}],'index')
         
-        +a-btn-primary('?btnValidate')='Validate'
+        +input-arguments('locator-path',[{description:'Locator Name',pugType:"input",value:''}],'index')
+    div(class='row')        
+        
+        +input-arguments('locator-text',[{description:'Locator Selector',pugType:"input",value:''}],'index')                    
+    div(class='row')                
+        +a-btn-primary('?btnValidate')='Check'
+    
     h4="Possible Locators"
-    +possible-locator-table([{path:"locator/Item/Name",pic:"1632792450295.png"}],possibleLocatorOkKey)
+    +possible-locator-table([{name:"locator/Item/Name",pic:"1632792450295.png",selector:'.new-todo'}],possibleLocatorOkKey)

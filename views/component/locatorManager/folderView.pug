@@ -1,0 +1,16 @@
+mixin folder-view(itemList)
+    div(class='container-fluid')
+        ul(class='list-group')
+            a(href='?newLocator')
+                li(class='list-group-item')="Create new locator"
+                    span(class='badge')
+                        +icon("pushpin")  
+
+            each item,i in itemList
+                a(href='?selectElement='+i)
+                    li(class='list-group-item')=item.name
+                        span(class='badge')
+                            if(item.isLocator)                                
+                                +icon("map-marker")
+                            else 
+                                +icon("folder-close")

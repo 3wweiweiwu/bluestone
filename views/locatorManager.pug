@@ -1,0 +1,9 @@
+extends ../node_modules/pug-bootstrap/_bootstrap.pug
+include ./component/locatorManager/pathNav.pug
+include ./component/locatorManager/folderView.pug
+include ./component/locatorManager/locatorDetail.pug
+block body
+    +path-nav(['Locator Manager','Todo Page'])
+    +folder-view([{"name":"todoText","isLocator":true},{"name":"acknowledgementSection","isLocator":false}])
+    +locator-detail('locatorName',"todo button",'locatorFolder','TODO page','selector','.s1.s2.s3','?ok')
+

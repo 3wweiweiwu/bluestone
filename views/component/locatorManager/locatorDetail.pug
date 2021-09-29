@@ -1,0 +1,15 @@
+include ../input.pug
+include ../refresh.pug
+//- element detail
+mixin locator-detail(queryKeyForName,locatorName,queryKeyForFolder,locatorPath,queryKeyForSelector,selector,redirectUrl)
+    script(src="/javascript/redirectInput.js")
+    div(class='col-md-9 col-xs-9')
+        +input-arguments(queryKeyForName,[{description:'Locator Name',pugType:"input",value:locatorName}],'index')
+    div(class='col-md-9 col-xs-9')
+        +input-arguments(queryKeyForFolder,[{description:'Locator Name',pugType:"input",value:locatorPath}],'index')        
+    div(class='col-md-9 col-xs-9')
+        +input-arguments(queryKeyForSelector,[{description:'Locator Name',pugType:"input",value:selector}],'index')        
+    div(class='col-md-9 col-xs-1')
+        +a-btn-primary(redirectUrl)='OK'
+    +refresh()
+    

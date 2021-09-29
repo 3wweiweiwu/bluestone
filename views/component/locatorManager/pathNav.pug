@@ -1,0 +1,8 @@
+mixin path-nav(currentFolderList)
+    div(class='container-fluid')
+        div(class='row')
+            ul(class="breadcrumb")
+                each folder,i in currentFolderList
+                    li
+                        a(href="/locator-manager?locatorManagerPathLevel="+i)=folder
+        div(class='row')

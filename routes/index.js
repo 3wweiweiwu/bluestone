@@ -44,6 +44,18 @@ router.get('/locator-definer', async function (req, res) {
   res.render('locatorDefiner.pug', variables);
 
 })
+router.get('/locator-manager', async function (req, res) {
+  /**
+   * @type {import('../controller/record/class/index.js').WorkflowRecord}
+   */
+  let workflow = req.app.locals.workflow
+  workflow.updateUserInputForSpy(req.query)
+
+  let variables = {
+  }
+  res.render('locatorManager.pug', variables);
+
+})
 router.get('/locator-definer-sidebar', async function (req, res) {
   /**
    * @type {import('../controller/record/class/index.js').WorkflowRecord}

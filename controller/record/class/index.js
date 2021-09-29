@@ -35,7 +35,7 @@ var COMMAND_TYPE = {
 
 
 class RecordingStep {
-    /**     * 
+    /** 
      * @param {step} recordingStep 
      */
     constructor(recordingStep) {
@@ -49,15 +49,18 @@ class RecordingStep {
         this.targetPicPath = recordingStep.targetPicPath
         this.timeoutMs = recordingStep.timeoutMs
         this.meta = {}
-        /** @type {Locator} */
-        this.finalMatch = null
+
+        this.finalLocatorName = ''
+        this.finalLocator = ''
         this.functionAst = recordingStep.functionAst
         if (this.functionAst) {
             this.parameter = JSON.parse(JSON.stringify(recordingStep.functionAst.params))
         }
 
-
-
+    }
+    setFinalLocator(finalLocatorName, finalLocator) {
+        this.finalLocatorName = finalLocatorName
+        this.finalLocator = finalLocator
     }
 }
 /**
@@ -121,6 +124,10 @@ class WorkflowRecord {
                     currentGroup: '',
                     currentOperation: '',
                     currentArgument: [],
+                    currentLocatorIndex: -1,
+                    currentLocatorPath: '',
+                    currentLocatorName: '',
+                    currentLocatorSelector: ''
                 },
                 group: {
                     customizedFunctions: {
@@ -397,6 +404,7 @@ class WorkflowRecord {
      * @param {RecordingStep} eventTarget 
      */
     __findPotentialMatchForEvent(eventTarget) {
+        /** @type {Array<Locator>} */
         let locatorLibrarySnapshot = JSON.parse(JSON.stringify(this.locatorManager.locatorLibrary))
         let eventSelector = eventTarget
         let potentialMatches = locatorLibrarySnapshot.filter(item => {

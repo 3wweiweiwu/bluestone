@@ -11,14 +11,14 @@ const Options = {
 *  @param {Page} page 
  * @param {ElementSelector} elementSelector element selector object
  * @param {Options} option 
- * @returns {import('puppeteer').ElementHandle}
+ * @returns {ElementHandle}
  */
 module.exports = async function (page, elementSelector, option = Options) {
     /**@type {Array<string>} */
     let locatorOptions = elementSelector.locator
     //find locator option within timeout
     let startTime = Date.now()
-    /**@type {import('puppeteer').ElementHandle} */
+    /**@type {ElementHandle} */
     let element = null
     let timeSpan = 0
     do {
