@@ -7,28 +7,34 @@ describe('locator.record', () => {
         let locatorManager = new LocatorManager(bluestoneLocatorPath)
         locatorManager.locatorPath = ''
         let baseline = {
-            "locatorLibrary": [
+            "__locatorLibrary": [
                 {
                     "Locator": [
                         "/html/body/ng-view/section/header/form/input"
                     ],
                     "screenshot": null,
-                    "path": [
-                        "todoPage",
-                        "todoText"
-                    ]
+                    "path": "Todo_Page/TODO_Text_Input",
+                    "selector": false
+                },
+                {
+                    "Locator": [
+                        "/html/body/ng-view/section/header/form/input"
+                    ],
+                    "screenshot": null,
+                    "path": "Todo_Page/todoText2",
+                    "selector": false
                 },
                 {
                     "Locator": [
                         "/html/body/ng-view/section/header/form/input1"
                     ],
                     "screenshot": null,
-                    "path": [
-                        "commonPage"
-                    ]
+                    "path": "Common_Page/locatorNotWork",
+                    "selector": false
                 }
             ],
-            "locatorPath": ""
+            "locatorPath": "",
+            "lastRefreshTime": 0
         }
         locatorManager.locatorPath = ""
         assert.deepStrictEqual(JSON.parse(JSON.stringify(locatorManager)), baseline)

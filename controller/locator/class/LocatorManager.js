@@ -57,8 +57,8 @@ class LocatorManager {
             //if current node contains locator attribute and that happen to be an array, push result into library            
             let newPath = []
             try {
-                newPath = JSON.parse(JSON.stringify(currentPathList))
-                newPath.push(key)
+
+                newPath = key
             } catch (error) {
                 console.log(error)
             }
