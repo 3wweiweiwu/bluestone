@@ -6,7 +6,9 @@ module.exports = {
     puppeteer: {
         "executablePath": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
         headless: false,
-        defaultViewport: null
+        defaultViewport: null,
+        args: ['--disable-web-security', '--disable-features=IsolateOrigins,site-per-process']
+
     },
     code: {
         funcPath: path.join(__dirname, './test/sample-project/bluestone-func.js'),

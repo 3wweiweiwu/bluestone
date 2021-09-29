@@ -4,6 +4,7 @@ const { WorkflowRecord } = require('../controller/record/class/index')
 const PugWorkflow = require('../controller/ui/class/Workflow')
 const PugLocatorDefiner = require('../controller/ui/class/LocatorDefiner')
 const { hideSpy, runCurrentOperation } = require('../controller/puppeteer/index')
+const checkLocatorInDefiner = require('../controller/puppeteer/activities/checkLocatorInDefiner')
 const config = require('../config')
 /* GET home page. */
 router.get('/', async function (req, res) {
@@ -43,6 +44,8 @@ router.get('/locator-definer', async function (req, res) {
   let workflow = req.app.locals.workflow
   await workflow.updateUserInputForSpy(req.query)
 
+
+
   let variables = {
     locatorHtml: workflow.locatorDefinerPug.locatorHtml
   }
@@ -67,7 +70,11 @@ router.get('/locator-definer-sidebar', async function (req, res) {
    */
   let workflow = req.app.locals.workflow
   await workflow.updateUserInputForSpy(req.query)
-
+  if (workflow.locatorDefinerPug.validateCurrentLocator) {
+    workflow.locatorDefinerPug.validateCurrentLocator = false
+    //TODO: hook up the result and move this to locator definer class
+    await checkLocatorInDefiner(req.app.locals.puppeteerControl.browser, workflow.locatorDefinerPug.locatorSelector)
+  }
   let variables = {
     revertQueryKey: PugLocatorDefiner.inBuiltQueryKey.btnRevert,
     txtLocatorQueryKey: PugLocatorDefiner.inBuiltQueryKey.txtLocator,
