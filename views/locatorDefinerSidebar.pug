@@ -6,16 +6,24 @@ block body
     script(src="/javascript/redirectInput.js")
     link(rel='stylesheet',href='/stylesheets/style.css')
     
-    +nav-pills-justified([{text:"Default",href:"?default"},{text:"Back",href:"?next=-1"},{text:"Next",href:"?next=1"}],0)
+    
     
     div(class='row')
         
-        +input-arguments('locator-path',[{description:'Locator Name',pugType:"input",value:''}],'index')
+        +input-arguments(txtLocatorNameQueryKey,[{description:'Locator Name',pugType:"input",value:txtLocatorName}],'index')
     div(class='row')        
         
-        +input-arguments('locator-text',[{description:'Locator Selector',pugType:"input",value:''}],'index')                    
+        +input-arguments(txtLocatorQueryKey,[{description:'Locator Selector',pugType:"input",value:txtLocatorValue}],'index')                    
     div(class='row')                
-        +a-btn-primary('?btnValidate')='Check'
+        +a-btn-info('?'+revertQueryKey)='Revert Selector'
+        +a-btn-primary('?'+btnCheckQueryKey)='Confirm'
+    div(class='row')                
+        if validationText==''
+            +panel-success("Success")
+                p Validation Success
+        else 
+            +panel-warning("Failed")
+                p=validationText
     
     h4="Possible Locators"
-    +possible-locator-table([{name:"locator/Item/Name",pic:"1632792450295.png",selector:'.new-todo'}],possibleLocatorOkKey)
+    +possible-locator-table(possibleLocatorMatch,possibleLocatorOkQueryKey)

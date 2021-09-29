@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const { WorkflowRecord } = require('../controller/record/class/index')
 const PugWorkflow = require('../controller/ui/class/Workflow')
+const PugLocatorDefiner = require('../controller/ui/class/LocatorDefiner')
 const { hideSpy, runCurrentOperation } = require('../controller/puppeteer/index')
 const config = require('../config')
 /* GET home page. */
@@ -13,7 +14,7 @@ router.get('/workflow', async function (req, res) {
    * @type {import('../controller/record/class/index.js').WorkflowRecord}
    */
   let workflow = req.app.locals.workflow
-  workflow.updateUserInputForSpy(req.query)
+  await workflow.updateUserInputForSpy(req.query)
   let variables = {
     workflow: workflow.getWorkflowForPug(),
     removeWorkflowQueryKey: PugWorkflow.inBuiltQueryKey.btnRemoveWorkflowStep,
@@ -26,6 +27,9 @@ router.get('/workflow', async function (req, res) {
     //if we are editing current workflow, we will redirect back to spy page
     res.redirect('/spy')
   }
+  else if (req.query[PugWorkflow.inBuiltQueryKey.btnLocatorWorkflow]) {
+    res.redirect('/locator-definer')
+  }
   else {
     //otherwise, continue with workflow page
     res.render('workflow.pug', variables);
@@ -37,9 +41,10 @@ router.get('/locator-definer', async function (req, res) {
    * @type {import('../controller/record/class/index.js').WorkflowRecord}
    */
   let workflow = req.app.locals.workflow
-  workflow.updateUserInputForSpy(req.query)
+  await workflow.updateUserInputForSpy(req.query)
 
   let variables = {
+    locatorHtml: workflow.locatorDefinerPug.locatorHtml
   }
   res.render('locatorDefiner.pug', variables);
 
@@ -49,7 +54,7 @@ router.get('/locator-manager', async function (req, res) {
    * @type {import('../controller/record/class/index.js').WorkflowRecord}
    */
   let workflow = req.app.locals.workflow
-  workflow.updateUserInputForSpy(req.query)
+  await workflow.updateUserInputForSpy(req.query)
 
   let variables = {
   }
@@ -61,11 +66,20 @@ router.get('/locator-definer-sidebar', async function (req, res) {
    * @type {import('../controller/record/class/index.js').WorkflowRecord}
    */
   let workflow = req.app.locals.workflow
-  workflow.updateUserInputForSpy(req.query)
+  await workflow.updateUserInputForSpy(req.query)
 
   let variables = {
-
+    revertQueryKey: PugLocatorDefiner.inBuiltQueryKey.btnRevert,
+    txtLocatorQueryKey: PugLocatorDefiner.inBuiltQueryKey.txtLocator,
+    txtLocatorNameQueryKey: PugLocatorDefiner.inBuiltQueryKey.txtLocatorName,
+    btnCheckQueryKey: PugLocatorDefiner.inBuiltQueryKey.btnCheck,
+    txtLocatorValue: workflow.locatorDefinerPug.locatorSelector,
+    txtLocatorName: workflow.locatorDefinerPug.locatorName,
+    possibleLocatorMatch: workflow.locatorDefinerPug.possibleLocators,
+    possibleLocatorOkQueryKey: PugLocatorDefiner.inBuiltQueryKey.btnLocatorOk,
+    validationText: workflow.locatorDefinerPug.getValidationText()
   }
+
   res.render('locatorDefinerSidebar.pug', variables);
 
 })
@@ -74,7 +88,7 @@ router.get('/spy', async function (req, res, next) {
    * @type {import('../controller/record/class/index.js').WorkflowRecord}
    */
   let workflow = req.app.locals.workflow
-  workflow.updateUserInputForSpy(req.query)
+  await workflow.updateUserInputForSpy(req.query)
   if (req.app.locals.puppeteerControl) {
     hideSpy(req.app.locals.puppeteerControl.page, workflow.spyVisible)
     runCurrentOperation(req.app.locals.puppeteerControl.page, workflow.runCurrentOperation)

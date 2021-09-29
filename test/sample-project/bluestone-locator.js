@@ -2,7 +2,7 @@
 module.exports = {
     'Todo_Page/TODO_Text_Input': {
         locator: ['/html/body/ng-view/section/header/form/input'],
-        screenshot: null
+        screenshot: './componentPic/1632928449951.png'
     },
     'Todo_Page/todoText2': {
         locator: ['/html/body/ng-view/section/header/form/input'],

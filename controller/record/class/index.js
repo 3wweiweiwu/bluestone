@@ -7,7 +7,9 @@ const JsDocTag = require('../../ast/class/JsDocTag')
 const { testTextEqual } = require('../../../ptLibrary/functions/inbuiltFunc')
 const _eval = require('eval')
 const WorkflowPug = require('../../ui/class/Workflow')
+const LocatorDefinerPug = require('../../ui/class/LocatorDefiner')
 const { Page } = require('puppeteer-core')
+const fs = require('fs').promises
 /**
  * @typedef {string} CommandType
  **/
@@ -105,7 +107,7 @@ class WorkflowRecord {
         this.lastOperationTimestamp = Date.now()
         this.__isRecording = true
         this.astManager = new AstManager(config.code.locatorPath)
-
+        this.__locatorDefinerPug = new LocatorDefinerPug('', '', '', '', [])
         this.ui = {
             spy: {
                 browserSelection: {
@@ -154,11 +156,71 @@ class WorkflowRecord {
 
 
     }
+    get locatorDefinerPug() {
+        return this.__locatorDefinerPug
+    }
+    /**
+     * Initialize Locator Definer page based on information from current locator information
+     * @param {string} defaultSelector 
+     * @param {string} locatorHtmlPath 
+     * @param {string} locatorName 
+     * @param {string} locatorSelector 
+     * @param {Array<Locator>} potentialMatch 
+     */
+    async refreshLocatorDefiner(defaultSelector, locatorHtmlPath, locatorName, locatorSelector, potentialMatch) {
+        //convert html path from local file to relative url
+        let htmlUrl = this.convertLocalPath2RelativeLink(locatorHtmlPath)
+
+        //create a new object because we are going to modify screenshot key direclty
+        /** @type {Array<Locator>} */
+        let newPotentialMatch = JSON.parse(JSON.stringify(potentialMatch))
+        //copy over locator pictures to temp folder for visualization
+        let bluestoneFuncFolder = path.dirname(this.locatorManager.locatorPath)
+        for (let i = 0; i < newPotentialMatch.length; i++) {
+            let item = newPotentialMatch[i]
+            //no pic
+            if (item.screenshot == null) {
+                continue
+            }
+            let sourcePath = path.join(bluestoneFuncFolder, item.screenshot)
+            let newPicPath = this.getPicPath()
+            //check if file path is valid
+            try {
+                await fs.access(sourcePath);
+                await fs.copyFile(sourcePath, newPicPath)
+
+            } catch (err) {
+                continue
+            }
+            newPotentialMatch[i].screenshot = this.getSpySelectorPictureForPug(newPicPath)
+        }
+
+        this.__locatorDefinerPug = new LocatorDefinerPug(defaultSelector, htmlUrl, locatorName, locatorSelector, newPotentialMatch)
+    }
     static inBuiltFunc = {
         testTextEqual: 'testTextEqual',
         testElementVisible: 'testElementVisible',
         testElementInvisible: 'testElementInvisible',
         hoverMouse: 'hoverMouse'
+    }
+    /**
+     * Convert local path to relative path
+     * @param {string} localPath 
+     */
+    convertLocalPath2RelativeLink(localPath) {
+        let fileBaseDir = __dirname
+        let projectBase = path.resolve(fileBaseDir, '../../../')
+        localPath = path.resolve(localPath)
+        let resultLink = ''
+        if (localPath.includes(projectBase)) {
+            resultLink = localPath.replace(projectBase, '')
+            resultLink = resultLink.replace('\\public', '').replace(/\\/g, '/')
+
+        }
+        //handle windows path
+
+
+        return resultLink
     }
     /**
      * Based on the active functions, populate available functions in the group
@@ -208,7 +270,7 @@ class WorkflowRecord {
     get runCurrentOperation() {
         return this.ui.spy.runCurrentOperation
     }
-    set runCurrentOperation(willRun) {
+    runCurrentOperation(willRun) {
         this.ui.spy.runCurrentOperation = willRun
     }
     /**
@@ -418,7 +480,7 @@ class WorkflowRecord {
      * @param {*} query 
      * @returns 
      */
-    updateUserInputForSpy(query) {
+    async updateUserInputForSpy(query) {
         let queryKeys = Object.keys(query)
         //if there is no query, we will just return
         if (queryKeys.length == 0) {
@@ -427,7 +489,7 @@ class WorkflowRecord {
         //handle update for current group and current operation
         if (queryKeys.length == 1) {
             let key = queryKeys[0]
-            this.__updateUserInputForSpy(key, query[key])
+            await this.__updateUserInputForSpy(key, query[key])
         }
         //handle update for arguments
         if (queryKeys.includes(WorkflowRecord.inbuiltQueryKey.currentArgument) && queryKeys.includes(WorkflowRecord.inbuiltQueryKey.currentArgumentIndex)) {
@@ -441,6 +503,7 @@ class WorkflowRecord {
             //update user selection value
             this.ui.spy.userSelection.currentArgument[currentArgumentIndex] = currentQueryKeyForValue
         }
+        this.locatorDefinerPug.update(query)
 
     }
     /**
@@ -469,7 +532,8 @@ class WorkflowRecord {
      * @param {string} key 
      * @param {string} value 
      */
-    __updateUserInputForSpy(key, value) {
+    async __updateUserInputForSpy(key, value) {
+        let targetStep
         switch (key) {
             case WorkflowRecord.inbuiltQueryKey.currentGroup:
                 this.ui.spy.userSelection.currentGroup = value
@@ -514,8 +578,14 @@ class WorkflowRecord {
                 this.__moveItemInArray(value, 1)
                 break
             case WorkflowPug.inBuiltQueryKey.btnEditWorkflow:
-                let targetStep = this.steps[value]
+                targetStep = this.steps[value]
                 this.__repopulateOperationUI(targetStep)
+                break
+            case WorkflowPug.inBuiltQueryKey.btnLocatorWorkflow:
+                let stepIndex = Number.parseInt(value)
+                targetStep = this.steps[stepIndex]
+
+                await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch)
                 break
             default:
                 break;
@@ -629,15 +699,15 @@ class WorkflowRecord {
         return filePath
 
     }
-    getSpySelectorPictureForPug() {
-        let pictureName = path.basename(this.ui.spy.browserSelection.selectorPicture)
+    getSpySelectorPictureForPug(picturePath = this.ui.spy.browserSelection.selectorPicture) {
+        let pictureName = path.basename(picturePath)
         return pictureName
     }
     /**
      * Create Info for workflow
      */
     getWorkflowForPug() {
-        let workflowHeader = ['Operation', 'target', 'Picture', 'Actions']
+        let workflowHeader = ['Operation', 'Target', 'Arguments', 'Actions']
         let workflowInfo = this.steps.map(step => {
             let argStr = ''
             if (step.functionAst != null) {

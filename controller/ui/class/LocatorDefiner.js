@@ -22,7 +22,6 @@ class LocatorDefiner {
         this.__locatorName = locatorName
         this.__locatorSelector = locatorSelector
         this.locatorHtml = locatorHtmlPath
-
         this.__possibleLocators = potentialMatch.map(item => {
             return {
                 name: item.path,
@@ -30,8 +29,15 @@ class LocatorDefiner {
                 pic: item.screenshot,
             }
         })
+        this.validateCurrentLocator = false
     }
-
+    static inBuiltQueryKey = {
+        btnRevert: 'LOCATOR_REVERT_SELECTOR',
+        txtLocatorName: 'LOCATOR_LOCATOR_NAME',
+        txtLocator: 'LOCATOR_LOCATOR',
+        btnCheck: 'LOCATOR_CHECK_LOCATOR',
+        btnLocatorOk: 'LOCATOR_LOCATOR_OKAY'
+    }
     get locatorName() {
         return this.__locatorName
     }
@@ -57,7 +63,7 @@ class LocatorDefiner {
         if (!this.__isSelectorValid) {
             text += 'Current selector you provide is invalid. Please try it again. If do not understand what you are doing, please click on default button'
         }
-        if (locatorName == '') {
+        if (this.locatorName == '') {
             text += 'No locator name is specified. Please specify locator name'
         }
         return text
@@ -84,6 +90,31 @@ class LocatorDefiner {
 
         }
         return finalSelection
+    }
+    update(query) {
+        let queryKeys = Object.keys(query)
+        let firstKey = queryKeys[0]
+        let firstValue = query[firstKey]
+        switch (firstKey) {
+            case LocatorDefiner.inBuiltQueryKey.btnRevert:
+                this.locatorSelector = this.defaultSelector
+                break;
+            case LocatorDefiner.inBuiltQueryKey.txtLocator:
+                this.locatorSelector = firstValue
+                break
+            case LocatorDefiner.inBuiltQueryKey.txtLocatorName:
+                this.locatorName = firstValue
+                break
+            case LocatorDefiner.inBuiltQueryKey.btnCheck:
+                this.validateCurrentLocator = true
+                break
+            case LocatorDefiner.inBuiltQueryKey.btnLocatorOk:
+                this.locatorName = this.possibleLocators[firstValue].name
+                this.locatorSelector = this.possibleLocators[firstValue].selector
+                break
+            default:
+                break;
+        }
     }
 }
 module.exports = LocatorDefiner
