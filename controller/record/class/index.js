@@ -594,7 +594,7 @@ class WorkflowRecord {
                 break
             case LocatorDefinerPug.inBuiltQueryKey.btnConfirm:
                 //check locator and confirm locator input
-                let locatorCheckResult = await this.puppeteer.checkLocatorInDefiner(this.locatorDefinerPug.locatorSelector)
+                let locatorCheckResult = await this.puppeteer.checkLocatorInDefiner(this.locatorDefinerPug.defaultSelector, this.locatorDefinerPug.locatorSelector)
                 let finalSelection = this.locatorDefinerPug.getFinalSelection(locatorCheckResult)
 
 

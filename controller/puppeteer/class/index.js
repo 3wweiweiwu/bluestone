@@ -33,8 +33,8 @@ class PuppeteerControl {
         return result
     }
 
-    async checkLocatorInDefiner(locator) {
-        let result = await checkLocatorInDefiner(this.browser, locator)
+    async checkLocatorInDefiner(targetLocator, currentLocator) {
+        let result = await checkLocatorInDefiner(this.browser, targetLocator, currentLocator)
         return result
     }
 }
