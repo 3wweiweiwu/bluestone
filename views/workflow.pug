@@ -1,5 +1,5 @@
 extends ./component/navigationHeader.pug
-include ./component/workflowTable.pug
+include ./component/workflow/workflowTable.pug
 block content
 
     +workflow-table(workflow.header,workflow.info,removeWorkflowQueryKey,upWorkflowQueryKey,downWorkflowQueryKey,editWorkflowQueryKey,locatorWorkflowQueryKey)
