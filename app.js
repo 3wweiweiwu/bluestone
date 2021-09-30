@@ -8,11 +8,12 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const recordRouter = require('./routes/record')
 const { WorkflowRecord } = require('./controller/record/class/index')
+const PuppeteerControl = require('./controller/puppeteer/class')
 
 var app = express();
 
-app.locals.puppeteerControl = null
-app.locals.workflow = new WorkflowRecord()
+app.locals.puppeteerControl = new PuppeteerControl()
+app.locals.workflow = new WorkflowRecord(app.locals.puppeteerControl)
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

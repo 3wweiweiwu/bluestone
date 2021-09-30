@@ -7,19 +7,29 @@ const getBluestonePage = require('./help/getBluestonePage')
 module.exports = async function (browser, locator) {
     //sidebar is the id for the locatorDefinerpug
     let page = await getBluestonePage(browser)
-    let viewerSelector = '#viewer'
+    //find frame that pointes to temp folder. This is the place where we store html page
     let frame = page.frames().find(item => {
-        return item._id == viewerSelector
+        return item.url().includes('/temp/')
     })
     let errorText = ''
     /** @type {Array<ElementHandle>} */
     let elements
     if (locator.startsWith('/')) {
-        elements = await frame.$x(locator)
+        try {
+            elements = await frame.$x(locator)
+        } catch (error) {
+            elements = []
+        }
+
 
     }
     else {
-        elements = await frame.$$(locator)
+        try {
+            elements = await frame.$$(locator)
+        } catch (error) {
+            elements = []
+        }
+
     }
     if (elements.length == 0) {
         errorText = 'Cannot find locator specified. Please try something else'

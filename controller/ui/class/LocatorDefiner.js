@@ -1,5 +1,6 @@
-const Locator = require('../../locator/class/Locator')
 
+const Locator = require('../../locator/class/Locator')
+const checkLocatorInDefiner = require('../../puppeteer/activities/checkLocatorInDefiner')
 class FinalLocatorSelection {
     constructor() {
         this.finalLocatorName = ''
@@ -15,13 +16,15 @@ class LocatorDefiner {
      * @param {string} locatorName the name of current locator. If it is a new locator, you shold provide ''
      * @param {string} locatorSelector the selector info. If '' is provided, it means that there is no potential match
      * @param {Array<Locator>} potentialMatch the potential match info coming from the recording step
+     * @param {number} stepIndex the index of current step. We need this inforamtion so that we can navigate back when we change the inforamtion in the step
      */
-    constructor(defaultSelector, locatorHtmlPath, locatorName, locatorSelector, potentialMatch) {
-        this.__isSelectorValid = false
+    constructor(defaultSelector, locatorHtmlPath, locatorName, locatorSelector, potentialMatch, stepIndex) {
+        this.__selectorValidationNote = ''
         this.defaultSelector = defaultSelector
         this.__locatorName = locatorName
         this.__locatorSelector = locatorSelector
         this.locatorHtml = locatorHtmlPath
+        this.__validationText = 'Please click Confirm button to validate your input'
         this.__possibleLocators = potentialMatch.map(item => {
             return {
                 name: item.path,
@@ -29,13 +32,21 @@ class LocatorDefiner {
                 pic: item.screenshot,
             }
         })
-        this.validateCurrentLocator = false
+        this.stepIndex = stepIndex
+
+    }
+    get validationText() {
+        return this.__validationText
+    }
+
+    set validationText(text) {
+        this.__validationText = text
     }
     static inBuiltQueryKey = {
         btnRevert: 'LOCATOR_REVERT_SELECTOR',
         txtLocatorName: 'LOCATOR_LOCATOR_NAME',
         txtLocator: 'LOCATOR_LOCATOR',
-        btnCheck: 'LOCATOR_CHECK_LOCATOR',
+        btnConfirm: 'LOCATOR_CHECK_LOCATOR',
         btnLocatorOk: 'LOCATOR_LOCATOR_OKAY'
     }
     get locatorName() {
@@ -50,23 +61,30 @@ class LocatorDefiner {
     set locatorName(info) {
         this.__locatorName = info
     }
-    set isSelectorValid(result) {
-        this.__isSelectorValid = result
-    }
+
     /**
      * Generate validation text based on locator name and locator validation result
      * If everything looks good, it will returns an empty string
+     * @param {string} locatorCheckErr this is locator check error from puppeteer.validateLocator function
      * @returns {string}
      */
-    getValidationText() {
+    validateLocator(locatorCheckErr) {
         let text = ''
-        if (!this.__isSelectorValid) {
-            text += 'Current selector you provide is invalid. Please try it again. If do not understand what you are doing, please click on default button'
+        if (this.locatorSelector == '') {
+            text += 'Please enter valid locator'
         }
+        else {
+            text += locatorCheckErr
+        }
+
+
         if (this.locatorName == '') {
-            text += 'No locator name is specified. Please specify locator name'
+            text += 'Please specify locator name'
         }
+
+        this.validationText = text
         return text
+
     }
     useDefaultSelector() {
         this.__locatorSelector = this.defaultSelector
@@ -78,12 +96,14 @@ class LocatorDefiner {
      * Based on the current inforamtion, generate final locator name and final locator
      * If current condition does not satisfy our need, it will return empty string for 
      * finalLocatorName nad finalLocator
+     * @param {string} locatorCheckErr This information is provided by puppeteerControl.checkLocatorInDefiner
      */
-    getFinalSelection() {
+    getFinalSelection(locatorCheckErr) {
         let finalSelection = new FinalLocatorSelection()
         //if no validation text is provided, it means everything looks good.
         //if anything goes wrong, we will not populate info for finalLocatorName and finalLocator
-        if (this.getValidationText() == '') {
+        let result = this.validateLocator(locatorCheckErr)
+        if (result == '') {
             //need to returns array here
             finalSelection.finalLocator = [this.__locatorSelector]
             finalSelection.finalLocatorName = this.__locatorName
@@ -105,9 +125,7 @@ class LocatorDefiner {
             case LocatorDefiner.inBuiltQueryKey.txtLocatorName:
                 this.locatorName = firstValue
                 break
-            case LocatorDefiner.inBuiltQueryKey.btnCheck:
-                this.validateCurrentLocator = true
-                break
+
             case LocatorDefiner.inBuiltQueryKey.btnLocatorOk:
                 this.locatorName = this.possibleLocators[firstValue].name
                 this.locatorSelector = this.possibleLocators[firstValue].selector

@@ -14,6 +14,29 @@
  * @property {string} selector //path to the selector
  * @property {ElementPos} pos
 */
+const { Page, Browser } = require('puppeteer-core')
+const openBluestoneTab = require('../activities/openBluestoneTab')
+const checkLocatorInDefiner = require('../activities/checkLocatorInDefiner')
+class PuppeteerControl {
+    constructor() {
+        /** @type {Page}*/
+        this.page = null
+        /** @type {Browser}*/
+        this.browser = null
+    }
+    /**
+     * launch bluestone page and go to specified bluestone path     
+     * @param {'spy'|'workflow'} bluestonePath 
+     */
+    async openBluestoneTab(bluestonePath) {
+        let result = await openBluestoneTab(this.browser, bluestonePath)
+        return result
+    }
 
-let s1
-module.exports = s1
+    async checkLocatorInDefiner(locator) {
+        let result = await checkLocatorInDefiner(this.browser, locator)
+        return result
+    }
+}
+
+module.exports = PuppeteerControl

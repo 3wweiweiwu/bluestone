@@ -25,7 +25,7 @@ router.get('/workflow', async function (req, res) {
     locatorWorkflowQueryKey: PugWorkflow.inBuiltQueryKey.btnLocatorWorkflow
   }
   if (req.query[PugWorkflow.inBuiltQueryKey.btnEditWorkflow]) {
-    //if we are editing current workflow, we will redirect back to spy page
+    //if we are editing current workflow, we will `redirect` back to spy page
     res.redirect('/spy')
   }
   else if (req.query[PugWorkflow.inBuiltQueryKey.btnLocatorWorkflow]) {
@@ -79,12 +79,12 @@ router.get('/locator-definer-sidebar', async function (req, res) {
     revertQueryKey: PugLocatorDefiner.inBuiltQueryKey.btnRevert,
     txtLocatorQueryKey: PugLocatorDefiner.inBuiltQueryKey.txtLocator,
     txtLocatorNameQueryKey: PugLocatorDefiner.inBuiltQueryKey.txtLocatorName,
-    btnCheckQueryKey: PugLocatorDefiner.inBuiltQueryKey.btnCheck,
+    btnCheckQueryKey: PugLocatorDefiner.inBuiltQueryKey.btnConfirm,
     txtLocatorValue: workflow.locatorDefinerPug.locatorSelector,
     txtLocatorName: workflow.locatorDefinerPug.locatorName,
     possibleLocatorMatch: workflow.locatorDefinerPug.possibleLocators,
     possibleLocatorOkQueryKey: PugLocatorDefiner.inBuiltQueryKey.btnLocatorOk,
-    validationText: workflow.locatorDefinerPug.getValidationText()
+    validationText: workflow.locatorDefinerPug.validationText
   }
 
   res.render('locatorDefinerSidebar.pug', variables);
@@ -96,7 +96,7 @@ router.get('/spy', async function (req, res, next) {
    */
   let workflow = req.app.locals.workflow
   await workflow.updateUserInputForSpy(req.query)
-  if (req.app.locals.puppeteerControl) {
+  if (req.app.locals.puppeteerControl.page) {
     hideSpy(req.app.locals.puppeteerControl.page, workflow.spyVisible)
     runCurrentOperation(req.app.locals.puppeteerControl.page, workflow.runCurrentOperation)
   }

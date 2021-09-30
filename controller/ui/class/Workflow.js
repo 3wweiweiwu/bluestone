@@ -4,6 +4,7 @@ class WorkFlowPug {
         this.target = target
         this.argument = JSON.stringify(argDic)
     }
+    //TODO: Add a button: resolve unmatched locator. 
     static inBuiltQueryKey = {
         btnRemoveWorkflowStep: 'REMOVE_WRKFLOW',
         btnMoveWorkflowUp: 'WRKFLOW_UP',

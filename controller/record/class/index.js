@@ -9,6 +9,7 @@ const _eval = require('eval')
 const WorkflowPug = require('../../ui/class/Workflow')
 const LocatorDefinerPug = require('../../ui/class/LocatorDefiner')
 const { Page } = require('puppeteer-core')
+const PuppeteerControl = require('../../puppeteer/class')
 const fs = require('fs').promises
 /**
  * @typedef {string} CommandType
@@ -96,9 +97,13 @@ class PugTextInputInfo {
     }
 }
 class WorkflowRecord {
-    constructor() {
+    /**     * 
+     * @param {PuppeteerControl} puppeteer 
+     */
+    constructor(puppeteer) {
         //TODO: seperate step into another class
         //TODO: seperate Ui spy into another class
+        this.puppeteer = puppeteer
         this.name = ''
         /** 
          * @type {Array<RecordingStep>} 
@@ -166,8 +171,9 @@ class WorkflowRecord {
      * @param {string} locatorName 
      * @param {string} locatorSelector 
      * @param {Array<Locator>} potentialMatch 
+     * @param {number} stepIndex
      */
-    async refreshLocatorDefiner(defaultSelector, locatorHtmlPath, locatorName, locatorSelector, potentialMatch) {
+    async refreshLocatorDefiner(defaultSelector, locatorHtmlPath, locatorName, locatorSelector, potentialMatch, stepIndex) {
         //convert html path from local file to relative url
         let htmlUrl = this.convertLocalPath2RelativeLink(locatorHtmlPath)
 
@@ -195,7 +201,7 @@ class WorkflowRecord {
             newPotentialMatch[i].screenshot = this.getSpySelectorPictureForPug(newPicPath)
         }
 
-        this.__locatorDefinerPug = new LocatorDefinerPug(defaultSelector, htmlUrl, locatorName, locatorSelector, newPotentialMatch)
+        this.__locatorDefinerPug = new LocatorDefinerPug(defaultSelector, htmlUrl, locatorName, locatorSelector, newPotentialMatch, stepIndex)
     }
     static inBuiltFunc = {
         testTextEqual: 'testTextEqual',
@@ -487,7 +493,7 @@ class WorkflowRecord {
             return
         }
         //handle update for current group and current operation
-        if (queryKeys.length == 1) {
+        if (queryKeys.length >= 1) {
             let key = queryKeys[0]
             await this.__updateUserInputForSpy(key, query[key])
         }
@@ -584,9 +590,24 @@ class WorkflowRecord {
             case WorkflowPug.inBuiltQueryKey.btnLocatorWorkflow:
                 let stepIndex = Number.parseInt(value)
                 targetStep = this.steps[stepIndex]
-
-                await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch)
+                await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex)
                 break
+            case LocatorDefinerPug.inBuiltQueryKey.btnConfirm:
+                //check locator and confirm locator input
+                let locatorCheckResult = await this.puppeteer.checkLocatorInDefiner(this.locatorDefinerPug.locatorSelector)
+                let finalSelection = this.locatorDefinerPug.getFinalSelection(locatorCheckResult)
+
+
+                //check all steps and replicate same setting for same locator
+                this.steps.forEach(item => {
+                    if (item.target == this.locatorDefinerPug.defaultSelector) {
+                        item.finalLocator = finalSelection.finalLocator
+                        item.finalLocatorName = finalSelection.finalLocatorName
+                    }
+                })
+
+                break
+
             default:
                 break;
         }
