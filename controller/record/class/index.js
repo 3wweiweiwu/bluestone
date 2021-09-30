@@ -54,7 +54,13 @@ class RecordingStep {
         this.meta = {}
 
         this.finalLocatorName = ''
+        if (recordingStep.finalLocatorName) {
+            this.finalLocatorName = recordingStep.finalLocatorName
+        }
         this.finalLocator = ''
+        if (recordingStep.finalLocator) {
+            this.finalLocator = recordingStep.finalLocator
+        }
         this.functionAst = recordingStep.functionAst
         if (this.functionAst) {
             this.parameter = JSON.parse(JSON.stringify(recordingStep.functionAst.params))
@@ -153,7 +159,8 @@ class WorkflowRecord {
         }
 
         this.locatorManager = new LocatorManager(config.code.locatorPath)
-
+        /**@type {WorkflowPug} */
+        this.workflowPug = new WorkflowPug([])
 
 
 
@@ -510,6 +517,7 @@ class WorkflowRecord {
             this.ui.spy.userSelection.currentArgument[currentArgumentIndex] = currentQueryKeyForValue
         }
         this.locatorDefinerPug.update(query)
+        this.workflowPug.update(query)
 
     }
     /**
@@ -539,7 +547,7 @@ class WorkflowRecord {
      * @param {string} value 
      */
     async __updateUserInputForSpy(key, value) {
-        let targetStep
+        let targetStep, stepIndex
         switch (key) {
             case WorkflowRecord.inbuiltQueryKey.currentGroup:
                 this.ui.spy.userSelection.currentGroup = value
@@ -588,9 +596,31 @@ class WorkflowRecord {
                 this.__repopulateOperationUI(targetStep)
                 break
             case WorkflowPug.inBuiltQueryKey.btnLocatorWorkflow:
-                let stepIndex = Number.parseInt(value)
+                stepIndex = Number.parseInt(value)
                 targetStep = this.steps[stepIndex]
                 await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex)
+                break
+            case WorkflowPug.inBuiltQueryKey.btnResolveLocatorQueryKey:
+                //automatically match all existing selectors
+                this.steps.forEach(item => {
+                    if (item.potentialMatch.length == 1) {
+                        item.finalLocatorName = item.potentialMatch[0].Locator
+                        item.finalLocator = item.potentialMatch[0].path
+                    }
+                })
+
+                //find out selector that is pending correlaton
+                stepIndex = this.steps.findIndex(item => {
+                    return item.finalLocator == '' || item.finalLocator == ''
+                })
+                if (stepIndex != -1) {
+                    targetStep = this.steps[stepIndex]
+                    await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex)
+                }
+
+
+                //update text info
+                this.workflowPug.validateForm(this.steps)
                 break
             case LocatorDefinerPug.inBuiltQueryKey.btnConfirm:
                 //check locator and confirm locator input
@@ -606,8 +636,13 @@ class WorkflowRecord {
                     }
                 })
 
+                this.workflowPug.validateForm(this.steps)
                 break
-
+            case WorkflowPug.inBuiltQueryKey.btnCreateTestcaseQueryKey:
+                if (this.workflowPug.validateForm(this.steps)) {
+                    //TODO: output code to file
+                }
+                break
             default:
                 break;
         }
@@ -728,24 +763,12 @@ class WorkflowRecord {
      * Create Info for workflow
      */
     getWorkflowForPug() {
-        let workflowHeader = ['Operation', 'Target', 'Arguments', 'Actions']
-        let workflowInfo = this.steps.map(step => {
-            let argStr = ''
-            if (step.functionAst != null) {
-                let currentOperation = step.functionAst.generateArgumentNContext()
-                argStr = currentOperation.argDic
-            }
-            let target = step.target
-            if (step.targetPicPath) {
-                target = path.basename(step.targetPicPath)
-            }
-            let workflowPug = new WorkflowPug(step.command, target, argStr)
-            let workflowPugArray = workflowPug.generatePugOutput()
-            return workflowPugArray
-        })
+        this.workflowPug.refreshWorkflowForPug(this.steps)
+
+
         return {
-            header: workflowHeader,
-            info: workflowInfo
+            header: this.workflowPug.workflowHeader,
+            info: this.workflowPug.workflowSteps
         }
     }
 }

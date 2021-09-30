@@ -1,5 +1,6 @@
 extends ./component/navigationHeader.pug
 include ./component/workflow/workflowTable.pug
+include ./component/workflow/testcaseControl.pug
 block content
-
+    +testcase-control(btnResolveLocatorQueryKey,btnCreateTestcaseQueryKey,txtTestSuiteQueryKey,textTestSuiteValue,txtTestCaseQueryKey,textTestCaseValue,txtValidationStatus)
     +workflow-table(workflow.header,workflow.info,removeWorkflowQueryKey,upWorkflowQueryKey,downWorkflowQueryKey,editWorkflowQueryKey,locatorWorkflowQueryKey)

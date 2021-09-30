@@ -22,7 +22,14 @@ router.get('/workflow', async function (req, res) {
     upWorkflowQueryKey: PugWorkflow.inBuiltQueryKey.btnMoveWorkflowUp,
     downWorkflowQueryKey: PugWorkflow.inBuiltQueryKey.btnMoveWorkflowDown,
     editWorkflowQueryKey: PugWorkflow.inBuiltQueryKey.btnEditWorkflow,
-    locatorWorkflowQueryKey: PugWorkflow.inBuiltQueryKey.btnLocatorWorkflow
+    locatorWorkflowQueryKey: PugWorkflow.inBuiltQueryKey.btnLocatorWorkflow,
+    btnResolveLocatorQueryKey: PugWorkflow.inBuiltQueryKey.btnResolveLocatorQueryKey,
+    btnCreateTestcaseQueryKey: PugWorkflow.inBuiltQueryKey.btnCreateTestcaseQueryKey,
+    txtTestSuiteQueryKey: PugWorkflow.inBuiltQueryKey.txtTestSuiteQueryKey,
+    txtTestCaseQueryKey: PugWorkflow.inBuiltQueryKey.txtTestCaseQueryKey,
+    textTestSuiteValue: workflow.workflowPug.textTestSuiteValue,
+    textTestCaseValue: workflow.workflowPug.textTestCaseValue,
+    txtValidationStatus: workflow.workflowPug.txtValidationStatus
   }
   if (req.query[PugWorkflow.inBuiltQueryKey.btnEditWorkflow]) {
     //if we are editing current workflow, we will `redirect` back to spy page

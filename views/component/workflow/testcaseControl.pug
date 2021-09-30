@@ -1,0 +1,16 @@
+//- table mixins
+include ../input.pug
+mixin testcase-control(btnResolveLocatorQueryKey,btnCreateTestcaseQueryKey,txtTestSuiteQueryKey,textTestSuiteValue,txtTestCaseQueryKey,textTestCaseValue,txtTestcaseStatus)
+    script(src="/javascript/redirectInput.js")
+    div(class='row')
+        div
+            +input-arguments(txtTestSuiteQueryKey,[{pugType:'input',description:'Test Suite Name',value:textTestSuiteValue}],'index')
+            +input-arguments(txtTestCaseQueryKey,[{pugType:'input',description:'Test Case Name',value:textTestCaseValue}],'index')
+            if txtTestcaseStatus==''
+                +panel-success("Testcase Status")            
+                    p=txtTestcaseStatus 
+            else 
+                +panel-danger("Testcase Status")            
+                    p=txtTestcaseStatus 
+            +a-btn-primary("?"+btnResolveLocatorQueryKey)="Resolve Pending Issues"
+            +a-btn-success("?"+btnCreateTestcaseQueryKey)="Create Testcase"

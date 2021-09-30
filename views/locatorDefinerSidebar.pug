@@ -1,18 +1,18 @@
 extends ../node_modules/pug-bootstrap/_bootstrap.pug
-include ./component/workflowTable.pug
+include ./component/workflow/workflowTable.pug
 include ./component/input.pug
-include ./component/possibleLocatorTable.pug
+include ./component/workflow/possibleLocatorTable.pug
 block body
     script(src="/javascript/redirectInput.js")
-    link(rel='stylesheet',href='/stylesheets/style.css')
-    
-    
-    
+    link(rel='stylesheet' href='/stylesheets/style.css')
+
+
+
     div(class='row')
-        
+
         +input-arguments(txtLocatorNameQueryKey,[{description:'Locator Name',pugType:"input",value:txtLocatorName}],'index')
     div(class='row')        
-        
+
         +input-arguments(txtLocatorQueryKey,[{description:'Locator Selector',pugType:"input",value:txtLocatorValue}],'index')                    
     div(class='row')                
         +a-btn-info('?'+revertQueryKey)='Revert Selector'
@@ -24,6 +24,6 @@ block body
         else 
             +panel-warning("Failed")
                 p=validationText
-    
+
     h4="Possible Locators"
     +possible-locator-table(possibleLocatorMatch,possibleLocatorOkQueryKey)
