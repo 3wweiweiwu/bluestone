@@ -6,6 +6,8 @@ const PugLocatorDefiner = require('../controller/ui/class/LocatorDefiner')
 const { hideSpy, runCurrentOperation } = require('../controller/puppeteer/index')
 const checkLocatorInDefiner = require('../controller/puppeteer/activities/checkLocatorInDefiner')
 const config = require('../config')
+const Operation = require('../controller/ui/class/Operation')
+const UI = require('../controller/ui')
 /* GET home page. */
 router.get('/', async function (req, res) {
   res.render('index.pug');
@@ -102,7 +104,12 @@ router.get('/spy', async function (req, res, next) {
    * @type {import('../controller/record/class/index.js').WorkflowRecord}
    */
   let workflow = req.app.locals.workflow
-  await workflow.updateUserInputForSpy(req.query)
+
+  /**@type {UI} */
+  let ui = req.app.locals.ui
+
+
+  await ui.updateUserInputForSpy(req.query)
   if (req.app.locals.puppeteerControl.page) {
     hideSpy(req.app.locals.puppeteerControl.page, workflow.spyVisible)
     runCurrentOperation(req.app.locals.puppeteerControl.page, workflow.runCurrentOperation)
@@ -110,20 +117,20 @@ router.get('/spy', async function (req, res, next) {
 
   let variables = {
     title: 'Express',
-    groups: workflow.getSpyGroupsInfoForPug(),
-    operations: workflow.getOperationInfoForPug(),
-    argumentList: workflow.getArgumentsInfoForPug(),
-    currentSelector: workflow.ui.spy.browserSelection.currentSelector,
-    currentSelectorPic: workflow.getSpySelectorPictureForPug(),
-    currentGroup: workflow.getCurrentGroupText(),
-    currentOperation: workflow.getCurrentOperationText(),
-    argumentsQueryKey: WorkflowRecord.inbuiltQueryKey.currentArgument,
-    argumentsQueryIndex: WorkflowRecord.inbuiltQueryKey.currentArgumentIndex,
-    btnAddStepValidation: workflow.ui.spy.validation.btnAddStep,
-    addStepQueryKey: WorkflowRecord.inbuiltQueryKey.btnAddStep,
-    cancelQueryKey: WorkflowRecord.inbuiltQueryKey.btnCancel,
-    runQueryKey: WorkflowRecord.inbuiltQueryKey.btnRun,
-    result: workflow.ui.spy.result
+    groups: ui.operation.getSpyGroupsInfoForPug(),
+    operations: ui.operation.getOperationInfoForPug(),
+    argumentList: ui.operation.getArgumentsInfoForPug(),
+    currentSelector: ui.operation.browserSelection.currentSelector,
+    currentSelectorPic: ui.operation.getSpySelectorPictureForPug(),
+    currentGroup: ui.operation.getCurrentGroupText(),
+    currentOperation: ui.operation.getCurrentOperationText(),
+    argumentsQueryKey: Operation.inbuiltQueryKey.currentArgument,
+    argumentsQueryIndex: Operation.inbuiltQueryKey.currentArgumentIndex,
+    btnAddStepValidation: ui.operation.spy.validation.btnAddStep,
+    addStepQueryKey: Operation.inbuiltQueryKey.btnAddStep,
+    cancelQueryKey: Operation.inbuiltQueryKey.btnCancel,
+    runQueryKey: Operation.inbuiltQueryKey.btnRun,
+    result: ui.operation.operationResult
   }
 
   res.render('spy.pug', variables);

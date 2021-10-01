@@ -4,6 +4,7 @@ const jimp = require('jimp')
 const path = require('path')
 const fs = require('fs').promises
 const openBluestoneTab = require('../../puppeteer/activities/openBluestoneTab')
+const Operation = require('../../puppeteer/class/index')
 /**
  * 
  * @param {import('../../record/class/index').WorkflowRecord} recordRepo 
@@ -43,7 +44,7 @@ module.exports = function (recordRepo, browser, page, io) {
             let pic = await jimp.read(picturePath)
             if (eventDetail.command == null) {
                 //for in-browser agent call
-                pic = pic.crop(recordRepo.ui.spy.browserSelection.x, recordRepo.ui.spy.browserSelection.y, recordRepo.ui.spy.browserSelection.width, recordRepo.ui.spy.browserSelection.height);
+                pic = pic.crop(recordRepo.operation.browserSelection.x, recordRepo.operation.browserSelection.y, recordRepo.operation.browserSelection.width, recordRepo.operation.browserSelection.height);
             }
             else {
                 //for ordinary event, just crop as usual
@@ -75,8 +76,8 @@ module.exports = function (recordRepo, browser, page, io) {
                 let activeFuncs = recordRepo.getActiveCustomFunctions()
                 recordRepo.mapOperationToGroups(activeFuncs)
             } catch (error) {
-                recordRepo.ui.spy.result.isPass = false
-                recordRepo.ui.spy.result.text = `Unable to load bluestone-func.js: ${error.toString()}`
+                recordRepo.operation.spy.result.isPass = false
+                recordRepo.operation.spy.result.text = `Unable to load bluestone-func.js: ${error.toString()}`
             }
 
 
@@ -87,7 +88,7 @@ module.exports = function (recordRepo, browser, page, io) {
             //we will not calculate timeout
             let timeoutMs = null
             if (page != null) {
-                timeoutMs = Date.now() - recordRepo.ui.spy.browserSelection.lastOperationTime
+                timeoutMs = Date.now() - recordRepo.operation.browserSelection.lastOperationTime
             }
             eventDetail.timeoutMs = timeoutMs
             //calculate timeout by subtracting current time to the time from previous step

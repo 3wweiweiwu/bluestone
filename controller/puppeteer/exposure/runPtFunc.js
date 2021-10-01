@@ -1,7 +1,7 @@
 const { WorkflowRecord } = require('../../record/class/index')
 const { Page, Browser } = require('puppeteer-core')
 const openBluestoneTab = require('../activities/openBluestoneTab')
-
+const Operation = require('../../puppeteer/class/index')
 const _eval = require('eval')
 /**
  * Run current operation
@@ -12,13 +12,14 @@ const _eval = require('eval')
 module.exports = function (recordRepo, browser, page, io) {
     function refreshSpy() {
         if (io) {
-            io.emit(WorkflowRecord.inbuiltEvent.refresh)
+            io.emit(Operation.inbuiltEvent.refresh)
         }
     }
     return async function () {
         recordRepo.runCurrentOperation = false
         recordRepo.spyVisible = false
         //get curren toperation
+        //TODO: fix currrent operation so that we can run testcase correctly
         let currentOperation = recordRepo.getCurrentOperation()
         //hide spy window
         let spyElement = await page.$('#bluestone_inbrowser_console')

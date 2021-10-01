@@ -8,13 +8,14 @@ module.exports = function (recordRepo) {
 
     return function (selector = '', innerText = '', x, y, height, width) {
         if (recordRepo.isRecording) {
-            recordRepo.ui.spy.browserSelection.currentSelector = selector
-            recordRepo.ui.spy.browserSelection.currentInnerText = innerText
-            recordRepo.ui.spy.browserSelection.x = x
-            recordRepo.ui.spy.browserSelection.y = y
-            recordRepo.ui.spy.browserSelection.height = height
-            recordRepo.ui.spy.browserSelection.width = width
-            recordRepo.ui.spy.browserSelection.lastOperationTimeoutMs = Date.now() - recordRepo.ui.spy.browserSelection.lastOperationTime
+
+            recordRepo.operation.browserSelection.currentSelector = selector
+            recordRepo.operation.browserSelection.currentInnerText = innerText
+            recordRepo.operation.browserSelection.x = x
+            recordRepo.operation.browserSelection.y = y
+            recordRepo.operation.browserSelection.height = height
+            recordRepo.operation.browserSelection.width = width
+            recordRepo.operation.browserSelection.lastOperationTimeoutMs = Date.now() - recordRepo.operation.browserSelection.lastOperationTime
         }
 
     }

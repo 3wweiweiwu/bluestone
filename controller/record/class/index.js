@@ -11,6 +11,7 @@ const LocatorDefinerPug = require('../../ui/class/LocatorDefiner')
 const { Page } = require('puppeteer-core')
 const PuppeteerControl = require('../../puppeteer/class')
 const fs = require('fs').promises
+
 /**
  * @typedef {string} CommandType
  **/
@@ -119,54 +120,35 @@ class WorkflowRecord {
         this.__isRecording = true
         this.astManager = new AstManager(config.code.locatorPath)
         this.__locatorDefinerPug = new LocatorDefinerPug('', '', '', '', [])
-        this.ui = {
+        this.operationGroup = {
+            customizedFunctions: {
+                text: 'Run Customzied Function',
+                operations: []
+            }
+        }
+        this.operation = {
             spy: {
-                browserSelection: {
-                    currentSelector: '',
-                    selectorPicture: '',
-                    selectorHtmlPath: '',
-                    currentInnerText: 'default',
-                    x: 0,
-                    y: 0,
-                    width: 0,
-                    height: 0,
-                    lastOperationTime: Date.now(),
-                    lastOperationTimeoutMs: 0
-                },
-                userSelection: {
-                    currentGroup: '',
-                    currentOperation: '',
-                    currentArgument: [],
-                    currentLocatorIndex: -1,
-                    currentLocatorPath: '',
-                    currentLocatorName: '',
-                    currentLocatorSelector: ''
-                },
-                group: {
-                    customizedFunctions: {
-                        text: 'Run Customzied Function',
-                        operations: []
-                    }
-                },
-                validation: {
-                    btnAddStep: ''
-                },
+                runCurrentOperation: true,
                 visible: false,
                 result: { isPass: null, text: '' },
-                runCurrentOperation: true
-
-            }
+            },
+            browserSelection: {
+                currentSelector: '',
+                selectorPicture: '',
+                selectorHtmlPath: '',
+                currentInnerText: 'default',
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0,
+                lastOperationTime: Date.now(),
+                lastOperationTimeoutMs: 0
+            },
         }
 
         this.locatorManager = new LocatorManager(config.code.locatorPath)
         /**@type {WorkflowPug} */
         this.workflowPug = new WorkflowPug([])
-
-
-
-
-
-
     }
     get locatorDefinerPug() {
         return this.__locatorDefinerPug
@@ -210,12 +192,6 @@ class WorkflowRecord {
 
         this.__locatorDefinerPug = new LocatorDefinerPug(defaultSelector, htmlUrl, locatorName, locatorSelector, newPotentialMatch, stepIndex)
     }
-    static inBuiltFunc = {
-        testTextEqual: 'testTextEqual',
-        testElementVisible: 'testElementVisible',
-        testElementInvisible: 'testElementInvisible',
-        hoverMouse: 'hoverMouse'
-    }
     /**
      * Convert local path to relative path
      * @param {string} localPath 
@@ -234,6 +210,15 @@ class WorkflowRecord {
 
 
         return resultLink
+    }
+    static inBuiltFunc = {
+        testTextEqual: 'testTextEqual',
+        testElementVisible: 'testElementVisible',
+        testElementInvisible: 'testElementInvisible',
+        hoverMouse: 'hoverMouse'
+    }
+    static inbuiltEvent = {
+        refresh: 'refresh'
     }
     /**
      * Based on the active functions, populate available functions in the group
@@ -268,7 +253,7 @@ class WorkflowRecord {
                 ]
             },
             customizedFunctions: {
-                text: this.ui.spy.group.customizedFunctions.text,
+                text: this.operationGroup.customizedFunctions.text,
                 operations: []
             }
         }
@@ -277,21 +262,21 @@ class WorkflowRecord {
             return !inBuiltFuncNames.includes(item.name)
         })
         groupInfo.customizedFunctions.operations = customizedFunctions
-        this.ui.spy.group = groupInfo
+        this.operationGroup = groupInfo
 
     }
     get runCurrentOperation() {
-        return this.ui.spy.runCurrentOperation
+        return this.operation.spy.runCurrentOperation
     }
     runCurrentOperation(willRun) {
-        this.ui.spy.runCurrentOperation = willRun
+        this.operation.spy.runCurrentOperation = willRun
     }
     /**
      * get active functions based on active elements on screen
      * @returns {Array<import('../../ast/class/Function')>}
      */
     getActiveCustomFunctions() {
-        this.ui.spy.group.customizedFunctions.operations = []
+        this.operationGroup.customizedFunctions.operations = []
         let activeElements = this.locatorManager.getActiveSelectors()
         //convert active elements into array of javascript string for the ease of the comparison
         let jsonLocatorArray = activeElements.map(element => {
@@ -310,154 +295,35 @@ class WorkflowRecord {
         return activeFunctions
     }
     set spyVisible(isVisible) {
-        this.ui.spy.visible = isVisible
+        this.operation.spy.visible = isVisible
     }
     get spyVisible() {
-        return this.ui.spy.visible
+        return this.operation.spy.visible
     }
     set spyBrowserSelectionPicPath(picturePath = '') {
-        this.ui.spy.browserSelection.selectorPicture = picturePath
+        this.operation.browserSelection.selectorPicture = picturePath
     }
     set spyBrowserSelectionHtmlPath(htmlPath = '') {
-        this.ui.spy.browserSelection.selectorHtmlPath = htmlPath
-    }
-    static inbuiltOperation = {
-
-        textEqual: 'testTextEqual',
-        itemVisible: 'itemVisible',
-        itemInvisible: 'itemInvisible',
-        hover: 'hover'
-
-    }
-    static inbuiltId = {
-        spy: 'bluestone_inbrowser_console'
-    }
-    static inbuiltQueryKey = {
-        currentGroup: 'currentGroup',
-        currentOperation: 'currentOperation',
-        currentArgument: 'currentArgument',
-        currentArgumentIndex: 'currentArgumentIndex',
-        btnAddStep: 'btnAddStep',
-        btnCancel: 'btnCancel',
-        btnRun: 'btnRun'
-    }
-    static inbuiltEvent = {
-        refresh: 'refresh'
-    }
-    /**
-     * return a list of group info for the pug to consume 
-     */
-    getSpyGroupsInfoForPug() {
-        let groupId = Object.keys(this.ui.spy.group)
-        let groupInfo = groupId.map(id => {
-            return new PugDropDownInfo(id, this.ui.spy.group[id].text, `spy?${WorkflowRecord.inbuiltQueryKey.currentGroup}=${id}`)
-        })
-        return groupInfo
-    }
-    /**
-     * return a list of operation based on curent group
-     * @returns 
-     */
-    getOperationInfoForPug() {
-        let currentGroup = this.ui.spy.userSelection.currentGroup
-
-        if (currentGroup == '') {
-            return []
-        }
-
-        let operationInfo = this.ui.spy.group[currentGroup].operations.map(item => {
-            return new PugDropDownInfo(item.name, item.description, `spy?${WorkflowRecord.inbuiltQueryKey.currentOperation}=${item.name}`)
-        })
-
-        return operationInfo
-
-
+        this.operation.browserSelection.selectorHtmlPath = htmlPath
     }
 
-    getArgumentsInfoForPug() {
-
-        let operation = this.getCurrentOperation()
-        if (operation == null) return []
-        if (operation.params == null) {
-            return []
-        }
-        let result = []
-        //add pugType property for the UI input
-        let uiIndex = 0
-        let operationArguments = operation.params.reduce((previousValue, currentValue, currentIndex) => {
-            let standardizedCurrentType = currentValue.type.name.toLowerCase()
-            if (standardizedCurrentType == 'string') {
-                currentValue['pugType'] = 'text'
-                previousValue.push(currentValue)
-                //if this is string for text equal, automatically populate value
-                if (operation.name == WorkflowRecord.inbuiltOperation.textEqual) {
-                    operation.params[currentIndex].value = this.ui.spy.browserSelection.currentInnerText
-                }
-                uiIndex++
-            }
-            else if (standardizedCurrentType == 'number') {
-                currentValue['pugType'] = 'number'
-                previousValue.push(currentValue)
-                uiIndex++
-            }
-            else {
-                console.log()
-                //mark params value to be page/browser/element
-            }
-            return previousValue
-        }, [])
-        return operationArguments
-    }
-    getCurrentGroup() {
-        if (this.ui.spy.userSelection.currentGroup == null || this.ui.spy.userSelection.currentGroup == '') {
-            return ''
-        }
 
 
-        return this.ui.spy.group[this.ui.spy.userSelection.currentGroup]
-    }
+
+
+
+
+
     /**
      * Set Last operation time
      */
     setLastOperationTime() {
-        this.ui.spy.browserSelection.lastOperationTime = Date.now()
+        this.operation.browserSelection.lastOperationTime = Date.now()
     }
 
-    /**
-     *  based on current selector info, return current selector we have 
-     * @returns {FunctionAST}
-     */
-    getCurrentOperation() {
-        //check group info
-        if (this.ui.spy.userSelection.currentGroup == null || this.ui.spy.userSelection.currentGroup == '') {
-            return ''
-        }
-        //check operation info
-        if (this.ui.spy.userSelection.currentOperation == null || this.ui.spy.userSelection.currentOperation == '') {
-            return ''
-        }
 
-        let operationInfo = this.ui.spy.group[this.ui.spy.userSelection.currentGroup].operations.find(item => {
-            return item.name == this.ui.spy.userSelection.currentOperation
-        })
-        return operationInfo
-    }
-    getCurrentGroupText() {
-        let current = this.getCurrentGroup()
-        let text = ''
-        if (current != null) {
-            text = current.text
-        }
-        return text
-    }
-    getCurrentOperationText() {
-        let current = this.getCurrentOperation()
-        let text = ''
-        if (current != null) {
-            text = current.description
-        }
-        return text
-    }
+
+
     set isRecording(recordStatus) {
         this.__isRecording = recordStatus
     }
@@ -504,181 +370,45 @@ class WorkflowRecord {
             let key = queryKeys[0]
             await this.__updateUserInputForSpy(key, query[key])
         }
-        //handle update for arguments
-        if (queryKeys.includes(WorkflowRecord.inbuiltQueryKey.currentArgument) && queryKeys.includes(WorkflowRecord.inbuiltQueryKey.currentArgumentIndex)) {
-            //update ui value
-            let currentArgumentIndex = query[WorkflowRecord.inbuiltQueryKey.currentArgumentIndex]
-            let currentQueryKeyForValue = query[WorkflowRecord.inbuiltQueryKey.currentArgument]
-            let currentFunction = this.getCurrentOperation()
-            let argIndex = this.__convertUIIndex2ArgumentIndex(currentArgumentIndex, currentFunction)
-            currentFunction.params[argIndex].value = currentQueryKeyForValue
 
-            //update user selection value
-            this.ui.spy.userSelection.currentArgument[currentArgumentIndex] = currentQueryKeyForValue
-        }
         this.locatorDefinerPug.update(query)
         this.workflowPug.update(query)
 
     }
-    /**
-     * Convert UI Index to actual argument index
-     * @param {number} uiIndex 
-     * @param {FunctionAST} operation 
-     */
-    __convertUIIndex2ArgumentIndex(uiIndex, operation) {
-        let qualifiedArgCounter = -1
-        let convertedIndex = 0
-        for (let i = 0; i < operation.params.length + 1; i++) {
-            let typeName = operation.params[i].type.name.toLowerCase()
-            if (typeName == 'number' || typeName == 'string') {
-                qualifiedArgCounter++
-            }
-            if (qualifiedArgCounter == uiIndex) {
-                convertedIndex = i
-                break
-            }
-        }
-        return convertedIndex
-
-    }
-    /**
-     * This is place where we handle single query call for the ui input
-     * @param {string} key 
-     * @param {string} value 
-     */
-    async __updateUserInputForSpy(key, value) {
-        let targetStep, stepIndex
-        switch (key) {
-            case WorkflowRecord.inbuiltQueryKey.currentGroup:
-                this.ui.spy.userSelection.currentGroup = value
-                break;
-            case WorkflowRecord.inbuiltQueryKey.currentOperation:
-                this.ui.spy.userSelection.currentOperation = value
-                this.ui.spy.userSelection.currentArgument = this.getCurrentOperation().params.map(argument => {
-                    return argument.description
-                })
-                break;
-            case WorkflowRecord.inbuiltQueryKey.btnAddStep:
-                this.__validateOverallFormForSpy()
-                //if validation is done correctly, add current operation
-                if (this.ui.spy.validation.btnAddStep == '') {
-                    let currentOperation = this.getCurrentOperation()
-                    let command = currentOperation.name
-                    let target = this.ui.spy.browserSelection.currentSelector
-                    let targetInnerText = this.ui.spy.browserSelection.currentInnerText
-                    let targetPicPath = this.ui.spy.browserSelection.selectorPicture
-                    let timeoutMs = this.ui.spy.browserSelection.lastOperationTimeoutMs
-                    let htmlPath = this.ui.spy.browserSelection.selectorHtmlPath
-                    let step = new RecordingStep({ command, target, timeoutMs, targetPicPath, targetInnerText, functionAst: currentOperation, htmlPath: htmlPath })
-                    this.addStep(step)
-                    console.log(this.steps)
-                }
-                break;
-            case WorkflowRecord.inbuiltQueryKey.btnCancel:
-                this.isRecording = true
-                this.spyVisible = false
-
-                break;
-            case WorkflowRecord.inbuiltQueryKey.btnRun:
-                this.runCurrentOperation = true
-                break;
-            case WorkflowPug.inBuiltQueryKey.btnRemoveWorkflowStep:
-                this.steps.splice(value, 1)
-                break
-            case WorkflowPug.inBuiltQueryKey.btnMoveWorkflowUp:
-                this.__moveItemInArray(value, -1)
-                break
-            case WorkflowPug.inBuiltQueryKey.btnMoveWorkflowDown:
-                this.__moveItemInArray(value, 1)
-                break
-            case WorkflowPug.inBuiltQueryKey.btnEditWorkflow:
-                targetStep = this.steps[value]
-                this.__repopulateOperationUI(targetStep)
-                break
-            case WorkflowPug.inBuiltQueryKey.btnLocatorWorkflow:
-                stepIndex = Number.parseInt(value)
-                targetStep = this.steps[stepIndex]
-                await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex)
-                break
-            case WorkflowPug.inBuiltQueryKey.btnResolveLocatorQueryKey:
-                //automatically match all existing selectors
-                this.steps.forEach(item => {
-                    if (item.potentialMatch.length == 1) {
-                        item.finalLocatorName = item.potentialMatch[0].Locator
-                        item.finalLocator = item.potentialMatch[0].path
-                    }
-                })
-
-                //find out selector that is pending correlaton
-                stepIndex = this.steps.findIndex(item => {
-                    return item.finalLocator == '' || item.finalLocator == ''
-                })
-                if (stepIndex != -1) {
-                    targetStep = this.steps[stepIndex]
-                    await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex)
-                }
 
 
-                //update text info
-                this.workflowPug.validateForm(this.steps)
-                break
-            case LocatorDefinerPug.inBuiltQueryKey.btnConfirm:
-                //check locator and confirm locator input
-                let locatorCheckResult = await this.puppeteer.checkLocatorInDefiner(this.locatorDefinerPug.defaultSelector, this.locatorDefinerPug.locatorSelector)
-                let finalSelection = this.locatorDefinerPug.getFinalSelection(locatorCheckResult)
-
-
-                //check all steps and replicate same setting for same locator
-                this.steps.forEach(item => {
-                    if (item.target == this.locatorDefinerPug.defaultSelector) {
-                        item.finalLocator = finalSelection.finalLocator
-                        item.finalLocatorName = finalSelection.finalLocatorName
-                    }
-                })
-
-                this.workflowPug.validateForm(this.steps)
-                break
-            case WorkflowPug.inBuiltQueryKey.btnCreateTestcaseQueryKey:
-                if (this.workflowPug.validateForm(this.steps)) {
-                    //TODO: output code to file
-                }
-                break
-            default:
-                break;
-        }
-    }
     /**
      * Based on the current step, repopulate UI
      * @param {RecordingStep} step 
      */
     __repopulateOperationUI(step) {
 
-        let currentGroupKeys = Object.keys(this.ui.spy.group)
+        let currentGroupKeys = Object.keys(this.operation.spy.group)
         let findOperation = false
         for (let i = 0; i < currentGroupKeys.length; i++) {
             let groupKey = currentGroupKeys[i]
             /** @type {Array<FunctionAST>} */
-            let operations = this.ui.spy.group[groupKey].operations
+            let operations = this.operation.spy.group[groupKey].operations
             let currentOperation = operations.find(item => {
                 if (item == null) return false
                 return item.name == step.command
             })
 
             if (currentOperation != null) {
-                this.ui.spy.userSelection.currentGroup = groupKey
-                this.ui.spy.userSelection.currentOperation = step.functionAst.name
-                this.ui.spy.browserSelection.currentInnerText = step.targetInnerText
-                this.ui.spy.browserSelection.currentSelector = step.target
-                this.ui.spy.browserSelection.selectorPicture = step.targetPicPath
-                this.ui.spy.browserSelection.lastOperationTimeoutMs = step.timeoutMs
+                this.operation.spy.userSelection.currentGroup = groupKey
+                this.operation.spy.userSelection.currentOperation = step.functionAst.name
+                this.operation.browserSelection.currentInnerText = step.targetInnerText
+                this.operation.browserSelection.currentSelector = step.target
+                this.operation.browserSelection.selectorPicture = step.targetPicPath
+                this.operation.browserSelection.lastOperationTimeoutMs = step.timeoutMs
                 findOperation = true
                 break
             }
 
         }
         if (!findOperation) {
-            this.ui.spy.result.isPass = false
-            this.ui.spy.result.text = `Unable to find function ${step.command}`
+            this.operation.spy.result.isPass = false
+            this.operation.spy.result.text = `Unable to find function ${step.command}`
         }
     }
     /**
@@ -704,39 +434,7 @@ class WorkflowRecord {
         eval()
     }
 
-    /**
-     * Validate current ui and see if all elements has been popoulated
-     * If all elements have been populated, this.ui.spy.validation.btnAddStep will equal to ''
-     * Otherwise, it will save validation error in this.ui.spy.validation.btnAddStep
-     * @returns 
-     */
-    __validateOverallFormForSpy() {
 
-        this.ui.spy.validation.btnAddStep = ''
-        //check group info
-        if (this.ui.spy.userSelection.currentGroup == null || this.ui.spy.userSelection.currentGroup == '') {
-            this.ui.spy.validation.btnAddStep = `Please input group info`
-            return
-        }
-
-        //check operation info
-        if (this.ui.spy.userSelection.currentOperation == null || this.ui.spy.userSelection.currentOperation == '') {
-            this.ui.spy.validation.btnAddStep = `Please input operation info`
-            return
-        }
-        //all argument need to be populated
-        let currentOperation = this.getCurrentOperation()
-        let emptyArgumentIndex = currentOperation.params.findIndex(item => {
-            //find out empty argument only for string and number input becasue we won't take any other input type here
-            return (item.type.name == 'string' || item.type.name == 'number') && (item.value == null || item.value == '')
-        })
-        if (emptyArgumentIndex != -1 && this.getCurrentOperation().name != WorkflowRecord.inBuiltFunc.testTextEqual) {
-            this.ui.spy.validation.btnAddStep = `Please enter value for argument`
-            return
-        }
-
-
-    }
     /**
      * returns the picture path for current step
      */
@@ -755,10 +453,7 @@ class WorkflowRecord {
         return filePath
 
     }
-    getSpySelectorPictureForPug(picturePath = this.ui.spy.browserSelection.selectorPicture) {
-        let pictureName = path.basename(picturePath)
-        return pictureName
-    }
+
     /**
      * Create Info for workflow
      */
