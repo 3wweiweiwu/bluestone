@@ -82,6 +82,7 @@ class Operation {
         let operationInfo = allOperationGroup[this.spy.userSelection.currentGroup].operations.find(item => {
             return item.name == this.spy.userSelection.currentOperation
         })
+        this.backend.operation.browserSelection.currentOpeartion = operationInfo
         return operationInfo
     }
     getCurrentGroup() {

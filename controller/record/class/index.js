@@ -126,6 +126,7 @@ class WorkflowRecord {
                 operations: []
             }
         }
+
         this.operation = {
             spy: {
                 runCurrentOperation: true,
@@ -142,13 +143,17 @@ class WorkflowRecord {
                 width: 0,
                 height: 0,
                 lastOperationTime: Date.now(),
-                lastOperationTimeoutMs: 0
+                lastOperationTimeoutMs: 0,
+                currentOpeartion: null
             },
         }
 
         this.locatorManager = new LocatorManager(config.code.locatorPath)
         /**@type {WorkflowPug} */
         this.workflowPug = new WorkflowPug([])
+    }
+    getCurrentOperation() {
+        return this.operation.browserSelection.currentOpeartion
     }
     get locatorDefinerPug() {
         return this.__locatorDefinerPug
