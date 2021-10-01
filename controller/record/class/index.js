@@ -129,7 +129,7 @@ class WorkflowRecord {
 
         this.operation = {
             spy: {
-                runCurrentOperation: true,
+                runCurrentOperation: false,
                 visible: false,
                 result: { isPass: null, text: '' },
             },
