@@ -6,7 +6,6 @@ const FunctionAST = require('../../ast/class/Function')
 const JsDocTag = require('../../ast/class/JsDocTag')
 const { testTextEqual } = require('../../../ptLibrary/functions/inbuiltFunc')
 const _eval = require('eval')
-const WorkflowPug = require('../../ui/class/Workflow')
 const LocatorDefinerPug = require('../../ui/class/LocatorDefiner')
 const { Page } = require('puppeteer-core')
 const PuppeteerControl = require('../../puppeteer/class')
@@ -109,7 +108,6 @@ class WorkflowRecord {
      */
     constructor(puppeteer) {
         //TODO: seperate step into another class
-        //TODO: seperate Ui spy into another class
         this.puppeteer = puppeteer
         this.name = ''
         /** 
@@ -149,8 +147,6 @@ class WorkflowRecord {
         }
 
         this.locatorManager = new LocatorManager(config.code.locatorPath)
-        /**@type {WorkflowPug} */
-        this.workflowPug = new WorkflowPug([])
     }
     getCurrentOperation() {
         return this.operation.browserSelection.currentOpeartion
@@ -336,13 +332,27 @@ class WorkflowRecord {
         return this.__isRecording
     }
     /**
+     * Refresh available functionGroup based on active element in current screen
+     * This function will load both inbuilt function and custom function
+     */
+    async refreshActiveFunc() {
+        let inbuiltFuncPath = path.join(__dirname, '../../../ptLibrary/bluestone-func.js')
+        await this.astManager.loadFunctions(config.code.funcPath)
+        await this.astManager.loadFunctions(inbuiltFuncPath)
+        let activeFuncs = this.getActiveCustomFunctions()
+        this.mapOperationToGroups(activeFuncs)
+    }
+    /**
      * add current event to the list
      * @param {RecordingStep} event 
      */
-    addStep(event) {
+    async addStep(event) {
         //TODO: handle change event, it should give us data
         event.potentialMatch = this.__findPotentialMatchForEvent(event.target)
         this.steps.push(event)
+        await this.refreshActiveFunc()
+
+
         this.setLastOperationTime()
     }
     /**
@@ -382,46 +392,13 @@ class WorkflowRecord {
     }
 
 
-    /**
-     * Based on the current step, repopulate UI
-     * @param {RecordingStep} step 
-     */
-    __repopulateOperationUI(step) {
 
-        let currentGroupKeys = Object.keys(this.operation.spy.group)
-        let findOperation = false
-        for (let i = 0; i < currentGroupKeys.length; i++) {
-            let groupKey = currentGroupKeys[i]
-            /** @type {Array<FunctionAST>} */
-            let operations = this.operation.spy.group[groupKey].operations
-            let currentOperation = operations.find(item => {
-                if (item == null) return false
-                return item.name == step.command
-            })
-
-            if (currentOperation != null) {
-                this.operation.spy.userSelection.currentGroup = groupKey
-                this.operation.spy.userSelection.currentOperation = step.functionAst.name
-                this.operation.browserSelection.currentInnerText = step.targetInnerText
-                this.operation.browserSelection.currentSelector = step.target
-                this.operation.browserSelection.selectorPicture = step.targetPicPath
-                this.operation.browserSelection.lastOperationTimeoutMs = step.timeoutMs
-                findOperation = true
-                break
-            }
-
-        }
-        if (!findOperation) {
-            this.operation.spy.result.isPass = false
-            this.operation.spy.result.text = `Unable to find function ${step.command}`
-        }
-    }
     /**
      * Based on the offset, update step sequence
     * @param {string} fromIndex 
     * @param {number} offset 
      */
-    __moveItemInArray(fromIndex, offset) {
+    moveStepInArray(fromIndex, offset) {
         fromIndex = Number.parseInt(fromIndex)
         let toIndex = fromIndex + offset
         let arr = this.steps
@@ -459,18 +436,7 @@ class WorkflowRecord {
 
     }
 
-    /**
-     * Create Info for workflow
-     */
-    getWorkflowForPug() {
-        this.workflowPug.refreshWorkflowForPug(this.steps)
 
-
-        return {
-            header: this.workflowPug.workflowHeader,
-            info: this.workflowPug.workflowSteps
-        }
-    }
 }
 
 module.exports = { WorkflowRecord, RecordingStep, COMMAND_TYPE }

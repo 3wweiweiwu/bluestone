@@ -1,4 +1,5 @@
 const path = require("path")
+const { WorkflowRecord, RecordingStep } = require('../../record/class')
 class WorkflowStepForPug {
     constructor(command, target, argDic) {
         this.command = command
@@ -17,7 +18,6 @@ class WorkflowStepForPug {
 
 class WorkFlowPug {
 
-    //TODO: Add a button: resolve unmatched locator. 
     static inBuiltQueryKey = {
         btnRemoveWorkflowStep: 'REMOVE_WRKFLOW',
         btnMoveWorkflowUp: 'WRKFLOW_UP',
@@ -32,8 +32,9 @@ class WorkFlowPug {
     /**
      * 
      * @param {Array<import('../../record/class/index').RecordingStep>} steps 
+     * @param {WorkflowRecord} backend
      */
-    constructor(steps) {
+    constructor(steps, backend) {
         this.workflowHeader = ['Operation', 'Target', 'Arguments', 'Actions']
         /** @type {List<WorkflowStepForPug>} */
         this.workflowSteps = null
@@ -42,6 +43,19 @@ class WorkFlowPug {
         this.textTestCaseValue = ''
         this.txtValidationStatus = ''
         this.textFileName = ''
+        this.backend = backend
+    }
+    /**
+     * Create UI info for workflow
+     */
+    getWorkflowForPug() {
+        this.refreshWorkflowForPug(this.backend.steps)
+
+
+        return {
+            header: this.workflowHeader,
+            info: this.workflowSteps
+        }
     }
     /**
      * 
@@ -66,12 +80,52 @@ class WorkFlowPug {
         this.workflowSteps = workflowInfo
     }
     //based on the query,update front-end data structure
-    update(query) {
+    async update(query) {
         let queryKeys = Object.keys(query)
         let firstKey = queryKeys[0]
         let firstValue = query[firstKey]
-        switch (firstKey) {
+        let stepIndex = -1
+        /**@type {RecordingStep} */
+        let targetStep = null
 
+        switch (firstKey) {
+            case WorkFlowPug.inBuiltQueryKey.btnRemoveWorkflowStep:
+                this.backend.steps.splice(firstValue, 1)
+
+                break
+            case WorkFlowPug.inBuiltQueryKey.btnMoveWorkflowUp:
+                this.backend.moveStepInArray(firstValue, -1)
+
+                break
+            case WorkFlowPug.inBuiltQueryKey.btnMoveWorkflowDown:
+                this.backend.moveStepInArray(firstValue, 1)
+                break
+            //TODO: This require integration with locator definer
+            case WorkFlowPug.inBuiltQueryKey.btnLocatorWorkflow:
+                stepIndex = Number.parseInt(firstValue)
+                targetStep = this.backend.steps[stepIndex]
+                // await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex)
+                break
+            case WorkFlowPug.inBuiltQueryKey.btnResolveLocatorQueryKey:
+                //automatically match all existing selectors
+                this.backend.steps.forEach(item => {
+                    if (item.potentialMatch.length == 1) {
+                        item.finalLocatorName = item.potentialMatch[0].Locator
+                        item.finalLocator = item.potentialMatch[0].path
+                    }
+                })
+
+                //find out selector that is pending correlaton
+                stepIndex = this.backend.steps.findIndex(item => {
+                    return item.finalLocator == '' || item.finalLocator == ''
+                })
+                if (stepIndex != -1) {
+                    targetStep = this.backend.steps[stepIndex]
+                    await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex)
+                }
+                //update text info
+                this.validateForm(this.backend.steps)
+                break
             case WorkFlowPug.inBuiltQueryKey.txtTestSuiteQueryKey:
                 this.textTestSuiteValue = firstValue
                 break

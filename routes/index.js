@@ -17,9 +17,11 @@ router.get('/workflow', async function (req, res) {
    * @type {import('../controller/record/class/index.js').WorkflowRecord}
    */
   let workflow = req.app.locals.workflow
-  await workflow.updateUserInputForSpy(req.query)
+  /**@type {UI} */
+  let ui = req.app.locals.ui
+  await ui.updateUserInputForSpy(req.query)
   let variables = {
-    workflow: workflow.getWorkflowForPug(),
+    workflow: ui.workflow.getWorkflowForPug(),
     removeWorkflowQueryKey: PugWorkflow.inBuiltQueryKey.btnRemoveWorkflowStep,
     upWorkflowQueryKey: PugWorkflow.inBuiltQueryKey.btnMoveWorkflowUp,
     downWorkflowQueryKey: PugWorkflow.inBuiltQueryKey.btnMoveWorkflowDown,
@@ -29,9 +31,9 @@ router.get('/workflow', async function (req, res) {
     btnCreateTestcaseQueryKey: PugWorkflow.inBuiltQueryKey.btnCreateTestcaseQueryKey,
     txtTestSuiteQueryKey: PugWorkflow.inBuiltQueryKey.txtTestSuiteQueryKey,
     txtTestCaseQueryKey: PugWorkflow.inBuiltQueryKey.txtTestCaseQueryKey,
-    textTestSuiteValue: workflow.workflowPug.textTestSuiteValue,
-    textTestCaseValue: workflow.workflowPug.textTestCaseValue,
-    txtValidationStatus: workflow.workflowPug.txtValidationStatus
+    textTestSuiteValue: ui.workflow.textTestSuiteValue,
+    textTestCaseValue: ui.workflow.textTestCaseValue,
+    txtValidationStatus: ui.workflow.txtValidationStatus
   }
   if (req.query[PugWorkflow.inBuiltQueryKey.btnEditWorkflow]) {
     //if we are editing current workflow, we will `redirect` back to spy page

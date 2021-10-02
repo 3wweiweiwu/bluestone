@@ -120,14 +120,14 @@ class Operation {
             //find out empty argument only for string and number input becasue we won't take any other input type here
             return (item.type.name == 'string' || item.type.name == 'number') && (item.value == null || item.value == '')
         })
-        if (emptyArgumentIndex != -1 && this.getCurrentOperation().name != Operation.inBuiltFunc.testTextEqual) {
+        if (emptyArgumentIndex != -1 && this.getCurrentOperation().name != WorkflowRecord.inBuiltFunc.testTextEqual) {
             this.spy.validation.btnAddStep = `Please enter value for argument`
             return
         }
 
 
     }
-    update(query) {
+    async update(query) {
         let queryKeys = Object.keys(query)
         let firstKey = queryKeys[0]
         let firstValue = query[firstKey]
@@ -148,14 +148,14 @@ class Operation {
                     let currentOperation = this.getCurrentOperation()
                     let command = currentOperation.name
 
-                    let target = this.backend.operation.spy.browserSelection.currentSelector
+                    let target = this.backend.operation.browserSelection.currentSelector
 
-                    let targetInnerText = this.backend.operation.spy.browserSelection.currentInnerText
-                    let targetPicPath = this.backend.operation.spy.browserSelection.selectorPicture
-                    let timeoutMs = this.backend.operation.spy.browserSelection.lastOperationTimeoutMs
-                    let htmlPath = this.backend.operation.spy.browserSelection.selectorHtmlPath
+                    let targetInnerText = this.backend.operation.browserSelection.currentInnerText
+                    let targetPicPath = this.backend.operation.browserSelection.selectorPicture
+                    let timeoutMs = this.backend.operation.browserSelection.lastOperationTimeoutMs
+                    let htmlPath = this.backend.operation.browserSelection.selectorHtmlPath
                     let step = new RecordingStep({ command, target, timeoutMs, targetPicPath, targetInnerText, functionAst: currentOperation, htmlPath: htmlPath })
-                    this.backend.addStep(step)
+                    await this.backend.addStep(step)
                     console.log(this.backend.steps)
                 }
                 break;

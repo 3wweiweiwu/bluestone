@@ -19,10 +19,9 @@ module.exports = function (recordRepo, browser, page, io) {
         recordRepo.runCurrentOperation = false
         recordRepo.spyVisible = false
         //get curren toperation
-        //TODO: fix currrent operation so that we can run testcase correctly
         let currentOperation = recordRepo.getCurrentOperation()
         //hide spy window
-        
+
 
         page.bringToFront()
         page.waitForTimeout(500)

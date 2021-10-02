@@ -61,25 +61,18 @@ module.exports = function (recordRepo, browser, page, io) {
             recordRepo.isRecording = false
             recordRepo.spyBrowserSelectionHtmlPath = htmlPath
             console.log('pause recording and call in-browser agent')
-
-            //display mvt console
-            await openBluestoneTab(browser, "spy")
-
-
             recordRepo.spyVisible = true
-
-            let ptFuncPath = path.join(__dirname, '../../../ptLibrary/bluestone-func.js')
             //populate group info
             try {
-                await recordRepo.astManager.loadFunctions(ptFuncPath)
-                await recordRepo.astManager.loadFunctions(config.code.funcPath)
-                let activeFuncs = recordRepo.getActiveCustomFunctions()
-                recordRepo.mapOperationToGroups(activeFuncs)
+                await recordRepo.refreshActiveFunc()
+
             } catch (error) {
                 recordRepo.operation.spy.result.isPass = false
                 recordRepo.operation.spy.result.text = `Unable to load bluestone-func.js: ${error.toString()}`
             }
 
+            //display mvt console
+            await openBluestoneTab(browser, "spy")
 
 
         }
@@ -97,7 +90,7 @@ module.exports = function (recordRepo, browser, page, io) {
             eventDetail.htmlPath = htmlPath
             let event = new RecordingStep(eventDetail)
 
-            recordRepo.addStep(event)
+            await recordRepo.addStep(event)
             console.log(JSON.stringify(recordRepo.steps))
             //update last operation time
         }
