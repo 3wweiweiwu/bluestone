@@ -269,7 +269,7 @@ class WorkflowRecord {
     get runCurrentOperation() {
         return this.operation.spy.runCurrentOperation
     }
-    runCurrentOperation(willRun) {
+    set runCurrentOperation(willRun) {
         this.operation.spy.runCurrentOperation = willRun
     }
     /**

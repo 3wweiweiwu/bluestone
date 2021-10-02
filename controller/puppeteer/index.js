@@ -83,8 +83,8 @@ async function hideSpy(page, isSpyVisible) {
  * run current opeation if runCurrentOperation argument is true
  * @param {import('puppeteer').Page} page 
  */
-async function runCurrentOperation(page, runCurrentOperation) {
-    if (runCurrentOperation == false) return
+async function runCurrentOperation(page, runOperation) {
+    if (runOperation == false) return
 
     //if spy is invisible, set attribute
     //the fist time we run it, page object may not be ready
