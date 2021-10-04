@@ -154,8 +154,14 @@ class Operation {
                     let targetPicPath = this.backend.operation.browserSelection.selectorPicture
                     let timeoutMs = this.backend.operation.browserSelection.lastOperationTimeoutMs
                     let htmlPath = this.backend.operation.browserSelection.selectorHtmlPath
-                    let step = new RecordingStep({ command, target, timeoutMs, targetPicPath, targetInnerText, functionAst: currentOperation, htmlPath: htmlPath })
+
+                    //construct operation step
+                    let step = new RecordingStep({ command, target, timeoutMs: timeoutMs, targetPicPath, targetInnerText, functionAst: currentOperation, htmlPath: htmlPath })
+
+
+
                     await this.backend.addStep(step)
+                    this.backend.operation.browserSelection.lastOperationTimeoutMs = 0
                     console.log(this.backend.steps)
                 }
                 break;

@@ -147,6 +147,9 @@ class WorkflowRecord {
         }
 
         this.locatorManager = new LocatorManager(config.code.locatorPath)
+        this.inbuiltFuncPath = path.join(__dirname, '../../../ptLibrary/bluestone-func.js')
+        this.astManager.loadFunctions(config.code.funcPath)
+        this.astManager.loadFunctions(this.inbuiltFuncPath)
     }
     getCurrentOperation() {
         return this.operation.browserSelection.currentOpeartion
@@ -175,6 +178,7 @@ class WorkflowRecord {
         testTextEqual: 'testTextEqual',
         testElementVisible: 'testElementVisible',
         testElementInvisible: 'testElementInvisible',
+        waitElementExists: 'waitElementExists',
         hoverMouse: 'hoverMouse'
     }
     static inbuiltEvent = {
@@ -209,7 +213,7 @@ class WorkflowRecord {
             inbuiltFunction: {
                 text: 'Run In-built function',
                 operations: [
-                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.hoverMouse)
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.waitElementExists)
                 ]
             },
             customizedFunctions: {
@@ -223,6 +227,24 @@ class WorkflowRecord {
         })
         groupInfo.customizedFunctions.operations = customizedFunctions
         this.operationGroup = groupInfo
+
+    }
+    /**
+     * Based on current step, decide if add wait before the call
+     * @param {RecordingStep} step the operation step
+     */
+    __addWaitForSteps(step) {
+        let waitCommand = 'waitElementExists'
+        //cosntruct wait step. insert wait step only if timeout is greater than 0 and previous command is not wait
+        if (step.command != 'goto' && step.command != waitCommand && step.timeoutMs != 0) {
+            let waitFunctionAst = this.astManager.getFunction(waitCommand)
+            let waitStep = JSON.parse(JSON.stringify(step))
+            waitStep.command = waitCommand
+            waitStep.functionAst = waitFunctionAst
+            //hard code wait time param here
+            waitStep.functionAst.params[2].value = step.timeoutMs
+            this.steps.push(waitStep)
+        }
 
     }
     get runCurrentOperation() {
@@ -295,9 +317,9 @@ class WorkflowRecord {
      * This function will load both inbuilt function and custom function
      */
     async refreshActiveFunc() {
-        let inbuiltFuncPath = path.join(__dirname, '../../../ptLibrary/bluestone-func.js')
+
         await this.astManager.loadFunctions(config.code.funcPath)
-        await this.astManager.loadFunctions(inbuiltFuncPath)
+        await this.astManager.loadFunctions(this.inbuiltFuncPath)
         let activeFuncs = this.getActiveCustomFunctions()
         this.mapOperationToGroups(activeFuncs)
     }
@@ -308,6 +330,7 @@ class WorkflowRecord {
     async addStep(event) {
         //TODO: handle change event, it should give us data
         event.potentialMatch = this.__findPotentialMatchForEvent(event.target)
+        this.__addWaitForSteps(event)
         this.steps.push(event)
         await this.refreshActiveFunc()
 

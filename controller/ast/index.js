@@ -167,9 +167,9 @@ class AST {
         let parameterStr = funcSignature.replace(/.*\(/g, '').replace(/\).*/g, '')
         let parameters = parameterStr.split(',')
         let reArrangedTag = []
-
+        let paramTags = commentAST.tags.filter(item => { return item.title == 'param' })
         //conduct parameter count check
-        if (parameters.length != commentAST.tags.length) {
+        if (parameters.length != paramTags.length) {
             throw `number of elements from function: ${funcSignature} does not match number of params in jsDoc.`
         }
 

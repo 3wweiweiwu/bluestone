@@ -73,6 +73,10 @@ class WorkFlowPug {
             if (step.targetPicPath) {
                 target = path.basename(step.targetPicPath)
             }
+            let description = step.command
+            if (step.functionAst && step.functionAst.description && step.functionAst.description != '') {
+                description = step.functionAst.description
+            }
             let workflowPug = new WorkflowStepForPug(step.command, target, argStr)
             let workflowPugArray = workflowPug.generatePugOutput()
             return workflowPugArray
@@ -101,7 +105,7 @@ class WorkFlowPug {
             case WorkFlowPug.inBuiltQueryKey.btnMoveWorkflowDown:
                 this.backend.moveStepInArray(firstValue, 1)
                 break
-  
+
 
             case WorkFlowPug.inBuiltQueryKey.txtTestSuiteQueryKey:
                 this.textTestSuiteValue = firstValue

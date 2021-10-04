@@ -88,9 +88,19 @@ module.exports = function (recordRepo, browser, page, io) {
 
             eventDetail.targetPicPath = picturePath
             eventDetail.htmlPath = htmlPath
+
+            //construct operation event
             let event = new RecordingStep(eventDetail)
+            try {
+                let commandFuncAst = recordRepo.astManager.getFunction(event.command)
+                event.functionAst = commandFuncAst
+            } catch (error) {
+                console.log(`Cannot find command ${event.command}`)
+            }
+
 
             await recordRepo.addStep(event)
+
             console.log(JSON.stringify(recordRepo.steps))
             //update last operation time
         }
