@@ -64,6 +64,7 @@ module.exports = function (recordRepo, browser, page, io) {
             recordRepo.spyVisible = true
             //populate group info
             try {
+                //TODO: This function is causing performance issue
                 await recordRepo.refreshActiveFunc()
 
             } catch (error) {

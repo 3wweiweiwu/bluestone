@@ -170,7 +170,12 @@ class Operation {
                 this.backend.spyVisible = false
                 break;
             case Operation.inbuiltQueryKey.btnRun:
-                this.backend.runCurrentOperation = true
+                let currentOperation = this.backend.getCurrentOperation()
+                let result = await this.backend.puppeteer.runCurrentStep(currentOperation, this.backend.operation.browserSelection.currentSelector)
+                this.backend.operation.spy.result.isPass = result.isResultPass
+                this.backend.operation.spy.result.text = result.resultText
+                this.backend.puppeteer.refreshSpy()
+                await this.backend.puppeteer.openBluestoneTab("spy")
                 break;
             case Operation.inbuiltQueryKey.currentArgument:
                 //update ui value

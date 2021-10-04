@@ -186,7 +186,7 @@ class WorkflowRecord {
         keydown: 'keydown'
     }
     static inbuiltEvent = {
-        refresh: 'refresh'
+        refresh: PuppeteerControl.inbuiltEvent.refresh
     }
     /**
      * Based on the active functions, populate available functions in the group
@@ -255,12 +255,7 @@ class WorkflowRecord {
         }
 
     }
-    get runCurrentOperation() {
-        return this.operation.spy.runCurrentOperation
-    }
-    set runCurrentOperation(willRun) {
-        this.operation.spy.runCurrentOperation = willRun
-    }
+
     /**
      * get active functions based on active elements on screen
      * @returns {Array<import('../../ast/class/Function')>}
@@ -327,7 +322,6 @@ class WorkflowRecord {
     async refreshActiveFunc() {
 
         await this.astManager.loadFunctions(config.code.funcPath)
-        await this.astManager.loadFunctions(this.inbuiltFuncPath)
         let activeFuncs = this.getActiveCustomFunctions()
         this.mapOperationToGroups(activeFuncs)
     }

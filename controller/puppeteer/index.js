@@ -5,7 +5,7 @@ const isRecording = require('./exposure/isRecordng')
 const logCurrentElement = require('./exposure/logCurrentElement')
 const isSpyVisible = require('./exposure/isSpyVisible')
 const setSpyVisible = require('./exposure/setSpyVisible')
-const runPtFunc = require('./exposure/runPtFunc')
+
 const path = require('path')
 const fs = require('fs').promises
 const { RecordingStep, WorkflowRecord } = require('../record/class')
@@ -21,11 +21,22 @@ const singlefileScript = require('single-file/cli/back-ends/common/scripts')
 const ConstStr = {
     'bluestone-locator': 'bluestone-locator', //This is attribute we used to store locator mapping info
 }
-
+/**
+ * 
+ * @param {import('../record/class').WorkflowRecord} record 
+ * @param {*} io 
+ * @param {string} url 
+ * @returns 
+ */
 async function startRecording(record, io, url = null) {
     const browser = await puppeteer.launch(config.puppeteer)
     const page = await browser.newPage();
 
+
+    //update io for record
+    record.puppeteer.setIO(io)
+    record.puppeteer.setBrowser(browser)
+    record.puppeteer.setPage(page)
     //inject event watcher and expose supporting function
     let eventRecorderPath = path.join(__dirname, './injection/eventRecorder.js')
     await injectModuleScriptBlock(page, eventRecorderPath)
@@ -43,7 +54,7 @@ async function startRecording(record, io, url = null) {
     await page.exposeFunction('setLocatorStatus', setLocatorStatus(record))
     await page.exposeFunction('isSpyVisible', isSpyVisible(record))
     await page.exposeFunction('setSpyVisible', setSpyVisible(record))
-    await page.exposeFunction('runPtFunc', runPtFunc(record, browser, page, io))
+    
 
 
 
@@ -80,21 +91,5 @@ async function hideSpy(page, isSpyVisible) {
 
 
 }
-/**
- * run current opeation if runCurrentOperation argument is true
- * @param {import('puppeteer').Page} page 
- */
-async function runCurrentOperation(page, runOperation) {
-    if (runOperation == false) return
 
-    //if spy is invisible, set attribute
-    //the fist time we run it, page object may not be ready
-
-    await page.evaluate(() => {
-        window.runPtFunc()
-    })
-
-
-
-}
-module.exports = { startRecording, endRecording, hideSpy, runCurrentOperation }
+module.exports = { startRecording, endRecording, hideSpy, }
