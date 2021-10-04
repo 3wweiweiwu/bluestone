@@ -179,7 +179,11 @@ class WorkflowRecord {
         testElementVisible: 'testElementVisible',
         testElementInvisible: 'testElementInvisible',
         waitElementExists: 'waitElementExists',
-        hoverMouse: 'hoverMouse'
+        hoverMouse: 'hoverMouse',
+        change: 'change',
+        click: 'click',
+        goto: 'goto',
+        keydown: 'keydown'
     }
     static inbuiltEvent = {
         refresh: 'refresh'
@@ -213,7 +217,11 @@ class WorkflowRecord {
             inbuiltFunction: {
                 text: 'Run In-built function',
                 operations: [
-                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.waitElementExists)
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.waitElementExists),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.change),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.goto),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.click),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.keydown),
                 ]
             },
             customizedFunctions: {

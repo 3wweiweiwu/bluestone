@@ -35,6 +35,8 @@ Object.keys(EVENTCONST).forEach(item => {
                         break;
                     case 'Escape':
                         break;
+                    case 'Tab':
+                        break;
                     default:
                         //if we see combo key ctrl-q, we will call in-browser plugin
                         if (event.ctrlKey && event.key === 'q') {

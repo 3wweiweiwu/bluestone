@@ -15,7 +15,7 @@ exports.testTextEqual = async function (page, elementSelector, desiredText) {
     /**
      * Use javascript to get text content
      */
-    let element = await findElement(page, elementSelector)
+    let element = await findElement(page, elementSelector, 2000)
     let currentText = await element.evaluate(el => el.textContent)
     //ensure text equal what we want
     assert.strictEqual(currentText, desiredText, `Current value for ${elementSelector.displayName} is ${currentText}. It's different from baseline ${desiredText}`)
@@ -73,4 +73,66 @@ exports.waitElementExists = async function (page, elementSelector, timeout) {
 
     return element
 
+}
+
+/**
+ * change value in text input
+*  @param {Page} page 
+ * @param {ElementSelector} elementSelector element selector object
+ * @param {string} text Text value you want to change to
+ * @returns {ElementHandle}
+ */
+exports.change = async function (page, elementSelector, text) {
+    let element = await findElement(page, elementSelector, 2000)
+    await element.type(text, { delay: 100 })
+
+    return `Type value ${text} success!`
+
+}
+
+/**
+ * Click UI element
+*  @param {Page} page 
+ * @param {ElementSelector} elementSelector element selector object
+ */
+exports.click = async function (page, elementSelector) {
+    let element = await findElement(page, elementSelector, 2000)
+    element.click()
+    return `Click success!`
+}
+/**
+ * Navigate browser to he url
+ * @param {Page} page 
+ * @param {string} url 
+ * @returns 
+ */
+exports.goto = async function (page, url) {
+    await page.goto(url)
+
+    return `Goto ${url} success!`
+
+}
+
+/**
+ * Press a key
+*  @param {Page} page 
+ * @param {string} key button you want to press. Supported Button: Enter|Tab|Escape
+ */
+exports.keydown = async function (page, key) {
+
+    switch (key) {
+        case 'Enter':
+            await page.keyboard.press("Enter")
+            break;
+        case "Tab":
+            await page.keyboard.press("Tab")
+            break
+        case "Escape":
+            await page.keyboard.press("Escape")
+            break
+        default:
+            break;
+    }
+    page.keyboard.press()
+    return `Click success!`
 }

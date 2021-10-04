@@ -174,6 +174,7 @@ class Operation {
                 break;
             case Operation.inbuiltQueryKey.currentArgument:
                 //update ui value
+                //TODO: allow url like https://todomvc.com/examples/angularjs/#/ to work
                 let currentArgumentIndex = query[Operation.inbuiltQueryKey.currentArgumentIndex]
                 let currentQueryKeyForValue = query[Operation.inbuiltQueryKey.currentArgument]
                 let currentFunction = this.getCurrentOperation()

@@ -52,6 +52,7 @@ async function startRecording(record, io, url = null) {
 
     if (url != null) await page.goto(url)
     let eventStep = new RecordingStep({ command: 'goto', target: url })
+    eventStep.parameter = url
     eventStep.finalLocator = 'FAKE locator to avoid check'
     eventStep.finalLocatorName = 'FAKE locator name to avoid check'
     logEvent(record)(eventStep)
