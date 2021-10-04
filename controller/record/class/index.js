@@ -6,7 +6,7 @@ const FunctionAST = require('../../ast/class/Function')
 const JsDocTag = require('../../ast/class/JsDocTag')
 const { testTextEqual } = require('../../../ptLibrary/functions/inbuiltFunc')
 const _eval = require('eval')
-const LocatorDefinerPug = require('../../ui/class/LocatorDefiner')
+
 const { Page } = require('puppeteer-core')
 const PuppeteerControl = require('../../puppeteer/class')
 const fs = require('fs').promises
@@ -117,7 +117,7 @@ class WorkflowRecord {
         this.lastOperationTimestamp = Date.now()
         this.__isRecording = true
         this.astManager = new AstManager(config.code.locatorPath)
-        this.__locatorDefinerPug = new LocatorDefinerPug('', '', '', '', [])
+
         this.operationGroup = {
             customizedFunctions: {
                 text: 'Run Customzied Function',
@@ -151,48 +151,7 @@ class WorkflowRecord {
     getCurrentOperation() {
         return this.operation.browserSelection.currentOpeartion
     }
-    get locatorDefinerPug() {
-        return this.__locatorDefinerPug
-    }
-    /**
-     * Initialize Locator Definer page based on information from current locator information
-     * @param {string} defaultSelector 
-     * @param {string} locatorHtmlPath 
-     * @param {string} locatorName 
-     * @param {string} locatorSelector 
-     * @param {Array<Locator>} potentialMatch 
-     * @param {number} stepIndex
-     */
-    async refreshLocatorDefiner(defaultSelector, locatorHtmlPath, locatorName, locatorSelector, potentialMatch, stepIndex) {
-        //convert html path from local file to relative url
-        let htmlUrl = this.convertLocalPath2RelativeLink(locatorHtmlPath)
 
-        //create a new object because we are going to modify screenshot key direclty
-        /** @type {Array<Locator>} */
-        let newPotentialMatch = JSON.parse(JSON.stringify(potentialMatch))
-        //copy over locator pictures to temp folder for visualization
-        let bluestoneFuncFolder = path.dirname(this.locatorManager.locatorPath)
-        for (let i = 0; i < newPotentialMatch.length; i++) {
-            let item = newPotentialMatch[i]
-            //no pic
-            if (item.screenshot == null) {
-                continue
-            }
-            let sourcePath = path.join(bluestoneFuncFolder, item.screenshot)
-            let newPicPath = this.getPicPath()
-            //check if file path is valid
-            try {
-                await fs.access(sourcePath);
-                await fs.copyFile(sourcePath, newPicPath)
-
-            } catch (err) {
-                continue
-            }
-            newPotentialMatch[i].screenshot = this.getSpySelectorPictureForPug(newPicPath)
-        }
-
-        this.__locatorDefinerPug = new LocatorDefinerPug(defaultSelector, htmlUrl, locatorName, locatorSelector, newPotentialMatch, stepIndex)
-    }
     /**
      * Convert local path to relative path
      * @param {string} localPath 
@@ -369,27 +328,7 @@ class WorkflowRecord {
 
         return potentialMatches
     }
-    /**
-     * Based on req.query and update the variable
-     * @param {*} query 
-     * @returns 
-     */
-    async updateUserInputForSpy(query) {
-        let queryKeys = Object.keys(query)
-        //if there is no query, we will just return
-        if (queryKeys.length == 0) {
-            return
-        }
-        //handle update for current group and current operation
-        if (queryKeys.length >= 1) {
-            let key = queryKeys[0]
-            await this.__updateUserInputForSpy(key, query[key])
-        }
 
-        this.locatorDefinerPug.update(query)
-        this.workflowPug.update(query)
-
-    }
 
 
 

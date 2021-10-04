@@ -1,5 +1,6 @@
 
 const Locator = require('../../locator/class/Locator')
+const { WorkflowRecord } = require('../../record/class/index')
 const checkLocatorInDefiner = require('../../puppeteer/activities/checkLocatorInDefiner')
 class FinalLocatorSelection {
     constructor() {
@@ -17,8 +18,9 @@ class LocatorDefiner {
      * @param {string} locatorSelector the selector info. If '' is provided, it means that there is no potential match
      * @param {Array<Locator>} potentialMatch the potential match info coming from the recording step
      * @param {number} stepIndex the index of current step. We need this inforamtion so that we can navigate back when we change the inforamtion in the step
+     * @param {WorkflowRecord} backend the workflow record backend
      */
-    constructor(defaultSelector, locatorHtmlPath, locatorName, locatorSelector, potentialMatch, stepIndex) {
+    constructor(defaultSelector, locatorHtmlPath, locatorName, locatorSelector, potentialMatch, stepIndex, backend) {
         this.__selectorValidationNote = ''
         this.defaultSelector = defaultSelector
         this.__locatorName = locatorName
@@ -33,6 +35,7 @@ class LocatorDefiner {
             }
         })
         this.stepIndex = stepIndex
+        this.backend = backend
 
     }
     get validationText() {
@@ -111,7 +114,7 @@ class LocatorDefiner {
         }
         return finalSelection
     }
-    update(query) {
+    async update(query) {
         let queryKeys = Object.keys(query)
         let firstKey = queryKeys[0]
         let firstValue = query[firstKey]
@@ -129,6 +132,21 @@ class LocatorDefiner {
             case LocatorDefiner.inBuiltQueryKey.btnLocatorOk:
                 this.locatorName = this.possibleLocators[firstValue].name
                 this.locatorSelector = this.possibleLocators[firstValue].selector
+                break
+            case LocatorDefiner.inBuiltQueryKey.btnConfirm:
+                //check locator and confirm locator input
+                let locatorCheckResult = await this.backend.puppeteer.checkLocatorInDefiner(this.defaultSelector, this.locatorSelector)
+                let finalSelection = this.getFinalSelection(locatorCheckResult)
+
+
+                //check all steps and replicate same setting for same locator
+                this.backend.steps.forEach(item => {
+                    if (item.target == this.defaultSelector) {
+                        item.finalLocator = finalSelection.finalLocator
+                        item.finalLocatorName = finalSelection.finalLocatorName
+                    }
+                })
+
                 break
             default:
                 break;

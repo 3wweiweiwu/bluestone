@@ -79,6 +79,7 @@ class WorkFlowPug {
         })
         this.workflowSteps = workflowInfo
     }
+
     //based on the query,update front-end data structure
     async update(query) {
         let queryKeys = Object.keys(query)
@@ -100,32 +101,8 @@ class WorkFlowPug {
             case WorkFlowPug.inBuiltQueryKey.btnMoveWorkflowDown:
                 this.backend.moveStepInArray(firstValue, 1)
                 break
-            //TODO: This require integration with locator definer
-            case WorkFlowPug.inBuiltQueryKey.btnLocatorWorkflow:
-                stepIndex = Number.parseInt(firstValue)
-                targetStep = this.backend.steps[stepIndex]
-                // await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex)
-                break
-            case WorkFlowPug.inBuiltQueryKey.btnResolveLocatorQueryKey:
-                //automatically match all existing selectors
-                this.backend.steps.forEach(item => {
-                    if (item.potentialMatch.length == 1) {
-                        item.finalLocatorName = item.potentialMatch[0].Locator
-                        item.finalLocator = item.potentialMatch[0].path
-                    }
-                })
+  
 
-                //find out selector that is pending correlaton
-                stepIndex = this.backend.steps.findIndex(item => {
-                    return item.finalLocator == '' || item.finalLocator == ''
-                })
-                if (stepIndex != -1) {
-                    targetStep = this.backend.steps[stepIndex]
-                    await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex)
-                }
-                //update text info
-                this.validateForm(this.backend.steps)
-                break
             case WorkFlowPug.inBuiltQueryKey.txtTestSuiteQueryKey:
                 this.textTestSuiteValue = firstValue
                 break
@@ -141,7 +118,8 @@ class WorkFlowPug {
      * @param {Array<import('../../record/class/index').RecordingStep>} steps 
      * @param {boolean}
      */
-    validateForm(steps) {
+    validateForm() {
+        let steps = this.backend.steps
         this.txtValidationStatus = ''
         if (this.textTestSuiteValue == '') {
             this.txtValidationStatus = 'Please enter test suite name'

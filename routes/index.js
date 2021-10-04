@@ -50,52 +50,37 @@ router.get('/workflow', async function (req, res) {
 })
 router.get('/locator-definer', async function (req, res) {
   /**
-   * @type {import('../controller/record/class/index.js').WorkflowRecord}
+   * @type {UI}
    */
-  let workflow = req.app.locals.workflow
-  await workflow.updateUserInputForSpy(req.query)
+  let ui = req.app.locals.ui
+
+  await ui.updateUserInputForSpy(req.query)
 
 
 
   let variables = {
-    locatorHtml: workflow.locatorDefinerPug.locatorHtml
+    locatorHtml: ui.locatorDefiner.locatorHtml
   }
   res.render('locatorDefiner.pug', variables);
 
 })
-router.get('/locator-manager', async function (req, res) {
-  /**
-   * @type {import('../controller/record/class/index.js').WorkflowRecord}
-   */
-  let workflow = req.app.locals.workflow
-  await workflow.updateUserInputForSpy(req.query)
 
-  let variables = {
-  }
-  res.render('locatorManager.pug', variables);
-
-})
 router.get('/locator-definer-sidebar', async function (req, res) {
-  /**
-   * @type {import('../controller/record/class/index.js').WorkflowRecord}
-   */
-  let workflow = req.app.locals.workflow
-  await workflow.updateUserInputForSpy(req.query)
-  if (workflow.locatorDefinerPug.validateCurrentLocator) {
-    workflow.locatorDefinerPug.validateCurrentLocator = false
-    //TODO: hook up the result and move this to locator definer class
-    await checkLocatorInDefiner(req.app.locals.puppeteerControl.browser, workflow.locatorDefinerPug.locatorSelector)
-  }
+
+  /**@type {UI} */
+  let ui = req.app.locals.ui
+  await ui.updateUserInputForSpy(req.query)
+
   let variables = {
     revertQueryKey: PugLocatorDefiner.inBuiltQueryKey.btnRevert,
     txtLocatorQueryKey: PugLocatorDefiner.inBuiltQueryKey.txtLocator,
     txtLocatorNameQueryKey: PugLocatorDefiner.inBuiltQueryKey.txtLocatorName,
     btnCheckQueryKey: PugLocatorDefiner.inBuiltQueryKey.btnConfirm,
-    txtLocatorValue: workflow.locatorDefinerPug.locatorSelector,
-    txtLocatorName: workflow.locatorDefinerPug.locatorName,
-    possibleLocatorMatch: workflow.locatorDefinerPug.possibleLocators,
+    txtLocatorValue: ui.locatorDefiner.locatorSelector,
+    txtLocatorName: ui.locatorDefiner.locatorName,
+    possibleLocatorMatch: ui.locatorDefiner.possibleLocators,
     possibleLocatorOkQueryKey: PugLocatorDefiner.inBuiltQueryKey.btnLocatorOk,
-    validationText: workflow.locatorDefinerPug.validationText
+    validationText: ui.locatorDefiner.validationText
   }
 
   res.render('locatorDefinerSidebar.pug', variables);

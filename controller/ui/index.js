@@ -2,6 +2,7 @@ const LocatorDefiner = require('./class/LocatorDefiner')
 const Operation = require('./class/Operation')
 const Workflow = require('./class/Workflow')
 const { WorkflowRecord } = require('../record/class')
+const path = require('path')
 class UI {
     /**
      * 
@@ -9,7 +10,7 @@ class UI {
      */
     constructor(backend) {
         this.backend = backend
-        this.locatorDefiner = new LocatorDefiner('', '', '', '', [], -1)
+        this.locatorDefiner = new LocatorDefiner('', '', '', '', [], -1, this.backend)
         this.operation = new Operation(this.backend)
         this.workflow = new Workflow([], this.backend)
 
@@ -22,19 +23,84 @@ class UI {
         }
         await this.operation.update(query)
         this.workflow.update(query)
+        await this.locatorDefiner.update(query)
         let firstKey = queryKeys[0]
         let firstValue = query[firstKey]
-        let targetStep
+        let targetStep, stepIndex
         switch (firstKey) {
             case Workflow.inBuiltQueryKey.btnEditWorkflow:
                 targetStep = this.backend.steps[firstValue]
                 this.__repopulateOperationUI(targetStep)
                 break
+            case Workflow.inBuiltQueryKey.btnResolveLocatorQueryKey:
+                //automatically match all existing selectors
+                this.backend.steps.forEach(item => {
+                    if (item.potentialMatch.length == 1) {
+                        item.finalLocatorName = item.potentialMatch[0].Locator
+                        item.finalLocator = item.potentialMatch[0].path
+                    }
+                })
+
+                //find out selector that is pending correlaton
+                stepIndex = this.backend.steps.findIndex(item => {
+                    return item.finalLocator == '' || item.finalLocator == ''
+                })
+                if (stepIndex != -1) {
+                    targetStep = this.backend.steps[stepIndex]
+                    await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex)
+                }
+                //update text info
+                this.workflow.validateForm(this.backend.steps)
+                break
+
+            case Workflow.inBuiltQueryKey.btnLocatorWorkflow:
+                stepIndex = Number.parseInt(firstValue)
+                targetStep = this.backend.steps[stepIndex]
+                await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex)
+                break
             default:
                 break;
         }
     }
+    /**
+     * Initialize Locator Definer page based on information from current locator information from workflow page
+     * @param {string} defaultSelector 
+     * @param {string} locatorHtmlPath 
+     * @param {string} locatorName 
+     * @param {string} locatorSelector 
+     * @param {Array<Locator>} potentialMatch 
+     * @param {number} stepIndex
+     */
+    async refreshLocatorDefiner(defaultSelector, locatorHtmlPath, locatorName, locatorSelector, potentialMatch, stepIndex) {
+        //convert html path from local file to relative url
+        let htmlUrl = this.backend.convertLocalPath2RelativeLink(locatorHtmlPath)
 
+        //create a new object because we are going to modify screenshot key direclty
+        /** @type {Array<Locator>} */
+        let newPotentialMatch = JSON.parse(JSON.stringify(potentialMatch))
+        //copy over locator pictures to temp folder for visualization
+        let bluestoneFuncFolder = path.dirname(this.backend.locatorManager.locatorPath)
+        for (let i = 0; i < newPotentialMatch.length; i++) {
+            let item = newPotentialMatch[i]
+            //no pic
+            if (item.screenshot == null) {
+                continue
+            }
+            let sourcePath = path.join(bluestoneFuncFolder, item.screenshot)
+            let newPicPath = this.backend.getPicPath()
+            //check if file path is valid
+            try {
+                await fs.access(sourcePath);
+                await fs.copyFile(sourcePath, newPicPath)
+
+            } catch (err) {
+                continue
+            }
+            newPotentialMatch[i].screenshot = this.backend.getSpySelectorPictureForPug(newPicPath)
+        }
+
+        this.locatorDefiner = new LocatorDefiner(defaultSelector, htmlUrl, locatorName, locatorSelector, newPotentialMatch, stepIndex, this.backend)
+    }
     /**
      * Based on the current step in the workflow, repopulate operation view
      * @param {RecordingStep} step 
