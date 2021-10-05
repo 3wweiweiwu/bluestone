@@ -14,10 +14,11 @@
  * @property {string} selector //path to the selector
  * @property {ElementPos} pos
 */
+const ElementSelector = require('../../../ptLibrary/class/ElementSelector')
 const { Page, Browser } = require('puppeteer-core')
 const openBluestoneTab = require('../activities/openBluestoneTab')
 const checkLocatorInDefiner = require('../activities/checkLocatorInDefiner')
-const PuppeteerResult = require('./Result')
+const PuppeteerResult = require('../../record/class/StepResult')
 const _eval = require('eval')
 class PuppeteerControl {
     constructor() {
@@ -60,13 +61,13 @@ class PuppeteerControl {
     /**
      * Run current step
      * @param {import('../../ast/class/Function')} functionAst
-     * @param {string} locatorText
+     * @param {ElementSelector} elementSelector
      */
-    async runCurrentStep(functionAst, locatorText) {
+    async runCurrentStep(functionAst, elementSelector) {
 
         let isResultPass = true
         let resultNote = ''
-        let argumentNContext = functionAst.generateArgumentNContext(this.browser, this.page, locatorText)
+        let argumentNContext = functionAst.generateArgumentNContext(this.browser, this.page, elementSelector)
         let argumentStr = argumentNContext.argumentStr
         let currentScope = argumentNContext.currentScope
         currentScope['mainFunc'] = functionAst.mainFunc
@@ -107,6 +108,14 @@ class PuppeteerControl {
         pResult.isResultPass = isResultPass
         pResult.resultText = resultNote
         return pResult
+    }
+    /**
+     * Clean up all cookie and browser cache on current page
+     */
+    async cleanCache() {
+        const client = await this.page.target().createCDPSession();
+        await client.send('Network.clearBrowserCookies');
+        await client.send('Network.clearBrowserCache');
     }
 }
 

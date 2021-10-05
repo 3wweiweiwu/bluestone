@@ -36,6 +36,7 @@ class LocatorDefiner {
         })
         this.stepIndex = stepIndex
         this.backend = backend
+        this.fullLocatorFromPossibleLocator = null
 
     }
     get validationText() {
@@ -108,8 +109,8 @@ class LocatorDefiner {
         let result = this.validateLocator(locatorCheckErr)
         if (result == '') {
             //need to returns array here
-            finalSelection.finalLocator = [this.__locatorSelector]
-            finalSelection.finalLocatorName = this.__locatorName
+            finalSelection.finalLocator = [this.locatorSelector]
+            finalSelection.finalLocatorName = this.locatorName
 
         }
         return finalSelection

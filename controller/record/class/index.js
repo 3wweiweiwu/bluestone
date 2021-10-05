@@ -6,7 +6,8 @@ const FunctionAST = require('../../ast/class/Function')
 const JsDocTag = require('../../ast/class/JsDocTag')
 const { testTextEqual } = require('../../../ptLibrary/functions/inbuiltFunc')
 const _eval = require('eval')
-
+const StepResult = require('./StepResult')
+const ElementSelector = require('../../../ptLibrary/class/ElementSelector')
 const { Page } = require('puppeteer-core')
 const PuppeteerControl = require('../../puppeteer/class')
 const fs = require('fs').promises
@@ -57,7 +58,7 @@ class RecordingStep {
         if (recordingStep.finalLocatorName) {
             this.finalLocatorName = recordingStep.finalLocatorName
         }
-        this.finalLocator = ''
+        this.finalLocator = ['']
         if (recordingStep.finalLocator) {
             this.finalLocator = recordingStep.finalLocator
         }
@@ -65,6 +66,7 @@ class RecordingStep {
         if (this.functionAst) {
             this.parameter = JSON.parse(JSON.stringify(recordingStep.functionAst.params))
         }
+        this.result = new StepResult()
 
     }
     setFinalLocator(finalLocatorName, finalLocator) {
@@ -83,25 +85,7 @@ class RecordingStep {
  * @property {import('../../ast/class/Function')} functionAst
  */
 
-class PugDropDownInfo {
-    /**
-     * Return group info for the pug
-     * @param {string} id 
-     * @param {string} text 
-     */
-    constructor(id, text, url) {
-        this.id = id
-        this.text = text
-        this.url = url
-    }
-}
-class PugTextInputInfo {
-    constructor(id, text, url) {
-        this.id = id
-        this.text = text
-        this.url = url
-    }
-}
+
 class WorkflowRecord {
     /**     * 
      * @param {PuppeteerControl} puppeteer 
@@ -255,7 +239,60 @@ class WorkflowRecord {
         }
 
     }
+    /**
+     * Correlate steps with existing locator. IF there is one and exactly one match, we will autoamtically map the step with the locator
+     */
+    resolveExistingLocatorInSteps() {
+        //automatically match all existing selectors
+        this.steps.forEach(item => {
+            if (item.potentialMatch.length == 1) {
+                item.finalLocatorName = item.potentialMatch[0].Locator
+                item.finalLocator = item.potentialMatch[0].path
+            }
+        })
+    }
+    /**
+     * Get index of the step that haven't been mapped
+     * -1 if nothing being found
+     * @returns {number}
+     */
+    findPendingLocatorInStep() {
+        let stepIndex = -1;
+        //find out selector that is pending correlaton
+        stepIndex = this.steps.findIndex(item => {
+            return item.finalLocator == '' || item.finalLocator == ''
+        })
+        return stepIndex
+    }
+    /**
+     * Run All steps and assign result to step.
+     * @returns {number} index of the failed step. -1 if everything pass
+     */
+    async runAllSteps() {
+        await this.puppeteer.cleanCache()
+        let failedStepIndex = -1
+        //check if there is any un-correlated locator in step
+        failedStepIndex = this.findPendingLocatorInStep()
+        if (failedStepIndex != -1) {
+            this.steps[failedStepIndex].result = new StepResult()
+            this.steps[failedStepIndex].result.resultText = 'Locator has not been correleated'
+            return failedStepIndex
+        }
 
+        //run step one by one
+        for (let i = 0; i < this.steps.length; i++) {
+            let step = this.steps[i]
+            let elementSelector = new ElementSelector(step.finalLocator, '', step.finalLocatorName)
+
+            let result = await this.puppeteer.runCurrentStep(step.functionAst, elementSelector)
+            this.steps[i].result = result
+            if (!result.isResultPass) {
+                failedStepIndex = i
+                break
+            }
+        }
+        return failedStepIndex
+    }
     /**
      * get active functions based on active elements on screen
      * @returns {Array<import('../../ast/class/Function')>}
@@ -371,16 +408,6 @@ class WorkflowRecord {
         arr.splice(toIndex, 0, element);
         this.steps = arr
     }
-    /**
-     * Based on the current element that is selected in in-browser spy, run function and output result to the validate view
-     */
-    __runCurrentFunc() {
-        let currentOperation = this.getCurrentOperation()
-
-        eval()
-    }
-
-
     /**
      * returns the picture path for current step
      */

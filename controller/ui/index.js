@@ -33,18 +33,10 @@ class UI {
                 this.__repopulateOperationUI(targetStep)
                 break
             case Workflow.inBuiltQueryKey.btnResolveLocatorQueryKey:
-                //automatically match all existing selectors
-                this.backend.steps.forEach(item => {
-                    if (item.potentialMatch.length == 1) {
-                        item.finalLocatorName = item.potentialMatch[0].Locator
-                        item.finalLocator = item.potentialMatch[0].path
-                    }
-                })
 
-                //find out selector that is pending correlaton
-                stepIndex = this.backend.steps.findIndex(item => {
-                    return item.finalLocator == '' || item.finalLocator == ''
-                })
+
+                this.backend.resolveExistingLocatorInSteps()
+                stepIndex = this.backend.findPendingLocatorInStep()
                 if (stepIndex != -1) {
                     targetStep = this.backend.steps[stepIndex]
                     await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex)

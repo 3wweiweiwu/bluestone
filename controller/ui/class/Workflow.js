@@ -27,7 +27,9 @@ class WorkFlowPug {
         btnResolveLocatorQueryKey: 'WORKFLOW_RESOLVE',
         btnCreateTestcaseQueryKey: 'WORKFLOW_CREATE_TC',
         txtTestSuiteQueryKey: 'WORKFLOW_TEST_SUITE',
-        txtTestCaseQueryKey: 'WORKFLOW_TEST_CASE'
+        txtTestCaseQueryKey: 'WORKFLOW_TEST_CASE',
+        btnRunWorkflow: 'WORKFLOW_RUN_ALL'
+
     }
     /**
      * 
@@ -41,7 +43,7 @@ class WorkFlowPug {
         this.refreshWorkflowForPug(steps)
         this.textTestSuiteValue = ''
         this.textTestCaseValue = ''
-        this.txtValidationStatus = ''
+        this.txtValidationStatus = 'Please click on Resolve Button to proceed'
         this.textFileName = ''
         this.backend = backend
     }
@@ -113,6 +115,11 @@ class WorkFlowPug {
             case WorkFlowPug.inBuiltQueryKey.txtTestCaseQueryKey:
                 this.textTestCaseValue = firstValue
                 break
+            case WorkFlowPug.inBuiltQueryKey.btnRunWorkflow:
+                await this.backend.runAllSteps()
+                this.validateForm()
+                await this.backend.puppeteer.openBluestoneTab('workflow')
+                break
             default:
                 break;
         }
@@ -138,6 +145,14 @@ class WorkFlowPug {
             let stepInfo = steps[i]
             if (stepInfo.finalLocator == '' || stepInfo.finalLocatorName == '') {
                 this.txtValidationStatus = `Please correlate locator at step ${i}`
+                return false
+            }
+        }
+        for (let i = 0; i < steps.length; i++) {
+            let stepInfo = steps[i]
+
+            if (!stepInfo.result.isResultPass) {
+                this.txtValidationStatus = `Step ${i} Failed: ${stepInfo.result.resultText}. Please run workflow again or modify the locator`
                 return false
             }
         }

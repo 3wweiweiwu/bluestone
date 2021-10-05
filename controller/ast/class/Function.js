@@ -36,10 +36,10 @@ class FunctionAST {
      * Generate argument string based on the params
      * @param {import('puppeteer-core').Browser} browser 
      * @param {import('puppeteer-core').Page} page 
-     * @param {string} currentSelector 
+     * @param {ElementSelector} elementSelector 
      * @returns 
      */
-    generateArgumentNContext(browser, page, currentSelector) {
+    generateArgumentNContext(browser, page, elementSelector) {
         //construct argment for the function
         let currentOperation = this
         let currentScope = {}
@@ -59,7 +59,7 @@ class FunctionAST {
                     break;
                 case "ElementSelector":
 
-                    let elementSelector = new ElementSelector([currentSelector], '', 'Selected UI element')
+                    
                     currentParam.push('elementSelector')
                     currentScope['elementSelector'] = elementSelector
                     break;

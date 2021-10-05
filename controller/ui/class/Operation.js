@@ -2,6 +2,7 @@ const FunctionAST = require('../../ast/class/Function')
 const JsDocTag = require('../../ast/class/JsDocTag')
 const { RecordingStep, WorkflowRecord } = require('../../record/class')
 const path = require('path')
+const ElementSelector = require('../../../ptLibrary/class/ElementSelector')
 class PugDropDownInfo {
     /**
      * Return group info for the pug
@@ -171,7 +172,9 @@ class Operation {
                 break;
             case Operation.inbuiltQueryKey.btnRun:
                 let currentOperation = this.backend.getCurrentOperation()
-                let result = await this.backend.puppeteer.runCurrentStep(currentOperation, this.backend.operation.browserSelection.currentSelector)
+
+                let elementSelector = new ElementSelector([this.backend.operation.browserSelection.currentSelector], '', 'Current Selector')
+                let result = await this.backend.puppeteer.runCurrentStep(currentOperation, elementSelector)
                 this.backend.operation.spy.result.isPass = result.isResultPass
                 this.backend.operation.spy.result.text = result.resultText
                 this.backend.puppeteer.refreshSpy()
