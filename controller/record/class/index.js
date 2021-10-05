@@ -370,11 +370,40 @@ class WorkflowRecord {
         //TODO: handle change event, it should give us data
         event.potentialMatch = this.__findPotentialMatchForEvent(event.target)
         this.__addWaitForSteps(event)
+
         this.steps.push(event)
+        this.__handleChangeNPressCombo(event)
         await this.refreshActiveFunc()
 
 
         this.setLastOperationTime()
+    }
+    /**
+     * check if current command is change call and see if prior step is press key and timeout is small (0<x<100ms)
+     * We do this because often times,change event will comes later than the press key event. We have to manually
+     * reorder the steps to issue. We want to ensure timeout is greater than 0 as people might manually add command
+     * And manual command will have timeout of 0
+     * @param {RecordingStep} step 
+     * @returns 
+     */
+    async __handleChangeNPressCombo(step) {
+        if (step.timeoutMs > 0 && step.timeoutMs < 400 && step.command == 'change' && this.steps[this.steps.length - 3].command == 'keydown') {
+            let waitStepForChange = this.steps[this.steps.length - 2]
+            let actionStepForChange = this.steps[this.steps.length - 1]
+            let actionStepForPress = this.steps[this.steps.length - 3]
+            let waitStepForPress = this.steps[this.steps.length - 4]
+
+            waitStepForChange.functionAst.params[2].value = waitStepForPress.timeoutMs
+
+
+            this.steps.splice(this.steps.length - 4, 4)
+            this.steps.push(waitStepForChange)
+            this.steps.push(actionStepForChange)
+            this.steps.push(waitStepForPress)
+            this.steps.push(actionStepForPress)
+
+
+        }
     }
     /**
      * look into current element and check if it is a potential match to a particular locator

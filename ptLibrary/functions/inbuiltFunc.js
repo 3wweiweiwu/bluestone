@@ -133,6 +133,5 @@ exports.keydown = async function (page, key) {
         default:
             break;
     }
-    page.keyboard.press()
     return `Click success!`
 }
