@@ -59,7 +59,7 @@ class FunctionAST {
                     break;
                 case "ElementSelector":
 
-                    
+
                     currentParam.push('elementSelector')
                     currentScope['elementSelector'] = elementSelector
                     break;

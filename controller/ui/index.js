@@ -60,7 +60,7 @@ class UI {
      * @param {string} defaultSelector 
      * @param {string} locatorHtmlPath 
      * @param {string} locatorName 
-     * @param {string} locatorSelector 
+     * @param {Array<string>} locatorSelector 
      * @param {Array<Locator>} potentialMatch 
      * @param {number} stepIndex
      */
@@ -92,7 +92,7 @@ class UI {
             newPotentialMatch[i].screenshot = this.operation.getSpySelectorPictureForPug(newPicPath)
         }
 
-        this.locatorDefiner = new LocatorDefiner(defaultSelector, htmlUrl, locatorName, locatorSelector, newPotentialMatch, stepIndex, this.backend)
+        this.locatorDefiner = new LocatorDefiner(defaultSelector, htmlUrl, locatorName, locatorSelector[0], newPotentialMatch, stepIndex, this.backend)
     }
     /**
      * Based on the current step in the workflow, repopulate operation view

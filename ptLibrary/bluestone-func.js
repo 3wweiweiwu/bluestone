@@ -23,7 +23,7 @@ module.exports = {
         locators: [{ locator: ['invalid_locator'] }]
     },
     keydown: {
-        func: inbuiltFunc.keydown,
+        func: inbuiltFunc.keydown1,
         locators: [{ locator: ['invalid_locator'] }]
     },
 

@@ -11,7 +11,7 @@ describe('test', () => {
         const page = await browser.newPage();
         await page.goto(process.env.site || 'https://todomvc.com/examples/angularjs/#/');
 
-        element = await findElement(page, locator, 'Todo_Page/TODO_Text_Input', { timeout: 2000 })
+        element = await findElement(page, locator['Todo_Page/TODO_Text_Input'], 1000)
         await element.type('hello')
         locator.todop
         console.log(locator['Todo_Page/TODO_Text_Input'])

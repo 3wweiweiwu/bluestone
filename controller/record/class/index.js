@@ -58,7 +58,7 @@ class RecordingStep {
         if (recordingStep.finalLocatorName) {
             this.finalLocatorName = recordingStep.finalLocatorName
         }
-        this.finalLocator = ''
+        this.finalLocator = ['']
         if (recordingStep.finalLocator) {
             this.finalLocator = recordingStep.finalLocator
         }

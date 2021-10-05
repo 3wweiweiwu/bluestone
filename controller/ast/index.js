@@ -69,7 +69,7 @@ class AST {
 
 
 
-            let functionAst = new FunctionAST(methodDetail.filePath, methodDetail.methodName, methodDetail.methodDescription, methodDetail.jsDocTag, locators, mainFunc)
+            let functionAst = new FunctionAST(funcPath, funcName, methodDetail.methodDescription, methodDetail.jsDocTag, locators, mainFunc)
             this.__addFuncAstToRepo(functionAst)
 
 

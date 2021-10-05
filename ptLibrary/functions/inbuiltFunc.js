@@ -118,7 +118,7 @@ exports.goto = async function (page, url) {
 *  @param {Page} page 
  * @param {string} key button you want to press. Supported Button: Enter|Tab|Escape
  */
-exports.keydown = async function (page, key) {
+exports.keydown1 = async function (page, key) {
 
     switch (key) {
         case 'Enter':
