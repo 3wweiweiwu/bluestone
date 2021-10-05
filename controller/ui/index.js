@@ -3,6 +3,7 @@ const Operation = require('./class/Operation')
 const Workflow = require('./class/Workflow')
 const { WorkflowRecord } = require('../record/class')
 const path = require('path')
+const fs = require('fs').promises
 class UI {
     /**
      * 
@@ -88,7 +89,7 @@ class UI {
             } catch (err) {
                 continue
             }
-            newPotentialMatch[i].screenshot = this.backend.getSpySelectorPictureForPug(newPicPath)
+            newPotentialMatch[i].screenshot = this.operation.getSpySelectorPictureForPug(newPicPath)
         }
 
         this.locatorDefiner = new LocatorDefiner(defaultSelector, htmlUrl, locatorName, locatorSelector, newPotentialMatch, stepIndex, this.backend)
