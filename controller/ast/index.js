@@ -36,7 +36,22 @@ class AST {
         let func = this.__funcRepo.find(item => {
             return item.name == name
         })
-        return func
+        if (func == null) {
+            return null
+        }
+        let newFunc = new FunctionAST(func.path, func.name, func.description, [], [], null)
+        //clone the object to avoid multiple step refere to the same object
+        if (func.mainFunc) {
+            newFunc.mainFunc = func.mainFunc
+        }
+        if (func.locators) {
+            newFunc.locators = JSON.parse(JSON.stringify(func.locators))
+        }
+        if (func.params) {
+            newFunc.params = JSON.parse(JSON.stringify(func.params))
+        }
+
+        return newFunc
     }
     /**
      * @param {string} funcPath

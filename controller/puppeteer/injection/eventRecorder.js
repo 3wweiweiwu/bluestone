@@ -17,7 +17,12 @@ const EVENTCONST = {
 
 Object.keys(EVENTCONST).forEach(item => {
     document.addEventListener(item, event => {
-        const selector = finder(event.target)
+        const selector = ''
+        try {
+            selector = finder(event.target)
+        } catch (error) {
+            console.log(error)
+        }
         const position = event.target.getBoundingClientRect()
         const targetInnerText = event.target.innerText
         let parameter = null
@@ -76,6 +81,7 @@ Object.keys(EVENTCONST).forEach(item => {
     })
 })
 
+//XXX (RoadMap) Add a way to handle delete operation
 //draw rectangle and return the selector and inner text of element mouse hover on
 document.addEventListener('mouseover', event => {
     if (window.isRecording()) {

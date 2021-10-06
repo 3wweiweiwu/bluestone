@@ -367,7 +367,6 @@ class WorkflowRecord {
      * @param {RecordingStep} event 
      */
     async addStep(event) {
-        //TODO: handle change event, it should give us data
         event.potentialMatch = this.__findPotentialMatchForEvent(event.target)
         this.__addWaitForSteps(event)
 
