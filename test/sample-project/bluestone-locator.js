@@ -5,7 +5,7 @@ module.exports = {
         screenshot: './componentPic/1632928449951.png'
     },
     'Todo_Page/todoText2': {
-        locator: ['/html/body/ng-view/section/header/form/input'],
+        locator: ['//body/ng-view/section/header/form/input'],
         screenshot: null
     },
     'Common_Page/locatorNotWork': {
