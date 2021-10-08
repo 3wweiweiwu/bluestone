@@ -124,8 +124,6 @@ class AstGenerator {
             "declarations": [
                 {
                     "type": "VariableDeclarator",
-                    "start": 6,
-                    "end": 47,
                     "id": {
                         "type": "Identifier",
                         "name": variableName
@@ -433,6 +431,15 @@ class AstGenerator {
             }
         }
         return ast
+    }
+    static getCodeWrapper() {
+        return {
+            "type": "Program",
+            "start": 0,
+            "end": 0,
+            "body": [],
+            "sourceType": "module"
+        }
     }
 
 }
