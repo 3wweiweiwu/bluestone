@@ -1,6 +1,6 @@
 class AstGenerator {
     /**
-     * Create simple ast for variable. sample func(var1)
+     * Create simple ast for variable. sample var1
      * @param {string} varName name of the var in this case, it will be'var1'
      * @returns 
      */
@@ -11,7 +11,7 @@ class AstGenerator {
         }
     }
     /**
-     * Create simple ast for variable. sample func(var1['key1'])
+     * Create simple ast for variable. sample (var1['key1'])
      * @param {string} varName in this case, it will be var1
      * @param {string} keyName in this case, it will be key1
      * @returns 
@@ -114,7 +114,7 @@ class AstGenerator {
         }
     }
     /**
-     * Sample: const variableName=require(libraryName)
+     * Sample: const variableName=require('libraryName')
      * @param {string} variableName 
      * @param {string} libraryName 
      */
@@ -235,6 +235,7 @@ class AstGenerator {
                 "optional": false
             }
         }
+        return ast
     }
     /**
      * const browser = await puppeteer.launch(config.puppeteer)
@@ -398,7 +399,7 @@ class AstGenerator {
     /**
      * await client.send('Network.clearBrowserCookies');
      * @param {string} clientVarName client
-     * @param {string} commandStr Network.clearBrowserCookies
+     * @param {'Network.clearBrowserCookies'|'Network.clearBrowserCache'} commandStr Network.clearBrowserCookies
      * @returns 
      */
     static getSendBDPClientCommand(clientVarName, commandStr) {
