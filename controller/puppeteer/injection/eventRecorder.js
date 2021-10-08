@@ -17,7 +17,7 @@ const EVENTCONST = {
 
 Object.keys(EVENTCONST).forEach(item => {
     document.addEventListener(item, event => {
-        const selector = ''
+        let selector = ''
         try {
             selector = finder(event.target)
         } catch (error) {
