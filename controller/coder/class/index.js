@@ -1,36 +1,63 @@
 
-let Function = require('../../ast/class/Function')
-const { getVariableDeclaration } = require('./AstGenerator')
+let FunctionAst = require('../../ast/class/Function')
+const { getVariableDeclaration, getCodeWrapper } = require('./AstGenerator')
 let AstGenerator = require('./AstGenerator')
 class Coder {
-
-    constructor(functionList) {
+    /**
+     * 
+     * @param {Array<FunctionAst>} functionList 
+     * @param {string} bluestoneLocatorPath the abosolute path of bluestone-locator.js
+     * @param {string} bluestoneFuncPath the absolute path to bluestone-locator.js
+     * @param {string} inbuiltFuncPath the absolute path to inbuilt bluestone-func.js
+     * @param {string} configPath the absolute path to config.js
+     * @param {string} testFilePath 
+     */
+    constructor(functionList, bluestoneLocatorPath, bluestoneFuncPath, configPath, testFilePath, inbuiltFuncPath) {
         this.funcList = functionList
 
         this.__testSuite = ''
         this.__testCase = ''
-        this.__ast = AstGenerator.getCodeWrapper()
-
-        this.__testCaseAst = AstGenerator.getDescribeItWrapper(this.__testSuite, this.__testCase)
-        this.__testCaseAst = this.initializeTestcaseBody()
+        this.__testFilePath = testFilePath
+        this.__testCaseAst = this.getTestcaseBody()
+        this.__astRequire = null
+        this.inbuiltVarName = {
+            require: [
+                {
+                    locator: bluestoneLocatorPath,
+                    projectFunc: bluestoneFuncPath,
+                    puppeteer: 'puppeteer-core',
+                    bluestoneFunc: inbuiltFuncPath || '../../../ptLibrary/bluestone-func',
+                    config: configPath
+                },
+            ],
+            body: {
+                variableDeclaration=['element', 'variable'],
+                browserVarName: 'browser',
+                pageVarName: 'page'
+            }
+        }
     }
     /**
      * Sample: const variableName=require('libraryName')
      * @param {string} variableName 
      * @param {string} libraryName 
      */
-    addRequireInfo(variableName, libraryName) {
-        this.__ast.body.push(variableName, libraryName)
+    __addRequireInfo(variableName, libraryName) {
+        this.__astRequire.body.push(variableName, libraryName)
+    }
+    /**
+     * Add all require info to the beginning of the main ast
+     */
+    getRequireInfo() {
+        this.__astRequire = AstGenerator.getCodeWrapper()
+        let keys = Object.keys(this.inbuiltVarName.require)
+        keys.forEach(key => {
+            this.__addRequireInfo(key, this.inbuiltVarName.require[key])
+        })
+        return this.__astRequire
     }
     get testcaseCodeBody() {
         return this.__testCaseAst.expression.arguments[1].body.body[0].expression.arguments[1].body.body
-    }
-    static inbuiltVarName = {
-        body: {
-            variableDeclaration=['element', 'variable'],
-            browserVarName: 'browser',
-            pageVarName: 'page'
-        }
     }
     /**
      * Add following line to the beginning of the testcase
@@ -38,18 +65,31 @@ class Coder {
      * //const browser = await puppeteer.launch(config.puppeteer)
      * //const page = await browser.newPage();
      */
-    initializeTestcaseBody() {
+    getTestcaseBody() {
         let ast
-        //let element,variable
-        ast = AstGenerator.getVariableDeclaration(Coder.inbuiltVarName.body.variableDeclaration)
-        this.testcaseCodeBody.push(ast)
-        //const browser = await puppeteer.launch(config.puppeteer)
-        ast = AstGenerator.getBrowserArgAst(Coder.inbuiltVarName.body.browserVarName)
-        this.testcaseCodeBody.push(ast)
-        //const page = await browser.newPage();
-        ast = AstGenerator.getPageInitializationStatement(Coder.inbuiltVarName.body.pageVarName, Coder.inbuiltVarName.body.browserVarName)
-    }
+        let testcaseCodeBody = AstGenerator.getDescribeItWrapper(this.__testSuite, this.__testCase)
 
+        //let element,variable
+        ast = AstGenerator.getVariableDeclaration(this.inbuiltVarName.body.variableDeclaration)
+        testcaseCodeBody.push(ast)
+        //const browser = await puppeteer.launch(config.puppeteer)
+        ast = AstGenerator.getBrowserArgAst(this.inbuiltVarName.body.browserVarName)
+        testcaseCodeBody.push(ast)
+        //const page = await browser.newPage();
+        ast = AstGenerator.getPageInitializationStatement(this.inbuiltVarName.body.pageVarName, this.inbuiltVarName.body.browserVarName)
+        testcaseCodeBody.push(ast)
+
+        //follow
+
+        return testcaseCodeBody
+    }
+    getTestcaseStep() {
+        let ast = []
+        for (let i = 0; i < this.funcList.length; i++) {
+            let currentFunc = this.funcList[i]
+            
+        }
+    }
     /**
      * const page = await browser.newPage();
      * @param {string} pageVarName page

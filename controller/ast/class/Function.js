@@ -1,6 +1,7 @@
 const Locator = require('../../locator/class/Locator')
 const ElementSelector = require('../../../ptLibrary/class/ElementSelector')
 const Coder = require('../../coder/class/AstGenerator')
+const AstGenerator = require('../../coder/class/AstGenerator')
 class ArgumentNContext {
     /**
      * 
@@ -82,29 +83,29 @@ class FunctionAST {
     }
     generateAstForCommand(libraryName, methodName, locatorName, browserVarName = 'browser', pageVarName = 'page', elementVarName = 'locator') {
 
-        let astJson = this.getCommandlineAstWrapper(libraryName, methodName)
+        let astJson = AstGenerator.getAwaitCommandWrapper(libraryName, methodName)
         for (let i = 0; i < currentOperation.params.length; i++) {
             let param = currentOperation.params[i]
             //construct scope
             switch (param.type.name) {
                 case "Page":
-                    let pageVarAst = Coder.getPageArgAst(pageVarName)
+                    let pageVarAst = AstGenerator.getPageArgAst(pageVarName)
                     astJson.expression.argument.arguments.push(pageVarAst)
                     break;
                 case "Browser":
-                    let browserVarAst = Coder.getBrowserArgAst(browserVarName)
+                    let browserVarAst = AstGenerator.getBrowserArgAst(browserVarName)
                     astJson.expression.argument.arguments.push(browserVarAst)
                     break;
                 case "ElementSelector":
-                    let elementVarAst = Coder.getElementSelectorArgAst(elementVarName, locatorName)
+                    let elementVarAst = AstGenerator.getElementSelectorArgAst(elementVarName, locatorName)
                     astJson.expression.argument.arguments.push(elementVarAst)
                     break;
                 case "string":
-                    let strVarAst = Coder.getSimpleValue(param.value)
+                    let strVarAst = AstGenerator.getSimpleValue(param.value)
                     astJson.expression.argument.arguments.push(strVarAst)
                     break;
                 case "number":
-                    let numberVarAst = Coder.getSimpleValue(param.value)
+                    let numberVarAst = AstGenerator.getSimpleValue(param.value)
                     astJson.expression.argument.arguments.push(numberVarAst)
                     break
                 default:
