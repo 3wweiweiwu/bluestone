@@ -70,7 +70,13 @@ class Coder {
         this.__ast = AstGenerator.getCodeWrapper()
         let keys = Object.keys(this.inbuiltVarName.require)
         keys.forEach(key => {
-            let linuxPath = path.relative(this.__testFileFolder, this.inbuiltVarName.require[key]).replace(/\\/g, '/')
+            let linuxPath = this.inbuiltVarName.require[key]
+
+            //check if it is a node_module. For node module, I assume it should never inlucde / \ .
+            if (linuxPath.includes('/') || linuxPath.includes('\\') || linuxPath.includes('.')) {
+                linuxPath = path.relative(this.__testFileFolder, linuxPath).replace(/\\/g, '/')
+            }
+
             this.__addRequireInfo(key, linuxPath)
         })
         return this.__ast
