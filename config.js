@@ -1,5 +1,6 @@
 const path = require('path')
-module.exports = {
+const fs = require('fs')
+let config = {
     app: {
         port: 3600
     },
@@ -10,10 +11,13 @@ module.exports = {
         args: ['--disable-web-security', '--disable-features=IsolateOrigins,site-per-process']
 
     },
+    bluestoneJson: path.join(__dirname, './test/sample-project/bluestone.json'),
     code: {
         funcPath: path.join(__dirname, './test/sample-project/bluestone-func.js'),
         locatorPath: path.join(__dirname, './test/sample-project/bluestone-locator.js'),
         scriptFolder: path.join(__dirname, './test/sample-project/script'),
+        configPath: path.join(__dirname, './test/sample-project/config.js'),
+        inbuiltFuncPath: path.join(__dirname, './ptLibrary/bluestone-func.js')
     },
     singlefile: {
         removeHiddenElements: false,
@@ -57,3 +61,16 @@ module.exports = {
     }
 
 }
+function configFunc() {
+    let projectInfo = fs.readFileSync(config.bluestoneJson)
+    let projectObj = JSON.parse(projectInfo.toString())
+    let projectFolder = path.dirname(config.bluestoneJson)
+    config.code.funcPath = path.join(projectFolder, projectObj.function)
+    config.code.locatorPath = path.join(projectFolder, projectObj.locator)
+    config.code.scriptFolder = path.join(projectFolder, projectObj.test)
+    config.code.configPath = path.join(projectFolder, projectObj.config)
+    return config
+}
+
+
+module.exports = configFunc()

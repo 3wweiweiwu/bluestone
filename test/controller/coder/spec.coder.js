@@ -2,7 +2,7 @@
 const path = require('path')
 const escodegen = require('escodegen')
 const assert = require('assert')
-const Coder = require('../../../controller/coder/class')
+const Coder = require('../../../controller/coder/class/Testcase')
 const fs = require('fs').promises
 describe('Coder', () => {
     it('should generate code as expected', async () => {
@@ -435,7 +435,7 @@ describe('Coder', () => {
         let coder = new Coder(functionList, projectLocatorPath, projectFuncPath, configPath, testFileFolder, bluestoneFuncPath)
         coder.testCase = 'test test name'
         coder.testSuite = 'test suite name'
-        let finalAst = await coder.generateFinalAst()
+        let finalAst = await coder.__generateFinalAst()
         let finalScript = escodegen.generate(finalAst)
         let baselinePath = path.join(__dirname, './baseline/happypath.base')
         let baselineText = await fs.readFile(baselinePath)

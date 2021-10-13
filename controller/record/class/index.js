@@ -11,7 +11,7 @@ const ElementSelector = require('../../../ptLibrary/class/ElementSelector')
 const { Page } = require('puppeteer-core')
 const PuppeteerControl = require('../../puppeteer/class')
 const fs = require('fs').promises
-
+const Testcase = require('../../coder/class/Testcase')
 /**
  * @typedef {string} CommandType
  **/
@@ -138,7 +138,15 @@ class WorkflowRecord {
     getCurrentOperation() {
         return this.operation.browserSelection.currentOpeartion
     }
+    async writeCodeToDisk(testSuite, testCase) {
+        //write code to disk
+        let functionAstList = this.getAllFunctionAst()
+        let coder = new Testcase(functionAstList, config.code.locatorPath, config.code.funcPath, config.code.configPath, config.code.scriptFolder, config.code.inbuiltFuncPath)
+        let finalPath = await coder.writeCodeToDisk()
 
+        //update locator
+        return finalPath
+    }
     /**
      * Convert local path to relative path
      * @param {string} localPath 

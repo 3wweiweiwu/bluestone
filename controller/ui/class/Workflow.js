@@ -46,6 +46,7 @@ class WorkFlowPug {
         this.txtValidationStatus = 'Please click on Resolve Button to proceed'
         this.textFileName = ''
         this.backend = backend
+        this.isValidationPass = false
     }
     /**
      * Create UI info for workflow
@@ -120,6 +121,13 @@ class WorkFlowPug {
                 this.validateForm()
                 await this.backend.puppeteer.openBluestoneTab('workflow')
                 break
+            case WorkFlowPug.inBuiltQueryKey.btnCreateTestcaseQueryKey:
+                if (this.validateForm()) {
+                    let finalPath = await this.backend.writeCodeToDisk(this.textTestSuiteValue, this.textTestCaseValue)
+                    this.txtValidationStatus = `Script created at: ${finalPath}`
+                    this.isValidationPass = true
+                }
+                break
             default:
                 break;
         }
@@ -132,6 +140,7 @@ class WorkFlowPug {
     validateForm() {
         let steps = this.backend.steps
         this.txtValidationStatus = ''
+        this.isValidationPass = false
         if (this.textTestSuiteValue == '') {
             this.txtValidationStatus = 'Please enter test suite name'
             return false
@@ -156,7 +165,7 @@ class WorkFlowPug {
                 return false
             }
         }
-
+        this.isValidationPass = true
         return true
     }
 }

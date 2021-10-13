@@ -23,7 +23,7 @@ class UI {
             return
         }
         await this.operation.update(query)
-        this.workflow.update(query)
+        await this.workflow.update(query)
         await this.locatorDefiner.update(query)
         let firstKey = queryKeys[0]
         let firstValue = query[firstKey]
