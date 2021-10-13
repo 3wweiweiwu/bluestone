@@ -145,6 +145,14 @@ class LocatorDefiner {
                     if (item.target == this.defaultSelector) {
                         item.finalLocator = finalSelection.finalLocator
                         item.finalLocatorName = finalSelection.finalLocatorName
+                        //specify the locato rname in the param
+                        let param = item.functionAst.params.find(item => {
+                            return item.type.name == 'ElementSelector'
+                        })
+                        if (param) {
+                            param.value = finalSelection.finalLocatorName
+                        }
+
                     }
                 })
 

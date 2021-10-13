@@ -1,4 +1,5 @@
 class AstGenerator {
+    
     /**
      * Create simple ast for variable. sample var1
      * @param {string} varName name of the var in this case, it will be'var1'
@@ -52,7 +53,7 @@ class AstGenerator {
      * @returns 
      */
     static getElementSelectorArgAst(elementVarName, locatorName) {
-        return Coder.getDictionaryVariableAst(elementVarName, locatorName)
+        return AstGenerator.getDictionaryVariableAst(elementVarName, locatorName)
     }
     /**
      * create the variable that can be used for page
@@ -60,7 +61,7 @@ class AstGenerator {
      * @returns 
      */
     static getPageArgAst(pageVarName) {
-        return Coder.getSimpleVariableAst(pageVarName)
+        return AstGenerator.getSimpleVariableAst(pageVarName)
     }
     /**
      * Create a argument for browser
@@ -68,7 +69,7 @@ class AstGenerator {
      * @returns 
      */
     static getBrowserArgAst(browserVarName) {
-        return Coder.getSimpleVariableAst(browserVarName)
+        return AstGenerator.getSimpleVariableAst(browserVarName)
     }
     /**
      * Create a argument for library and method funcLib.method1.func()

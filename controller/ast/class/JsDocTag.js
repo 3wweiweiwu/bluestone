@@ -7,7 +7,7 @@
 class TagType {
     /**
      * Enter the type name
-     * @param {'Page'|'Browser'|'string'|'number'} typeName 
+     * @param {'Page'|'Browser'|'string'|'number'|'ElementSelector'} typeName 
      */
     constructor(typeName) {
         this.type = 'NameExpression'

@@ -81,39 +81,5 @@ class FunctionAST {
         let result = new ArgumentNContext(currentScope, argumentStr, argDic)
         return result
     }
-    generateAstForCommand(libraryName, methodName, locatorName, browserVarName = 'browser', pageVarName = 'page', elementVarName = 'locator') {
-
-        let astJson = AstGenerator.getAwaitCommandWrapper(libraryName, methodName)
-        for (let i = 0; i < currentOperation.params.length; i++) {
-            let param = currentOperation.params[i]
-            //construct scope
-            switch (param.type.name) {
-                case "Page":
-                    let pageVarAst = AstGenerator.getPageArgAst(pageVarName)
-                    astJson.expression.argument.arguments.push(pageVarAst)
-                    break;
-                case "Browser":
-                    let browserVarAst = AstGenerator.getBrowserArgAst(browserVarName)
-                    astJson.expression.argument.arguments.push(browserVarAst)
-                    break;
-                case "ElementSelector":
-                    let elementVarAst = AstGenerator.getElementSelectorArgAst(elementVarName, locatorName)
-                    astJson.expression.argument.arguments.push(elementVarAst)
-                    break;
-                case "string":
-                    let strVarAst = AstGenerator.getSimpleValue(param.value)
-                    astJson.expression.argument.arguments.push(strVarAst)
-                    break;
-                case "number":
-                    let numberVarAst = AstGenerator.getSimpleValue(param.value)
-                    astJson.expression.argument.arguments.push(numberVarAst)
-                    break
-                default:
-                    break;
-            }
-        }
-        return astJson
-
-    }
 }
 module.exports = FunctionAST

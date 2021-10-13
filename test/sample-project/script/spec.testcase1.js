@@ -1,4 +1,4 @@
-const locator = require('../bluestone-locator')
+const locator = require('..\\bluestone-locator')
 const projectFunc = require('../bluestone-func')
 const puppeteer = require('puppeteer-core')
 const bluestoneFunc = require('../../../ptLibrary/bluestone-func')
