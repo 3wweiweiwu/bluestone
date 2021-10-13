@@ -6,21 +6,20 @@ const LocatorAstGen = require('./LocatorAstGen')
 const escodegen = require('escodegen')
 class LocatorManager {
     /**
-     * Create Locator Manager Class
-     * @param {string} locatorPath path to bluestone-locator.js
+     * Create Locator Manager Class     * 
      */
-    constructor(locatorPath) {
-        this.__initialize(locatorPath)
+    constructor() {
+        this.__initialize()
     }
     /**
      * Create Locator Manager Class
-     * @param {string} locatorPath path to bluestone-locator.js
+     * 
      */
-    __initialize(locatorPath) {
+    __initialize() {
         /** @type {Array<Locator>} */
         this.__locatorLibrary = []
-        this.locatorPath = locatorPath
-        this.__parseLocator(locatorPath)
+        this.locatorPath = config.code.locatorPath
+        this.__parseLocator(this.locatorPath)
         this.lastRefreshTime = 0 //unit ms
     }
     get locatorLibrary() {
@@ -92,8 +91,10 @@ class LocatorManager {
      * @param {string} locatorName 
      * @param {string} locatorValue 
      * @param {string} picPath 
+     * @returns {Locator} if new locator is created, return this locator 
      */
     async updateLocator(locatorName, locatorValue, picPath) {
+        let newLocator = null
         //copy picture into desinanated location
         let newPicName = locatorName.replace(/\W/g, '_') + '.png'
         let newPicPath = path.join(config.code.pictureFolder, newPicName)
@@ -101,19 +102,21 @@ class LocatorManager {
 
         //get relative path for the locator
         let relativePicPath = path.relative(config.code.locatorPath, newPicPath)
-
+        relativePicPath = relativePicPath.replace(/\\/g, '/')
         //add new locator into the library
         let targetLocator = this.locatorLibrary.find(item => { return item.path == locatorName })
         if (targetLocator == null) {
             targetLocator = new Locator(locatorValue, relativePicPath, locatorName)
             this.locatorLibrary.push(targetLocator)
+            newLocator = targetLocator
         }
 
         //check if update is required for the current locator. If so, update locator and screenshot path
         if (targetLocator.Locator[0] != locatorValue[0]) {
             targetLocator.Locator = locatorValue
-            targetLocator.screenshot = targetLocator
+            targetLocator.screenshot = relativePicPath
         }
+        return JSON.parse(JSON.stringify(newLocator))
 
     }
     /**
@@ -127,7 +130,9 @@ class LocatorManager {
             ast.body[0].expression.right.properties.push(locatorAst)
         })
         let output = escodegen.generate(ast)
-        await fs.writeFile(config.code.locatorPath,output)
+        await fs.writeFile(config.code.locatorPath, output)
+        this.__initialize()
+        //XXX(feature) Automatically refresh the locator definer view
     }
 
 }

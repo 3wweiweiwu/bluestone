@@ -139,7 +139,7 @@ class WorkflowRecord {
         return this.operation.browserSelection.currentOpeartion
     }
     /**
-     * Write Testcase code into script output folder
+     * Write Testcase code into script output folder and update bluestone-locator.js 
      * @param {string} testSuite 
      * @param {string} testCase 
      * @returns {string} output path
@@ -156,14 +156,21 @@ class WorkflowRecord {
         for (let i = 0; i < this.steps.length; i++) {
             let step = this.steps[i]
             //ignore locator for goto functon
-            if (step.command = WorkflowRecord.inBuiltFunc.goto) continue
+            if (step.command == WorkflowRecord.inBuiltFunc.goto) continue
 
             //update step information accordingly
-            this.locatorManager.updateLocator(step.finalLocatorName, step.finalLocator, step.targetPicPath)
+            let newLocator = await this.locatorManager.updateLocator(step.finalLocatorName, step.finalLocator, step.targetPicPath)
+
+            //if it is a new locator, add the newly created locator to possible match
+            if (newLocator) {
+                newLocator.screenshot = path.basename(step.targetPicPath)
+                step.potentialMatch.push(newLocator)
+            }
 
         }
         //output locator to disk
         await this.locatorManager.outputLocatorToDisk()
+
         return finalPath
     }
     /**
