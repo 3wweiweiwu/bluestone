@@ -262,7 +262,7 @@ class WorkflowRecord {
         stepIndex = this.steps.findIndex(item => {
             return item.finalLocator == '' || item.finalLocator == ''
         })
-        return stepIndex 
+        return stepIndex
     }
     /**
      * Return all functionAst object for ast purpose

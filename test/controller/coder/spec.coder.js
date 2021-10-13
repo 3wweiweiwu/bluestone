@@ -431,15 +431,17 @@ describe('Coder', () => {
         let projectFuncPath = path.join(__dirname, '../../sample-project/bluestone-func.js')
         let projectLocatorPath = path.join(__dirname, '../../sample-project/bluestone-locator.js')
         let configPath = path.join(__dirname, '../../sample-project/config.js')
-        let testFileFolder = path.join(__dirname, '../../sample-project/script')
+        let testFileFolder = path.join(__dirname, '.')
         let coder = new Coder(functionList, projectLocatorPath, projectFuncPath, configPath, testFileFolder, bluestoneFuncPath)
-        coder.testCase = 'test name'
+        coder.testCase = 'test test name'
         coder.testSuite = 'test suite name'
-        let finalAst = coder.generateFinalAst()
+        let finalAst = await coder.generateFinalAst()
         let finalScript = escodegen.generate(finalAst)
         let baselinePath = path.join(__dirname, './baseline/happypath.base')
         let baselineText = await fs.readFile(baselinePath)
         let baseline = JSON.parse(baselineText)
         assert.equal(finalScript, baseline.result)
+
+
     }).timeout(20000)
 })

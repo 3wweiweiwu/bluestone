@@ -2,6 +2,8 @@
 let FunctionAst = require('../../ast/class/Function')
 const { getVariableDeclaration, getCodeWrapper } = require('./AstGenerator')
 let AstGenerator = require('./AstGenerator')
+const escodegen = require('escodegen')
+const fs = require("fs").promises
 const path = require('path')
 class Coder {
     /**
@@ -47,6 +49,10 @@ class Coder {
             [this.inbuiltVarName.library.configLibrary]: configPath
 
         }
+    }
+    get fileName() {
+        return this.testCase.replace(/\W/g, '_') + '.js'
+
     }
     /**
      * Sample: const variableName=require('libraryName')
@@ -108,14 +114,19 @@ class Coder {
         return ast
     }
     /**
-     * Generate final ast
+     * Generate final ast and output it into the disk
      */
-    generateFinalAst() {
+    async generateFinalAst() {
         this.__updateAstRequirement()
 
         this.__updateTestcaseBodyAst()
         //combine astRequirement with astTestcaseBody
         this.__ast.body = this.__ast.body.concat(this.__testCaseAst)
+
+        //output file
+        let outputPath = path.join(this.__testFileFolder, this.fileName)
+        let testCode = escodegen.generate(this.__ast)
+        await fs.writeFile(outputPath, testCode)
         return this.__ast
     }
     /**
