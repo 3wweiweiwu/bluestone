@@ -1,5 +1,7 @@
 {
     "function": "./bluestone-func.js",
     "locator": "./bluestone-locator.js",
-    "test": "./script"
+    "test": "./script",
+    "config": "./config.js",
+    "pic": "./componentPic"
 }

@@ -1,11 +1,22 @@
 const Locator = require('./Locator')
-
+const fs = require('fs').promises
+const config = require('../../../config')
+const path = require('path')
+const LocatorAstGen = require('./LocatorAstGen')
+const escodegen = require('escodegen')
 class LocatorManager {
     /**
      * Create Locator Manager Class
      * @param {string} locatorPath path to bluestone-locator.js
      */
     constructor(locatorPath) {
+        this.__initialize(locatorPath)
+    }
+    /**
+     * Create Locator Manager Class
+     * @param {string} locatorPath path to bluestone-locator.js
+     */
+    __initialize(locatorPath) {
         /** @type {Array<Locator>} */
         this.__locatorLibrary = []
         this.locatorPath = locatorPath
@@ -74,6 +85,49 @@ class LocatorManager {
 
             this.__iterateThroughObject(value, newPath)
         }
+    }
+
+    /**
+     * Update current locator library based on the input value
+     * @param {string} locatorName 
+     * @param {string} locatorValue 
+     * @param {string} picPath 
+     */
+    async updateLocator(locatorName, locatorValue, picPath) {
+        //copy picture into desinanated location
+        let newPicName = locatorName.replace(/\W/g, '_') + '.png'
+        let newPicPath = path.join(config.code.pictureFolder, newPicName)
+        await fs.copyFile(picPath, newPicPath)
+
+        //get relative path for the locator
+        let relativePicPath = path.relative(config.code.locatorPath, newPicPath)
+
+        //add new locator into the library
+        let targetLocator = this.locatorLibrary.find(item => { return item.path == locatorName })
+        if (targetLocator == null) {
+            targetLocator = new Locator(locatorValue, relativePicPath, locatorName)
+            this.locatorLibrary.push(targetLocator)
+        }
+
+        //check if update is required for the current locator. If so, update locator and screenshot path
+        if (targetLocator.Locator[0] != locatorValue[0]) {
+            targetLocator.Locator = locatorValue
+            targetLocator.screenshot = targetLocator
+        }
+
+    }
+    /**
+     * output current locator change to the local disk
+     */
+    async outputLocatorToDisk() {
+
+        let ast = LocatorAstGen.getModuleExportWrapper()
+        this.locatorLibrary.forEach(item => {
+            let locatorAst = LocatorAstGen.getLocatorStructure(item.path, item.Locator[0], item.screenshot)
+            ast.body[0].expression.right.properties.push(locatorAst)
+        })
+        let output = escodegen.generate(ast)
+        await fs.writeFile(config.code.locatorPath,output)
     }
 
 }

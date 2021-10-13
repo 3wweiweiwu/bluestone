@@ -21,6 +21,7 @@ class LocatorDefiner {
      * @param {WorkflowRecord} backend the workflow record backend
      */
     constructor(defaultSelector, locatorHtmlPath, locatorName, locatorSelector, potentialMatch, stepIndex, backend) {
+
         this.__selectorValidationNote = ''
         this.defaultSelector = defaultSelector
         this.__locatorName = locatorName
@@ -137,15 +138,16 @@ class LocatorDefiner {
             case LocatorDefiner.inBuiltQueryKey.btnConfirm:
                 //check locator and confirm locator input
                 let locatorCheckResult = await this.backend.puppeteer.checkLocatorInDefiner(this.defaultSelector, this.locatorSelector)
+                //will not update the locator if current locator is not valid
+                if (locatorCheckResult != '') break
+
                 let finalSelection = this.getFinalSelection(locatorCheckResult)
-
-
                 //check all steps and replicate same setting for same locator
                 this.backend.steps.forEach(item => {
                     if (item.target == this.defaultSelector) {
                         item.finalLocator = finalSelection.finalLocator
                         item.finalLocatorName = finalSelection.finalLocatorName
-                        //specify the locato rname in the param
+                        //specify the locator name in the param
                         let param = item.functionAst.params.find(item => {
                             return item.type.name == 'ElementSelector'
                         })

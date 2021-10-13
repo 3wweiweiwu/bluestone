@@ -1,4 +1,3 @@
-
 module.exports = {
     'Todo_Page/TODO_Text_Input': {
         locator: ['/html/body/ng-view/section/header/form/input'],
@@ -12,6 +11,4 @@ module.exports = {
         locator: ['/html/body/ng-view/section/header/form/input1'],
         screenshot: null
     }
-
-
-}
+};

@@ -138,13 +138,32 @@ class WorkflowRecord {
     getCurrentOperation() {
         return this.operation.browserSelection.currentOpeartion
     }
+    /**
+     * Write Testcase code into script output folder
+     * @param {string} testSuite 
+     * @param {string} testCase 
+     * @returns {string} output path
+     */
     async writeCodeToDisk(testSuite, testCase) {
         //write code to disk
         let functionAstList = this.getAllFunctionAst()
         let coder = new Testcase(functionAstList, config.code.locatorPath, config.code.funcPath, config.code.configPath, config.code.scriptFolder, config.code.inbuiltFuncPath)
+        coder.testSuite = testSuite
+        coder.testCase = testCase
         let finalPath = await coder.writeCodeToDisk()
 
         //update locator
+        for (let i = 0; i < this.steps.length; i++) {
+            let step = this.steps[i]
+            //ignore locator for goto functon
+            if (step.command = WorkflowRecord.inBuiltFunc.goto) continue
+
+            //update step information accordingly
+            this.locatorManager.updateLocator(step.finalLocatorName, step.finalLocator, step.targetPicPath)
+
+        }
+        //output locator to disk
+        await this.locatorManager.outputLocatorToDisk()
         return finalPath
     }
     /**
