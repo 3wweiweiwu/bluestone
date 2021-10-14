@@ -164,7 +164,11 @@ class WorkflowRecord {
             //if it is a new locator, add the newly created locator to possible match
             if (newLocator) {
                 newLocator.screenshot = path.basename(step.targetPicPath)
-                step.potentialMatch.push(newLocator)
+                this.steps.forEach(item => {
+                    if (item.finalLocatorName == step.finalLocatorName) {
+                        item.potentialMatch.push(newLocator)
+                    }
+                })
             }
 
         }

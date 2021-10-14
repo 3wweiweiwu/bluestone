@@ -44,7 +44,9 @@ class LocatorManager {
      * @returns {{Array<Locator>}
      */
     __parseLocator(path) {
+        delete require.cache[path]
         let locatorObj = require(path)
+
         //recursively go through all json node and create mapping
         this.__iterateThroughObject(locatorObj, [])
     }
@@ -101,7 +103,8 @@ class LocatorManager {
         await fs.copyFile(picPath, newPicPath)
 
         //get relative path for the locator
-        let relativePicPath = path.relative(config.code.locatorPath, newPicPath)
+        let locatorFolder = path.dirname(config.code.locatorPath)
+        let relativePicPath = path.relative(locatorFolder, newPicPath)
         relativePicPath = relativePicPath.replace(/\\/g, '/')
         //add new locator into the library
         let targetLocator = this.locatorLibrary.find(item => { return item.path == locatorName })
