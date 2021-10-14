@@ -24,36 +24,11 @@ module.exports = function (recordRepo, browser, page, io) {
 
 
         //handle page capture
-        let htmlPath = ''
-        if (page != null) {
-            htmlPath = recordRepo.getHtmlPath()
-            let pageData = await page.evaluate(async (DEFAULT_OPTIONS) => {
+        let htmlPath = recordRepo.operation.browserSelection.selectorHtmlPath
 
-                const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
-                return pageData;
-            }, config.singlefile);
-            fs.writeFile(htmlPath, pageData.content)
-
-        }
         //handle screenshot
-        let picturePath = ''
-        if (page != null) {
-            picturePath = recordRepo.getPicPath()
-            await page.screenshot({ path: picturePath, captureBeyondViewport: false })
-            if (eventDetail.command == COMMAND_TYPE.goto) return Promise.reject('GOTO')
-            let pic = await jimp.read(picturePath)
-            if (eventDetail.command == null) {
-                //for in-browser agent call
-                pic = pic.crop(recordRepo.operation.browserSelection.x, recordRepo.operation.browserSelection.y, recordRepo.operation.browserSelection.width, recordRepo.operation.browserSelection.height);
-            }
-            else {
-                //for ordinary event, just crop as usual
-                pic = pic.crop(eventDetail.pos.x, eventDetail.pos.y, eventDetail.pos.width, eventDetail.pos.height);
-            }
-            await pic.writeAsync(picturePath)
-
-        }
-
+        let picturePath = recordRepo.operation.browserSelection.selectorPicture
+        eventDetail.target = recordRepo.operation.browserSelection.currentSelector
 
         //if event command is null, call the in-browser console
         if (eventDetail.command == null) {

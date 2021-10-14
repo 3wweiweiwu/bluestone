@@ -44,8 +44,14 @@ module.exports = async function (browser, targetLocator, currentLocator) {
         let targetElement = await frame.$(targetLocator)
         let targettBox = await targetElement.boundingBox()
         let currentBox = await elements[0].boundingBox()
-        //check if current element is within the target element.
-        if (targettBox.height + targettBox.y < currentBox.height + currentBox.y ||
+        if (targettBox == null || currentBox == null) {
+            //when targebox and current box is invisible, conduct blind check
+            if (targettBox != currentBox) {
+                errorText = 'The current element is not contained within target element'
+            }
+        }
+        else if (targettBox.height + targettBox.y < currentBox.height + currentBox.y ||
+            //check if current element is within the target element.
             targettBox.width + targettBox.x < currentBox.width + currentBox.x ||
             targettBox.x > currentBox.x ||
             targettBox.y > currentBox.y

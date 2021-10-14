@@ -49,12 +49,12 @@ async function startRecording(record, io, url = null) {
 
     await page.exposeFunction('logEvent', logEvent(record, browser, page, io))
     await page.exposeFunction('isRecording', isRecording(record))
-    await page.exposeFunction('logCurrentElement', logCurrentElement(record))
+    await page.exposeFunction('logCurrentElement', logCurrentElement(record, page))
     await page.exposeFunction('getLocator', getLocator(record))
     await page.exposeFunction('setLocatorStatus', setLocatorStatus(record))
     await page.exposeFunction('isSpyVisible', isSpyVisible(record))
     await page.exposeFunction('setSpyVisible', setSpyVisible(record))
-    
+
 
 
 

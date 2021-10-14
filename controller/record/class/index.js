@@ -77,7 +77,7 @@ class RecordingStep {
 /**
  * @typedef step
  * @property {'click'|'change'|'dblclick'|'keydown'|'goto'} command
- * @property {number} target
+ * @property {string} target
  * @property {Array<ExistingSelector>} matchedSelector
  * @property {number} timeoutMs
  * @property {string} htmlPath
@@ -493,8 +493,10 @@ class WorkflowRecord {
     /**
      * returns the picture path for current step
      */
-    getHtmlPath() {
-        let fileName = Date.now().toString() + ".html"
+    getHtmlPath(fileName = null) {
+        if (fileName == null) {
+            fileName = Date.now().toString() + ".html"
+        }
         let filePath = path.join(__dirname, '../../../public/temp/componentPic', fileName)
         return filePath
 
@@ -502,8 +504,11 @@ class WorkflowRecord {
     /**
      * returns the picture path for current step
      */
-    getPicPath() {
-        let fileName = Date.now().toString() + ".png"
+    getPicPath(fileName = null) {
+        if (fileName == null) {
+            fileName = Date.now().toString() + ".png"
+        }
+
         let filePath = path.join(__dirname, '../../../public/temp/componentPic', fileName)
         return filePath
 
