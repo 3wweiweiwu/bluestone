@@ -280,8 +280,8 @@ class WorkflowRecord {
         //automatically match all existing selectors
         this.steps.forEach(item => {
             if (item.potentialMatch.length == 1) {
-                item.finalLocatorName = item.potentialMatch[0].Locator
-                item.finalLocator = item.potentialMatch[0].path
+                item.finalLocatorName = item.potentialMatch[0].path
+                item.finalLocator = item.potentialMatch[0].Locator
             }
         })
     }
