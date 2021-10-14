@@ -135,7 +135,6 @@ class LocatorManager {
         let output = escodegen.generate(ast)
         await fs.writeFile(config.code.locatorPath, output)
         this.__initialize()
-        //XXX(feature) Automatically refresh the locator definer view
     }
 
 }
