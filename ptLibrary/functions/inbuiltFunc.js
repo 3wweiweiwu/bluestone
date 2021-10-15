@@ -97,7 +97,12 @@ exports.change = async function (page, elementSelector, text) {
  */
 exports.click = async function (page, elementSelector) {
     let element = await findElement(page, elementSelector, 2000)
-    element.click()
+    try {
+        await element.click()
+    } catch (error) {
+        return Promise.reject(`Unable to click ${elementSelector.displayName}`)
+    }
+
     return `Click success!`
 }
 /**

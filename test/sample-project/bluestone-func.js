@@ -4,11 +4,11 @@ module.exports = {
 
     logConsole: {
         func: func.failedFunction,
-        locators: [locators['Todo_Page/TODO_Text_Input'], locators['Todo_Page/todoText2']]
+        locators: []
     },
     notActiveFunc: {
         func: func.testFunc,
-        locators: [locators['Common_Page/locatorNotWork']]
+        locators: []
     }
 
 }

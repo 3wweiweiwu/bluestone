@@ -440,7 +440,7 @@ class WorkflowRecord {
      * @returns 
      */
     async __handleChangeNPressCombo(step) {
-        if (step.timeoutMs > 0 && step.timeoutMs < 400 && step.command == 'change' && this.steps[this.steps.length - 3].command == 'keydown') {
+        if (this.steps.length > 3 && step.command == 'change' && this.steps[this.steps.length - 3].command == 'keydown' && step.target == this.steps[this.steps.length - 3].target) {
             let waitStepForChange = this.steps[this.steps.length - 2]
             let actionStepForChange = this.steps[this.steps.length - 1]
             let actionStepForPress = this.steps[this.steps.length - 3]
