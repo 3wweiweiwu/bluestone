@@ -93,6 +93,21 @@ class LocatorAstGen {
                             "value": picPath,
                         },
                         "kind": "init"
+                    },
+                    {
+                        "type": "Property",
+                        "method": false,
+                        "shorthand": false,
+                        "computed": false,
+                        "key": {
+                            "type": "Identifier",
+                            "name": "displayName"
+                        },
+                        "value": {
+                            "type": "Literal",
+                            "value": locatorPath,
+                        },
+                        "kind": "init"
                     }
                 ]
             },
