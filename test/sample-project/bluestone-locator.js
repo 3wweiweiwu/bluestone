@@ -18,5 +18,15 @@ module.exports = {
         locator: ['//form/input'],
         screenshot: 'componentPic/txtInput.png',
         displayName: 'txtInput'
+    },
+    'txtUserName': {
+        locator: ['#username'],
+        screenshot: 'componentPic/txtUserName.png',
+        displayName: 'txtUserName'
+    },
+    'txtPassword': {
+        locator: ['#password'],
+        screenshot: 'componentPic/txtPassword.png',
+        displayName: 'txtPassword'
     }
 };
