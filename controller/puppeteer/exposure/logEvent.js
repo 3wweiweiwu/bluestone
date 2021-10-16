@@ -22,13 +22,50 @@ module.exports = function (recordRepo, browser, page, io) {
 
         //goto command does not generate a locator, we w
 
-
         //handle page capture
-        let htmlPath = recordRepo.operation.browserSelection.selectorHtmlPath
+        let htmlPath = ''
+        if (page != null) {
+            htmlPath = recordRepo.getHtmlPath()
+            page.evaluate(async (DEFAULT_OPTIONS) => {
 
+                const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
+                return pageData;
+            }, config.singlefile)
+                .then(pageData => {
+                    fs.writeFile(htmlPath, pageData.content)
+                })
+
+
+        }
         //handle screenshot
-        let picturePath = recordRepo.operation.browserSelection.selectorPicture
-        eventDetail.target = recordRepo.operation.browserSelection.currentSelector
+        let picturePath = ''
+        if (page != null) {
+            picturePath = recordRepo.getPicPath()
+
+            if (eventDetail.command == COMMAND_TYPE.goto) return Promise.reject('GOTO')
+            await page.screenshot({ path: picturePath, captureBeyondViewport: false })
+            let pic = await jimp.read(picturePath)
+            if (eventDetail.command == null) {
+                //for in-browser agent call
+                pic = pic.crop(recordRepo.operation.browserSelection.x, recordRepo.operation.browserSelection.y, recordRepo.operation.browserSelection.width, recordRepo.operation.browserSelection.height);
+            }
+            else {
+                //for ordinary event, just crop as usual
+                pic = pic.crop(eventDetail.pos.x, eventDetail.pos.y, eventDetail.pos.width, eventDetail.pos.height);
+            }
+            pic.writeAsync(picturePath)
+
+        }
+        //in case the element is destroyed after the event, we will get the snapshot from realtime snapshot
+        if (eventDetail.target == null || eventDetail.target == '') {
+            eventDetail.target = recordRepo.operation.browserSelection.currentSelector
+            //handle page capture
+            htmlPath = recordRepo.operation.browserSelection.selectorHtmlPath
+
+            //handle screenshot
+            picturePath = recordRepo.operation.browserSelection.selectorPicture
+        }
+
 
         //if event command is null, call the in-browser console
         if (eventDetail.command == null) {

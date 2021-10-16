@@ -22,7 +22,7 @@ let config = {
     },
     singlefile: {
         removeHiddenElements: false,
-        removeUnusedStyles: true,
+        removeUnusedStyles: false,
         removeUnusedFonts: false,
         progressBarEnabled: false,
         userScriptEnabled: false,
