@@ -25,14 +25,17 @@ module.exports = function (recordRepo, browser, page, io) {
         //handle page capture
         let htmlPath = ''
         if (page != null) {
-            htmlPath = recordRepo.getHtmlPath()
+            htmlPath = recordRepo.operation.browserSelection.selectorHtmlPath
             page.evaluate(async (DEFAULT_OPTIONS) => {
 
                 const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
                 return pageData;
             }, config.singlefile)
                 .then(pageData => {
-                    fs.writeFile(htmlPath, pageData.content)
+                    return fs.writeFile(htmlPath, pageData.content)
+                })
+                .catch(err => {
+                    htmlPath = recordRepo.operation.browserSelection.selectorHtmlPath
                 })
 
 
@@ -40,30 +43,35 @@ module.exports = function (recordRepo, browser, page, io) {
         //handle screenshot
         let picturePath = ''
         if (page != null) {
-            picturePath = recordRepo.getPicPath()
+            picturePath = recordRepo.operation.browserSelection.selectorPicture
 
             if (eventDetail.command == COMMAND_TYPE.goto) return Promise.reject('GOTO')
-            await page.screenshot({ path: picturePath, captureBeyondViewport: false })
-            let pic = await jimp.read(picturePath)
-            if (eventDetail.command == null) {
-                //for in-browser agent call
-                pic = pic.crop(recordRepo.operation.browserSelection.x, recordRepo.operation.browserSelection.y, recordRepo.operation.browserSelection.width, recordRepo.operation.browserSelection.height);
+            try {
+                await page.screenshot({ path: picturePath, captureBeyondViewport: false })
+                let pic = await jimp.read(picturePath)
+                if (eventDetail.command == null) {
+                    //for in-browser agent call
+                    pic = pic.crop(recordRepo.operation.browserSelection.x, recordRepo.operation.browserSelection.y, recordRepo.operation.browserSelection.width, recordRepo.operation.browserSelection.height);
+                }
+                else {
+                    //for ordinary event, just crop as usual
+                    pic = pic.crop(eventDetail.pos.x, eventDetail.pos.y, eventDetail.pos.width, eventDetail.pos.height);
+                }
+                pic.writeAsync(picturePath)
+            } catch (error) {
+                picturePath = recordRepo.operation.browserSelection.selectorPicture
             }
-            else {
-                //for ordinary event, just crop as usual
-                pic = pic.crop(eventDetail.pos.x, eventDetail.pos.y, eventDetail.pos.width, eventDetail.pos.height);
-            }
-            pic.writeAsync(picturePath)
+
 
         }
         //in case the element is destroyed after the event, we will get the snapshot from realtime snapshot
         if (eventDetail.target == null || eventDetail.target == '') {
             eventDetail.target = recordRepo.operation.browserSelection.currentSelector
             //handle page capture
-            htmlPath = recordRepo.operation.browserSelection.selectorHtmlPath
 
-            //handle screenshot
-            picturePath = recordRepo.operation.browserSelection.selectorPicture
+
+
+
         }
 
 

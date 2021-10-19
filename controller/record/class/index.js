@@ -48,7 +48,7 @@ class RecordingStep {
         /** @type {Array<Locator>} */
         this.potentialMatch = []
 
-        this.htmlPath = recordingStep.htmlPath
+        this.__htmlPath = recordingStep.htmlPath
         this.targetInnerText = recordingStep.targetInnerText
         this.targetPicPath = recordingStep.targetPicPath
         this.timeoutMs = recordingStep.timeoutMs
@@ -68,6 +68,29 @@ class RecordingStep {
         }
         this.result = new StepResult()
 
+    }
+    /**
+     * //based on the searalized json file, re-create object
+     * @param {object} json 
+     * @param {FunctionAST} functionAst 
+     * @param {string} command 
+     * @returns {RecordingStep}
+     */
+    static restore(json, functionAst, command) {
+        let result = new RecordingStep(json)
+        let keys = Object.keys(json)
+        keys.forEach(key => {
+            result[key] = json[key]
+        })
+        result.functionAst = functionAst
+        result.command = command
+        return result
+    }
+    get htmlPath() {
+        return this.__htmlPath
+    }
+    set htmlPath(path) {
+        this.__htmlPath = path
     }
     setFinalLocator(finalLocatorName, finalLocator) {
         this.finalLocatorName = finalLocatorName
@@ -269,8 +292,7 @@ class WorkflowRecord {
         if (step.command != 'goto' && step.command != waitCommand && step.timeoutMs != 0) {
             let waitFunctionAst = this.astManager.getFunction(waitCommand)
             let waitStep = JSON.parse(JSON.stringify(step))
-            waitStep.command = waitCommand
-            waitStep.functionAst = waitFunctionAst
+            waitStep = RecordingStep.restore(waitStep, waitFunctionAst, waitCommand)
             //hard code wait time param here
             waitStep.functionAst.params[2].value = step.timeoutMs
             this.steps.push(waitStep)

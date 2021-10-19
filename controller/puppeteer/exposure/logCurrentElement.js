@@ -23,30 +23,42 @@ module.exports = function (recordRepo, page) {
             //handle page capture
             let htmlPath = ''
             if (page != null) {
-                htmlPath = recordRepo.getHtmlPath()
-                recordRepo.operation.browserSelection.selectorHtmlPath = htmlPath
+                try {
+                    htmlPath = recordRepo.getHtmlPath()
+                    recordRepo.operation.browserSelection.selectorHtmlPath = htmlPath
 
-                let pageData = await page.evaluate(async (DEFAULT_OPTIONS) => {
+                    let pageData = await page.evaluate(async (DEFAULT_OPTIONS) => {
 
-                    const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
-                    return pageData;
-                }, config.singlefile);
-                fs.writeFile(htmlPath, pageData.content)
+                        const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
+                        return pageData;
+                    }, config.singlefile);
+                    fs.writeFile(htmlPath, pageData.content)
+                    recordRepo.operation.browserSelection.selectorHtmlPath = htmlPath
+                } catch (error) {
+
+                }
+
 
             }
 
             //handle screenshot
             let picturePath = ''
             if (page != null) {
-                picturePath = recordRepo.getPicPath()
-                recordRepo.operation.browserSelection.selectorPicture = picturePath
-                await page.screenshot({ path: picturePath, captureBeyondViewport: false })
+                try {
+                    picturePath = recordRepo.getPicPath()
+                    recordRepo.operation.browserSelection.selectorPicture = picturePath
+                    await page.screenshot({ path: picturePath, captureBeyondViewport: false })
 
-                let pic = await jimp.read(picturePath)
+                    let pic = await jimp.read(picturePath)
 
-                //for ordinary event, just crop as usual
-                pic = pic.crop(x, y, width, height);
-                pic.writeAsync(picturePath)
+                    //for ordinary event, just crop as usual
+                    pic = pic.crop(x, y, width, height);
+                    pic.writeAsync(picturePath)
+                    recordRepo.operation.browserSelection.selectorPicture = picturePath
+                } catch (error) {
+                    
+                }
+
 
             }
 

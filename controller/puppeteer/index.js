@@ -57,7 +57,6 @@ async function startRecording(record, io, url = null) {
 
 
 
-
     await page.setBypassCSP(true)
 
 
@@ -67,6 +66,19 @@ async function startRecording(record, io, url = null) {
     eventStep.finalLocator = 'FAKE locator to avoid check'
     eventStep.finalLocatorName = 'FAKE locator name to avoid check'
     logEvent(record)(eventStep)
+
+    await page.setRequestInterception(true)
+    page.on('request', async request => {
+        if (request.isNavigationRequest() && request.redirectChain().length !== 0) {
+            await page.waitForTimeout(1000);
+            request.continue()
+        } else {
+            request.continue();
+        }
+    })
+
+
+
     return { browser, page }
 }
 /**
