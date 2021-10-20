@@ -24,17 +24,24 @@ module.exports = function (recordRepo, browser, page, io) {
 
         //handle page capture
         let htmlPath = ''
+        recordRepo.isHtmlCaptureOngoing = true
         if (page != null) {
             htmlPath = recordRepo.operation.browserSelection.selectorHtmlPath
+            if (htmlPath == '') {
+                htmlPath = recordRepo.getHtmlPath()
+            }
             page.evaluate(async (DEFAULT_OPTIONS) => {
 
                 const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
                 return pageData;
             }, config.singlefile)
                 .then(pageData => {
+                    recordRepo.isHtmlCaptureOngoing = false
                     return fs.writeFile(htmlPath, pageData.content)
+
                 })
                 .catch(err => {
+                    recordRepo.isHtmlCaptureOngoing = false
                     htmlPath = recordRepo.operation.browserSelection.selectorHtmlPath
                 })
 
@@ -43,7 +50,10 @@ module.exports = function (recordRepo, browser, page, io) {
         //handle screenshot
         let picturePath = ''
         if (page != null) {
-            picturePath = recordRepo.operation.browserSelection.selectorPicture
+            picturePath = recordRepo.getPicPath()
+            if (picturePath == '') {
+                picturePath = recordRepo.getPicPath()
+            }
 
             if (eventDetail.command == COMMAND_TYPE.goto) return Promise.reject('GOTO')
             try {

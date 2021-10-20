@@ -12,6 +12,7 @@ const { Page } = require('puppeteer-core')
 const PuppeteerControl = require('../../puppeteer/class')
 const fs = require('fs').promises
 const Testcase = require('../../coder/class/Testcase')
+const Navigation = require('../class/NavigationStatus')
 /**
  * @typedef {string} CommandType
  **/
@@ -124,14 +125,14 @@ class WorkflowRecord {
         this.lastOperationTimestamp = Date.now()
         this.__isRecording = true
         this.astManager = new AstManager(config.code.locatorPath)
-
+        this.__isNavigationPending = false
         this.operationGroup = {
             customizedFunctions: {
                 text: 'Run Customzied Function',
                 operations: []
             }
         }
-
+        this.navigation = new Navigation()
         this.operation = {
             spy: {
                 runCurrentOperation: false,
@@ -149,7 +150,8 @@ class WorkflowRecord {
                 height: 0,
                 lastOperationTime: Date.now(),
                 lastOperationTimeoutMs: 0,
-                currentOpeartion: null
+                currentOpeartion: null,
+                __htmlCaptureInProcess: false
             },
         }
 
@@ -157,6 +159,19 @@ class WorkflowRecord {
         this.inbuiltFuncPath = path.join(__dirname, '../../../ptLibrary/bluestone-func.js')
         this.astManager.loadFunctions(config.code.funcPath)
         this.astManager.loadFunctions(this.inbuiltFuncPath)
+    }
+    get isNavigationPending() {
+        return this.__isNavigationPending
+    }
+    set isNavigationPending(isPending) {
+        this.__isNavigationPending = isPending
+    }
+    get isHtmlCaptureOngoing() {
+        return this.operation.browserSelection.__htmlCaptureInProcess
+    }
+
+    set isHtmlCaptureOngoing(status) {
+        this.operation.browserSelection.__htmlCaptureInProcess = status
     }
     getCurrentOperation() {
         return this.operation.browserSelection.currentOpeartion

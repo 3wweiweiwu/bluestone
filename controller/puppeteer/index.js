@@ -5,7 +5,7 @@ const isRecording = require('./exposure/isRecordng')
 const logCurrentElement = require('./exposure/logCurrentElement')
 const isSpyVisible = require('./exposure/isSpyVisible')
 const setSpyVisible = require('./exposure/setSpyVisible')
-
+const ElementSelector = require('../../ptLibrary/class/ElementSelector')
 const path = require('path')
 const fs = require('fs').promises
 const { RecordingStep, WorkflowRecord } = require('../record/class')
@@ -68,10 +68,31 @@ async function startRecording(record, io, url = null) {
     logEvent(record)(eventStep)
 
     await page.setRequestInterception(true)
+
     page.on('request', async request => {
-        if (request.isNavigationRequest() && request.redirectChain().length !== 0) {
+        if (request.isNavigationRequest()) {
             await page.waitForTimeout(1000);
-            request.continue()
+            if (record.isHtmlCaptureOngoing) {
+                await request.abort('aborted')
+                while (record.isHtmlCaptureOngoing) {
+                    await new Promise(resolve => { setTimeout(resolve, 500) })
+                }
+                record.navigation.initialize(request.url(), request.method(), request.postData(), request.headers())
+
+                page.goto(request.url())
+            }
+            else if (record.navigation.isPending) {
+                //handle navigation
+                let data = record.navigation.getCurrentNavigationData()
+                request.continue(data)
+                record.navigation.complete()
+
+            }
+            else {
+                request.continue()
+            }
+
+
         } else {
             request.continue();
         }

@@ -21,46 +21,51 @@ module.exports = function (recordRepo, page) {
             recordRepo.operation.browserSelection.lastOperationTimeoutMs = Date.now() - recordRepo.operation.browserSelection.lastOperationTime
 
             //handle page capture
-            let htmlPath = ''
-            if (page != null) {
-                try {
-                    htmlPath = recordRepo.getHtmlPath()
-                    recordRepo.operation.browserSelection.selectorHtmlPath = htmlPath
-
-                    let pageData = await page.evaluate(async (DEFAULT_OPTIONS) => {
-
-                        const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
-                        return pageData;
-                    }, config.singlefile);
-                    fs.writeFile(htmlPath, pageData.content)
-                    recordRepo.operation.browserSelection.selectorHtmlPath = htmlPath
-                } catch (error) {
-
-                }
+            // let htmlPath = ''
+            // if (page != null) {
+            //     try {
+            //         htmlPath = recordRepo.getHtmlPath()
 
 
-            }
+            //         let pageData = await page.evaluate(async (DEFAULT_OPTIONS) => {
+
+            //             const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
+            //             return pageData;
+            //         }, config.singlefile);
+            //         fs.writeFile(htmlPath, pageData.content)
+            //             .then(() => {
+            //                 recordRepo.operation.browserSelection.selectorHtmlPath = htmlPath
+            //             })
+
+            //     } catch (error) {
+
+            //     }
+
+
+            // }
 
             //handle screenshot
-            let picturePath = ''
-            if (page != null) {
-                try {
-                    picturePath = recordRepo.getPicPath()
-                    recordRepo.operation.browserSelection.selectorPicture = picturePath
-                    await page.screenshot({ path: picturePath, captureBeyondViewport: false })
+            // let picturePath = ''
+            // if (page != null) {
+            //     try {
+            //         picturePath = recordRepo.getPicPath()
 
-                    let pic = await jimp.read(picturePath)
+            //         await page.screenshot({ path: picturePath, captureBeyondViewport: false })
 
-                    //for ordinary event, just crop as usual
-                    pic = pic.crop(x, y, width, height);
-                    pic.writeAsync(picturePath)
-                    recordRepo.operation.browserSelection.selectorPicture = picturePath
-                } catch (error) {
-                    
-                }
+            //         let pic = await jimp.read(picturePath)
+
+            //         //for ordinary event, just crop as usual
+            //         pic = pic.crop(x, y, width, height);
+            //         pic.writeAsync(picturePath).then(() => {
+            //             recordRepo.operation.browserSelection.selectorPicture = picturePath
+            //         })
+
+            //     } catch (error) {
+
+            //     }
 
 
-            }
+            // }
 
 
         }
