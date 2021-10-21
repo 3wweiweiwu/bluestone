@@ -24,8 +24,9 @@ module.exports = function (recordRepo, browser, page, io) {
 
         //handle page capture
         let htmlPath = ''
-        recordRepo.isHtmlCaptureOngoing = true
+
         if (page != null) {
+            recordRepo.htmlCaptureStatus.pushOperation(eventDetail.target)
             htmlPath = recordRepo.operation.browserSelection.selectorHtmlPath
             if (htmlPath == '') {
                 htmlPath = recordRepo.getHtmlPath()
@@ -36,12 +37,12 @@ module.exports = function (recordRepo, browser, page, io) {
                 return pageData;
             }, config.singlefile)
                 .then(pageData => {
-                    recordRepo.isHtmlCaptureOngoing = false
+                    recordRepo.htmlCaptureStatus.popOPeration()
                     return fs.writeFile(htmlPath, pageData.content)
 
                 })
                 .catch(err => {
-                    recordRepo.isHtmlCaptureOngoing = false
+                    recordRepo.htmlCaptureStatus.popOPeration()
                     htmlPath = recordRepo.operation.browserSelection.selectorHtmlPath
                 })
 

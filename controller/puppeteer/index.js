@@ -72,9 +72,9 @@ async function startRecording(record, io, url = null) {
     page.on('request', async request => {
         if (request.isNavigationRequest()) {
             await page.waitForTimeout(1000);
-            if (record.isHtmlCaptureOngoing) {
+            if (record.htmlCaptureStatus.isHtmlCaptureOngoing) {
                 await request.abort('aborted')
-                while (record.isHtmlCaptureOngoing) {
+                while (record.htmlCaptureStatus.isHtmlCaptureOngoing) {
                     await new Promise(resolve => { setTimeout(resolve, 500) })
                 }
                 record.navigation.initialize(request.url(), request.method(), request.postData(), request.headers())

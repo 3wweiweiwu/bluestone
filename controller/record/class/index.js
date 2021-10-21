@@ -11,6 +11,7 @@ const ElementSelector = require('../../../ptLibrary/class/ElementSelector')
 const { Page } = require('puppeteer-core')
 const PuppeteerControl = require('../../puppeteer/class')
 const fs = require('fs').promises
+const HtmlCaptureStatus = require('./HtmlCaptureStatus')
 const Testcase = require('../../coder/class/Testcase')
 const Navigation = require('../class/NavigationStatus')
 /**
@@ -68,6 +69,7 @@ class RecordingStep {
             this.parameter = JSON.parse(JSON.stringify(recordingStep.functionAst.params))
         }
         this.result = new StepResult()
+
 
     }
     /**
@@ -151,10 +153,10 @@ class WorkflowRecord {
                 lastOperationTime: Date.now(),
                 lastOperationTimeoutMs: 0,
                 currentOpeartion: null,
-                __htmlCaptureInProcess: false
+                __htmlCaptureInProcess: []
             },
         }
-
+        this.htmlCaptureStatus = new HtmlCaptureStatus()
         this.locatorManager = new LocatorManager(config.code.locatorPath)
         this.inbuiltFuncPath = path.join(__dirname, '../../../ptLibrary/bluestone-func.js')
         this.astManager.loadFunctions(config.code.funcPath)
@@ -165,13 +167,6 @@ class WorkflowRecord {
     }
     set isNavigationPending(isPending) {
         this.__isNavigationPending = isPending
-    }
-    get isHtmlCaptureOngoing() {
-        return this.operation.browserSelection.__htmlCaptureInProcess
-    }
-
-    set isHtmlCaptureOngoing(status) {
-        this.operation.browserSelection.__htmlCaptureInProcess = status
     }
     getCurrentOperation() {
         return this.operation.browserSelection.currentOpeartion
