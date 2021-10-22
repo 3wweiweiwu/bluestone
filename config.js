@@ -54,7 +54,7 @@ let config = {
         saveRawPage: false,
         resolveFragmentIdentifierURLs: false,
         userScriptEnabled: false,
-        saveFavicon: true,
+        saveFavicon: false,
         includeBOM: false,
         insertMetaCSP: false,
         insertMetaNoIndex: false,

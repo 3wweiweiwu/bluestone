@@ -23,59 +23,71 @@ module.exports = function (recordRepo, browser, page, io) {
         //goto command does not generate a locator, we w
 
         //handle page capture
+        let lastHtmlCapture = recordRepo.htmlCaptureStatus.getLastItemBeforeTimeStamp()
         let htmlPath = ''
-
-        if (page != null) {
-            recordRepo.htmlCaptureStatus.pushOperation(eventDetail.target)
-            htmlPath = recordRepo.operation.browserSelection.selectorHtmlPath
-            if (htmlPath == '') {
-                htmlPath = recordRepo.getHtmlPath()
-            }
-            page.evaluate(async (DEFAULT_OPTIONS) => {
-
-                const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
-                return pageData;
-            }, config.singlefile)
-                .then(pageData => {
-                    recordRepo.htmlCaptureStatus.popOPeration()
-                    return fs.writeFile(htmlPath, pageData.content)
-
-                })
-                .catch(err => {
-                    recordRepo.htmlCaptureStatus.popOPeration()
-                    htmlPath = recordRepo.operation.browserSelection.selectorHtmlPath
-                })
-
-
+        if (lastHtmlCapture != null) {
+            htmlPath = lastHtmlCapture.path
         }
+
+
+
+        // if (page != null) {
+        //     recordRepo.htmlCaptureStatus.pushOperation(eventDetail.target)
+        //     htmlPath = recordRepo.operation.browserSelection.selectorHtmlPath
+        //     if (htmlPath == '') {
+        //         htmlPath = recordRepo.getHtmlPath()
+        //     }
+        //     page.evaluate(async (DEFAULT_OPTIONS) => {
+
+        //         const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
+        //         return pageData;
+        //     }, config.singlefile)
+        //         .then(pageData => {
+        //             recordRepo.htmlCaptureStatus.popOperation()
+        //             return fs.writeFile(htmlPath, pageData.content)
+
+        //         })
+        //         .catch(err => {
+        //             recordRepo.htmlCaptureStatus.popOperation()
+        //             htmlPath = recordRepo.operation.browserSelection.selectorHtmlPath
+        //         })
+
+
+        // }
         //handle screenshot
-        let picturePath = ''
-        if (page != null) {
-            picturePath = recordRepo.getPicPath()
-            if (picturePath == '') {
-                picturePath = recordRepo.getPicPath()
-            }
 
-            if (eventDetail.command == COMMAND_TYPE.goto) return Promise.reject('GOTO')
-            try {
-                await page.screenshot({ path: picturePath, captureBeyondViewport: false })
-                let pic = await jimp.read(picturePath)
-                if (eventDetail.command == null) {
-                    //for in-browser agent call
-                    pic = pic.crop(recordRepo.operation.browserSelection.x, recordRepo.operation.browserSelection.y, recordRepo.operation.browserSelection.width, recordRepo.operation.browserSelection.height);
-                }
-                else {
-                    //for ordinary event, just crop as usual
-                    pic = pic.crop(eventDetail.pos.x, eventDetail.pos.y, eventDetail.pos.width, eventDetail.pos.height);
-                }
-                pic.writeAsync(picturePath)
-            } catch (error) {
-                picturePath = recordRepo.operation.browserSelection.selectorPicture
-            }
+        let picturePath = recordRepo.operation.browserSelection.selectorPicture
+        // if (page != null) {
+        //     picturePath = recordRepo.getPicPath()
+
+        //     if (eventDetail.target == '') {
+        //         //handle those element that will be destroyed right after interaaction
+        //         picturePath = recordRepo.operation.browserSelection.selectorPicture
+        //     }
+        //     else {
+        //         //handle element that persist
+        //         try {
+        //             await page.screenshot({ path: picturePath, captureBeyondViewport: false })
+        //             let pic = await jimp.read(picturePath)
+        //             if (eventDetail.command == null) {
+        //                 //for in-browser agent call
+        //                 pic = pic.crop(recordRepo.operation.browserSelection.x, recordRepo.operation.browserSelection.y, recordRepo.operation.browserSelection.width, recordRepo.operation.browserSelection.height);
+        //             }
+        //             else {
+        //                 //for ordinary event, just crop as usual
+        //                 pic = pic.crop(eventDetail.pos.x, eventDetail.pos.y, eventDetail.pos.width, eventDetail.pos.height);
+        //             }
+        //             pic.writeAsync(picturePath)
+        //         } catch (error) {
+        //             picturePath = recordRepo.operation.browserSelection.selectorPicture
+        //         }
+        //     }
 
 
-        }
-        //in case the element is destroyed after the event, we will get the snapshot from realtime snapshot
+
+
+        // }
+        //in case the element is destroyed after the event, we will get the locator from last hovered element
         if (eventDetail.target == null || eventDetail.target == '') {
             eventDetail.target = recordRepo.operation.browserSelection.currentSelector
             //handle page capture

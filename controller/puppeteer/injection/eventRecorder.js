@@ -83,7 +83,7 @@ Object.keys(EVENTCONST).forEach(item => {
 
 //XXX (RoadMap) Add a way to handle delete operation
 //draw rectangle and return the selector and inner text of element mouse hover on
-document.addEventListener('mouseover', event => {
+document.addEventListener('mouseover', async event => {
     if (window.isRecording()) {
         const selector = finder(event.target)
         const innerText = event.target.innerText
@@ -94,11 +94,11 @@ document.addEventListener('mouseover', event => {
             console.log(error)
         }
 
-
-
-        window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width)
         const previousStyle = event.target.style.backgroundColor
         event.target.setAttribute('previousBackground', previousStyle)
+
+        window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width)
+
         event.target.style.backgroundColor = 'rgba(140, 99, 255,0.7)'
     }
 
@@ -180,3 +180,8 @@ async function LocatorScanner() {
 LocatorScanner()
 
 
+async function captureSerice() {
+    await window.captureService()
+    setTimeout(captureSerice, 300);
+}
+captureSerice()

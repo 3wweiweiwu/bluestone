@@ -10,8 +10,11 @@ const config = require('../../../config')
 module.exports = function (recordRepo, page) {
 
     return async function (selector = '', innerText = '', x, y, height, width) {
+        //if current selector has been captured, we will not capture it again
+        if (selector == recordRepo.operation.browserSelection.currentSelector && x == recordRepo.operation.browserSelection.x && recordRepo.operation.browserSelection.y == y) {
+            return
+        }
         if (recordRepo.isRecording) {
-
             recordRepo.operation.browserSelection.currentSelector = selector
             recordRepo.operation.browserSelection.currentInnerText = innerText
             recordRepo.operation.browserSelection.x = x
@@ -20,52 +23,31 @@ module.exports = function (recordRepo, page) {
             recordRepo.operation.browserSelection.width = width
             recordRepo.operation.browserSelection.lastOperationTimeoutMs = Date.now() - recordRepo.operation.browserSelection.lastOperationTime
 
-            //handle page capture
-            // let htmlPath = ''
-            // if (page != null) {
-            //     try {
-            //         htmlPath = recordRepo.getHtmlPath()
-
-
-            //         let pageData = await page.evaluate(async (DEFAULT_OPTIONS) => {
-
-            //             const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
-            //             return pageData;
-            //         }, config.singlefile);
-            //         fs.writeFile(htmlPath, pageData.content)
-            //             .then(() => {
-            //                 recordRepo.operation.browserSelection.selectorHtmlPath = htmlPath
-            //             })
-
-            //     } catch (error) {
-
-            //     }
-
-
-            // }
-
             //handle screenshot
-            // let picturePath = ''
-            // if (page != null) {
-            //     try {
-            //         picturePath = recordRepo.getPicPath()
+            let picturePath = ''
+            if (page != null) {
+                try {
+                    picturePath = recordRepo.getPicPath()
 
-            //         await page.screenshot({ path: picturePath, captureBeyondViewport: false })
+                    await page.screenshot({ path: picturePath, captureBeyondViewport: false })
 
-            //         let pic = await jimp.read(picturePath)
+                    let pic = await jimp.read(picturePath)
 
-            //         //for ordinary event, just crop as usual
-            //         pic = pic.crop(x, y, width, height);
-            //         pic.writeAsync(picturePath).then(() => {
-            //             recordRepo.operation.browserSelection.selectorPicture = picturePath
-            //         })
-
-            //     } catch (error) {
-
-            //     }
+                    //for ordinary event, just crop as usual
+                    pic = pic.crop(x, y, width, height);
+                    pic.writeAsync(picturePath)
+                        .then(() => {
+                            recordRepo.operation.browserSelection.selectorPicture = picturePath
+                        })
 
 
-            // }
+
+                } catch (error) {
+
+                }
+
+
+            }
 
 
         }

@@ -6,6 +6,7 @@ const logCurrentElement = require('./exposure/logCurrentElement')
 const isSpyVisible = require('./exposure/isSpyVisible')
 const setSpyVisible = require('./exposure/setSpyVisible')
 const ElementSelector = require('../../ptLibrary/class/ElementSelector')
+const captureService = require('./exposure/captureService')
 const path = require('path')
 const fs = require('fs').promises
 const { RecordingStep, WorkflowRecord } = require('../record/class')
@@ -54,7 +55,7 @@ async function startRecording(record, io, url = null) {
     await page.exposeFunction('setLocatorStatus', setLocatorStatus(record))
     await page.exposeFunction('isSpyVisible', isSpyVisible(record))
     await page.exposeFunction('setSpyVisible', setSpyVisible(record))
-
+    await page.exposeFunction('captureService', captureService(page, record))
 
 
     await page.setBypassCSP(true)
@@ -73,6 +74,9 @@ async function startRecording(record, io, url = null) {
         if (request.isNavigationRequest()) {
             await page.waitForTimeout(1000);
             if (record.htmlCaptureStatus.isHtmlCaptureOngoing) {
+                //stop capture if navigation pending
+                record.isRecording = false
+
                 await request.abort('aborted')
                 while (record.htmlCaptureStatus.isHtmlCaptureOngoing) {
                     await new Promise(resolve => { setTimeout(resolve, 500) })
@@ -86,7 +90,8 @@ async function startRecording(record, io, url = null) {
                 let data = record.navigation.getCurrentNavigationData()
                 request.continue(data)
                 record.navigation.complete()
-
+                //resume the capture
+                record.isRecording = true
             }
             else {
                 request.continue()
