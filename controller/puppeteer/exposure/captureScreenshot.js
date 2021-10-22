@@ -15,11 +15,12 @@ module.exports = function (page, recordRepo) {
             //capture html
 
             let picPath = recordRepo.getPicPath()
-            recordRepo.picCapture.pushOperation('', picPath)
+            let index = recordRepo.picCapture.pushOperation('', picPath)
             try {
                 await page.screenshot({ path: picPath, captureBeyondViewport: false })
 
-                fs.writeFile(picPath, pageData.content)
+                recordRepo.picCapture.markCaptureDone(index)
+
                 recordRepo.picCapture.popOperation()
             } catch (error) {
                 recordRepo.picCapture.popOperation()

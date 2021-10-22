@@ -182,9 +182,10 @@ LocatorScanner()
 
 async function captureHtml() {
     await window.captureHtml()
-    setTimeout(captureHtml, 100);
+    // setTimeout(captureHtml, 100);
 }
-captureHtml()
+// captureHtml()
+setInterval(captureHtml,500)
 
 async function captureScreenshot() {
     await window.captureScreenshot()

@@ -15,7 +15,7 @@ module.exports = function (page, recordRepo) {
             //capture html
 
             let htmlPath = recordRepo.getHtmlPath()
-            recordRepo.htmlCaptureStatus.pushOperation('', htmlPath)
+            let htmlIndex = recordRepo.htmlCaptureStatus.pushOperation('', htmlPath)
             try {
                 let pageData = await page.evaluate(async (DEFAULT_OPTIONS) => {
                     const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
@@ -24,6 +24,9 @@ module.exports = function (page, recordRepo) {
                 recordRepo.htmlCaptureStatus.popOperation()
                 recordRepo.operation.browserSelection.selectorHtmlPath = htmlPath
                 fs.writeFile(htmlPath, pageData.content)
+                    .then(() => {
+                        recordRepo.htmlCaptureStatus.markWriteReady(htmlIndex)
+                    })
             } catch (error) {
                 recordRepo.htmlCaptureStatus.popOperation()
             }

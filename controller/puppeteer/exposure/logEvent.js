@@ -23,37 +23,12 @@ module.exports = function (recordRepo, browser, page, io) {
         //goto command does not generate a locator, we w
 
         //handle page capture
-        let lastHtmlCapture = recordRepo.htmlCaptureStatus.getLastItemBeforeTimeStamp()
+
         let htmlPath = ''
-        if (lastHtmlCapture != null) {
-            htmlPath = lastHtmlCapture.path
+        if (page != null) {
+            htmlPath = recordRepo.getHtmlPath()
+            recordRepo.htmlCaptureStatus.outputHtml(htmlPath)
         }
-
-
-
-        // if (page != null) {
-        //     recordRepo.htmlCaptureStatus.pushOperation(eventDetail.target)
-        //     htmlPath = recordRepo.operation.browserSelection.selectorHtmlPath
-        //     if (htmlPath == '') {
-        //         htmlPath = recordRepo.getHtmlPath()
-        //     }
-        //     page.evaluate(async (DEFAULT_OPTIONS) => {
-
-        //         const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
-        //         return pageData;
-        //     }, config.singlefile)
-        //         .then(pageData => {
-        //             recordRepo.htmlCaptureStatus.popOperation()
-        //             return fs.writeFile(htmlPath, pageData.content)
-
-        //         })
-        //         .catch(err => {
-        //             recordRepo.htmlCaptureStatus.popOperation()
-        //             htmlPath = recordRepo.operation.browserSelection.selectorHtmlPath
-        //         })
-
-
-        // }
         //handle screenshot
 
         let picturePath = ''

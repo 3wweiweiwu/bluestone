@@ -1,3 +1,5 @@
+const fs = require('fs').promises
+const { constants } = require('fs')
 class HtmlCaptureEntry {
     /**
      * 
@@ -8,6 +10,7 @@ class HtmlCaptureEntry {
         this.timeStamp = Date.now()
         this.selector = selector
         this.path = path
+        this.writeReady = false
     }
 }
 class HtmlCaptureStatus {
@@ -27,11 +30,15 @@ class HtmlCaptureStatus {
     pushOperation(selector = 'unknown', path = '') {
         let htmlCaptureEntry = new HtmlCaptureEntry(selector, path)
         this.__queue.push(htmlCaptureEntry)
+        return this.__queue.length - 1
     }
     popOperation() {
         this.__popIndex++
     }
-    getLastItemBeforeTimeStamp() {
+    markWriteReady(index) {
+        this.__queue[index].writeReady = true
+    }
+    async outputHtml(newPath) {
         let timeStamp = Date.now()
         let i = 0
         for (i = 0; i < this.__queue.length; i++) {
@@ -40,8 +47,25 @@ class HtmlCaptureStatus {
             }
         }
         i = i - 1
+        //if no picture found, just return
+        if (i == -1) {
+            return
+        }
+        let filePath = this.__queue[i].path
+        //keep waiting until picture is ready
+        do {
+            if (this.__queue[i].writeReady) {
+                break
+            }
+            await new Promise(resolve => { setTimeout(resolve, 500) })
 
-        return this.__queue[i]
+        } while (true);
+        try {
+            await fs.copyFile(filePath, newPath)
+        } catch (error) {
+            console.log(error)
+        }
+
     }
 }
 module.exports = HtmlCaptureStatus

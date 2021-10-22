@@ -10,6 +10,7 @@ class PicCaptureEntry {
         this.timeStamp = Date.now()
         this.selector = selector
         this.path = path
+        this.isCaptureDone = false
     }
 }
 class PicCapture {
@@ -28,10 +29,14 @@ class PicCapture {
     }
     pushOperation(selector = 'unknown', path = '') {
         let htmlCaptureEntry = new PicCaptureEntry(selector, path)
-        this.__queue.push(htmlCaptureEntry)
+        let length = this.__queue.push(htmlCaptureEntry)
+        return length - 1
     }
     popOperation() {
         this.__popIndex++
+    }
+    markCaptureDone(index) {
+        this.__queue[index].isCaptureDone = true
     }
     async outputCurrentPic(x, y, width, height, newPath) {
         let timeStamp = Date.now()
@@ -49,14 +54,12 @@ class PicCapture {
         }
         let filePath = this.__queue[i].path
         //keep waiting until picture is ready
-        let isFileReady = false
         do {
-            try {
-                await fs.access(filePath)
+            if (this.__queue[i].isCaptureDone) {
                 break
-            } catch (error) {
-                await new Promise(resolve => { setTimeout(resolve, 500) })
             }
+            await new Promise(resolve => { setTimeout(resolve, 500) })
+
         } while (true);
         //corp the picture to specific size
         let pic = await jimp.read(filePath)
