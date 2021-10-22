@@ -56,45 +56,30 @@ module.exports = function (recordRepo, browser, page, io) {
         // }
         //handle screenshot
 
-        let picturePath = recordRepo.operation.browserSelection.selectorPicture
-        // if (page != null) {
-        //     picturePath = recordRepo.getPicPath()
+        let picturePath = ''
+        if (page != null) {
+            picturePath = recordRepo.getPicPath()
 
-        //     if (eventDetail.target == '') {
-        //         //handle those element that will be destroyed right after interaaction
-        //         picturePath = recordRepo.operation.browserSelection.selectorPicture
-        //     }
-        //     else {
-        //         //handle element that persist
-        //         try {
-        //             await page.screenshot({ path: picturePath, captureBeyondViewport: false })
-        //             let pic = await jimp.read(picturePath)
-        //             if (eventDetail.command == null) {
-        //                 //for in-browser agent call
-        //                 pic = pic.crop(recordRepo.operation.browserSelection.x, recordRepo.operation.browserSelection.y, recordRepo.operation.browserSelection.width, recordRepo.operation.browserSelection.height);
-        //             }
-        //             else {
-        //                 //for ordinary event, just crop as usual
-        //                 pic = pic.crop(eventDetail.pos.x, eventDetail.pos.y, eventDetail.pos.width, eventDetail.pos.height);
-        //             }
-        //             pic.writeAsync(picturePath)
-        //         } catch (error) {
-        //             picturePath = recordRepo.operation.browserSelection.selectorPicture
-        //         }
-        //     }
+            if (eventDetail.target == '') {
+                //handle those element that will be destroyed right after interaaction
+                picturePath = recordRepo.operation.browserSelection.selectorPicture
+            }
+            else {
 
+                if (eventDetail.command == null) {
+                    //for operation coming custozied operation
+                    recordRepo.picCapture.outputCurrentPic(recordRepo.operation.browserSelection.x, recordRepo.operation.browserSelection.y, recordRepo.operation.browserSelection.width, recordRepo.operation.browserSelection.height, picturePath);
+                }
+                else {
+                    //for ordinary event, just crop as usual
+                    recordRepo.picCapture.outputCurrentPic(eventDetail.pos.x, eventDetail.pos.y, eventDetail.pos.width, eventDetail.pos.height, picturePath);
+                }
 
-
-
-        // }
+            }
+        }
         //in case the element is destroyed after the event, we will get the locator from last hovered element
         if (eventDetail.target == null || eventDetail.target == '') {
             eventDetail.target = recordRepo.operation.browserSelection.currentSelector
-            //handle page capture
-
-
-
-
         }
 
 

@@ -14,6 +14,7 @@ const fs = require('fs').promises
 const HtmlCaptureStatus = require('./HtmlCaptureStatus')
 const Testcase = require('../../coder/class/Testcase')
 const Navigation = require('../class/NavigationStatus')
+const PicCapture = require('../class/PicCapture')
 /**
  * @typedef {string} CommandType
  **/
@@ -156,6 +157,7 @@ class WorkflowRecord {
                 __htmlCaptureInProcess: []
             },
         }
+        this.picCapture = new PicCapture()
         this.htmlCaptureStatus = new HtmlCaptureStatus()
         this.locatorManager = new LocatorManager(config.code.locatorPath)
         this.inbuiltFuncPath = path.join(__dirname, '../../../ptLibrary/bluestone-func.js')

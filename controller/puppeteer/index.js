@@ -6,13 +6,14 @@ const logCurrentElement = require('./exposure/logCurrentElement')
 const isSpyVisible = require('./exposure/isSpyVisible')
 const setSpyVisible = require('./exposure/setSpyVisible')
 const ElementSelector = require('../../ptLibrary/class/ElementSelector')
-const captureService = require('./exposure/captureService')
+const captureHtml = require('./exposure/captureHtml')
 const path = require('path')
 const fs = require('fs').promises
 const { RecordingStep, WorkflowRecord } = require('../record/class')
 const { getLocator, setLocatorStatus } = require('./exposure/LocatorManager')
 const injectModuleScriptBlock = require('./help/injectModuleScriptBlock')
 const singlefileScript = require('single-file/cli/back-ends/common/scripts')
+const captureScreenshot = require('./exposure/captureScreenshot')
 /**
  * Create a new puppeteer browser instance
  * @param {import('../record/class/index').WorkflowRecord} record
@@ -55,7 +56,8 @@ async function startRecording(record, io, url = null) {
     await page.exposeFunction('setLocatorStatus', setLocatorStatus(record))
     await page.exposeFunction('isSpyVisible', isSpyVisible(record))
     await page.exposeFunction('setSpyVisible', setSpyVisible(record))
-    await page.exposeFunction('captureService', captureService(page, record))
+    await page.exposeFunction('captureHtml', captureHtml(page, record))
+    await page.exposeFunction('captureScreenshot', captureScreenshot(page, record))
 
 
     await page.setBypassCSP(true)

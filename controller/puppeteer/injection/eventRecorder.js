@@ -180,8 +180,14 @@ async function LocatorScanner() {
 LocatorScanner()
 
 
-async function captureSerice() {
-    await window.captureService()
-    setTimeout(captureSerice, 300);
+async function captureHtml() {
+    await window.captureHtml()
+    setTimeout(captureHtml, 100);
 }
-captureSerice()
+captureHtml()
+
+async function captureScreenshot() {
+    await window.captureScreenshot()
+    setTimeout(captureScreenshot, 300);
+}
+captureScreenshot()

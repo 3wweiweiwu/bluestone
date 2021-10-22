@@ -24,30 +24,9 @@ module.exports = function (recordRepo, page) {
             recordRepo.operation.browserSelection.lastOperationTimeoutMs = Date.now() - recordRepo.operation.browserSelection.lastOperationTime
 
             //handle screenshot
-            let picturePath = ''
-            if (page != null) {
-                try {
-                    picturePath = recordRepo.getPicPath()
-
-                    await page.screenshot({ path: picturePath, captureBeyondViewport: false })
-
-                    let pic = await jimp.read(picturePath)
-
-                    //for ordinary event, just crop as usual
-                    pic = pic.crop(x, y, width, height);
-                    pic.writeAsync(picturePath)
-                        .then(() => {
-                            recordRepo.operation.browserSelection.selectorPicture = picturePath
-                        })
-
-
-
-                } catch (error) {
-
-                }
-
-
-            }
+            let picturePath = recordRepo.getPicPath()
+            recordRepo.operation.browserSelection.selectorPicture = picturePath
+            recordRepo.picCapture.outputCurrentPic(x, y, width, height, picturePath)
 
 
         }
