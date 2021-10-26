@@ -3,5 +3,10 @@
     "locator": "./bluestone-locator.js",
     "test": "./script",
     "config": "./config.js",
-    "pic": "./componentPic"
+    "pic": "./componentPic",
+    "urlBlackList": [
+        "https://apis.google.com/",
+        "https://platform.twitter.com/widgets",
+        "https://accounts.google.com/"
+    ]
 }

@@ -19,6 +19,7 @@ let config = {
         configPath: path.join(__dirname, './test/sample-project/config.js'),
         inbuiltFuncPath: path.join(__dirname, './ptLibrary/bluestone-func.js'),
         pictureFolder: path.join(__dirname, './test/sample-project/componentPic'),
+        urlBlackList: []
     },
     singlefile: {
         removeHiddenElements: false,
@@ -71,6 +72,7 @@ function configFunc() {
     config.code.scriptFolder = path.join(projectFolder, projectObj.test)
     config.code.configPath = path.join(projectFolder, projectObj.config)
     config.code.pictureFolder = path.join(projectFolder, projectObj.pic)
+    config.code.urlBlackList = projectObj.urlBlackList
     return config
 }
 
