@@ -14,6 +14,7 @@ const { getLocator, setLocatorStatus } = require('./exposure/LocatorManager')
 const injectModuleScriptBlock = require('./help/injectModuleScriptBlock')
 const singlefileScript = require('single-file/cli/back-ends/common/scripts')
 const captureScreenshot = require('./exposure/captureScreenshot')
+const checkUrlBlackList = require('./help/checkUrlBlacklist')
 /**
  * Create a new puppeteer browser instance
  * @param {import('../record/class/index').WorkflowRecord} record
@@ -74,18 +75,22 @@ async function startRecording(record, io, url = null) {
 
     page.on('request', async request => {
         if (request.isNavigationRequest()) {
+
             await page.waitForTimeout(1000);
-            if (record.htmlCaptureStatus.isHtmlCaptureOngoing) {
+            if (checkUrlBlackList(request.url())) {
+                await request.abort('aborted')
+            }
+            else if (record.htmlCaptureStatus.isHtmlCaptureOngoing) {
                 //stop capture if navigation pending
                 record.isRecording = false
 
                 await request.abort('aborted')
-                while (record.htmlCaptureStatus.isHtmlCaptureOngoing) {
+                while (record.htmlCaptureStatus.isHtmlCaptureOngoing && record.picCapture.isCaptureOngoing) {
                     await new Promise(resolve => { setTimeout(resolve, 500) })
                 }
                 record.navigation.initialize(request.url(), request.method(), request.postData(), request.headers())
 
-                page.goto(request.url())
+                await page.goto(request.url())
             }
             else if (record.navigation.isPending) {
                 //handle navigation
