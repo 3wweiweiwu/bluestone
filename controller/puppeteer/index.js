@@ -1,4 +1,4 @@
-const puppeteer = require('puppeteer-core')
+const puppeteer = require('puppeteer')
 const config = require('../../config')
 const logEvent = require('./exposure/logEvent')
 const isRecording = require('./exposure/isRecordng')
