@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "babel-node ./bin/www",
-    "build": "babel bin -d dist"
+    "build": "babel bin -d dist",
+    "test": "echo \"No test specified\""
   },
   "dependencies": {
     "@medv/finder": "^2.0.0",
