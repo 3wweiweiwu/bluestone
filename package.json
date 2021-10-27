@@ -7,6 +7,7 @@
     "build": "babel bin -d dist",
     "test": "echo \"No test specified\""
   },
+  "files": [],
   "bin": "./bin/bluestone.js",
   "repository": {
     "type": "git",
