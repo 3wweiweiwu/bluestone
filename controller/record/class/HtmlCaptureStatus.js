@@ -20,7 +20,7 @@ class HtmlCaptureStatus {
         this.__popIndex = -1
     }
     get isHtmlCaptureOngoing() {
-        if (this.__queue.length == this.__popIndex + 1) {
+        if (this.__queue.length <= this.__popIndex + 1) {
             return false
         }
         else {

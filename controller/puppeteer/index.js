@@ -76,22 +76,22 @@ async function startRecording(record, io, url = null) {
     page.on('request', async request => {
         if (request.isNavigationRequest()) {
             let isRecording = record.isRecording
-            await page.waitForTimeout(1000);
             if (checkUrlBlackList(request.url())) {
+                //block unwanted url because of random redirection issue observed in todomvc.com
                 await request.abort('aborted')
             }
-            else if (record.htmlCaptureStatus.isHtmlCaptureOngoing) {
+            else if (record.htmlCaptureStatus.isHtmlCaptureOngoing || record.picCapture.isCaptureOngoing) {
                 //stop capture if navigation pending
                 record.isRecording = false
-
-
-                while (record.htmlCaptureStatus.isHtmlCaptureOngoing && record.picCapture.isCaptureOngoing) {
+                await request.abort('aborted')
+                while (record.htmlCaptureStatus.isHtmlCaptureOngoing || record.picCapture.isCaptureOngoing) {
                     await new Promise(resolve => { setTimeout(resolve, 500) })
                 }
-                await request.abort('aborted')
+
                 record.navigation.initialize(request.url(), request.method(), request.postData(), request.headers(), isRecording)
 
                 await page.goto(request.url())
+
             }
             else if (record.navigation.isPending) {
                 //handle navigation
