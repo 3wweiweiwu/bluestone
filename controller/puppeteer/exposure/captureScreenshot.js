@@ -1,8 +1,6 @@
 const { WorkflowRecord } = require('../../record/class/index')
 const { Page, Browser } = require('puppeteer-core')
 const config = require('../../../config')
-const fs = require('fs').promises
-const jimp = require('jimp')
 /**
  * Continuously capture html snapshot and save it to the disk
  * @param {Page} page 
@@ -20,7 +18,7 @@ module.exports = function (page, recordRepo) {
                 await page.screenshot({ path: picPath, captureBeyondViewport: false })
 
                 recordRepo.picCapture.markCaptureDone(index)
-
+                
                 recordRepo.picCapture.popOperation()
             } catch (error) {
                 recordRepo.picCapture.popOperation()

@@ -75,7 +75,7 @@ async function startRecording(record, io, url = null) {
 
     page.on('request', async request => {
         if (request.isNavigationRequest()) {
-
+            let isRecording = record.isRecording
             await page.waitForTimeout(1000);
             if (checkUrlBlackList(request.url())) {
                 await request.abort('aborted')
@@ -84,11 +84,12 @@ async function startRecording(record, io, url = null) {
                 //stop capture if navigation pending
                 record.isRecording = false
 
-                await request.abort('aborted')
+
                 while (record.htmlCaptureStatus.isHtmlCaptureOngoing && record.picCapture.isCaptureOngoing) {
                     await new Promise(resolve => { setTimeout(resolve, 500) })
                 }
-                record.navigation.initialize(request.url(), request.method(), request.postData(), request.headers())
+                await request.abort('aborted')
+                record.navigation.initialize(request.url(), request.method(), request.postData(), request.headers(), isRecording)
 
                 await page.goto(request.url())
             }
@@ -98,7 +99,7 @@ async function startRecording(record, io, url = null) {
                 request.continue(data)
                 record.navigation.complete()
                 //resume the capture
-                record.isRecording = true
+                record.isRecording = record.navigation.isRecording
             }
             else {
                 request.continue()

@@ -6,7 +6,8 @@ class Navigation {
         this.__postData = ''
         this.__headers = {}
     }
-    initialize(url, method, postData, headers) {
+    initialize(url, method, postData, headers, isRecording) {
+        this.isRecording = isRecording
         this.isPending = true
         this.method = method
         this.postData = postData

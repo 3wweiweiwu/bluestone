@@ -2,7 +2,6 @@ const { WorkflowRecord } = require('../../record/class/index')
 const { Page, Browser } = require('puppeteer-core')
 const config = require('../../../config')
 const fs = require('fs').promises
-const jimp = require('jimp')
 /**
  * Continuously capture html snapshot and save it to the disk
  * @param {Page} page 
@@ -21,12 +20,14 @@ module.exports = function (page, recordRepo) {
                     const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
                     return pageData;
                 }, config.singlefile)
-                recordRepo.htmlCaptureStatus.popOperation()
+
                 recordRepo.operation.browserSelection.selectorHtmlPath = htmlPath
                 fs.writeFile(htmlPath, pageData.content)
                     .then(() => {
                         recordRepo.htmlCaptureStatus.markWriteReady(htmlIndex)
                     })
+
+                recordRepo.htmlCaptureStatus.popOperation()
             } catch (error) {
                 recordRepo.htmlCaptureStatus.popOperation()
             }

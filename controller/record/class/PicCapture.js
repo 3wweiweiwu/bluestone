@@ -33,6 +33,19 @@ class PicCapture {
         return length - 1
     }
     popOperation() {
+        //set timeout to delete picture in next 1 minute
+        if (this.__popIndex != -1) {
+            let currentItem = this.__queue[this.__popIndex]
+            setTimeout((currentPath) => {
+                try {
+                    fs.unlink(currentPath)
+                } catch (error) {
+
+                }
+
+            }, 30000, currentItem.path);
+        }
+
         this.__popIndex++
     }
     markCaptureDone(index) {
@@ -62,9 +75,20 @@ class PicCapture {
 
         } while (true);
         //corp the picture to specific size
-        let pic = await jimp.read(filePath)
-        pic = pic.crop(x, y, width, height);
-        pic.writeAsync(newPath)
+        let pic = null
+        try {
+            pic = await jimp.read(filePath)
+        } catch (error) {
+            console.log(error)
+        }
+
+        try {
+            pic = pic.crop(x, y, width, height);
+            pic.writeAsync(newPath)
+
+        } catch (error) {
+            console.log(error)
+        }
 
     }
 }

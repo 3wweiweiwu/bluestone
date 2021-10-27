@@ -1,6 +1,5 @@
 const { RecordingStep, COMMAND_TYPE, WorkflowRecord } = require('../../record/class/index')
 
-const jimp = require('jimp')
 /**
  * 
  * @param {import('../../record/class/index').WorkflowRecord} recordRepo 

@@ -33,6 +33,23 @@ class HtmlCaptureStatus {
         return this.__queue.length - 1
     }
     popOperation() {
+        //set timeout to delete picture in next 1 minute
+
+
+        if (this.__popIndex != -1) {
+            let currentItem = this.__queue[this.__popIndex]
+            setTimeout((currentPath) => {
+                try {
+                    fs.unlink(currentPath)
+                } catch (error) {
+
+                }
+
+            }, 30000, currentItem.path);
+        }
+
+
+
         this.__popIndex++
     }
     markWriteReady(index) {

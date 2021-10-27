@@ -1,6 +1,5 @@
 const { RecordingStep, COMMAND_TYPE, WorkflowRecord } = require('../../record/class/index')
 const config = require('../../../config')
-const jimp = require('jimp')
 const path = require('path')
 const fs = require('fs').promises
 const openBluestoneTab = require('../../puppeteer/activities/openBluestoneTab')

@@ -1,5 +1,4 @@
 const { WorkflowRecord } = require('../../record/class/index')
-const jimp = require('jimp')
 const fs = require('fs').promises
 const config = require('../../../config')
 /**
