@@ -10,7 +10,7 @@ let config = {
         args: ['--disable-web-security', '--disable-features=IsolateOrigins,site-per-process']
 
     },
-    bluestoneJson: path.join(__dirname, './test/sample-project/bluestone.json'),
+    bluestoneJson: process.env.bluestonePath || path.join(__dirname, './test/sample-project/bluestone.json'),
     code: {
         funcPath: path.join(__dirname, './test/sample-project/bluestone-func.js'),
         locatorPath: path.join(__dirname, './test/sample-project/bluestone-locator.js'),

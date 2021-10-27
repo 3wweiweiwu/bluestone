@@ -7,7 +7,7 @@ const path = require('path')
 const fs = require('fs').promises
 const fsSync = require('fs')
 const axios = require('axios').default
-const config = require('../config')
+let config = require('../config')
 function getPidPath() {
     return path.join(__dirname, 'bluestone.pid')
 }
@@ -44,15 +44,33 @@ try {
     const server = serverAt(cli.args);
     let bluestoneUrl = ''
     let runTime = getRuntimeInfo()
+    let bluestoneJsonPath = ''
     switch (cli.command) {
 
         case 'start':
+            //test bluestone.json file
+
+            if (fsSync.existsSync(cli.args.path)) {
+                //check if it working out-of-box
+                process.env.bluestonePath = path.join(path.resolve(cli.args.path), 'bluestone.json')
+            }
+            else {
+                cli.error(`Path does not contains bluestone.json: '${bluestoneJsonPath}'.`);
+                break
+            }
+            //update port information based on current input    
             process.env.port = cli.args.port
+
+
+            //refesh config.js based on current inforamtion
+            let configPath = path.resolve(__dirname, '../config.js')
+            delete require.cache[configPath]
+            require('../config')
+
+            //launch app
             server.start(process.env.port);
             bluestoneUrl = `http://localhost:${cli.args.port}`
             axios.get(`${bluestoneUrl}/spy`)
-            //update port information based on current input
-            config.app.port = process.env.port
             break;
         case 'record':
             let port = runTime.port
@@ -66,6 +84,9 @@ try {
             cli.error(`Invalid command '${cli.command}'.`);
             break;
     }
+
+
+
 }
 catch (err) {
     cli.error(err.message);

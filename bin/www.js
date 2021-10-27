@@ -8,8 +8,8 @@ require("@babel/register")({
   // an array of strings to be explicitly matched or a regex / glob
   ignore: [],
 });
-const config = require('../config')
-function startBackend(port = config.app.port) {
+
+function startBackend(port) {
   var app = require('../app');
   var debug = require('debug')('pt-recorder:server');
   var http = require('http');

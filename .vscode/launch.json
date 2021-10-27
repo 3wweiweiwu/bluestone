@@ -17,7 +17,12 @@
       "request": "launch",
       "skipFiles": ["<node_internals>/**"],
       "type": "node",
-      "args": ["start", "--port", "3601"]
+      "args": [
+        "start",
+        "../../../temp/ss/test/sample-project",
+        "--port",
+        "3601"
+      ]
     },
     {
       "name": "Launch Record Command line",

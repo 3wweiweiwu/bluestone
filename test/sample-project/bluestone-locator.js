@@ -28,5 +28,20 @@ module.exports = {
         locator: ['#password'],
         screenshot: 'componentPic/txtPassword.png',
         displayName: 'txtPassword'
+    },
+    'btnLogin': {
+        locator: ['#kc-login'],
+        screenshot: 'componentPic/btnLogin.png',
+        displayName: 'btnLogin'
+    },
+    'selectedaccount': {
+        locator: ['.selected-account'],
+        screenshot: 'componentPic/selectedaccount.png',
+        displayName: 'selectedaccount'
+    },
+    'btnLogout': {
+        locator: ['.logout-button > span'],
+        screenshot: 'componentPic/btnLogout.png',
+        displayName: 'btnLogout'
     }
 };

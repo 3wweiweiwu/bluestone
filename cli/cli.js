@@ -1,7 +1,10 @@
 const yargs = require('yargs')
-const startService = require('../bin/www')
 const path = require('path')
 const options = {
+    path: {
+        description: 'The path to the folder where we can find bluestone.json',
+        type: 'string'
+    },
     url: {
         description: 'The url of your website',
         type: 'string'
@@ -24,11 +27,12 @@ const options = {
 
 let argv = yargs
     .usage('Usage: bluestone [command=start] [options...]')
-    .command('start', 'Starts the server (default command)', startYargs => {
+    .command('start <path>', 'Starts the server based on the project specified', startYargs => {
         startYargs
-            .usage('Usage: bluestone [start] [options...]')
+            .usage('Usage: bluestone start <path>')
             .help('help')
             .wrap(null)
+            .positional('path', options.path)
             .options({ port: options.port })
             .example('bluestone start --port 3600',
                 'Starts on port 3600')
