@@ -12,6 +12,22 @@
       "type": "node"
     },
     {
+      "name": "Launch Command line",
+      "program": "${workspaceFolder}/bin/bluestone.js",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node",
+      "args": ["start", "--port", "3601"]
+    },
+    {
+      "name": "Launch Record Command line",
+      "program": "${workspaceFolder}/bin/bluestone.js",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node",
+      "args": ["record", "https://event-analytics.qa.mnubo.org"]
+    },
+    {
       "type": "node",
       "request": "launch",
       "name": "Debug",

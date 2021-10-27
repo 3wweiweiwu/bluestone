@@ -2,7 +2,7 @@ const path = require('path')
 const fs = require('fs')
 let config = {
     app: {
-        port: 3600
+        port: process.env.port || 3600
     },
     puppeteer: {
         headless: false,

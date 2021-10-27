@@ -5,3 +5,4 @@ cypress.json
 .DS_Store
 .cache
 public/temp
+.pid
