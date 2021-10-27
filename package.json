@@ -1,11 +1,15 @@
 {
   "name": "bluestone",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "scripts": {
     "start": "babel-node ./bin/www",
     "build": "babel bin -d dist",
     "test": "echo \"No test specified\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/3wweiweiwu/bluestone"
   },
   "dependencies": {
     "@medv/finder": "^2.0.0",
