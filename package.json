@@ -7,7 +7,9 @@
     "build": "babel bin -d dist",
     "test": "echo \"No test specified\""
   },
-  "files": ["*"],
+  "files": [
+    "*.pug"
+  ],
   "bin": "./bin/bluestone.js",
   "repository": {
     "type": "git",

@@ -45,7 +45,7 @@ class Coder {
             [this.inbuiltVarName.library.locatorLibrary]: path.resolve(projectLocatorPath),
             [this.inbuiltVarName.library.projectFuncLibrary]: path.resolve(projectFuncPath),
             [this.inbuiltVarName.library.puppeteerLibrary]: 'puppeteer',
-            [this.inbuiltVarName.library.bluestoneFuncLibrary]: path.resolve(inbuiltFuncPath),
+            [this.inbuiltVarName.library.bluestoneFuncLibrary]: 'bluestone',
             [this.inbuiltVarName.library.configLibrary]: configPath
 
         }
