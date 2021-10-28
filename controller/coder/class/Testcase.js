@@ -149,9 +149,9 @@ class Coder {
 
         //decide library name
         let currentFuncPath = path.resolve(functionAst.path)
-        let bluestoneFuncPath = this.inbuiltVarName.require[this.inbuiltVarName.library.bluestoneFuncLibrary]
+        let projectFuncPath = this.inbuiltVarName.require[this.inbuiltVarName.library.projectFuncLibrary]
         let libraryName = this.inbuiltVarName.library.projectFuncLibrary
-        if (currentFuncPath == bluestoneFuncPath) {
+        if (currentFuncPath != projectFuncPath) {
             libraryName = this.inbuiltVarName.library.bluestoneFuncLibrary
         }
         let astJson = AstGenerator.getAwaitCommandWrapper(libraryName, functionAst.name)
