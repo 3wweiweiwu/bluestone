@@ -7,10 +7,11 @@ class PicCaptureEntry {
      * @param {string} path full path to captured file
      */
     constructor(selector, path) {
-        this.timeStamp = Date.now()
+        this.timeStamp = null
         this.selector = selector
         this.path = path
         this.isCaptureDone = false
+        this.isLocked = false
     }
 }
 class PicCapture {
@@ -34,8 +35,10 @@ class PicCapture {
     }
     popOperation() {
         //set timeout to delete picture in next 1 minute
+
         if (this.__popIndex != -1) {
             let currentItem = this.__queue[this.__popIndex]
+            this.__queue[this.__popIndex].timeStamp = Date.now()
             setTimeout((currentPath) => {
                 try {
                     fs.unlink(currentPath)
@@ -43,7 +46,7 @@ class PicCapture {
 
                 }
 
-            }, 30000, currentItem.path);
+            }, 120000, currentItem.path);
         }
 
         this.__popIndex++
@@ -55,7 +58,7 @@ class PicCapture {
         let timeStamp = Date.now()
         let i = 0
         for (i = 0; i < this.__queue.length; i++) {
-            if (this.__queue[i] > timeStamp) {
+            if (this.__queue[i].timeStamp > timeStamp || this.__queue[i].timeStamp == null) {
                 break
             }
         }
