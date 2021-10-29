@@ -24,6 +24,7 @@ async function drawProgressBar(page, pendingPicCapture, pendingHtmlCapture) {
             progress.style.width = '40%'
             progress.style.height = '40%'
             progress.style.fontSize = '30px'
+            progress.style.background = 'white'
         }
         progress.innerText = `Please wait while we are completing some background work. Pending Html Capture:${pendingHtmlCapture}; Pending Pic Capture ${pendingPicCapture}} !`
         document.body.appendChild(progress)

@@ -15,6 +15,7 @@ const injectModuleScriptBlock = require('./help/injectModuleScriptBlock')
 const singlefileScript = require('single-file/cli/back-ends/common/scripts')
 const captureScreenshot = require('./exposure/captureScreenshot')
 const checkUrlBlackList = require('./help/checkUrlBlacklist')
+const { drawPendingWorkProgress } = require('./activities/drawPendingWorkProgress')
 /**
  * Create a new puppeteer browser instance
  * @param {import('../record/class/index').WorkflowRecord} record
@@ -84,10 +85,10 @@ async function startRecording(record, io, url = null) {
                 //stop capture if navigation pending
                 record.isRecording = false
                 await request.abort('aborted')
-                while (record.htmlCaptureStatus.isHtmlCaptureOngoing || record.picCapture.isCaptureOngoing) {
-                    await new Promise(resolve => { setTimeout(resolve, 500) })
-                }
-
+                // while (record.htmlCaptureStatus.isHtmlCaptureOngoing || record.picCapture.isCaptureOngoing) {
+                //     await new Promise(resolve => { setTimeout(resolve, 500) })
+                // }
+                await drawPendingWorkProgress(page, record.picCapture, record.htmlCaptureStatus)
                 record.navigation.initialize(request.url(), request.method(), request.postData(), request.headers(), isRecording)
 
                 await page.goto(request.url())
