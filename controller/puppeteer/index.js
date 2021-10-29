@@ -82,12 +82,16 @@ async function startRecording(record, io, url = null) {
                 await request.abort('aborted')
             }
             else if (record.htmlCaptureStatus.isHtmlCaptureOngoing || record.picCapture.isCaptureOngoing) {
+                //wait for 1s before all operation is logged
+
+                await new Promise(resolve => { setTimeout(resolve, 1000) })
                 //stop capture if navigation pending
                 record.isRecording = false
+
+
+
                 await request.abort('aborted')
-                // while (record.htmlCaptureStatus.isHtmlCaptureOngoing || record.picCapture.isCaptureOngoing) {
-                //     await new Promise(resolve => { setTimeout(resolve, 500) })
-                // }
+
                 await drawPendingWorkProgress(page, record.picCapture, record.htmlCaptureStatus)
                 record.navigation.initialize(request.url(), request.method(), request.postData(), request.headers(), isRecording)
 
