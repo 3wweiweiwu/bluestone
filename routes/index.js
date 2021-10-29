@@ -123,5 +123,23 @@ router.get('/spy', async function (req, res, next) {
 
   res.render('spy.pug', variables);
 });
+router.get('/pending-capture', async function (req, res, next) {
+  /**
+   * @type {import('../controller/record/class/index.js').WorkflowRecord}
+   */
+  let workflow = req.app.locals.workflow
+
+  /**@type {UI} */
+  let ui = req.app.locals.ui
+
+  let variables = {
+    htmlCaptureCompleted: workflow.htmlCaptureStatus.__popIndex,
+    htmlCaptureTotal: workflow.htmlCaptureStatus.__queue.length,
+    picCaptureCompleted: workflow.picCapture.__popIndex,
+    picCaptureTotal: workflow.htmlCaptureStatus.__queue.length
+  }
+
+  res.render('pendingCapture.pug', variables);
+});
 
 module.exports = router;

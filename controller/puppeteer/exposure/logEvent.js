@@ -3,6 +3,7 @@ const config = require('../../../config')
 const path = require('path')
 const fs = require('fs').promises
 const openBluestoneTab = require('../../puppeteer/activities/openBluestoneTab')
+const { drawPendingWorkProgress } = require('../../puppeteer/activities/drawPendingWorkProgress')
 const Operation = require('../../puppeteer/class/index')
 /**
  * 
@@ -74,6 +75,8 @@ module.exports = function (recordRepo, browser, page, io) {
                 recordRepo.operation.spy.result.text = `Unable to load bluestone-func.js: ${error.toString()}`
             }
 
+            //display pending work progress
+            await drawPendingWorkProgress(page, recordRepo.picCapture, recordRepo.htmlCaptureStatus)
             //display mvt console
             await openBluestoneTab(browser, "spy")
 

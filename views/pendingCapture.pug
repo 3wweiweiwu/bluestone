@@ -1,0 +1,11 @@
+extends ../node_modules/pug-bootstrap/_bootstrap.pug
+block body
+
+
+    h1='Please wait, bluestone is wrapping up some work, we will redirect you once it is completed'
+    h3='Pending Html Capture: '+(htmlCaptureTotal-htmlCaptureCompleted-1)
+    +progress-bar-info((htmlCaptureCompleted+1)/htmlCaptureTotal*100)
+    h3='Pending Picture Capture: '+ (picCaptureTotal-picCaptureCompleted-1)
+    +progress-bar-info((picCaptureCompleted+1)/picCaptureTotal*100)
+    script.
+        setTimeout(()=>{location.reload(); }, 3000)
