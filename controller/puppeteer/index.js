@@ -82,7 +82,7 @@ async function startRecording(record, io, url = null) {
                 await request.abort('aborted')
             }
             else if (record.htmlCaptureStatus.isHtmlCaptureOngoing || record.picCapture.isCaptureOngoing) {
-                //wait for 1s before all operation is logged
+                //wait for 1s so that we have sufficient time to add step
 
                 await new Promise(resolve => { setTimeout(resolve, 1000) })
                 //stop capture if navigation pending
@@ -102,11 +102,15 @@ async function startRecording(record, io, url = null) {
                 //handle navigation
                 let data = record.navigation.getCurrentNavigationData()
                 request.continue(data)
-                record.navigation.complete()
-                //resume the capture
-                record.isRecording = record.navigation.isRecording
+                record.navigation.redirect()
+
             }
             else {
+                if (record.navigation.isPending == null) {
+                    //resume the capture
+                    record.isRecording = record.navigation.isRecording
+                    record.navigation.complete()
+                }
                 request.continue()
             }
 

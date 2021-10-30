@@ -1,4 +1,9 @@
 class Navigation {
+    //navigation life cycle consist of 3 stages
+    // 0   stage default - isPending=false, this means that there is no pending navigation, we just need to directly navigate right awawy
+    // 1st stage initialize - isPending=false to true. This means that there is pending capture, we pause navigation and wait till all pending work is ready. Once all work is ready, we wil resume navigation
+    // 2nd stage redirect - isPending from false to null- All pending work is ready. we start to re-navigation
+    // 3rd stage complete - isPending from null to false - restore recording status and navigate to new page
     constructor() {
         this.__isPending = false
         this.__url = ''
@@ -13,6 +18,9 @@ class Navigation {
         this.postData = postData
         this.url = url
         this.__headers = JSON.parse(JSON.stringify(headers))
+    }
+    redirect() {
+        this.isPending = null
     }
     complete() {
         this.isPending = false
