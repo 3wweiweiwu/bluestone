@@ -136,7 +136,7 @@ router.get('/pending-capture', async function (req, res, next) {
     htmlCaptureCompleted: workflow.htmlCaptureStatus.__popIndex,
     htmlCaptureTotal: workflow.htmlCaptureStatus.__queue.length,
     picCaptureCompleted: workflow.picCapture.__popIndex,
-    picCaptureTotal: workflow.htmlCaptureStatus.__queue.length
+    picCaptureTotal: workflow.picCapture.__queue.length
   }
 
   res.render('pendingCapture.pug', variables);
