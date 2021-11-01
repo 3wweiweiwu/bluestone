@@ -27,6 +27,9 @@ class HtmlCaptureStatus {
             return true
         }
     }
+    getPendingItems() {
+        return this.__queue.length - this.__popIndex - 1
+    }
     pushOperation(selector = 'unknown', path = '') {
         let htmlCaptureEntry = new HtmlCaptureEntry(selector, path)
         this.__queue.push(htmlCaptureEntry)

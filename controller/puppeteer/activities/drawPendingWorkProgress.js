@@ -26,7 +26,10 @@ async function drawProgressBar(page, pendingPicCapture, pendingHtmlCapture) {
             progress.style.fontSize = '30px'
             progress.style.background = 'white'
         }
-        progress.innerText = `Please wait while we are completing some background work. Pending Html Capture:${pendingHtmlCapture}; Pending Pic Capture ${pendingPicCapture}} !`
+        progress.innerText = `Please wait while we are completing some background work. Pending Html Capture:${pendingHtmlCapture}`
+        if (pendingPicCapture != null) {
+            progress.innerText += `; Pending Pic Capture ${pendingPicCapture}`
+        }
         document.body.appendChild(progress)
     }, ProgressBarConst.id, pendingPicCapture, pendingHtmlCapture)
 
@@ -38,7 +41,10 @@ async function drawProgressBar(page, pendingPicCapture, pendingHtmlCapture) {
 async function deleteProgressBar(page) {
     await page.evaluate((progressBarId) => {
         let progress = document.getElementById(progressBarId)
-        progress.parentElement.removeChild(progress)
+        if (progress != null) {
+            progress.parentElement.removeChild(progress)
+        }
+
     }, ProgressBarConst.id)
 
 }
@@ -52,9 +58,10 @@ async function drawPendingWorkProgress(page, PicCaptureStatus, htmlCaptureStatus
 
 
     //keep waiting until capture is all completed
-    while (PicCaptureStatus.isCaptureOngoing || htmlCaptureStatus.isHtmlCaptureOngoing) {
+    while (htmlCaptureStatus.isHtmlCaptureOngoing) {
         try {
             await drawProgressBar(page, (PicCaptureStatus.__queue.length - PicCaptureStatus.__popIndex - 1), (htmlCaptureStatus.__queue.length - htmlCaptureStatus.__popIndex - 1))
+            // await drawProgressBar(page, null, (htmlCaptureStatus.__queue.length - htmlCaptureStatus.__popIndex - 1))
         } catch (error) {
             console.log()
         }

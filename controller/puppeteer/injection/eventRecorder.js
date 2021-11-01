@@ -187,7 +187,7 @@ async function captureHtml() {
 
     }
 
-    // setTimeout(captureHtml, 100);
+
 }
 // captureHtml()
 var htmlCaptureInterval = setInterval(captureHtml, 300)
@@ -199,7 +199,7 @@ async function captureScreenshot() {
 
     }
 
-    // setTimeout(captureScreenshot, 300);
+
 }
-// captureScreenshot()
+// await captureScreenshot()
 var sccrenshotInterval = setInterval(captureScreenshot, 300)

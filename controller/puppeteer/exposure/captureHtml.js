@@ -10,7 +10,7 @@ const fs = require('fs').promises
 module.exports = function (page, recordRepo) {
 
     return async function () {
-        if (page != null && recordRepo.isRecording) {
+        if (page != null && recordRepo.isRecording && recordRepo.htmlCaptureStatus.getPendingItems() < 3) {
             //capture html
 
             let htmlPath = recordRepo.getHtmlPath()

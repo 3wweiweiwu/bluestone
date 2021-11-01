@@ -28,6 +28,9 @@ class PicCapture {
             return true
         }
     }
+    getPendingItems() {
+        return this.__queue.length - this.__popIndex - 1
+    }
     pushOperation(selector = 'unknown', path = '') {
         let htmlCaptureEntry = new PicCaptureEntry(selector, path)
         let length = this.__queue.push(htmlCaptureEntry)
