@@ -44,12 +44,23 @@ exports.waitElementExists = async function (page, elementSelector, timeout) {
 
             if (locator.startsWith('/')) {
                 //xpath
-                let elementResult = await page.$x(locator)
+                let elementResult
+                try {
+                    elementResult = await page.$x(locator)
+                } catch (error) {
+                    continue
+                }
+
                 if (elementResult.length > 0) element = elementResult[0]
             }
             else {
                 //selector
-                element = await page.$(locator)
+                try {
+                    element = await page.$(locator)
+                } catch (error) {
+                    continue
+                }
+
             }
             if (element != null) {
                 break
