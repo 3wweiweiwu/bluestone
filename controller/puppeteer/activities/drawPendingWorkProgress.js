@@ -12,12 +12,12 @@ const ProgressBarConst = {
  */
 async function drawProgressBar(page, pendingPicCapture, pendingHtmlCapture) {
     let url = `http://localhost:${config.app.port}/pending-capture`
-    await page.evaluate((progressBarId, pendingPicCapture, pendingHtmlCapture) => {
+    await page.evaluate((progressBarId, pendingPicCapture, pendingHtmlCapture, url) => {
         let progress = document.getElementById(progressBarId)
         if (progress == null) {
-            progress = document.createElement('div')
+            progress = document.createElement('iframe')
             progress.id = progressBarId
-            // progress.src = url
+            progress.src = url
             progress.style.position = 'fixed'
             progress.style.top = '30%'
             progress.style.left = '30%'
@@ -31,7 +31,7 @@ async function drawProgressBar(page, pendingPicCapture, pendingHtmlCapture) {
             progress.innerText += `; Pending Pic Capture ${pendingPicCapture}`
         }
         document.body.appendChild(progress)
-    }, ProgressBarConst.id, pendingPicCapture, pendingHtmlCapture)
+    }, ProgressBarConst.id, pendingPicCapture, pendingHtmlCapture, url)
 
 }
 /**
@@ -58,15 +58,21 @@ async function drawPendingWorkProgress(page, PicCaptureStatus, htmlCaptureStatus
 
 
     //keep waiting until capture is all completed
+    try {
+        await drawProgressBar(page, (PicCaptureStatus.__queue.length - PicCaptureStatus.__popIndex - 1), (htmlCaptureStatus.__queue.length - htmlCaptureStatus.__popIndex - 1))
+    } catch (error) {
+        console.log(error)
+    }
+
     while (htmlCaptureStatus.isHtmlCaptureOngoing) {
         try {
-            await drawProgressBar(page, (PicCaptureStatus.__queue.length - PicCaptureStatus.__popIndex - 1), (htmlCaptureStatus.__queue.length - htmlCaptureStatus.__popIndex - 1))
+            await new Promise(resolve => setTimeout(resolve, 500))
             // await drawProgressBar(page, null, (htmlCaptureStatus.__queue.length - htmlCaptureStatus.__popIndex - 1))
         } catch (error) {
             console.log()
         }
 
-        await new Promise(resolve => { setTimeout(resolve, 500) })
+        // await new Promise(resolve => { setTimeout(resolve, 500) })
     }
     await deleteProgressBar(page)
 }
