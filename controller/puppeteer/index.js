@@ -77,14 +77,15 @@ async function startRecording(record, io, url = null) {
     page.on('request', async request => {
         if (request.isNavigationRequest()) {
             let isRecording = record.isRecording
-            if (checkUrlBlackList(request.url())) {
-                //block unwanted url because of random redirection issue observed in todomvc.com
-                await request.abort('aborted')
+            await new Promise(resolve => { setTimeout(resolve, 1000) })
+            if (request.frame().parentFrame() != null) {
+                //will only block top level redirect call as this is the only call that will navigate the whole web page
+                await request.continue()
             }
-            else if (record.htmlCaptureStatus.isHtmlCaptureOngoing || record.picCapture.isCaptureOngoing) {
+            else if (record.htmlCaptureStatus.isHtmlCaptureOngoing) {
                 //wait for 1s so that we have sufficient time to add step
 
-                await new Promise(resolve => { setTimeout(resolve, 1000) })
+
                 //stop capture if navigation pending
                 record.isRecording = false
 
@@ -116,6 +117,7 @@ async function startRecording(record, io, url = null) {
 
 
         } else {
+            // await new Promise(resolve => { setTimeout(resolve, 1000) })
             request.continue();
         }
     })
