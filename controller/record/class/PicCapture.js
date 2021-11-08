@@ -55,17 +55,18 @@ class PicCapture {
         this.__queue[index].isCaptureDone = true
     }
     async outputCurrentPic(x, y, width, height, newPath) {
-        let timeStamp = Date.now()
         let i = 0
-        for (i = 0; i < this.__queue.length; i++) {
-            if (this.__queue[i].timeStamp > timeStamp || this.__queue[i].timeStamp == null) {
+        let targetFound = false
+        for (i = this.__queue.length - 1; i >= 0; i--) {
+            if (this.__queue[i].isCaptureDone == true) {
+                targetFound = true
                 break
             }
         }
-        i = i - 1
+
 
         //if no picture found, just return
-        if (i == -1) {
+        if (!targetFound) {
             return
         }
         let filePath = this.__queue[i].path

@@ -7,7 +7,10 @@ let config = {
     puppeteer: {
         headless: false,
         defaultViewport: null,
-        args: ['--disable-web-security', '--disable-features=IsolateOrigins,site-per-process']
+        args: [
+            '--disable-web-security',
+            '--disable-features=IsolateOrigins,site-per-process'
+        ]
 
     },
     bluestoneJson: process.env.bluestonePath || path.join(__dirname, './test/sample-project/bluestone.json'),

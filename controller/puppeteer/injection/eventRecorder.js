@@ -6,7 +6,10 @@ const EVENTCONST = {
     dblclick: 'dblclick',
     keydown: 'keydown',
 }
-
+const BLUESTONE = {
+    previousbackground: 'bluestone-previous-background',
+    dataSingleFileAttributePattern: 'data-single-file-'
+}
 /**
  * This function will add event listener for all dom element
  * 
@@ -95,7 +98,7 @@ document.addEventListener('mouseover', async event => {
         }
 
         const previousStyle = event.target.style.backgroundColor
-        event.target.setAttribute('previousBackground', previousStyle)
+        event.target.setAttribute(BLUESTONE.previousbackground, previousStyle)
 
         window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width)
 
@@ -109,10 +112,10 @@ document.addEventListener('mouseover', async event => {
 document.addEventListener("mouseout", event => {
     if (!window.isRecording()) return
     try {
-        const previousStyle = event.target.getAttribute('previousBackground')
+        const previousStyle = event.target.getAttribute(BLUESTONE.previousbackground)
         if (previousStyle != null) {
             event.target.style.backgroundColor = previousStyle
-            event.target.removeAttribute('previousBackground')
+            event.target.removeAttribute(BLUESTONE.previousbackground)
         }
     } catch (error) {
 
@@ -127,54 +130,57 @@ const Helper = {
 }
 async function LocatorScanner() {
 
+    while (true) {
+        /** @type {Array<import('../../locator/index').Locator>} */
+        let currentLocatorList = await window.getLocator()
+        let startTime = Date.now()
 
-    /** @type {Array<import('../../locator/index').Locator>} */
-    let currentLocatorList = await window.getLocator()
-    let startTime = Date.now()
+        for (let i = 0; i < currentLocatorList.length; i++) {
+            currentLocatorList[i].selector = ''
+            let locator = currentLocatorList[i]
+            let currentLocatorOptions = locator.Locator
+            let currentElement = null
+            let currentLocator
+            //search through avialble option to find if anhing match
 
-    for (let i = 0; i < currentLocatorList.length; i++) {
-        currentLocatorList[i].selector = ''
-        let locator = currentLocatorList[i]
-        let currentLocatorOptions = locator.Locator
-        let currentElement = null
-        let currentLocator
-        //search through avialble option to find if anhing match
+            for (let locatorOptionIndex = 0; locatorOptionIndex < currentLocatorOptions.length; locatorOptionIndex++) {
 
-        for (let locatorOptionIndex = 0; locatorOptionIndex < currentLocatorOptions.length; locatorOptionIndex++) {
+                currentLocator = currentLocatorOptions[locatorOptionIndex]
+                if (currentLocator.startsWith('/')) {
+                    //current locator is xpath
 
-            currentLocator = currentLocatorOptions[locatorOptionIndex]
-            if (currentLocator.startsWith('/')) {
-                //current locator is xpath
-
-                currentElement = document.evaluate(currentLocator, document).iterateNext()
+                    currentElement = document.evaluate(currentLocator, document).iterateNext()
+                }
+                else {
+                    //current selector is css selector
+                    currentElement = document.querySelector(currentLocator)
+                }
+                //if current locator find element, break current loop to save time
+                if (currentElement != null) {
+                    break
+                }
             }
-            else {
-                //current selector is css selector
-                currentElement = document.querySelector(currentLocator)
-            }
-            //if current locator find element, break current loop to save time
+
             if (currentElement != null) {
-                break
+                //UI elemnet found, update its attribute
+                let currentBluestoneSelector = currentElement.getAttribute(Helper.bsLocator)
+
+                if (currentBluestoneSelector == null) {
+                    currentBluestoneSelector = finder(currentElement)
+                    currentElement.setAttribute(Helper.bsLocator, currentBluestoneSelector)
+                }
+                currentLocatorList[i].selector = currentBluestoneSelector
             }
+
         }
 
-        if (currentElement != null) {
-            //UI elemnet found, update its attribute
-            let currentBluestoneSelector = currentElement.getAttribute(Helper.bsLocator)
-
-            if (currentBluestoneSelector == null) {
-                currentBluestoneSelector = finder(currentElement)
-                currentElement.setAttribute(Helper.bsLocator, currentBluestoneSelector)
-            }
-            currentLocatorList[i].selector = currentBluestoneSelector
-        }
+        let endTime = Date.now()
+        let timeSpan = endTime - startTime
+        await window.setLocatorStatus(currentLocatorList, timeSpan)
+        // await new Promise(resolve => { setTimeout(resolve, 500) })
     }
 
-    let endTime = Date.now()
 
-    let timeSpan = endTime - startTime
-    await window.setLocatorStatus(currentLocatorList, timeSpan)
-    setTimeout(LocatorScanner, 300);
 
 }
 LocatorScanner()
@@ -189,8 +195,7 @@ async function captureHtml() {
 
 
 }
-// captureHtml()
-var htmlCaptureInterval = setInterval(captureHtml, 300)
+
 
 async function captureScreenshot() {
     try {
@@ -201,5 +206,53 @@ async function captureScreenshot() {
 
 
 }
-// await captureScreenshot()
-var sccrenshotInterval = setInterval(captureScreenshot, 300)
+
+// if (window.frameElement == null) {
+//     // captureHtml()
+//     setInterval(captureHtml, 300)
+//     // await captureScreenshot()
+//     setInterval(captureScreenshot, 300)
+// }
+
+//use event recorder to capture the screenshot and page element
+// Select the node that will be observed for mutations
+
+
+// Options for the observer (which mutations to observe)
+const config = { attributes: true, childList: true, subtree: true };
+
+// Create an observer instance linked to the callback function
+const mutationObserverCallback = function (mutationsList, observer) {
+    function checkAttributeNameExists(targetAttribute) {
+        let isAttributeNameExists = false
+        for (const mutation of mutationsList) {
+            let attributeName = mutation.attributeName
+            try {
+                isAttributeNameExists = attributeName.includes(targetAttribute)
+            } catch (error) { }
+            if (isAttributeNameExists) {
+                return isAttributeNameExists
+            }
+        }
+        return isAttributeNameExists
+
+    }
+    //will not proceed the change that is introduced by single file downloader
+    if (checkAttributeNameExists(BLUESTONE.dataSingleFileAttributePattern)) {
+        return
+    }
+
+    if (checkAttributeNameExists(BLUESTONE.previousbackground)) {
+        return
+    }
+    captureScreenshot()
+    //only proceed change that is introduced by RPA engine or code change
+    captureHtml()
+
+    console.log(mutationsList)
+}
+
+const observer = new MutationObserver(mutationObserverCallback);
+
+// Start observing the target node for configured mutations
+observer.observe(document, config);
