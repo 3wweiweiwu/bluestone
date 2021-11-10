@@ -28,7 +28,7 @@ module.exports = function (recordRepo, browser, page, io) {
         if (page != null) {
             htmlPath = recordRepo.getHtmlPath()
             recordRepo.htmlCaptureStatus.outputHtml(htmlPath)
-        }
+        }   
         //handle screenshot
 
         let picturePath = ''

@@ -8,7 +8,9 @@ const EVENTCONST = {
 }
 const BLUESTONE = {
     previousbackground: 'bluestone-previous-background',
-    dataSingleFileAttributePattern: 'data-single-file-'
+    dataSingleFileAttributePattern: 'data-single-file-',
+    bluestoneLocator: 'bluestone-locator',
+    bluestoneIframePath: 'bluestone-iframe-path'
 }
 /**
  * This function will add event listener for all dom element
@@ -26,6 +28,14 @@ Object.keys(EVENTCONST).forEach(item => {
         } catch (error) {
             console.log(error)
         }
+        //retrieve iframe info for current frame
+        let iframe = '[]'
+        if (window.frameElement && window.frameElement.getAttribute(BLUESTONE.bluestoneIframePath)) {
+            iframe = window.frameElement.getAttribute(BLUESTONE.bluestoneIframePath)
+            console.log(iframe)
+        }
+
+
         const position = event.target.getBoundingClientRect()
         const targetInnerText = event.target.innerText
         let parameter = null
@@ -62,6 +72,7 @@ Object.keys(EVENTCONST).forEach(item => {
         }
         const eventDetail = {
             command: command,
+            iframe: iframe,
             target: selector,
             parameter: parameter,
             targetInnerText: targetInnerText,
@@ -126,7 +137,7 @@ document.addEventListener("mouseout", event => {
 //This function will find all element in the page and report them back to record manager
 
 const Helper = {
-    bsLocator: "bluestone-locator" //this is attribute that is used to store locator mapping
+    bsLocator: BLUESTONE.bluestoneLocator //this is attribute that is used to store locator mapping
 }
 async function LocatorScanner() {
 
@@ -206,18 +217,30 @@ async function captureScreenshot() {
 
 
 }
+/**
+ * This function will automatically assign locator to iframe element. 
+ */
+const getFrameLocator = function () {
+    let iframeLocatorJson = '[]'
+    //get parent locator id
+    if (window.frameElement != null && window.frameElement.getAttribute(BLUESTONE.bluestoneIframePath) != null) {
+        iframeLocatorJson = window.frameElement.getAttribute(BLUESTONE.bluestoneIframePath)
+    }
+    let iframeElements = document.getElementsByTagName('iframe')
+    for (const element of iframeElements) {
+        //get selector for current iframe
+        let selector = finder(element)
+        //parse original locator
+        let iframeLocator = JSON.parse(iframeLocatorJson)
+        //add current selector to the list
+        iframeLocator.push(selector)
+        //set attribute and convert that back to json
+        let strLocator = JSON.stringify(iframeLocator)
 
-// if (window.frameElement == null) {
-//     // captureHtml()
-//     setInterval(captureHtml, 300)
-//     // await captureScreenshot()
-//     setInterval(captureScreenshot, 300)
-// }
+        element.setAttribute(BLUESTONE.bluestoneIframePath, strLocator)
+    }
 
-//use event recorder to capture the screenshot and page element
-// Select the node that will be observed for mutations
-
-
+}
 // Options for the observer (which mutations to observe)
 const config = { attributes: true, childList: true, subtree: true };
 
@@ -241,18 +264,28 @@ const mutationObserverCallback = function (mutationsList, observer) {
     if (checkAttributeNameExists(BLUESTONE.dataSingleFileAttributePattern)) {
         return
     }
-
-    if (checkAttributeNameExists(BLUESTONE.previousbackground)) {
+    if (checkAttributeNameExists(BLUESTONE.bluestoneLocator)
+        || checkAttributeNameExists(BLUESTONE.previousbackground)
+        || checkAttributeNameExists(BLUESTONE.bluestoneIframePath)) {
         return
     }
     captureScreenshot()
     //only proceed change that is introduced by RPA engine or code change
     captureHtml()
-
-    console.log(mutationsList)
+    getFrameLocator()
+    // console.log(mutationsList)
 }
 
 const observer = new MutationObserver(mutationObserverCallback);
 
+
+
 // Start observing the target node for configured mutations
 observer.observe(document, config);
+
+//when scroll up and down, take screenshot
+document.addEventListener('scroll', captureScreenshot)
+
+captureHtml()
+captureScreenshot()
+getFrameLocator()

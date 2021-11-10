@@ -130,6 +130,22 @@ exports.goto = async function (page, url) {
 }
 
 /**
+ * Go to specific iframe component
+*  @param {Page} page 
+ * @param {ElementSelector} elementSelector element selector object
+ */
+exports.gotoFrame = async function (page, elementSelector) {
+    let element = await findElement(page, elementSelector, 2000)
+    let frame = null
+    try {
+        frame = await element.contentFrame()
+        return frame
+    } catch (error) {
+        return Promise.reject(`Unable to go to frame ${elementSelector.displayName}`)
+    }
+}
+
+/**
  * Press a key
 *  @param {Page} page 
  * @param {string} key button you want to press. Supported Button: Enter|Tab|Escape

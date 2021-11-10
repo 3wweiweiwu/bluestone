@@ -26,5 +26,9 @@ module.exports = {
         func: inbuiltFunc.keydown1,
         locators: [{ locator: ['invalid_locator'] }]
     },
+    gotoFrame: {
+        func: inbuiltFunc.gotoFrame,
+        locators: [{ locator: ['invalid_locator'] }]
+    }
 
 }

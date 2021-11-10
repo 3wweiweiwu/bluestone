@@ -48,9 +48,15 @@ class RecordingStep {
     constructor(recordingStep) {
         this.command = recordingStep.command
         this.target = recordingStep.target
+        /** @type {Array<string>} */
+        this.iframe = recordingStep.iframe
+        if (typeof (recordingStep.iframe) == 'string') {
+            this.iframe = JSON.parse(recordingStep.iframe)
+        }
+
         /** @type {Array<Locator>} */
         this.potentialMatch = []
-
+        this.framePotentialMatch = []
         this.__htmlPath = recordingStep.htmlPath
         this.targetInnerText = recordingStep.targetInnerText
         this.targetPicPath = recordingStep.targetPicPath
@@ -109,6 +115,7 @@ class RecordingStep {
  * @property {number} timeoutMs
  * @property {string} htmlPath
  * @property {string} targetPicPath
+ * @property {Array<string>} iframe
  * @property {import('../../ast/class/Function')} functionAst
  */
 
@@ -240,7 +247,8 @@ class WorkflowRecord {
         change: 'change',
         click: 'click',
         goto: 'goto',
-        keydown: 'keydown'
+        keydown: 'keydown',
+        gotoFrame: 'gotoFrame'
     }
     static inbuiltEvent = {
         refresh: PuppeteerControl.inbuiltEvent.refresh
@@ -298,12 +306,61 @@ class WorkflowRecord {
      * Based on current step, decide if add wait before the call
      * @param {RecordingStep} step the operation step
      */
-    __addWaitForSteps(step) {
+    __addSwitchIframeForStep(step) {
+        let gotoFrameCommand = WorkflowRecord.inBuiltFunc.gotoFrame
+        //cosntruct wait step. insert wait step only if timeout is greater than 0 and previous command is not wait
+        if (step.command != 'goto' && step.command != gotoFrameCommand && step.iframe != null) {
+            let switchToFrameAst = this.astManager.getFunction(gotoFrameCommand)
+            let waitStep = JSON.parse(JSON.stringify(step))
+            waitStep = RecordingStep.restore(waitStep, switchToFrameAst, gotoFrameCommand)
+
+            //for iframe, its parent iframe will be its parent and its locator should be last xpath
+            let parentIframe = step.iframe.slice(0, step.iframe.length - 1)
+            let currentIframe = step.iframe[step.iframe.length - 1]
+            waitStep.target = currentIframe
+            waitStep.iframe = parentIframe
+            waitStep.potentialMatch = step.framePotentialMatch
+
+            this.steps.push(waitStep)
+        }
+    }
+    /**
+     * Based on current step, decide if add wait before the call
+     * @param {RecordingStep} step the operation step
+     */
+    __addWaitForFrame(step) {
+        let waitCommand = WorkflowRecord.inBuiltFunc.waitElementExists
+        //cosntruct wait step. insert wait step only if timeout is greater than 0 and previous command is not wait
+        if (step.command != 'goto' && step.command != waitCommand && step.timeoutMs != 0 && step.iframe != null) {
+            let waitFunctionAst = this.astManager.getFunction(waitCommand)
+            let waitStep = JSON.parse(JSON.stringify(step))
+            waitStep.target = waitStep.iframe
+            waitStep = RecordingStep.restore(waitStep, waitFunctionAst, waitCommand)
+            //hard code wait time param here
+            waitStep.functionAst.params[2].value = step.timeoutMs
+            this.steps.push(waitStep)
+        }
+
+    }
+    /**
+     * Based on current step, decide if add wait before the call
+     * @param {RecordingStep} step the operation step
+     *  @param {boolean} isFrame the operation step
+     */
+    __addWaitForSteps(step, isFrame = false) {
         let waitCommand = 'waitElementExists'
         //cosntruct wait step. insert wait step only if timeout is greater than 0 and previous command is not wait
         if (step.command != 'goto' && step.command != waitCommand && step.timeoutMs != 0) {
             let waitFunctionAst = this.astManager.getFunction(waitCommand)
             let waitStep = JSON.parse(JSON.stringify(step))
+            if (isFrame) {
+                //for iframe, its parent iframe will be its parent and its locator should be last xpath
+                waitStep.potentialMatch = step.framePotentialMatch
+                let parentIframe = step.iframe.slice(0, step.iframe.length - 1)
+                let currentIframe = step.iframe[step.iframe.length - 1]
+                waitStep.target = currentIframe
+                waitStep.iframe = parentIframe
+            }
             waitStep = RecordingStep.restore(waitStep, waitFunctionAst, waitCommand)
             //hard code wait time param here
             waitStep.functionAst.params[2].value = step.timeoutMs
@@ -455,8 +512,18 @@ class WorkflowRecord {
      * @param {RecordingStep} event 
      */
     async addStep(event) {
+        //handle change in iframe
+        let lastStep = this.steps[this.steps.length - 1]
+        if (lastStep != null && JSON.stringify(event.iframe) != JSON.stringify(lastStep.iframe)) {
+            event.framePotentialMatch = this.__findPotentialMatchForEvent(event.iframe)
+            this.__addWaitForSteps(event, true)
+            this.__addSwitchIframeForStep(event)
+        }
+
+
+        //
         event.potentialMatch = this.__findPotentialMatchForEvent(event.target)
-        this.__addWaitForSteps(event)
+        this.__addWaitForSteps(event, false)
 
         this.steps.push(event)
         this.__handleChangeNPressCombo(event)
@@ -501,7 +568,7 @@ class WorkflowRecord {
         let locatorLibrarySnapshot = JSON.parse(JSON.stringify(this.locatorManager.locatorLibrary))
         let eventSelector = eventTarget
         let potentialMatches = locatorLibrarySnapshot.filter(item => {
-            return item.selector == eventSelector
+            return item.selector == eventSelector && item.selector != ''
         })
 
         return potentialMatches

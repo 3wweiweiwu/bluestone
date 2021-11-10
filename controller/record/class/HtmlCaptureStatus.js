@@ -41,13 +41,13 @@ class HtmlCaptureStatus {
 
         if (this.__popIndex != -1) {
             let currentItem = this.__queue[this.__popIndex]
-            setTimeout((currentPath) => {
+            // setTimeout((currentPath) => {
 
-                fs.unlink(currentPath)
-                    .catch(err => { })
+            //     fs.unlink(currentPath)
+            //         .catch(err => { })
 
 
-            }, 30000, currentItem.path);
+            // }, 30000, currentItem.path);
         }
 
 

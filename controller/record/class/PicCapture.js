@@ -42,11 +42,11 @@ class PicCapture {
         if (this.__popIndex != -1) {
             let currentItem = this.__queue[this.__popIndex]
             this.__queue[this.__popIndex].timeStamp = Date.now()
-            setTimeout((currentPath) => {
+            // setTimeout((currentPath) => {
 
-                fs.unlink(currentPath).catch(err => { })
+            //     fs.unlink(currentPath).catch(err => { })
 
-            }, 120000, currentItem.path);
+            // }, 120000, currentItem.path);
         }
 
         this.__popIndex++
