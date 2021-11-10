@@ -48,9 +48,15 @@ class PuppeteerControl {
         let result = await openBluestoneTab(this.browser, bluestonePath)
         return result
     }
-
-    async checkLocatorInDefiner(targetLocator, currentLocator) {
-        let result = await checkLocatorInDefiner(this.browser, targetLocator, currentLocator)
+    /**
+     * Check if current locator exists in definer
+     * @param {string} targetLocator 
+     * @param {string} currentLocator
+     * @param {Array<string>} parentFrame 
+     * @returns 
+     */
+    async checkLocatorInDefiner(targetLocator, currentLocator, parentFrame) {
+        let result = await checkLocatorInDefiner(this.browser, targetLocator, currentLocator, parentFrame)
         return result
     }
     refreshSpy() {

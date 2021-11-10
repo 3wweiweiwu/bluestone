@@ -11,7 +11,7 @@ class UI {
      */
     constructor(backend) {
         this.backend = backend
-        this.locatorDefiner = new LocatorDefiner('', '', '', '', [], -1, this.backend)
+        this.locatorDefiner = new LocatorDefiner('', '', '', '', [], -1, this.backend, [])
         this.operation = new Operation(this.backend)
         this.workflow = new Workflow([], this.backend)
 
@@ -40,7 +40,7 @@ class UI {
                 stepIndex = this.backend.findPendingLocatorInStep()
                 if (stepIndex != -1) {
                     targetStep = this.backend.steps[stepIndex]
-                    await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex)
+                    await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex, targetStep.iframe)
                 }
                 //update text info
                 this.workflow.validateForm(this.backend.steps)
@@ -49,7 +49,7 @@ class UI {
             case Workflow.inBuiltQueryKey.btnLocatorWorkflow:
                 stepIndex = Number.parseInt(firstValue)
                 targetStep = this.backend.steps[stepIndex]
-                await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex)
+                await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex, targetStep.iframe)
                 break
             default:
                 break;
@@ -62,9 +62,10 @@ class UI {
      * @param {string} locatorName 
      * @param {Array<string>} locatorSelector 
      * @param {Array<Locator>} potentialMatch 
+     * @param {Array<string>} parentFrame
      * @param {number} stepIndex
      */
-    async refreshLocatorDefiner(defaultSelector, locatorHtmlPath, locatorName, locatorSelector, potentialMatch, stepIndex) {
+    async refreshLocatorDefiner(defaultSelector, locatorHtmlPath, locatorName, locatorSelector, potentialMatch, stepIndex, parentFrame) {
         //convert html path from local file to relative url
         let htmlUrl = this.backend.convertLocalPath2RelativeLink(locatorHtmlPath)
 
@@ -92,7 +93,7 @@ class UI {
             newPotentialMatch[i].screenshot = this.operation.getSpySelectorPictureForPug(newPicPath)
         }
 
-        this.locatorDefiner = new LocatorDefiner(defaultSelector, htmlUrl, locatorName, locatorSelector[0], newPotentialMatch, stepIndex, this.backend)
+        this.locatorDefiner = new LocatorDefiner(defaultSelector, htmlUrl, locatorName, locatorSelector[0], newPotentialMatch, stepIndex, this.backend, parentFrame)
     }
     /**
      * Based on the current step in the workflow, repopulate operation view

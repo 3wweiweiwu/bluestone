@@ -1,38 +1,41 @@
-const { Browser, ElementHandle } = require('puppeteer-core')
+const { Browser, ElementHandle, Frame } = require('puppeteer-core')
 const getBluestonePage = require('./help/getBluestonePage')
 /**
  * @param {Browser} browser
  * @param {string} currentLocator
  * @param {string} targetLocator
+ * @param {Array<string>} parentIframes
  */
-module.exports = async function (browser, targetLocator, currentLocator) {
+module.exports = async function (browser, targetLocator, currentLocator, parentIframes) {
     //sidebar is the id for the locatorDefinerpug
     let page = await getBluestonePage(browser)
     //find frame that pointes to temp folder. This is the place where we store html page
     let frame = page.frames().find(item => {
         return item.url().includes('/temp/')
     })
-    let errorText = ''
+
     /** @type {Array<ElementHandle>} */
-    let elements
+    let elements = []
+    let errorText = ''
 
-    if (currentLocator.startsWith('/')) {
-        try {
-            elements = await frame.$x(currentLocator)
-        } catch (error) {
-            elements = []
+    //navigate through frames and get to current elements
+    for (const frameLocator of parentIframes) {
+        let frameElements = await getLocator(frame, frameLocator)
+        if (frameElements.length != 1) {
+            errorText = `Invalid Parent iFrame:${frameLocator}`
+            return errorText
         }
-
-
-    }
-    else {
         try {
-            elements = await frame.$$(currentLocator)
+            frame = await frameElements[0].contentFrame()
         } catch (error) {
-            elements = []
+            errorText = `Unable to find content frame in :${frameLocator}`
         }
-
     }
+
+
+    /** @type {Array<ElementHandle>} */
+    elements = await getLocator(frame, currentLocator)
+
     if (elements.length == 0) {
         errorText = 'Cannot find locator specified. Please try something else'
     }
@@ -70,4 +73,35 @@ module.exports = async function (browser, targetLocator, currentLocator) {
 
 
 
+}
+/**
+ * 
+ * @param {Frame} frame 
+ * @param {string} currentLocator 
+ * @returns {Array<ElementHandle>}
+ */
+async function getLocator(frame, currentLocator) {
+
+    /** @type {Array<ElementHandle>} */
+    let elements
+
+    if (currentLocator.startsWith('/')) {
+        try {
+            elements = await frame.$x(currentLocator)
+        } catch (error) {
+            elements = []
+        }
+
+
+    }
+    else {
+        try {
+            elements = await frame.$$(currentLocator)
+        } catch (error) {
+            elements = []
+        }
+
+    }
+
+    return elements
 }

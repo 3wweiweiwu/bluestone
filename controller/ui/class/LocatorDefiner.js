@@ -19,8 +19,9 @@ class LocatorDefiner {
      * @param {Array<Locator>} potentialMatch the potential match info coming from the recording step
      * @param {number} stepIndex the index of current step. We need this inforamtion so that we can navigate back when we change the inforamtion in the step
      * @param {WorkflowRecord} backend the workflow record backend
+     * @param {Array<string>} parentFrame the parent frame hierachy
      */
-    constructor(defaultSelector, locatorHtmlPath, locatorName, locatorSelector, potentialMatch, stepIndex, backend) {
+    constructor(defaultSelector, locatorHtmlPath, locatorName, locatorSelector, potentialMatch, stepIndex, backend, parentFrame) {
 
         this.__selectorValidationNote = ''
         this.defaultSelector = defaultSelector
@@ -38,6 +39,7 @@ class LocatorDefiner {
         this.stepIndex = stepIndex
         this.backend = backend
         this.fullLocatorFromPossibleLocator = null
+        this.parentFrame = parentFrame
 
     }
     get validationText() {
@@ -137,11 +139,12 @@ class LocatorDefiner {
                 break
             case LocatorDefiner.inBuiltQueryKey.btnConfirm:
                 //check locator and confirm locator input
-                let locatorCheckResult = await this.backend.puppeteer.checkLocatorInDefiner(this.defaultSelector, this.locatorSelector)
+                let locatorCheckResult = await this.backend.puppeteer.checkLocatorInDefiner(this.defaultSelector, this.locatorSelector, this.parentFrame)
                 //will not update the locator if current locator is not valid
-                if (locatorCheckResult != '') break
+
 
                 let finalSelection = this.getFinalSelection(locatorCheckResult)
+                if (locatorCheckResult != '') break
                 //check all steps and replicate same setting for same locator
                 this.backend.steps.forEach(item => {
                     if (item.target == this.defaultSelector) {
