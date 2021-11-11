@@ -66,6 +66,7 @@ Object.keys(EVENTCONST).forEach(item => {
                     default:
                         //if we see combo key ctrl-q, we will call in-browser plugin
                         if (event.ctrlKey && event.key === 'q') {
+                            captureScreenshot()
                             command = null
                             parameter = null
                             console.log('call in-browser spy')
@@ -147,62 +148,62 @@ document.addEventListener("mouseout", event => {
 const Helper = {
     bsLocator: BLUESTONE.bluestoneLocator //this is attribute that is used to store locator mapping
 }
-async function LocatorScanner() {
+async function scanLocator() {
 
-    while (true) {
-        /** @type {Array<import('../../locator/index').Locator>} */
-        let currentLocatorList = await window.getLocator()
-        let startTime = Date.now()
 
-        for (let i = 0; i < currentLocatorList.length; i++) {
-            currentLocatorList[i].selector = ''
-            let locator = currentLocatorList[i]
-            let currentLocatorOptions = locator.Locator
-            let currentElement = null
-            let currentLocator
-            //search through avialble option to find if anhing match
+    /** @type {Array<import('../../locator/index').Locator>} */
+    let currentLocatorList = await window.getLocator()
+    let startTime = Date.now()
 
-            for (let locatorOptionIndex = 0; locatorOptionIndex < currentLocatorOptions.length; locatorOptionIndex++) {
+    for (let i = 0; i < currentLocatorList.length; i++) {
+        currentLocatorList[i].selector = ''
+        let locator = currentLocatorList[i]
+        let currentLocatorOptions = locator.Locator
+        let currentElement = null
+        let currentLocator
+        //search through avialble option to find if anhing match
 
-                currentLocator = currentLocatorOptions[locatorOptionIndex]
-                if (currentLocator.startsWith('/')) {
-                    //current locator is xpath
+        for (let locatorOptionIndex = 0; locatorOptionIndex < currentLocatorOptions.length; locatorOptionIndex++) {
 
-                    currentElement = document.evaluate(currentLocator, document).iterateNext()
-                }
-                else {
-                    //current selector is css selector
-                    currentElement = document.querySelector(currentLocator)
-                }
-                //if current locator find element, break current loop to save time
-                if (currentElement != null) {
-                    break
-                }
+            currentLocator = currentLocatorOptions[locatorOptionIndex]
+            if (currentLocator.startsWith('/')) {
+                //current locator is xpath
+
+                currentElement = document.evaluate(currentLocator, document).iterateNext()
             }
-
+            else {
+                //current selector is css selector
+                currentElement = document.querySelector(currentLocator)
+            }
+            //if current locator find element, break current loop to save time
             if (currentElement != null) {
-                //UI elemnet found, update its attribute
-                let currentBluestoneSelector = currentElement.getAttribute(Helper.bsLocator)
-
-                if (currentBluestoneSelector == null) {
-                    currentBluestoneSelector = finder(currentElement)
-                    currentElement.setAttribute(Helper.bsLocator, currentBluestoneSelector)
-                }
-                currentLocatorList[i].selector = currentBluestoneSelector
+                break
             }
-
         }
 
-        let endTime = Date.now()
-        let timeSpan = endTime - startTime
-        await window.setLocatorStatus(currentLocatorList, timeSpan)
-        // await new Promise(resolve => { setTimeout(resolve, 500) })
+        if (currentElement != null) {
+            //UI elemnet found, update its attribute
+            let currentBluestoneSelector = currentElement.getAttribute(Helper.bsLocator)
+
+            if (currentBluestoneSelector == null) {
+                currentBluestoneSelector = finder(currentElement)
+                currentElement.setAttribute(Helper.bsLocator, currentBluestoneSelector)
+            }
+            currentLocatorList[i].selector = currentBluestoneSelector
+        }
+
     }
+
+    let endTime = Date.now()
+    let timeSpan = endTime - startTime
+    await window.setLocatorStatus(currentLocatorList, timeSpan)
+    // await new Promise(resolve => { setTimeout(resolve, 500) })
+
 
 
 
 }
-LocatorScanner()
+
 
 
 async function captureHtml() {
@@ -281,6 +282,7 @@ const mutationObserverCallback = function (mutationsList, observer) {
     //only proceed change that is introduced by RPA engine or code change
     captureHtml()
     getFrameLocator()
+    scanLocator()
     // console.log(mutationsList)
 }
 
@@ -297,3 +299,4 @@ document.addEventListener('scroll', captureScreenshot)
 captureHtml()
 captureScreenshot()
 getFrameLocator()
+scanLocator()
