@@ -1,5 +1,7 @@
 const { Browser, ElementHandle, Frame } = require('puppeteer-core')
 const getBluestonePage = require('./help/getBluestonePage')
+const getLocator = require('./getLocator')
+const getFrame = require('./getFrame')
 /**
  * @param {Browser} browser
  * @param {string} currentLocator
@@ -19,17 +21,9 @@ module.exports = async function (browser, targetLocator, currentLocator, parentI
     let errorText = ''
 
     //navigate through frames and get to current elements
-    for (const frameLocator of parentIframes) {
-        let frameElements = await getLocator(frame, frameLocator)
-        if (frameElements.length != 1) {
-            errorText = `Invalid Parent iFrame:${frameLocator}`
-            return errorText
-        }
-        try {
-            frame = await frameElements[0].contentFrame()
-        } catch (error) {
-            errorText = `Unable to find content frame in :${frameLocator}`
-        }
+    frame = await getFrame(frame, parentIframes)
+    if (frame == null) {
+        return `Unable to navigate to iframe ${JSON.stringify(parentIframes)}`
     }
 
 
@@ -73,35 +67,4 @@ module.exports = async function (browser, targetLocator, currentLocator, parentI
 
 
 
-}
-/**
- * 
- * @param {Frame} frame 
- * @param {string} currentLocator 
- * @returns {Array<ElementHandle>}
- */
-async function getLocator(frame, currentLocator) {
-
-    /** @type {Array<ElementHandle>} */
-    let elements
-
-    if (currentLocator.startsWith('/')) {
-        try {
-            elements = await frame.$x(currentLocator)
-        } catch (error) {
-            elements = []
-        }
-
-
-    }
-    else {
-        try {
-            elements = await frame.$$(currentLocator)
-        } catch (error) {
-            elements = []
-        }
-
-    }
-
-    return elements
 }

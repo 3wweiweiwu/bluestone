@@ -154,6 +154,7 @@ class WorkflowRecord {
                 selectorPicture: '',
                 selectorHtmlPath: '',
                 currentInnerText: 'default',
+                parentIframe: [],
                 x: 0,
                 y: 0,
                 width: 0,
@@ -429,7 +430,7 @@ class WorkflowRecord {
             let step = this.steps[i]
             let elementSelector = new ElementSelector(step.finalLocator, '', step.finalLocatorName)
 
-            let result = await this.puppeteer.runCurrentStep(step.functionAst, elementSelector)
+            let result = await this.puppeteer.runCurrentStep(step.functionAst, elementSelector, step.iframe)
             this.steps[i].result = result
             if (!result.isResultPass) {
                 failedStepIndex = i

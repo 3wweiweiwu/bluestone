@@ -1,7 +1,7 @@
 const LocatorDefiner = require('./class/LocatorDefiner')
 const Operation = require('./class/Operation')
 const Workflow = require('./class/Workflow')
-const { WorkflowRecord } = require('../record/class')
+const { WorkflowRecord, RecordingStep } = require('../record/class')
 const path = require('path')
 const fs = require('fs').promises
 class UI {
@@ -119,6 +119,7 @@ class UI {
                 this.operation.browserSelection.currentSelector = step.target
                 this.operation.browserSelection.selectorPicture = step.targetPicPath
                 this.operation.browserSelection.lastOperationTimeoutMs = step.timeoutMs
+                this.operation.browserSelection.parentIframe = step.iframe
                 findOperation = true
                 break
             }

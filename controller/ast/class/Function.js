@@ -39,9 +39,10 @@ class FunctionAST {
      * @param {import('puppeteer-core').Browser} browser 
      * @param {import('puppeteer-core').Page} page 
      * @param {ElementSelector} elementSelector 
+     * @param {import('puppeteer-core').Frame} frame 
      * @returns 
      */
-    generateArgumentNContext(browser, page, elementSelector) {
+    generateArgumentNContext(browser, page, elementSelector, frame) {
         //construct argment for the function
         let currentOperation = this
         let currentScope = {}
@@ -51,6 +52,10 @@ class FunctionAST {
             let param = currentOperation.params[i]
             //construct scope
             switch (param.type.name) {
+                case "Frame":
+                    currentScope['frame'] = frame
+                    currentParam.push('frame')
+                    break;
                 case "Page":
                     currentScope['page'] = page
                     currentParam.push('page')

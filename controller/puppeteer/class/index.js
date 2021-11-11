@@ -17,6 +17,7 @@
 const ElementSelector = require('../../../ptLibrary/class/ElementSelector')
 const { Page, Browser } = require('puppeteer-core')
 const openBluestoneTab = require('../activities/openBluestoneTab')
+const getFrame = require('../activities/getFrame')
 const checkLocatorInDefiner = require('../activities/checkLocatorInDefiner')
 const PuppeteerResult = require('../../record/class/StepResult')
 const _eval = require('eval')
@@ -68,19 +69,26 @@ class PuppeteerControl {
      * Run current step
      * @param {import('../../ast/class/Function')} functionAst
      * @param {ElementSelector} elementSelector
+     * @param {Array<string>} parentFrame
      */
-    async runCurrentStep(functionAst, elementSelector) {
+    async runCurrentStep(functionAst, elementSelector, parentFrame) {
 
         let isResultPass = true
         let resultNote = ''
-        let argumentNContext = functionAst.generateArgumentNContext(this.browser, this.page, elementSelector)
-        let argumentStr = argumentNContext.argumentStr
-        let currentScope = argumentNContext.currentScope
-        currentScope['mainFunc'] = functionAst.mainFunc
-        let res = null
 
-        await this.page.bringToFront()
+
         try {
+
+            await this.page.bringToFront()
+            let frame = await getFrame(this.page, parentFrame)
+
+
+            let argumentNContext = functionAst.generateArgumentNContext(this.browser, this.page, elementSelector, frame)
+            let argumentStr = argumentNContext.argumentStr
+            let currentScope = argumentNContext.currentScope
+            currentScope['mainFunc'] = functionAst.mainFunc
+            let res = null
+
             res = _eval(`
             mainFunc(${argumentStr})
                             .then(result => {
