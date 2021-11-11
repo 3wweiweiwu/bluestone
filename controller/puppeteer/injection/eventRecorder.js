@@ -12,6 +12,19 @@ const BLUESTONE = {
     bluestoneLocator: 'bluestone-locator',
     bluestoneIframePath: 'bluestone-iframe-path'
 }
+
+/**
+ * get iframe locator inforamtion
+ * @returns {string}
+ */
+function getCurrentIframe() {
+    //retrieve iframe info for current frame
+    let iframe = '[]'
+    if (window.frameElement && window.frameElement.getAttribute(BLUESTONE.bluestoneIframePath)) {
+        iframe = window.frameElement.getAttribute(BLUESTONE.bluestoneIframePath)
+    }
+    return iframe
+}
 /**
  * This function will add event listener for all dom element
  * 
@@ -28,12 +41,7 @@ Object.keys(EVENTCONST).forEach(item => {
         } catch (error) {
             console.log(error)
         }
-        //retrieve iframe info for current frame
-        let iframe = '[]'
-        if (window.frameElement && window.frameElement.getAttribute(BLUESTONE.bluestoneIframePath)) {
-            iframe = window.frameElement.getAttribute(BLUESTONE.bluestoneIframePath)
-            console.log(iframe)
-        }
+        let iframe = getCurrentIframe()
 
 
         const position = event.target.getBoundingClientRect()
@@ -110,8 +118,8 @@ document.addEventListener('mouseover', async event => {
 
         const previousStyle = event.target.style.backgroundColor
         event.target.setAttribute(BLUESTONE.previousbackground, previousStyle)
-
-        window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width)
+        let iFrame = getCurrentIframe()
+        window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame)
 
         event.target.style.backgroundColor = 'rgba(140, 99, 255,0.7)'
     }

@@ -1,5 +1,5 @@
 class AstGenerator {
-    
+
     /**
      * Create simple ast for variable. sample var1
      * @param {string} varName name of the var in this case, it will be'var1'
@@ -57,6 +57,15 @@ class AstGenerator {
     }
     /**
      * create the variable that can be used for page
+     * @param {string} frameVarName 
+     * @returns 
+     */
+    static getFrameArgAst(frameVarName) {
+        return AstGenerator.getSimpleVariableAst(frameVarName)
+    }
+
+    /**
+     * create the variable that can be used for page
      * @param {string} pageVarName 
      * @returns 
      */
@@ -71,6 +80,52 @@ class AstGenerator {
     static getBrowserArgAst(browserVarName) {
         return AstGenerator.getSimpleVariableAst(browserVarName)
     }
+    /**
+     * Create opeartion such as s1=await function()
+     * @param {string} variableName s1
+     * @param {*} operationAst ast for await function()
+     * @returns 
+     */
+    static getAssignFunctionResultToVarOperation(variableName, operationAst) {
+        return {
+            "type": "ExpressionStatement",
+            "expression": {
+                "type": "AssignmentExpression",
+                "operator": "=",
+                "left": {
+                    "type": "Identifier",
+                    "name": variableName
+                },
+                "right": operationAst
+            }
+        }
+
+    }
+    /**
+     * assign variable based on other variable value s1=s2
+     * @param {string} leftVarName  s1
+     * @param {string} rightVarName  s2
+     * @returns 
+     */
+    static getAssignVarToVarOpeartion(leftVarName, rightVarName) {
+        return {
+            "type": "ExpressionStatement",
+
+            "expression": {
+                "type": "AssignmentExpression",
+                "operator": "=",
+                "left": {
+                    "type": "Identifier",
+                    "name": leftVarName
+                },
+                "right": {
+                    "type": "Identifier",
+                    "name": rightVarName
+                }
+            }
+        }
+    }
+    
     /**
      * Create a argument for library and method funcLib.method1.func()
      * @param {string} libraryName in this case, it is funcLib

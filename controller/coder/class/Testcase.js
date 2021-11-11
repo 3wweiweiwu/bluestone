@@ -33,9 +33,10 @@ class Coder {
                 configLibrary: 'config'
             },
             body: {
-                variableDeclaration: ['element', 'variable'],
+                variableDeclaration: ['element', 'variable', 'frame'],
                 browserVarName: 'browser',
-                pageVarName: 'page'
+                pageVarName: 'page',
+                frameVarName: 'frame'
             }
         }
 
@@ -104,6 +105,9 @@ class Coder {
         ast = AstGenerator.getPageInitializationStatement(this.inbuiltVarName.body.pageVarName, this.inbuiltVarName.body.browserVarName)
         this.testcaseCodeBody.push(ast)
 
+        //frame = page
+        ast = AstGenerator.getAssignVarToVarOpeartion(this.inbuiltVarName.body.frameVarName, this.inbuiltVarName.body.pageVarName)
+        this.testcaseCodeBody.push(ast)
         //create follow-up step
         let stepList = this.__getTestcaseStep()
         stepList.forEach(item => {
@@ -159,6 +163,10 @@ class Coder {
             let param = functionAst.params[i]
             //construct scope
             switch (param.type.name) {
+                case "Frame":
+                    let frameVarAst = AstGenerator.getFrameArgAst(this.inbuiltVarName.body.frameVarName)
+                    astJson.expression.argument.arguments.push(frameVarAst)
+                    break
                 case "Page":
                     let pageVarAst = AstGenerator.getPageArgAst(this.inbuiltVarName.body.pageVarName)
                     astJson.expression.argument.arguments.push(pageVarAst)
@@ -182,6 +190,10 @@ class Coder {
                 default:
                     break;
             }
+        }
+        //for gotoFrame function, will assign the returned variable to frame variable so that we can switch context
+        if (functionAst.name == 'gotoFrame') {
+            astJson = AstGenerator.getAssignFunctionResultToVarOperation(this.inbuiltVarName.body.frameVarName, astJson)
         }
         return astJson
 

@@ -56,4 +56,10 @@ describe('AST Generator Class', () => {
         let jsCode = escodegen.generate(ast)
         assert.equal(jsCode, `await client.send('Network.clearBrowserCache');`)
     })
+    it('should assign function result to a variable', async () => {
+        let ast = AstGenerator.getAwaitCommandWrapper('lib', 'run')
+        ast = AstGenerator.getAssignOperation('var1', ast)
+        let jsCode = escodegen.generate(ast)
+        assert.equal(jsCode, 'var1 = await lib.run.func();')
+    })
 })

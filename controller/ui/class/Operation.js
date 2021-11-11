@@ -155,9 +155,10 @@ class Operation {
                     let targetPicPath = this.backend.operation.browserSelection.selectorPicture
                     let timeoutMs = this.backend.operation.browserSelection.lastOperationTimeoutMs
                     let htmlPath = this.backend.operation.browserSelection.selectorHtmlPath
+                    let parentFrame = this.backend.operation.browserSelection.parentIframe
 
                     //construct operation step
-                    let step = new RecordingStep({ command, target, timeoutMs: timeoutMs, targetPicPath, targetInnerText, functionAst: currentOperation, htmlPath: htmlPath })
+                    let step = new RecordingStep({ command, target, timeoutMs: timeoutMs, targetPicPath, targetInnerText, functionAst: currentOperation, htmlPath: htmlPath, iframe: parentFrame })
 
 
 
@@ -174,7 +175,7 @@ class Operation {
                 let currentOperation = this.backend.getCurrentOperation()
 
                 let elementSelector = new ElementSelector([this.backend.operation.browserSelection.currentSelector], '', 'Current Selector')
-                let result = await this.backend.puppeteer.runCurrentStep(currentOperation, elementSelector)
+                let result = await this.backend.puppeteer.runCurrentStep(currentOperation, elementSelector, this.backend.operation.browserSelection.parentIframe)
                 this.backend.operation.spy.result.isPass = result.isResultPass
                 this.backend.operation.spy.result.text = result.resultText
                 this.backend.puppeteer.refreshSpy()
