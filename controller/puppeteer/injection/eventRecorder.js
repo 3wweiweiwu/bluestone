@@ -9,7 +9,7 @@ const EVENTCONST = {
 const BLUESTONE = {
     previousbackground: 'bluestone-previous-background',
     dataSingleFileAttributePattern: 'data-single-file-',
-    bluestoneLocator: 'bluestone-locator',
+    bluestonePotentialMatchIndexes: 'bluestone-potential-match-indexes',
     bluestoneIframePath: 'bluestone-iframe-path'
 }
 
@@ -146,22 +146,42 @@ document.addEventListener("mouseout", event => {
 //This function will find all element in the page and report them back to record manager
 
 const Helper = {
-    bsLocator: BLUESTONE.bluestoneLocator //this is attribute that is used to store locator mapping
+    potentialLocatorMatchIndexes: BLUESTONE.bluestonePotentialMatchIndexes //this is attribute that is used to store locator mapping
 }
-async function scanLocator() {
 
+async function scanLocator() {
+    function resetBsLocatorAttribute() {
+        //clearly all bluestone-locator properties from the elements in current frame to reset to clean state
+
+
+        while (true) {
+            let bsLocators = document.evaluate(`//*[@${BLUESTONE.bluestonePotentialMatchIndexes}]`, document)
+            try {
+                let element = bsLocators.iterateNext()
+                //stop iteration when 
+                if (element == null) {
+                    break
+                }
+                element.removeAttribute(BLUESTONE.bluestonePotentialMatchIndexes)
+            } catch (error) {
+                console.log(error)
+            }
+
+        }
+    }
 
     /** @type {Array<import('../../locator/index').Locator>} */
     let currentLocatorList = await window.getLocator()
     let startTime = Date.now()
-
+    //clean up all 
+    resetBsLocatorAttribute()
     for (let i = 0; i < currentLocatorList.length; i++) {
         currentLocatorList[i].selector = ''
         let locator = currentLocatorList[i]
         let currentLocatorOptions = locator.Locator
         let currentElement = null
         let currentLocator
-        //search through avialble option to find if anhing match
+
 
         for (let locatorOptionIndex = 0; locatorOptionIndex < currentLocatorOptions.length; locatorOptionIndex++) {
 
@@ -183,25 +203,20 @@ async function scanLocator() {
 
         if (currentElement != null) {
             //UI elemnet found, update its attribute
-            let currentBluestoneSelector = currentElement.getAttribute(Helper.bsLocator)
-
-            if (currentBluestoneSelector == null) {
-                currentBluestoneSelector = finder(currentElement)
-                currentElement.setAttribute(Helper.bsLocator, currentBluestoneSelector)
+            let currentPotentialMatch = currentElement.getAttribute(Helper.potentialLocatorMatchIndexes)
+            let potentialMatchLocatorIndex = []
+            if (currentPotentialMatch == null) {
+                potentialMatchLocatorIndex = [i]
             }
-            currentLocatorList[i].selector = currentBluestoneSelector
+            else {
+                potentialMatchLocatorIndex = JSON.parse(currentPotentialMatch)
+                potentialMatchLocatorIndex.push(i)
+            }
+
+            currentElement.setAttribute(Helper.potentialLocatorMatchIndexes, JSON.stringify(potentialMatchLocatorIndex))
         }
 
     }
-
-    let endTime = Date.now()
-    let timeSpan = endTime - startTime
-    await window.setLocatorStatus(currentLocatorList, timeSpan)
-    // await new Promise(resolve => { setTimeout(resolve, 500) })
-
-
-
-
 }
 
 
@@ -273,7 +288,7 @@ const mutationObserverCallback = function (mutationsList, observer) {
     if (checkAttributeNameExists(BLUESTONE.dataSingleFileAttributePattern)) {
         return
     }
-    if (checkAttributeNameExists(BLUESTONE.bluestoneLocator)
+    if (checkAttributeNameExists(BLUESTONE.bluestonePotentialMatchIndexes)
         || checkAttributeNameExists(BLUESTONE.previousbackground)
         || checkAttributeNameExists(BLUESTONE.bluestoneIframePath)) {
         return
