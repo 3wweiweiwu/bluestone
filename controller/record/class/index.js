@@ -162,7 +162,8 @@ class WorkflowRecord {
                 lastOperationTime: Date.now(),
                 lastOperationTimeoutMs: 0,
                 currentOpeartion: null,
-                __htmlCaptureInProcess: []
+                __htmlCaptureInProcess: [],
+                potentialMatch: []
             },
         }
         this.picCapture = new PicCapture()
