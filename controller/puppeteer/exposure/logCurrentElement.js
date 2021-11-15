@@ -6,9 +6,9 @@ const config = require('../../../config')
  * @param {WorkflowRecord} recordRepo 
  * @param {import('puppeteer-core').Page} page
  */
-module.exports = function (recordRepo, page) {
+module.exports = function logCurrentElement(recordRepo, page) {
 
-    return async function (selector = '', innerText = '', x, y, height, width, parentFrame, potentialMatch) {
+    return async function (selector = '', innerText = '', x, y, height, width, parentFrame, potentialMatch, framePotentialMatch) {
         //if current selector has been captured, we will not capture it again
         if (selector == recordRepo.operation.browserSelection.currentSelector && x == recordRepo.operation.browserSelection.x && recordRepo.operation.browserSelection.y == y) {
             return
@@ -34,6 +34,19 @@ module.exports = function (recordRepo, page) {
                 for (index of matchedList) {
                     let locatorObj = JSON.parse(JSON.stringify(recordRepo.locatorManager.locatorLibrary[index]))
                     recordRepo.operation.browserSelection.potentialMatch.push(locatorObj)
+                }
+
+
+            } catch (error) {
+
+            }
+
+            recordRepo.operation.browserSelection.framePotentialMatch = []
+            try {
+                let matchedList = JSON.parse(framePotentialMatch)
+                for (index of matchedList) {
+                    let locatorObj = JSON.parse(JSON.stringify(recordRepo.locatorManager.locatorLibrary[index]))
+                    recordRepo.operation.browserSelection.framePotentialMatch.push(locatorObj)
                 }
 
 

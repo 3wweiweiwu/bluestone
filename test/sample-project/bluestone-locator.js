@@ -43,5 +43,25 @@ module.exports = {
         locator: ['.logout-button > span'],
         screenshot: 'componentPic/btnLogout.png',
         displayName: 'btnLogout'
+    },
+    'Code Frame': {
+        locator: ['#frame_Active_learning_classic_embedding_uses'],
+        screenshot: 'componentPic/Code_Frame.png',
+        displayName: 'Code Frame'
+    },
+    'Code Text': {
+        locator: ['#code'],
+        screenshot: 'componentPic/Code_Text.png',
+        displayName: 'Code Text'
+    },
+    'TOP iframe': {
+        locator: ['TOP IFRAME'],
+        screenshot: 'componentPic/TOP_iframe.png',
+        displayName: 'TOP iframe'
+    },
+    'iFrame in Detail Header': {
+        locator: ['#iframes_in_detail > a'],
+        screenshot: 'componentPic/iFrame_in_Detail_Header.png',
+        displayName: 'iFrame in Detail Header'
     }
 };

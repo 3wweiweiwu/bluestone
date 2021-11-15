@@ -15,6 +15,7 @@ const HtmlCaptureStatus = require('./HtmlCaptureStatus')
 const Testcase = require('../../coder/class/Testcase')
 const Navigation = require('../class/NavigationStatus')
 const PicCapture = require('../class/PicCapture')
+const ptConstant = require('../../../ptLibrary/functions/inbuiltFunc').VAR
 /**
  * @typedef {string} CommandType
  **/
@@ -56,7 +57,7 @@ class RecordingStep {
 
         /** @type {Array<Locator>} */
         this.potentialMatch = recordingStep.potentialMatch
-        this.framePotentialMatch = []
+        this.framePotentialMatch = recordingStep.framePotentialMatch
         this.__htmlPath = recordingStep.htmlPath
         this.targetInnerText = recordingStep.targetInnerText
         this.targetPicPath = recordingStep.targetPicPath
@@ -117,7 +118,8 @@ class RecordingStep {
  * @property {string} targetPicPath
  * @property {Array<string>} iframe
  * @property {import('../../ast/class/Function')} functionAst
- * @property {RecordingStep} potentialMatch
+ * @property {Array<RecordingStep>} potentialMatch
+ * @property {Array<RecordingStep>} framePotentialMatch
  */
 
 
@@ -164,7 +166,8 @@ class WorkflowRecord {
                 lastOperationTimeoutMs: 0,
                 currentOpeartion: null,
                 __htmlCaptureInProcess: [],
-                potentialMatch: []
+                potentialMatch: [],
+                framePotentialMatch: []
             },
         }
         this.picCapture = new PicCapture()
@@ -321,6 +324,9 @@ class WorkflowRecord {
             let parentIframe = step.iframe.slice(0, step.iframe.length - 1)
             let currentIframe = step.iframe[step.iframe.length - 1]
             waitStep.target = currentIframe
+            if (currentIframe == null) {
+                waitStep.target = ptConstant.parentIFrameLocator
+            }
             waitStep.iframe = parentIframe
             waitStep.potentialMatch = step.framePotentialMatch
 
@@ -362,6 +368,9 @@ class WorkflowRecord {
                 let parentIframe = step.iframe.slice(0, step.iframe.length - 1)
                 let currentIframe = step.iframe[step.iframe.length - 1]
                 waitStep.target = currentIframe
+                if (currentIframe == null) {
+                    waitStep.target = ptConstant.parentIFrameLocator
+                }
                 waitStep.iframe = parentIframe
             }
             waitStep = RecordingStep.restore(waitStep, waitFunctionAst, waitCommand)
@@ -377,6 +386,16 @@ class WorkflowRecord {
     resolveExistingLocatorInSteps() {
         //automatically match all existing selectors
         this.steps.forEach(item => {
+            if (item.target == ptConstant.parentIFrameLocator) {
+                //if we are working with parent frame, we will search through locator library to find potential match
+                //find if we have defined parent iframe in the past
+                let parentFrame = this.locatorManager.locatorLibrary.find(item => { return item.Locator.includes(ptConstant.parentIFrameLocator) })
+                if (parentFrame) {
+                    item.potentialMatch = [JSON.parse(JSON.stringify(parentFrame))]
+
+                }
+
+            }
             if (item.potentialMatch.length == 1) {
                 item.finalLocatorName = item.potentialMatch[0].path
                 item.finalLocator = item.potentialMatch[0].Locator
@@ -387,6 +406,7 @@ class WorkflowRecord {
                 }
 
             }
+
         })
     }
     /**
@@ -518,7 +538,6 @@ class WorkflowRecord {
         //handle change in iframe
         let lastStep = this.steps[this.steps.length - 1]
         if (lastStep != null && JSON.stringify(event.iframe) != JSON.stringify(lastStep.iframe)) {
-            event.framePotentialMatch = event.potentialMatch
             this.__addWaitForSteps(event, true)
             this.__addSwitchIframeForStep(event)
         }

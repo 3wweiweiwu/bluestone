@@ -3,6 +3,11 @@ const ElementSelector = require('../class/ElementSelector')
 const findElement = require('./findElement')
 const assert = require('assert')
 
+const ConstantVar = {
+    parentIFrameLocator: 'TOP IFRAME'
+}
+
+exports.VAR = ConstantVar
 
 /**
  * Test current text equal to desired value
@@ -41,7 +46,10 @@ exports.waitElementExists = async function (frame, elementSelector, timeout) {
     do {
         for (let i = 0; i < locatorOptions.length; i++) {
             let locator = locatorOptions[i]
-
+            //if we are checking parent iframe element, we will just skip that
+            if (locator == ConstantVar.parentIFrameLocator) {
+                return ''
+            }
             if (locator.startsWith('/')) {
                 //xpath
                 let elementResult
@@ -132,10 +140,15 @@ exports.goto = async function (page, url) {
 
 /**
  * Go to specific iframe component
+ * @param {Page} page
 *  @param {Frame} frame 
  * @param {ElementSelector} elementSelector element selector object
  */
-exports.gotoFrame = async function (frame, elementSelector) {
+exports.gotoFrame = async function (page, frame, elementSelector) {
+    //if current page locator is iframe, we will just go back to the top page
+    if (elementSelector.locator == ConstantVar.parentIFrameLocator) {
+        return page
+    }
     let element = await findElement(frame, elementSelector, 2000)
     try {
         frame = await element.contentFrame()

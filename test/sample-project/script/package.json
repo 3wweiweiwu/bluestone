@@ -1,0 +1,15 @@
+{
+    "name": "bluestone-sample-project",
+    "version": "0.0.0",
+    "private": true,
+    "scripts": {
+        "start": "./node_modules/.bin/_mocha ./script/**.js --timeout 60000s",
+        "build": "babel bin -d dist"
+    },
+    "dependencies": {
+        "bluestone": "^0.1.2",
+        "mocha": "^9.1.3",
+        "puppeteer": "^10.2.0",
+        "puppeteer-core": "^10.2.0"
+    }
+}

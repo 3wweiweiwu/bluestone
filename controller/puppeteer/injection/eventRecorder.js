@@ -44,6 +44,7 @@ Object.keys(EVENTCONST).forEach(item => {
         }
 
         let iframe = getElementAttribute(window.frameElement, BLUESTONE.bluestoneIframePath)
+        let framePotentialMatch = getElementAttribute(window.frameElement, BLUESTONE.bluestonePotentialMatchIndexes)
         let potentialMatch = getElementAttribute(event.target, BLUESTONE.bluestonePotentialMatchIndexes)
 
 
@@ -88,6 +89,7 @@ Object.keys(EVENTCONST).forEach(item => {
             target: selector,
             parameter: parameter,
             targetInnerText: targetInnerText,
+            framePotentialMatch: framePotentialMatch,
             targetPicPath: targetPicPath,
             potentialMatch: potentialMatch,
             pos: {
@@ -124,8 +126,9 @@ document.addEventListener('mouseover', async event => {
         const previousStyle = event.target.style.backgroundColor
         event.target.setAttribute(BLUESTONE.previousbackground, previousStyle)
         let iFrame = getElementAttribute(window.frameElement, BLUESTONE.bluestoneIframePath)
+        let framePotentialMatch = getElementAttribute(window.frameElement, BLUESTONE.bluestonePotentialMatchIndexes)
         let potentialMatch = getElementAttribute(event.target, BLUESTONE.bluestonePotentialMatchIndexes)
-        window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch)
+        window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch)
 
         event.target.style.backgroundColor = 'rgba(140, 99, 255,0.7)'
     }

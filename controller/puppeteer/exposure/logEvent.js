@@ -35,7 +35,19 @@ module.exports = function (recordRepo, browser, page, io) {
         } catch (error) {
 
         }
+        //handle frame potential match
+        let framePotentialMatch = []
+        try {
+            let matchedList = JSON.parse(eventDetail.framePotentialMatch)
+            for (index of matchedList) {
+                let locatorObj = JSON.parse(JSON.stringify(recordRepo.locatorManager.locatorLibrary[index]))
+                framePotentialMatch.push(locatorObj)
+            }
 
+
+        } catch (error) {
+
+        }
         //handle page capture
 
         let htmlPath = ''
@@ -113,6 +125,7 @@ module.exports = function (recordRepo, browser, page, io) {
             eventDetail.targetPicPath = picturePath
             eventDetail.htmlPath = htmlPath
             eventDetail.potentialMatch = locatorPotentialMatch
+            eventDetail.framePotentialMatch = framePotentialMatch
             //construct operation event
             let event = new RecordingStep(eventDetail)
             try {

@@ -2,6 +2,7 @@ const { Browser, ElementHandle, Frame } = require('puppeteer-core')
 const getBluestonePage = require('./help/getBluestonePage')
 const getLocator = require('./getLocator')
 const getFrame = require('./getFrame')
+const ptInbuiltFunc = require('../../../ptLibrary/functions/inbuiltFunc')
 /**
  * @param {Browser} browser
  * @param {string} currentLocator
@@ -20,12 +21,23 @@ module.exports = async function (browser, targetLocator, currentLocator, parentI
     let elements = []
     let errorText = ''
 
+    //if target locator is equal to current locator and equals to null, it means we are dealing with parent locator, just return as it is
+
     //navigate through frames and get to current elements
     frame = await getFrame(frame, parentIframes)
     if (frame == null) {
         return `Unable to navigate to iframe ${JSON.stringify(parentIframes)}`
     }
 
+    if (parentIframes.length == 0 && targetLocator == ptInbuiltFunc.VAR.parentIFrameLocator) {
+        //we are swithcing back to the top frame
+        if (currentLocator == ptInbuiltFunc.VAR.parentIFrameLocator) {
+            return errorText
+        }
+        else {
+            return 'Please use default value as we are switching back to parent frame'
+        }
+    }
 
     /** @type {Array<ElementHandle>} */
     elements = await getLocator(frame, currentLocator)
