@@ -156,9 +156,10 @@ class Operation {
                     let timeoutMs = this.backend.operation.browserSelection.lastOperationTimeoutMs
                     let htmlPath = this.backend.operation.browserSelection.selectorHtmlPath
                     let parentFrame = this.backend.operation.browserSelection.parentIframe
+                    let potentialMatch = this.backend.operation.browserSelection.potentialMatch
 
                     //construct operation step
-                    let step = new RecordingStep({ command, target, timeoutMs: timeoutMs, targetPicPath, targetInnerText, functionAst: currentOperation, htmlPath: htmlPath, iframe: parentFrame })
+                    let step = new RecordingStep({ command, target, timeoutMs: timeoutMs, targetPicPath, targetInnerText, functionAst: currentOperation, htmlPath: htmlPath, iframe: parentFrame, potentialMatch: potentialMatch })
 
 
 

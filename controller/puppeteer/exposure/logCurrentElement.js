@@ -8,7 +8,7 @@ const config = require('../../../config')
  */
 module.exports = function (recordRepo, page) {
 
-    return async function (selector = '', innerText = '', x, y, height, width, parentFrame) {
+    return async function (selector = '', innerText = '', x, y, height, width, parentFrame, potentialMatch) {
         //if current selector has been captured, we will not capture it again
         if (selector == recordRepo.operation.browserSelection.currentSelector && x == recordRepo.operation.browserSelection.x && recordRepo.operation.browserSelection.y == y) {
             return
@@ -24,6 +24,19 @@ module.exports = function (recordRepo, page) {
             recordRepo.operation.browserSelection.parentIframe = []
             try {
                 recordRepo.operation.browserSelection.parentIframe = JSON.parse(parentFrame)
+            } catch (error) {
+
+            }
+
+            recordRepo.operation.browserSelection.potentialMatch = []
+            try {
+                let matchedList = JSON.parse(potentialMatch)
+                for (index of matchedList) {
+                    let locatorObj = JSON.parse(JSON.stringify(recordRepo.locatorManager.locatorLibrary[index]))
+                    recordRepo.operation.browserSelection.potentialMatch.push(locatorObj)
+                }
+
+
             } catch (error) {
 
             }

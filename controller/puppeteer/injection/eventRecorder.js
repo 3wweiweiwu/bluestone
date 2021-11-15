@@ -14,14 +14,15 @@ const BLUESTONE = {
 }
 
 /**
- * get iframe locator inforamtion
+ * get attribute value based on attribute name
+ * @param {string} attributeName
  * @returns {string}
  */
-function getCurrentIframe() {
+function getElementAttribute(element, attributeName) {
     //retrieve iframe info for current frame
     let iframe = '[]'
-    if (window.frameElement && window.frameElement.getAttribute(BLUESTONE.bluestoneIframePath)) {
-        iframe = window.frameElement.getAttribute(BLUESTONE.bluestoneIframePath)
+    if (element && element.getAttribute(attributeName)) {
+        iframe = element.getAttribute(attributeName)
     }
     return iframe
 }
@@ -41,7 +42,9 @@ Object.keys(EVENTCONST).forEach(item => {
         } catch (error) {
             console.log(error)
         }
-        let iframe = getCurrentIframe()
+
+        let iframe = getElementAttribute(window.frameElement, BLUESTONE.bluestoneIframePath)
+        let potentialMatch = getElementAttribute(event.target, BLUESTONE.bluestonePotentialMatchIndexes)
 
 
         const position = event.target.getBoundingClientRect()
@@ -86,6 +89,7 @@ Object.keys(EVENTCONST).forEach(item => {
             parameter: parameter,
             targetInnerText: targetInnerText,
             targetPicPath: targetPicPath,
+            potentialMatch: potentialMatch,
             pos: {
                 x: position.x,
                 y: position.y,
@@ -119,8 +123,9 @@ document.addEventListener('mouseover', async event => {
 
         const previousStyle = event.target.style.backgroundColor
         event.target.setAttribute(BLUESTONE.previousbackground, previousStyle)
-        let iFrame = getCurrentIframe()
-        window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame)
+        let iFrame = getElementAttribute(window.frameElement, BLUESTONE.bluestoneIframePath)
+        let potentialMatch = getElementAttribute(event.target, BLUESTONE.bluestonePotentialMatchIndexes)
+        window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch)
 
         event.target.style.backgroundColor = 'rgba(140, 99, 255,0.7)'
     }

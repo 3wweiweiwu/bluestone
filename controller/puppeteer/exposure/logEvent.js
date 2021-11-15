@@ -22,22 +22,40 @@ module.exports = function (recordRepo, browser, page, io) {
 
         //goto command does not generate a locator, we w
 
+        //handle locator potential match
+        let locatorPotentialMatch = []
+        try {
+            let matchedList = JSON.parse(eventDetail.potentialMatch)
+            for (index of matchedList) {
+                let locatorObj = JSON.parse(JSON.stringify(recordRepo.locatorManager.locatorLibrary[index]))
+                locatorPotentialMatch.push(locatorObj)
+            }
+
+
+        } catch (error) {
+
+        }
+
         //handle page capture
 
         let htmlPath = ''
         if (page != null) {
             htmlPath = recordRepo.getHtmlPath()
             recordRepo.htmlCaptureStatus.outputHtml(htmlPath)
-        }   
+        }
         //handle screenshot
 
         let picturePath = ''
+
+
+
         if (page != null) {
             picturePath = recordRepo.getPicPath()
 
             if (eventDetail.target == '') {
                 //handle those element that will be destroyed right after interaaction
                 picturePath = recordRepo.operation.browserSelection.selectorPicture
+                locatorPotentialMatch = recordRepo.operation.browserSelection.potentialMatch
             }
             else {
 
@@ -94,7 +112,7 @@ module.exports = function (recordRepo, browser, page, io) {
 
             eventDetail.targetPicPath = picturePath
             eventDetail.htmlPath = htmlPath
-
+            eventDetail.potentialMatch = locatorPotentialMatch
             //construct operation event
             let event = new RecordingStep(eventDetail)
             try {

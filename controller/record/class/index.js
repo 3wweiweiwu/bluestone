@@ -55,7 +55,7 @@ class RecordingStep {
         }
 
         /** @type {Array<Locator>} */
-        this.potentialMatch = []
+        this.potentialMatch = recordingStep.potentialMatch
         this.framePotentialMatch = []
         this.__htmlPath = recordingStep.htmlPath
         this.targetInnerText = recordingStep.targetInnerText
@@ -117,6 +117,7 @@ class RecordingStep {
  * @property {string} targetPicPath
  * @property {Array<string>} iframe
  * @property {import('../../ast/class/Function')} functionAst
+ * @property {RecordingStep} potentialMatch
  */
 
 
@@ -517,14 +518,13 @@ class WorkflowRecord {
         //handle change in iframe
         let lastStep = this.steps[this.steps.length - 1]
         if (lastStep != null && JSON.stringify(event.iframe) != JSON.stringify(lastStep.iframe)) {
-            event.framePotentialMatch = this.__findPotentialMatchForEvent(event.iframe)
+            event.framePotentialMatch = event.potentialMatch
             this.__addWaitForSteps(event, true)
             this.__addSwitchIframeForStep(event)
         }
 
 
-        //
-        event.potentialMatch = this.__findPotentialMatchForEvent(event.target)
+
         this.__addWaitForSteps(event, false)
 
         this.steps.push(event)

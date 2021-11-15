@@ -19,7 +19,7 @@
       "type": "node",
       "args": [
         "start",
-        "../../../temp/ss/test/sample-project",
+        "./test/sample-project",
         "--port",
         "3601"
       ]
