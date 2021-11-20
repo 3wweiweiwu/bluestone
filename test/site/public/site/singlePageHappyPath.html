@@ -1,0 +1,66 @@
+<html>
+  <body>
+    <h1 id="header">This is header</h1>
+    <div id="div1">This is a paragrah</div>
+    <input id="happy_input" />
+  </body>
+  <script
+    src="https://code.jquery.com/jquery-3.6.0.js"
+    integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+    crossorigin="anonymous"
+  ></script>
+  <script src="/socket.io/socket.io.js"></script>
+
+  <script type="module">
+    var socket = io();
+    socket.on("www", (obj) => {
+      console.log(`Message Received: ${JSON.stringify(obj)}`);
+      let targetId = obj.target;
+      let eventName = obj.event;
+      let arg = JSON.parse(obj.arg);
+      let target = document.getElementById(obj.target);
+      let event = new Event(obj.event);
+      event;
+      //based on the event and target prepare env
+      switch (obj.event) {
+        case "change":
+          target.value = obj.arg;
+          break;
+        case "keydown":
+          //if ctrl key present, then set the property to be true
+          if (arg.ctrlKey) {
+            Object.defineProperty(event, "ctrlKey", {
+              writable: false,
+              value: true,
+            });
+          }
+          if (arg.code) {
+            Object.defineProperty(event, "code", {
+              writable: false,
+              value: arg.code,
+            });
+          }
+          if (arg.key) {
+            Object.defineProperty(event, "key", {
+              writable: false,
+              value: arg.key,
+            });
+          }
+
+          break;
+        default:
+          break;
+      }
+
+      //freeeze target within the event
+
+      Object.defineProperty(event, "target", {
+        writable: false,
+        value: target,
+      });
+      document.dispatchEvent(event);
+      console.log(target);
+      console.log(event);
+    });
+  </script>
+</html>

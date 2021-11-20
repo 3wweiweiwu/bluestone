@@ -138,10 +138,10 @@ function getElementPos(element) {
     }
     let position = element.getBoundingClientRect()
     //calculate relative position of current element's iframe
-    console.log(iframePos)
+
 
     iframePos.forEach(pos => {
-        console.log(pos)
+
         position.x += pos.x
         position.y += pos.y
     })
