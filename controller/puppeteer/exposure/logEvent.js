@@ -70,8 +70,8 @@ module.exports = function (recordRepo, browser, page, io) {
                 locatorPotentialMatch = recordRepo.operation.browserSelection.potentialMatch
             }
             else {
-
-                if (eventDetail.command == null) {
+                //handle 2 scenario, if current event is gone before we capture that, we will just use last mouse position
+                if (eventDetail.command == null || (eventDetail.pos.x == 0 && eventDetail.pos.y == 0)) {
                     //for operation coming custozied operation
                     recordRepo.picCapture.outputCurrentPic(recordRepo.operation.browserSelection.x, recordRepo.operation.browserSelection.y, recordRepo.operation.browserSelection.width, recordRepo.operation.browserSelection.height, picturePath);
                 }
