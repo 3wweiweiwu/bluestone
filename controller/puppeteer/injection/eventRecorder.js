@@ -107,7 +107,7 @@ Object.keys(EVENTCONST).forEach(item => {
         window.logEvent(eventDetail)
 
         // console.log(JSON.stringify(event))
-    })
+    }, { capture: true })
 })
 /**
  * get element location even though they are within iframe
@@ -172,7 +172,7 @@ document.addEventListener('mouseover', async event => {
 
 
 
-})
+}, { capture: true })
 
 document.addEventListener("mouseout", event => {
     if (!window.isRecording()) return
