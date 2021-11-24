@@ -22,7 +22,7 @@ class TestSite {
     }
     async getMainPage() {
 
-        let res = axios.get(`${this.url}`)
+        let res = await axios.get(`${this.url}`)
         return res
 
     }
