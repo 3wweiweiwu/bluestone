@@ -8,7 +8,7 @@
 // });
 
 function startBackend(port) {
-  var app = require('../app');
+  var app = require('../app').app;
   var debug = require('debug')('pt-recorder:server');
   var http = require('http');
 
@@ -25,9 +25,9 @@ function startBackend(port) {
    * Create HTTP server.
    */
 
-  var server = http.createServer(app);
-  const io = require('socket.io')(server)
-  app.locals.io = io
+  var server = require('../app').server;
+
+
 
   /**
    * Listen on provided port, on all network interfaces.
