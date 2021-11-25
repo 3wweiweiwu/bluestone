@@ -2,7 +2,23 @@
   <body>
     <h1 id="header">This is header</h1>
     <div id="div1">This is a paragrah</div>
-    <input id="happy_input" />
+    <form id="happy_form" action="/site/singlePageHappyPath.html">
+      <label for="happy_form_first_name">First name:</label><br />
+      <input
+        type="text"
+        id="happy_form_first_name"
+        name="fname"
+        value="John"
+      /><br />
+      <label for="happy_form_last_name">Last name:</label><br />
+      <input
+        type="text"
+        id="happy_form_last_name"
+        name="lname"
+        value="Doe"
+      /><br /><br />
+      <input type="submit" id="happy_form_submit" value="Submit" />
+    </form>
   </body>
   <script
     src="https://code.jquery.com/jquery-3.6.0.js"

@@ -1,17 +1,23 @@
 const axios = require('axios').default
-const testConfig = require('../config')
-const app = require('../../site/app').app
+const testConfig = require('../testConfig')
+const app = require('../../site/app').server
 class TestSite {
     constructor() {
         this.url = `http://localhost:${testConfig.testSite.port}`
+        this.singlePageHappyPath = `${this.url}/site/singlePageHappyPath.html`
         this.app = null
     }
 
     async launchApp() {
         return new Promise((resolve) => {
-            this.app = app.listen(testConfig.testSite.port, () => {
-                resolve()
-            })
+            try {
+                this.app = app.listen(testConfig.testSite.port, () => {
+                    resolve()
+                })
+            } catch (error) {
+                console.log()
+            }
+
         })
     }
     async closeApp() {
@@ -30,7 +36,7 @@ class TestSite {
      * @param {*} arg additional argument you want to parse in
      * @returns 
      */
-    async sendOperation(event, target, arg) {
+    async sendOperation(event, target, arg = '') {
         let res = await axios.post(`${this.url}/operation`, {
             event: event,
             target: target,

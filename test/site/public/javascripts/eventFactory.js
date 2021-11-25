@@ -3,7 +3,13 @@ socket.on("www", (obj) => {
     console.log(`Message Received: ${JSON.stringify(obj)}`);
     let targetId = obj.target;
     let eventName = obj.event;
-    let arg = JSON.parse(obj.arg);
+
+    let arg = {}
+    if (obj.arg != '') {
+        arg = JSON.parse(obj.arg);
+    }
+
+
     let target = document.getElementById(obj.target);
     let event = new Event(obj.event);
     event;
