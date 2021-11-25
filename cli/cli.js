@@ -39,11 +39,11 @@ let argv = yargs
     })
     .command('record <url>', 'Record new workflow', recordYargs => {
         recordYargs
-            .usage('Usage: mb record <url>')
+            .usage('Usage: bluestone record <url>')
             .help('help')
             .positional('url', options.url)
             .wrap(null)
-            .example('mb record https://www.google.com', 'start record script against https://www.google.com ')
+            .example('bluestone record https://www.google.com', 'start record script against https://www.google.com ')
 
     })
     .wrap(null)
