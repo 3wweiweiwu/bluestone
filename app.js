@@ -6,6 +6,7 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var diagnosticsRouter = require('./routes/diagnostics')
 const recordRouter = require('./routes/record')
 const { WorkflowRecord } = require('./controller/record/class/index')
 const PuppeteerControl = require('./controller/puppeteer/class')
@@ -35,6 +36,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/api', recordRouter);
+app.use('/diagnostics', diagnosticsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
