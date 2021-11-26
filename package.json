@@ -30,6 +30,7 @@
     "extract-comments": "^1.1.0",
     "http-errors": "~1.6.3",
     "jimp": "^0.16.1",
+    "mocha": "^9.1.3",
     "morgan": "~1.9.1",
     "pug": "2.0.3",
     "pug-bootstrap": "0.0.16",
