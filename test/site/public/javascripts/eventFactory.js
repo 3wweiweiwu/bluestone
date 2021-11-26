@@ -40,6 +40,9 @@ socket.on("www", (obj) => {
             }
 
             break;
+        case "submit":
+            target.submit()
+            return
         default:
             break;
     }

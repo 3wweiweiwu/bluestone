@@ -24,7 +24,8 @@ class TestSite {
     }
     async closeApp() {
         return new Promise((resolve) => {
-            this.app.close(resolve)
+            this.app.close()
+            resolve()
         })
     }
     async getMainPage() {
@@ -36,6 +37,14 @@ class TestSite {
     async startRecording(url) {
         let res = await axios.post(`${this.url}/api/record`, { url: url })
         await new Promise(resolve => setTimeout(resolve, 1000))
+        return res
+    }
+    async getSteps() {
+        let res = await axios.get(`${this.url}/diagnostics/steps`)
+        return res
+    }
+    async getPageCount() {
+        let res = await axios.get(`${this.url}/diagnostics/page-count`)
         return res
     }
 }

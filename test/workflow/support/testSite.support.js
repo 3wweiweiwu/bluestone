@@ -22,7 +22,9 @@ class TestSite {
     }
     async closeApp() {
         return new Promise((resolve) => {
-            this.app.close(resolve)
+            this.app.close()
+
+            resolve()
         })
     }
     async getMainPage() {
@@ -31,7 +33,7 @@ class TestSite {
     }
     /**
      * 
-     * @param {'keydown'|'click'|'change'} event event name
+     * @param {'keydown'|'click'|'change'|'mouseover'|'submit'} event event name
      * @param {*} target the id of the target
      * @param {*} arg additional argument you want to parse in
      * @returns 
@@ -40,7 +42,22 @@ class TestSite {
         let res = await axios.post(`${this.url}/operation`, {
             event: event,
             target: target,
-            arg: arg
+            arg: JSON.stringify(arg)
+        })
+
+        return res
+    }
+    async callBluestoneTab(target) {
+
+        let res = null
+        await this.sendOperation('mouseover', target)
+        res = await axios.post(`${this.url}/operation`, {
+            event: 'keydown',
+            target: target,
+            arg: JSON.stringify({
+                ctrlKey: true,
+                key: 'q'
+            })
         })
 
         return res
