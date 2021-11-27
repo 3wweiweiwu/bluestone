@@ -45,6 +45,24 @@ class TestSite {
     }
     async getSteps() {
         let res = await axios.get(`${this.url}/diagnostics/steps`)
+        let currentData = JSON.parse(res.data)
+        for (let i = 0; i < currentData.length; i++) {
+            if (currentData[i].functionAst.params) {
+                currentData[i].functionAst.params = currentData[i].functionAst.params.filter(item => {
+                    return item.name != 'timeout'
+                })
+            }
+
+            Object.assign(currentData[i].functionAst, {
+                path: ''
+            })
+            Object.assign(currentData[i], {
+                targetPicPath: null,
+                timeoutMs: null,
+                __htmlPath: null
+            })
+        }
+        res.data = currentData
         return res
     }
     async getPageCount() {
