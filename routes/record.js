@@ -13,6 +13,6 @@ router.post('/record', async function (req, res) {
 router.delete('/record', async function (req, res) {
     await puppeteerControl.endRecording(req.app.locals.puppeteerControl.browser)
 
-    res.json(req.app.locals.workflow)
+    res.json()
 });
 module.exports = router;

@@ -63,5 +63,10 @@ module.exports = {
         locator: ['#iframes_in_detail > a'],
         screenshot: 'componentPic/iFrame_in_Detail_Header.png',
         displayName: 'iFrame in Detail Header'
+    },
+    'Header': {
+        locator: ['#header'],
+        screenshot: 'componentPic/Header.png',
+        displayName: 'Header'
     }
 };

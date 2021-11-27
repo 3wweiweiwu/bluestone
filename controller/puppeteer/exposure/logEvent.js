@@ -143,7 +143,7 @@ module.exports = function (recordRepo, browser, page, io) {
 
             await recordRepo.addStep(event)
 
-            console.log(JSON.stringify(recordRepo.steps))
+            // console.log(JSON.stringify(recordRepo.steps))
             //update last operation time
         }
 

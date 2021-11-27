@@ -39,6 +39,10 @@ class TestSite {
         await new Promise(resolve => setTimeout(resolve, 1000))
         return res
     }
+    async stopRecording() {
+        let res = await axios.delete(`${this.url}/api/record`)
+        return res
+    }
     async getSteps() {
         let res = await axios.get(`${this.url}/diagnostics/steps`)
         return res
@@ -46,6 +50,28 @@ class TestSite {
     async getPageCount() {
         let res = await axios.get(`${this.url}/diagnostics/page-count`)
         return res
+    }
+    async getBackendOperation() {
+        try {
+            let res = await axios.get(`${this.url}/diagnostics/backend-operation`)
+            let currentData = res.data
+            Object.assign(currentData, {
+                selectorPicture: "",
+                selectorHtmlPath: "",
+                x: null,
+                y: null,
+                width: null,
+                height: null,
+                lastOperationTime: null,
+                lastOperationTimeoutMs: null,
+                currentOpeartion: null,
+            })
+            res.data = currentData
+            return res
+        } catch (error) {
+            console.log(error)
+        }
+
     }
 }
 module.exports = TestSite

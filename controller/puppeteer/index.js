@@ -35,7 +35,9 @@ const ConstStr = {
 async function startRecording(record, io, url = null) {
     const browser = await puppeteer.launch(config.puppeteer)
     const page = await browser.newPage();
-
+    //initialize recording object
+    record.steps = []
+    record.isRecording = true
 
     //update io for record
     record.puppeteer.setIO(io)
@@ -122,7 +124,7 @@ async function startRecording(record, io, url = null) {
         }
     })
     page.on('frameattached', async frame => {
-        console.log(frame)
+        // console.log(frame)
     })
 
 
@@ -133,7 +135,10 @@ async function startRecording(record, io, url = null) {
  * @param {import('puppeteer').Browser} browser 
  */
 async function endRecording(browser) {
-    await browser.close()
+    if (browser != null) {
+        await browser.close()
+    }
+
 }
 
 /**

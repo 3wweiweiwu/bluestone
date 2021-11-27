@@ -1,0 +1,17 @@
+module.exports = {
+    currentSelector: "#div1",
+    selectorPicture: "",
+    selectorHtmlPath: "",
+    currentInnerText: "This is a paragrah",
+    parentIframe: [],
+    x: null,
+    y: null,
+    width: null,
+    height: null,
+    lastOperationTime: null,
+    lastOperationTimeoutMs: null,
+    currentOpeartion: null,
+    __htmlCaptureInProcess: [],
+    potentialMatch: [],
+    framePotentialMatch: [],
+};

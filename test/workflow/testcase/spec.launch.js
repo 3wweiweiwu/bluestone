@@ -4,8 +4,11 @@ let Bluestone = require('../support/bluestoneBackend')
 let siteBackend = new TestSite()
 let bluestoneBackend = new Bluestone()
 let testConfig = require('../testConfig')
+let fs = require('fs').promises
 describe('Smoke Test', () => {
     beforeEach(done => {
+        siteBackend = new TestSite()
+        bluestoneBackend = new Bluestone()
         siteBackend.launchApp()
             .then(() => {
                 return bluestoneBackend.launchApp()
@@ -40,11 +43,37 @@ describe('Smoke Test', () => {
         assert.strictEqual(res.data.value, 3)
         // await new Promise(resolve => setTimeout(resolve, 500000))
 
+    }).timeout(10000)
+    it('should record corrleated and uncorrelated elements as steps correctly')
+    it('should correlate existing locator when hovering defined element', async () => {
+        let happyPathPage = testConfig.testSite.page.happypath
+        await bluestoneBackend.startRecording(siteBackend.singlePageHappyPath)
+        await siteBackend.sendOperation('mouseover', happyPathPage.header)
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        let res = await bluestoneBackend.getBackendOperation()
+        let baseline = require('../input/mouseover_header_steps');
+        //override data which is irrelevant
+        let currentData = res.data
 
+        assert.deepStrictEqual(currentData, baseline)
+    }).timeout(5000)
+    it('should not correlate locator when hovering undefined element', async () => {
+        let happyPathPage = testConfig.testSite.page.happypath
+        await bluestoneBackend.startRecording(siteBackend.singlePageHappyPath)
+        await siteBackend.sendOperation('mouseover', happyPathPage.paragraph)
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        res = await bluestoneBackend.getBackendOperation()
+        let baseline = require('../input/mouseover_undefined_element_step');
+        //override data which is irrelevant
+        let currentData = res.data
+        assert.deepStrictEqual(currentData, baseline)
     }).timeout(500000)
     afterEach(function (done) {
         this.timeout(120000)
         siteBackend.closeApp()
+            .then(() => {
+                return bluestoneBackend.stopRecording()
+            })
             .then(() => {
                 return bluestoneBackend.closeApp()
             })
