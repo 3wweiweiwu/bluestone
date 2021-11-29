@@ -33,11 +33,10 @@ exports.isMatchTextPattern = async function (browser, page, element, pattern) {
     if (value == null) {
         value = await page.evaluate(el => el.textContent, element)
     }
-    if(value.includes(pattern){
+    if (value.includes(pattern)) {
         assert.ok('pattern matched')
     }
-    else
-    {
+    else {
         assert.fail('pattern not matched')
     }
 
