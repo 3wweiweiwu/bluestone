@@ -9,6 +9,6 @@ module.exports = {
     notActiveFunc: {
         func: func.testFunc,
         locators: []
-    }
+    },
 
 }
