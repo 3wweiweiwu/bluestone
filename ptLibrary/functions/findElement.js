@@ -21,26 +21,37 @@ module.exports = async function (page, elementSelector, timeout, option = Option
     let element = null
     let timeSpan = 0
     do {
-        for (let i = 0; i < locatorOptions.length; i++) {
-            let locator = locatorOptions[i]
 
-            if (locator.startsWith('/')) {
-                //xpath
-                let elementResult = await page.$x(locator)
-                if (elementResult.length > 0) element = elementResult[0]
+        try {
+            for (let i = 0; i < locatorOptions.length; i++) {
+                let locator = locatorOptions[i]
+
+                if (locator.startsWith('/')) {
+                    //xpath
+                    let elementResult = await page.$x(locator)
+                    if (elementResult.length > 0) element = elementResult[0]
+                }
+                else {
+                    //selector
+                    element = await page.$(locator)
+                }
+                if (element != null) {
+                    break
+                }
+
             }
-            else {
-                //selector
-                element = await page.$(locator)
-            }
-            if (element != null) {
-                break
-            }
+        } catch (error) {
 
         }
         let currentTime = Date.now()
         timeSpan = currentTime - startTime
-    } while (timeSpan < timeout && element == null);
+        if (element != null) {
+            let clientHeight = await element.evaluate(node => node.clientHeight)
+            if (clientHeight != 0) {
+                break
+            }
+        }
+    } while (timeSpan < timeout);
 
     if (element == null) {
         let info = `Unable to find UI element:${elementSelector.displayName} in ${timeout}ms`
