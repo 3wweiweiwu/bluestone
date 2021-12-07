@@ -5,10 +5,6 @@ module.exports = {
     logConsole: {
         func: func.failedFunction,
         locators: []
-    },
-    notActiveFunc: {
-        func: func.testFunc,
-        locators: []
-    },
+    }
 
 }
