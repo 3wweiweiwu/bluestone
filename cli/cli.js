@@ -34,7 +34,7 @@ let argv = yargs
             .wrap(null)
             .positional('path', options.path)
             .options({ port: options.port })
-            .example('bluestone start --port 3600',
+            .example('bluestone start ./sample_project --port 3600',
                 'Starts on port 3600')
     })
     .command('record <url>', 'Record new workflow', recordYargs => {
