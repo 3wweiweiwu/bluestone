@@ -1,4 +1,4 @@
-const { Page, Frame } = require('puppeteer-core')
+const { Page, Frame, ElementHandle } = require('puppeteer-core')
 const ElementSelector = require('../class/ElementSelector')
 const findElement = require('./findElement')
 const assert = require('assert')
@@ -35,61 +35,7 @@ exports.testTextEqual = async function (frame, elementSelector, desiredText) {
  * @returns {ElementHandle}
  */
 exports.waitElementExists = async function (frame, elementSelector, timeout) {
-    /**@type {Array<string>} */
-    let throwError = true
-    let locatorOptions = elementSelector.locator
-    //find locator option within timeout
-    let startTime = Date.now()
-    /**@type {ElementHandle} */
-    let element = null
-    let timeSpan = 0
-    do {
-        for (let i = 0; i < locatorOptions.length; i++) {
-            let locator = locatorOptions[i]
-            //if we are checking parent iframe element, we will just skip that
-            if (locator == ConstantVar.parentIFrameLocator) {
-                return ''
-            }
-            if (locator.startsWith('/')) {
-                //xpath
-                let elementResult
-                try {
-                    elementResult = await frame.$x(locator)
-                } catch (error) {
-                    continue
-                }
-
-                if (elementResult.length > 0) element = elementResult[0]
-            }
-            else {
-                //selector
-                try {
-                    element = await frame.$(locator)
-                } catch (error) {
-                    continue
-                }
-
-            }
-            if (element != null) {
-                break
-            }
-
-        }
-        let currentTime = Date.now()
-        timeSpan = currentTime - startTime
-    } while (timeSpan < timeout && element == null);
-
-    if (element == null) {
-        let info = `Unable to find UI element:${elementSelector.displayName} in ${timeout}ms`
-        if (throwError) {
-            return Promise.reject(info)
-        }
-        else {
-            console.log(info)
-        }
-
-    }
-
+    let element = await findElement(frame, elementSelector, timeout, { throwError: true })
     return element
 
 }
