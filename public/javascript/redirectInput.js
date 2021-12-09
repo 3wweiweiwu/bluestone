@@ -3,6 +3,7 @@ function redirectInputOnChange(event) {
     let queryKey = event.target.getAttribute('querykey')
     let index = event.target.getAttribute('index')
     let queryindex = event.target.getAttribute('queryIndex')
-    let decodedUri = (`?${queryKey}=${value}&${queryindex}=${index}`).replace(/#/g,'%23')
+    value = encodeURIComponent(value)
+    let decodedUri = (`?${queryKey}=${value}&${queryindex}=${index}`).replace(/#/g, '%23')
     window.location.replace(decodedUri)
 }
