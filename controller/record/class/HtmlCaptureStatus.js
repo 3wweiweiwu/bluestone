@@ -59,18 +59,27 @@ class HtmlCaptureStatus {
     }
     async outputHtml(newPath) {
         let timeStamp = Date.now()
-        let i = 0
+
         let htmlFound = false
-        for (i = this.__queue.length - 1; i >= 0; i--) {
-            if (this.__queue[i].writeReady) {
-                htmlFound = true
-                break
-            }
+        //get current html capture
+        let i = this.__queue.length - 1;
+        if (i >= 0) {
+            htmlFound = true
         }
+
+        // for (i = this.__queue.length - 1; i >= 0; i--) {
+        //     if (this.__queue[i].writeReady) {
+        //         htmlFound = true
+        //         break
+        //     }
+        // }
 
         //if no picture found, just return
         if (!htmlFound) {
             return
+        }
+        while (!this.__queue[i].writeReady) {
+            await new Promise(resolve => { setTimeout(resolve, 500) })
         }
         let filePath = this.__queue[i].path
 
