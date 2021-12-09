@@ -5,7 +5,7 @@
   "scripts": {
     "start": "babel-node ./bin/www",
     "build": "babel bin -d dist",
-    "test": "echo \"No test specified\""
+    "test": "node ./node_modules/mocha/bin/_mocha './test/**/spec.*.js' --exit --grep \"^Smoke Test\" --timeout 10000"
   },
   "files": [
     "*"
