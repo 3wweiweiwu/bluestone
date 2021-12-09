@@ -4,6 +4,6 @@ cypress
 cypress.json
 .DS_Store
 .cache
-public/temp
+public/temp/**/*.html
+public/temp/**/*.png
 *.pid
-*.png
