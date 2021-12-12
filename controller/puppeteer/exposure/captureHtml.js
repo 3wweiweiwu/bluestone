@@ -10,8 +10,23 @@ const fs = require('fs').promises
 module.exports = function (page, recordRepo) {
 
     return async function () {
-        if (page != null && recordRepo.isRecording && recordRepo.htmlCaptureStatus.getPendingItems() < 30) {
-            //capture html
+        if (page != null && recordRepo.isRecording) {
+            //Use queue to avoid repeated capture for a short period of time to enhance performance
+            //when there is more than 1 item, add a waiting queue, if there are more action being taken while we are waiting,
+            //the subsequent action will be cancelled because it is waiting for the same thing
+            //taking multiple same picture will not help
+            //the html will be captured while the queue is empty
+            const maxQueue = 1
+            let currentQueue = recordRepo.htmlCaptureStatus.getPendingItems()
+            if (currentQueue == maxQueue) {
+                while (recordRepo.htmlCaptureStatus.getPendingItems() >= maxQueue) {
+                    await new Promise(resolve => setTimeout(resolve, 100))
+                }
+            }
+            else if (currentQueue > maxQueue) {
+                return
+            }
+
 
             let htmlPath = recordRepo.getHtmlPath()
             let htmlIndex = recordRepo.htmlCaptureStatus.pushOperation('', htmlPath)
