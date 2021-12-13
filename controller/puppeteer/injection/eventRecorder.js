@@ -338,9 +338,13 @@ const mutationObserverCallback = function (mutationsList, observer) {
         || checkAttributeNameExists(BLUESTONE.bluestoneIframePath)) {
         return
     }
+    //will not proceed to record if recording is set to false
+    if (window.isRecording() == false) {
+        return
+    }
     captureScreenshot()
     //only proceed change that is introduced by RPA engine or code change
-    captureHtml()
+    // captureHtml()
     getFrameLocator()
     scanLocator()
     // console.log(mutationsList)
@@ -355,8 +359,16 @@ observer.observe(document, config);
 
 //when scroll up and down, take screenshot
 document.addEventListener('scroll', captureScreenshot)
+// document.addEventListener('animationend', () => {
+//     console.log('Animation ended');
+//     captureHtml()
+//     //capture html after 800ms in case there are some animation
+//     setTimeout(captureHtml, 1000)
+//     captureScreenshot()
 
-captureHtml()
+// }, { capture: true });
+// captureHtml()
+setInterval(captureHtml, 800)
 captureScreenshot()
 getFrameLocator()
 scanLocator()
