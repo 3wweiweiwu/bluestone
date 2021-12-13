@@ -61,7 +61,9 @@ router.get('/locator-definer', async function (req, res) {
 
 
   let variables = {
-    locatorHtml: ui.locatorDefiner.locatorHtml
+    locatorHtml: ui.locatorDefiner.locatorHtml,
+    btnNextHtmlQueryKey: PugLocatorDefiner.inBuiltQueryKey.btnNextHtml,
+    btnPrevHtmlQueryKey: PugLocatorDefiner.inBuiltQueryKey.btnPrevHtml,
   }
   res.render('locatorDefiner.pug', variables);
 
@@ -133,7 +135,7 @@ router.get('/pending-capture', async function (req, res, next) {
   let ui = req.app.locals.ui
 
   let variables = {
-    htmlCaptureCompleted: workflow.htmlCaptureStatus.__popIndex,
+    htmlCaptureCompleted: workflow.htmlCaptureStatus.__queue.length - workflow.htmlCaptureStatus.getPendingItems().length - 1,
     htmlCaptureTotal: workflow.htmlCaptureStatus.__queue.length,
     picCaptureCompleted: workflow.picCapture.__popIndex,
     picCaptureTotal: workflow.picCapture.__queue.length

@@ -344,7 +344,7 @@ const mutationObserverCallback = function (mutationsList, observer) {
     }
     captureScreenshot()
     //only proceed change that is introduced by RPA engine or code change
-    // captureHtml()
+    captureHtml()
     getFrameLocator()
     scanLocator()
     // console.log(mutationsList)
@@ -359,16 +359,21 @@ observer.observe(document, config);
 
 //when scroll up and down, take screenshot
 document.addEventListener('scroll', captureScreenshot)
-// document.addEventListener('animationend', () => {
-//     console.log('Animation ended');
-//     captureHtml()
-//     //capture html after 800ms in case there are some animation
-//     setTimeout(captureHtml, 1000)
-//     captureScreenshot()
+document.addEventListener('animationstart', () => {
+    console.log('Animation started');
+    captureHtml()
+    setTimeout(captureHtml, 1000)
+    setTimeout(captureHtml, 2000)
+}, { capture: true });
+document.addEventListener('animationend', () => {
+    console.log('Animation ended');
+    captureHtml()
+    //capture html after 800ms in case there are some animation
+    captureScreenshot()
 
-// }, { capture: true });
-// captureHtml()
-setInterval(captureHtml, 800)
+}, { capture: true });
+captureHtml()
+// setInterval(captureHtml, 800)
 captureScreenshot()
 getFrameLocator()
 scanLocator()

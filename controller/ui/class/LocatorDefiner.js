@@ -54,7 +54,9 @@ class LocatorDefiner {
         txtLocatorName: 'LOCATOR_LOCATOR_NAME',
         txtLocator: 'LOCATOR_LOCATOR',
         btnConfirm: 'LOCATOR_CHECK_LOCATOR',
-        btnLocatorOk: 'LOCATOR_LOCATOR_OKAY'
+        btnLocatorOk: 'LOCATOR_LOCATOR_OKAY',
+        btnNextHtml: 'LOCATOR_NEXT_HTML',
+        btnPrevHtml: 'LOCATOR_PREVIOUS_HTML',
     }
     get locatorName() {
         return this.__locatorName
@@ -161,6 +163,14 @@ class LocatorDefiner {
                     }
                 })
 
+                break
+            case LocatorDefiner.inBuiltQueryKey.btnNextHtml:
+                this.backend.steps[this.stepIndex].updateHtmlForStep(1, this.backend.htmlCaptureStatus)
+                this.locatorHtml = this.backend.convertLocalPath2RelativeLink(this.backend.steps[this.stepIndex].htmlPath)
+                break
+            case LocatorDefiner.inBuiltQueryKey.btnPrevHtml:
+                this.backend.steps[this.stepIndex].updateHtmlForStep(-1, this.backend.htmlCaptureStatus)
+                this.locatorHtml = this.backend.convertLocalPath2RelativeLink(this.backend.steps[this.stepIndex].htmlPath)
                 break
             default:
                 break;

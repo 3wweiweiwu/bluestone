@@ -107,6 +107,27 @@ class RecordingStep {
         this.finalLocatorName = finalLocatorName
         this.finalLocator = finalLocator
     }
+    /**
+     * Update the html capture and change its index based on its location in htmlCapture repo
+     * @param {Number} offSet 
+     * @param {HtmlCaptureStatus} htmlCaptureRepo 
+     */
+    updateHtmlForStep(offSet, htmlCaptureRepo) {
+        let currentIndex = htmlCaptureRepo.__queue.findIndex(item => { return item.outputPath.includes(this.__htmlPath) || item.path == this.__htmlPath })
+        if (currentIndex == -1) {
+            throw 'Unable to find current html in the html repo'
+        }
+        let updatedIndex = currentIndex + offSet
+        if (updatedIndex < 0) {
+            updatedIndex = 0
+        }
+
+        if (updatedIndex >= htmlCaptureRepo.__queue.length) {
+            updatedIndex = htmlCaptureRepo.__queue.length - 1
+        }
+        this.__htmlPath = htmlCaptureRepo.__queue[updatedIndex].path
+
+    }
 }
 /**
  * @typedef step

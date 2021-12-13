@@ -12,6 +12,7 @@ class HtmlCaptureEntry {
         this.selector = selector
         this.path = path
         this.writeReady = isWriteReady
+        this.outputPath = []
     }
 }
 class HtmlCaptureStatus {
@@ -19,6 +20,20 @@ class HtmlCaptureStatus {
         /** @type {Array<HtmlCaptureEntry>} */
         this.__queue = []
         this.__popIndex = -1
+        this.__lastHtml = ''
+        this.__lastFilePath = ''
+    }
+    get lastFilePath() {
+        return this.__lastFilePath
+    }
+    set lastFilePath(path) {
+        this.__lastFilePath = path
+    }
+    get lastHtml() {
+        return this.__lastHtml
+    }
+    set lastHtml(html) {
+        this.__lastHtml = html
     }
     get isHtmlCaptureOngoing() {
 
@@ -39,6 +54,19 @@ class HtmlCaptureStatus {
      * @returns {Array<HtmlCaptureEntry>}
      */
     getPendingItemBeforeFileName(fileName = null, queue = null) {
+        let waitingWorker = this.getWorkerAtState(null, fileName, queue)
+        let workingWorker = this.getWorkerAtState(false, fileName, queue)
+        let totalWorker = workingWorker.concat(waitingWorker)
+        return totalWorker
+    }
+    /**
+     * returns worker before filename that is in a particular state
+     * @param {boolean} state 
+     * @param {string} fileName 
+     * @param {Array<HtmlCaptureEntry>} queue 
+     * @returns {Array<HtmlCaptureEntry>}
+     */
+    getWorkerAtState(state, fileName = null, queue = null) {
         //populate fileName
         if (fileName == null) {
             fileName = 'this is name that will never be hit. It will ensure we loop through the whole queue'
@@ -55,7 +83,7 @@ class HtmlCaptureStatus {
                 break
             }
             try {
-                if (entry.writeReady != true) {
+                if (entry.writeReady == state) {
                     newQueue.push(entry)
                 }
             } catch (error) {
@@ -64,7 +92,6 @@ class HtmlCaptureStatus {
 
         }
         return newQueue
-
     }
     pushOperation(selector = 'unknown', path = '') {
         let htmlCaptureEntry = new HtmlCaptureEntry(selector, path)
@@ -118,13 +145,22 @@ class HtmlCaptureStatus {
         if (!htmlFound) {
             return
         }
-        while (!this.__queue[i].writeReady) {
-            await new Promise(resolve => { setTimeout(resolve, 500) })
-        }
+        let writeComplete = false
+        do {
+
+            try {
+                writeComplete = this.__queue[i].writeReady
+                await new Promise(resolve => { setTimeout(resolve, 500) })
+            } catch (error) {
+                i = i - 1
+            }
+        } while (writeComplete == false)
         let filePath = this.__queue[i].path
+        this.__queue[i].outputPath.push(newPath)
 
         try {
             await fs.copyFile(filePath, newPath)
+
             // await fs.unlink(filePath)
             // this.__queue[i].path = newPath
         } catch (error) {

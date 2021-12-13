@@ -20,9 +20,10 @@ module.exports = function (page, recordRepo) {
             //the html will be captured while the queue is empty
 
             //# of simoutaneous html capture session
-            const maxQueue = 1
+            const maxConcurrentWorker = 1
+            const maxWaitingWorker = 2
             try {
-                if (recordRepo.htmlCaptureStatus.getPendingItems() <= maxQueue + 1) {
+                if (recordRepo.htmlCaptureStatus.getPendingItems().length < maxConcurrentWorker + maxWaitingWorker) {
                     htmlIndex = recordRepo.htmlCaptureStatus.pushOperation('', htmlPath)
                     let currentPendingQueue = recordRepo.htmlCaptureStatus.__queue
                     do {
@@ -32,16 +33,16 @@ module.exports = function (page, recordRepo) {
                             console.log(error)
                         }
                         //will not wait if I am first item
-                        if (currentPendingQueue.length == 0) {
+                        if (currentPendingQueue.length < maxConcurrentWorker) {
                             break
                         }
-                        if (currentPendingQueue.length > maxQueue) {
+                        if (currentPendingQueue.length > maxConcurrentWorker + maxWaitingWorker) {
                             recordRepo.htmlCaptureStatus.popOperation(htmlPath)
                             return
                         }
                         await new Promise(resolve => setTimeout(resolve, 100))
                     }
-                    while (currentPendingQueue.length >= maxQueue)
+                    while (currentPendingQueue.length >= maxConcurrentWorker)
                 }
                 else {
                     return
@@ -60,10 +61,21 @@ module.exports = function (page, recordRepo) {
                 }, config.singlefile)
 
                 recordRepo.operation.browserSelection.selectorHtmlPath = htmlPath
-                fs.writeFile(htmlPath, pageData.content)
-                    .then(() => {
-                        recordRepo.htmlCaptureStatus.markWriteReady(htmlPath)
-                    })
+                if (recordRepo.htmlCaptureStatus.lastHtml == pageData.content) {
+                    let item = recordRepo.htmlCaptureStatus.__queue.find(item => item.path == htmlPath)
+                    item.path = recordRepo.htmlCaptureStatus.lastFilePath
+                    item.writeReady = true
+                }
+                else {
+
+                    fs.writeFile(htmlPath, pageData.content)
+                        .then(() => {
+                            recordRepo.htmlCaptureStatus.lastHtml = pageData.content
+                            recordRepo.htmlCaptureStatus.lastFilePath = htmlPath
+                            recordRepo.htmlCaptureStatus.markWriteReady(htmlPath)
+                        })
+                }
+
             } catch (error) {
                 console.log(error)
                 recordRepo.htmlCaptureStatus.popOperation(htmlPath)
