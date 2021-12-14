@@ -113,18 +113,38 @@ class RecordingStep {
      * @param {HtmlCaptureStatus} htmlCaptureRepo 
      */
     updateHtmlForStep(offSet, htmlCaptureRepo) {
+        //get an rough estimate on where current html come from
         let currentIndex = htmlCaptureRepo.__queue.findIndex(item => { return item.outputPath.includes(this.__htmlPath) || item.path == this.__htmlPath })
         if (currentIndex == -1) {
             throw 'Unable to find current html in the html repo'
         }
-        let updatedIndex = currentIndex + offSet
-        if (updatedIndex < 0) {
-            updatedIndex = 0
-        }
 
-        if (updatedIndex >= htmlCaptureRepo.__queue.length) {
-            updatedIndex = htmlCaptureRepo.__queue.length - 1
+        let updatedIndex = 0
+        //find next/previous element that is different from current picture
+        do {
+            updatedIndex = currentIndex + offSet
+
+
+            //updated index reach maximum limit
+            if (updatedIndex < 0) {
+                updatedIndex = 0
+                break
+            }
+            //updated index reach minimum limit
+            if (updatedIndex >= htmlCaptureRepo.__queue.length) {
+                updatedIndex = htmlCaptureRepo.__queue.length - 1
+                break
+            }
+
+            //the element in the updated index is different from current picture
+            let updatedHtml = htmlCaptureRepo.__queue[updatedIndex]
+            if (updatedHtml.path != this.__htmlPath && !updatedHtml.outputPath.includes(this.__htmlPath)) {
+                break
+            }
+
         }
+        while (true)
+
         this.__htmlPath = htmlCaptureRepo.__queue[updatedIndex].path
 
     }
