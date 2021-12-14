@@ -98,10 +98,10 @@ class HtmlCaptureStatus {
         this.__queue.push(htmlCaptureEntry)
         return this.__queue.length - 1
     }
-    popOperation(fileName) {
-        this.__queue = this.__queue.filter(item => {
-            return item.path != fileName
-        })
+    popOperation(htmlPath) {
+        let item = this.__queue.find(item => item.path == htmlPath)
+        item.path = this.lastFilePath
+        item.writeReady = true
     }
     /**
      * Mark file to specific status. True=>competed false=>capturing null=>queue

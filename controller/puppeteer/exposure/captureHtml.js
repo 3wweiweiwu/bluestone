@@ -62,9 +62,7 @@ module.exports = function (page, recordRepo) {
 
                 recordRepo.operation.browserSelection.selectorHtmlPath = htmlPath
                 if (recordRepo.htmlCaptureStatus.lastHtml == pageData.content) {
-                    let item = recordRepo.htmlCaptureStatus.__queue.find(item => item.path == htmlPath)
-                    item.path = recordRepo.htmlCaptureStatus.lastFilePath
-                    item.writeReady = true
+                    recordRepo.htmlCaptureStatus.popOperation(htmlPath)
                 }
                 else {
 
