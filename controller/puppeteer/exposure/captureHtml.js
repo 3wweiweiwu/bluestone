@@ -28,7 +28,7 @@ module.exports = function (page, recordRepo) {
                     let currentPendingQueue = recordRepo.htmlCaptureStatus.__queue
                     do {
                         try {
-                            currentPendingQueue = recordRepo.htmlCaptureStatus.getPendingItemBeforeFileName(htmlPath, currentPendingQueue)
+                            currentPendingQueue = recordRepo.htmlCaptureStatus.getPendingItemBeforeIndex(htmlIndex)
                         } catch (error) {
                             console.log(error)
                         }
@@ -37,7 +37,7 @@ module.exports = function (page, recordRepo) {
                             break
                         }
                         if (currentPendingQueue.length > maxConcurrentWorker + maxWaitingWorker) {
-                            recordRepo.htmlCaptureStatus.popOperation(htmlPath)
+                            recordRepo.htmlCaptureStatus.popOperation(htmlIndex)
                             return
                         }
                         await new Promise(resolve => setTimeout(resolve, 100))
@@ -54,7 +54,7 @@ module.exports = function (page, recordRepo) {
 
 
             try {
-                recordRepo.htmlCaptureStatus.markWriteStarted(htmlPath)
+                htmlPath = recordRepo.htmlCaptureStatus.markWriteStarted(htmlIndex)
                 let pageData = await page.evaluate(async (DEFAULT_OPTIONS) => {
                     const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
                     return pageData;
@@ -62,7 +62,7 @@ module.exports = function (page, recordRepo) {
 
                 recordRepo.operation.browserSelection.selectorHtmlPath = htmlPath
                 if (recordRepo.htmlCaptureStatus.lastHtml == pageData.content) {
-                    recordRepo.htmlCaptureStatus.popOperation(htmlPath)
+                    recordRepo.htmlCaptureStatus.popOperation(htmlIndex)
                 }
                 else {
 
@@ -70,13 +70,13 @@ module.exports = function (page, recordRepo) {
                         .then(() => {
                             recordRepo.htmlCaptureStatus.lastHtml = pageData.content
                             recordRepo.htmlCaptureStatus.lastFilePath = htmlPath
-                            recordRepo.htmlCaptureStatus.markWriteReady(htmlPath)
+                            recordRepo.htmlCaptureStatus.markWriteDone(htmlIndex)
                         })
                 }
 
             } catch (error) {
                 console.log(error)
-                recordRepo.htmlCaptureStatus.popOperation(htmlPath)
+                recordRepo.htmlCaptureStatus.popOperation(htmlIndex)
             }
 
 

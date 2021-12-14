@@ -1,5 +1,6 @@
 const fs = require('fs').promises
 const { constants } = require('fs')
+const path = require('path')
 class HtmlCaptureEntry {
     /**
      * 
@@ -45,43 +46,36 @@ class HtmlCaptureStatus {
         }
     }
     getPendingItems() {
-        return this.getPendingItemBeforeFileName()
+        return this.getPendingItemBeforeIndex()
     }
     /**
      * Get pending item before specific index
-     * @param {string} fileName 
-     * @param {Array<HtmlCaptureEntry>} queue
+     * @param {number} index 
      * @returns {Array<HtmlCaptureEntry>}
      */
-    getPendingItemBeforeFileName(fileName = null, queue = null) {
-        let waitingWorker = this.getWorkerAtState(null, fileName, queue)
-        let workingWorker = this.getWorkerAtState(false, fileName, queue)
+    getPendingItemBeforeIndex(index = null) {
+        let waitingWorker = this.getWorkerAtState(null, index)
+        let workingWorker = this.getWorkerAtState(false, index)
         let totalWorker = workingWorker.concat(waitingWorker)
         return totalWorker
     }
     /**
      * returns worker before filename that is in a particular state
      * @param {boolean} state 
-     * @param {string} fileName 
+     * @param {number} workerIndex 
      * @param {Array<HtmlCaptureEntry>} queue 
      * @returns {Array<HtmlCaptureEntry>}
      */
-    getWorkerAtState(state, fileName = null, queue = null) {
-        //populate fileName
-        if (fileName == null) {
-            fileName = 'this is name that will never be hit. It will ensure we loop through the whole queue'
+    getWorkerAtState(state, workerIndex = null) {
+        //if worker index is null, we will go through all queue to find worker at particular state
+        if (workerIndex == null) {
+            workerIndex = this.__queue.length
         }
-        //populate queue
-        if (queue == null) {
-            queue = this.__queue
-        }
+        let queue = this.__queue
         let newQueue = []
-        for (let i = 0; i < queue.length; i++) {
+        for (let i = 0; i < workerIndex; i++) {
             let entry = queue[i]
             //if we find current file name, just stop
-            if (entry.path == fileName) {
-                break
-            }
             try {
                 if (entry.writeReady == state) {
                     newQueue.push(entry)
@@ -98,30 +92,37 @@ class HtmlCaptureStatus {
         this.__queue.push(htmlCaptureEntry)
         return this.__queue.length - 1
     }
-    popOperation(htmlPath) {
-        let item = this.__queue.find(item => item.path == htmlPath)
-        item.path = this.lastFilePath
-        item.writeReady = true
+    popOperation(htmlIndex) {
+        this.__queue[htmlIndex].path = this.lastFilePath
+        this.__queue[htmlIndex].writeReady = true
     }
     /**
      * Mark file to specific status. True=>competed false=>capturing null=>queue
-     * @param {string} fileName 
+     * @param {number} workerIndex 
      * @param {boolean} status 
      */
-    __markFileStatus(fileName, status) {
-        for (let i = 0; i < this.__queue.length; i++) {
-            let item = this.__queue[i]
-            if (item.path == fileName) {
-                this.__queue[i].writeReady = status
-                break
-            }
+    __markFileStatus(workerIndex, status) {
+        this.__queue[workerIndex].writeReady = status
+    }
+    markWriteDone(workerIndex) {
+        this.__markFileStatus(workerIndex, true)
+    }
+    /**
+     * Mark worker at particular index to specific state. If current file's name is duplicate with other item in the queue, we will rename current item in order to resolve file clash
+     * @param {number} workerIndex 
+     * @returns {string} return the name of the current file
+     */
+    markWriteStarted(workerIndex) {
+        //check if current worker's file name is unique
+        let workerFilePath = this.__queue[workerIndex].path
+        let totalFileWithSimilarName = this.__queue.filter(item => { return workerFilePath == item.path })
+        if (totalFileWithSimilarName.length > 1) {
+            let fileFolder = path.dirname(workerFilePath)
+            let fileName = Date.now().toString() + ".html"
+            this.__queue[workerIndex].path = path.join(fileFolder, fileName)
         }
-    }
-    markWriteReady(fileName) {
-        this.__markFileStatus(fileName, true)
-    }
-    markWriteStarted(fileName) {
-        this.__markFileStatus(fileName, false)
+        this.__markFileStatus(workerIndex, false)
+        return this.__queue[workerIndex].path
     }
     async outputHtml(newPath) {
         let timeStamp = Date.now()
