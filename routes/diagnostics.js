@@ -22,5 +22,8 @@ router.get('/page-count', async function (req, res) {
     }
     res.json({ value: count })
 })
+router.get('/html-queue', async function (req, res) {
+    res.json(req.app.locals.workflow.htmlCaptureStatus.__queue)
+})
 
 module.exports = router;
