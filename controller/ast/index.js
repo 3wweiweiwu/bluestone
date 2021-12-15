@@ -61,7 +61,14 @@ class AST {
     async loadFunctions(funcPath) {
         let jsStr = (await fs.readFile(funcPath)).toString()
         let ast = acorn.parse(jsStr, { ecmaVersion: 2020 })
+        //delete cached library and its dependencies
+        if (require.cache[funcPath]) {
+            require.cache[funcPath].children.forEach(item => {
+                delete require.cache[item.id]
+            })
+        }
 
+        delete require.cache[funcPath]
         let bsFunction = require(funcPath)
         let functionKeys = Object.keys(bsFunction)
 
@@ -180,7 +187,11 @@ class AST {
      */
     __rearrangeJsDocSequence(funcSignature, commentAST) {
         let parameterStr = funcSignature.replace(/.*\(/g, '').replace(/\).*/g, '')
-        let parameters = parameterStr.split(',')
+        let parameters = []
+        //in case there is , within the function, this indicates that there is no parameter
+        if (!funcSignature.includes('()')) {
+            parameters = parameterStr.split(',')
+        }
         let reArrangedTag = []
         let paramTags = commentAST.tags.filter(item => { return item.title == 'param' })
         //conduct parameter count check
