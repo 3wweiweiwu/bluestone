@@ -53,11 +53,15 @@ module.exports = async function (browser, targetLocator, currentLocator, parentI
         let targetElement = await frame.$(targetLocator)
         let targettBox = await targetElement.boundingBox()
         let currentBox = await elements[0].boundingBox()
-        if (targettBox == null || currentBox == null) {
+        if (currentBox == null) {
             //when targebox and current box is invisible, conduct blind check
             if (targettBox != currentBox) {
-                errorText = 'The current element is not contained within target element'
+                errorText = 'The current element is not found'
             }
+        }
+        else if (targettBox == null) {
+            //target element cannot be found. Conduct blind check
+            return errorText
         }
         else if (targettBox.height + targettBox.y < currentBox.height + currentBox.y ||
             //check if current element is within the target element.
