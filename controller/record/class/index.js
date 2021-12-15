@@ -119,10 +119,10 @@ class RecordingStep {
             throw 'Unable to find current html in the html repo'
         }
 
-        let updatedIndex = 0
+        let updatedIndex = currentIndex
         //find next/previous element that is different from current picture
         do {
-            updatedIndex = currentIndex + offSet
+            updatedIndex = updatedIndex + offSet
 
 
             //updated index reach maximum limit
