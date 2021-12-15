@@ -5,7 +5,14 @@ module.exports = {
         func: inbuiltFunc.testTextEqual,
         locators: [{ locator: ['invalid_locator'] }]
     },
-
+    hover: {
+        func: inbuiltFunc.hover,
+        locators: [{ locator: ['invalid_locator'] }]
+    },
+    waitElementVisible: {
+        func: inbuiltFunc.waitTillElementVisible,
+        locators: [{ locator: ['invalid_locator'] }]
+    },
     waitElementExists: {
         func: inbuiltFunc.waitElementExists,
         locators: [{ locator: ['invalid_locator'] }]

@@ -54,6 +54,34 @@ exports.change = async function (frame, elementSelector, text) {
     return `Type value ${text} success!`
 
 }
+/**
+ * Wait till element visible
+*  @param {Frame} frame 
+ * @param {ElementSelector} elementSelector element selector object
+ * @param {number} timeout wait time in ms.
+ */
+exports.waitTillElementVisible = async function (frame, elementSelector, timeout) {
+    let itemVisible = false
+    let startTime = Date.now()
+    let timeSpan = 0
+    do {
+        let element = await findElement(frame, elementSelector, timeout)
+        let rect = await element.evaluate(node => node.getBoundingClientRect())
+        if (rect.width > 0 && rect.height > 0) {
+            itemVisible = true
+            break
+        }
+        timespan = Date.now() - startTime
+    }
+    while (timeSpan < timeout)
+    if (itemVisible) {
+        return 'Element is visible'
+    }
+    else {
+        assert.fail(`${elementSelector.displayName} is not visible within ${timeout} ms`)
+    }
+
+}
 
 /**
  * Click UI element
@@ -70,6 +98,22 @@ exports.click = async function (frame, elementSelector) {
 
     return `Click success!`
 }
+
+/**
+ * Hover Mouse on Element
+*  @param {Frame} frame 
+ * @param {ElementSelector} elementSelector element selector object
+ */
+exports.hover = async function (frame, elementSelector) {
+    let element = await findElement(frame, elementSelector, 2000)
+    try {
+        await element.hover()
+    } catch (error) {
+        return Promise.reject(`Unable to hover ${elementSelector.displayName}`)
+    }
+    return 'hover success!'
+}
+
 /**
  * Navigate browser to he url
  * @param {Frame} page 

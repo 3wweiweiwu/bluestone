@@ -287,7 +287,8 @@ class WorkflowRecord {
     }
     static inBuiltFunc = {
         testTextEqual: 'testTextEqual',
-        testElementVisible: 'testElementVisible',
+        hover: 'hover',
+        waitElementVisible: 'waitElementVisible',
         testElementInvisible: 'testElementInvisible',
         waitElementExists: 'waitElementExists',
         hoverMouse: 'hoverMouse',
@@ -307,7 +308,7 @@ class WorkflowRecord {
     mapOperationToGroups(activeFunctions) {
         const inBuiltFuncNames = [
             WorkflowRecord.inBuiltFunc.testTextEqual,
-            WorkflowRecord.inBuiltFunc.testElementVisible,
+            WorkflowRecord.inBuiltFunc.waitElementVisible,
             WorkflowRecord.inBuiltFunc.testElementInvisible,
             WorkflowRecord.inBuiltFunc.hoverMouse
         ]
@@ -322,8 +323,7 @@ class WorkflowRecord {
             waitTill: {
                 text: 'Wait Till',
                 operations: [
-                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.testElementVisible),
-                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.testElementInvisible)
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.waitElementVisible)
                 ]
             },
             inbuiltFunction: {
@@ -334,6 +334,7 @@ class WorkflowRecord {
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.goto),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.click),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.keydown),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.hover),
                 ]
             },
             customizedFunctions: {
