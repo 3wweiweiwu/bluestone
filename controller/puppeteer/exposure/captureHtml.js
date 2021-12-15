@@ -21,7 +21,7 @@ module.exports = function (page, recordRepo) {
 
             //# of simoutaneous html capture session
             const maxConcurrentWorker = 1
-            const maxWaitingWorker = 2
+            const maxWaitingWorker = 1
             try {
                 if (recordRepo.htmlCaptureStatus.getPendingItems().length < maxConcurrentWorker + maxWaitingWorker) {
                     htmlIndex = recordRepo.htmlCaptureStatus.pushOperation('', htmlPath)
@@ -65,12 +65,12 @@ module.exports = function (page, recordRepo) {
                     recordRepo.htmlCaptureStatus.popOperation(htmlIndex)
                 }
                 else {
+                    recordRepo.htmlCaptureStatus.markWriteDone(htmlIndex)
 
                     fs.writeFile(htmlPath, pageData.content)
                         .then(() => {
                             recordRepo.htmlCaptureStatus.lastHtml = pageData.content
                             recordRepo.htmlCaptureStatus.lastFilePath = htmlPath
-                            recordRepo.htmlCaptureStatus.markWriteDone(htmlIndex)
                         })
                 }
 
