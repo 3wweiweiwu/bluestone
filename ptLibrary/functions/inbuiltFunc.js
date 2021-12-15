@@ -28,7 +28,7 @@ exports.testTextEqual = async function (frame, elementSelector, desiredText) {
 }
 
 /**
- * Wait element exists
+ * element exists
 *  @param {Frame} frame 
  * @param {ElementSelector} elementSelector element selector object
  * @param {number} timeout wait time in ms. If no element appear within this period, an error will be thrown

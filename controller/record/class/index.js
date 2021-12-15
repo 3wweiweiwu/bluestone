@@ -317,7 +317,8 @@ class WorkflowRecord {
             assert: {
                 text: 'Verify',
                 operations: [
-                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.testTextEqual)
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.testTextEqual),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.waitElementExists),
                 ]
             },
             waitTill: {
@@ -329,7 +330,6 @@ class WorkflowRecord {
             inbuiltFunction: {
                 text: 'Run In-built function',
                 operations: [
-                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.waitElementExists),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.change),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.goto),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.click),
