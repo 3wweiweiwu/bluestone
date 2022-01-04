@@ -50,7 +50,7 @@ module.exports = [
         functionAst: {
             path: "",
             name: "waitElementExists",
-            description: "Wait element exists",
+            description: "element exists",
             params: [
                 {
                     title: "param",
@@ -141,7 +141,7 @@ module.exports = [
         functionAst: {
             path: "",
             name: "waitElementExists",
-            description: "Wait element exists",
+            description: "element exists",
             params: [
                 {
                     title: "param",
