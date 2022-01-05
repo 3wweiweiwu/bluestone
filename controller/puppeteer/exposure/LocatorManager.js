@@ -23,13 +23,11 @@ function getLocator(recordRepo) {
  */
 function setLocatorStatus(recordRepo) {
     /**
-     * Log browser event to the cache
-     * @param {import('../../record/class').RecordingStep} eventDetail 
-     * @param {number} timeSpan time it takes to go through all locators
+     * Set specific locator to be active
+     * @param {Array<number>} activeIndexes 
      */
-    async function setLocatorToBluestone(locatorStatus, timeSpan) {
-        recordRepo.locatorManager.locatorLibrary = locatorStatus
-        recordRepo.locatorManager.lastRefreshTime = timeSpan
+    async function setLocatorToBluestone(activeIndexes) {
+        recordRepo.locatorManager.setActiveLocator(activeIndexes)
 
 
     }

@@ -73,6 +73,7 @@ Object.keys(EVENTCONST).forEach(item => {
                             captureScreenshot()
                             command = null
                             parameter = null
+                            getActiveLocator()
                             console.log('call in-browser spy')
                             break
                         }
@@ -193,7 +194,24 @@ document.addEventListener("mouseout", event => {
 const Helper = {
     potentialLocatorMatchIndexes: BLUESTONE.bluestonePotentialMatchIndexes //this is attribute that is used to store locator mapping
 }
+function getActiveLocator() {
+    let activeLocatorIndexes = []
+    let activeElements = document.evaluate(`//*[contains(@${BLUESTONE.bluestonePotentialMatchIndexes},'[')]`, document)
+    let currentElement = null
+    //retrieve indexes for the locators
+    do {
 
+        currentElement = activeElements.iterateNext()
+        if (currentElement == null) {
+            break
+        }
+        let matchIndexStr = currentElement.getAttribute(BLUESTONE.bluestonePotentialMatchIndexes)
+        let potentialMatchList = JSON.parse(matchIndexStr)
+        potentialMatchList.forEach(item => activeLocatorIndexes.push(item))
+    }
+    while (true)
+    window.setLocatorStatus(activeLocatorIndexes)
+}
 async function scanLocator() {
     function resetBsLocatorAttribute() {
         //clearly all bluestone-locator properties from the elements in current frame to reset to clean state

@@ -29,6 +29,22 @@ class LocatorManager {
         this.__locatorLibrary = locatorLibrary
     }
     /**
+     * Reset Active Locators to inactive
+     */
+    __resetActiveLocatorStatus() {
+        this.locatorLibrary.forEach(item => {
+            item.selector = null
+        })
+    }
+    /**
+     * Reset Locator's activation status and mark specific index to be active
+     * @param {Array<number>} locatorIndexList 
+     */
+    setActiveLocator(locatorIndexList) {
+        this.__resetActiveLocatorStatus()
+        locatorIndexList.forEach(index => this.locatorLibrary[index].selector = true)
+    }
+    /**
      * Return all active elements as an array
      * @returns {Array<Locator>}
      */
