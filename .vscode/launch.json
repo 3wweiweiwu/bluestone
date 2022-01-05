@@ -17,12 +17,15 @@
       "request": "launch",
       "skipFiles": ["<node_internals>/**"],
       "type": "node",
-      "args": [
-        "start",
-        "./test/sample-project",
-        "--port",
-        "3601"
-      ]
+      "args": ["start", "./test/sample-project", "--port", "3601"]
+    },
+    {
+      "name": "Launch Command line for wab-bluestone",
+      "program": "${workspaceFolder}/bin/bluestone.js",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node",
+      "args": ["start", "../wab-bluestone", "--port", "3601"]
     },
     {
       "name": "Launch Record Command line",

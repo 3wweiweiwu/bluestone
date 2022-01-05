@@ -152,6 +152,10 @@ async function hideSpy(page, isSpyVisible) {
     //the fist time we run it, page object may not be ready
 
     await page.bringToFront()
+    page.evaluate(() => {
+        window.captureHtml()
+        captureScreenshot()
+    })
 
 
 }
