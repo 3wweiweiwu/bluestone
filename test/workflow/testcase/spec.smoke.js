@@ -5,6 +5,8 @@ let siteBackend = new TestSite()
 let bluestoneBackend = new Bluestone()
 let testConfig = require('../testConfig')
 let fs = require('fs').promises
+const fsCb = require('fs')
+const path = require('path')
 describe('Smoke Test', () => {
     beforeEach(done => {
         siteBackend = new TestSite()
@@ -17,6 +19,20 @@ describe('Smoke Test', () => {
             )
             .then(done)
 
+    })
+    after(done => {
+        let directory = path.join(__dirname, '../../../public/temp/componentPic')
+        fsCb.readdir(directory, (err, files) => {
+            if (err) throw err;
+
+            for (const file of files) {
+                if (file == '.placeholder') continue
+                fsCb.unlink(path.join(directory, file), err => {
+                    if (err) throw err;
+                });
+            }
+            done()
+        });
     })
     it('should launch test harness and bluestone correctly', async () => {
         let res = await siteBackend.getMainPage()
