@@ -50,7 +50,18 @@ module.exports = async function (browser, targetLocator, currentLocator, parentI
     }
     else {
         //check if two elements are of the same coordination
-        let targetElement = await frame.$(targetLocator)
+        //check if there is error in original locator
+        let targetElementList = await getLocator(frame, targetLocator)
+        if (targetElementList.length == 0) {
+            errorText = 'Original Selector cannot be found. Please contact bluestone team or check your selector generator'
+            return errorText
+        }
+        else if (targetElementList.length > 1) {
+            errorText = 'More than 1 selector being found. Please contact bluestone team or check your selector generator'
+            return errorText
+        }
+        //get target element
+        let targetElement = targetElementList[0]
         let targettBox = await targetElement.boundingBox()
         let currentBox = await elements[0].boundingBox()
         if (currentBox == null) {

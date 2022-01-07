@@ -1,4 +1,14 @@
-import { finder } from 'https://medv.io/finder/finder.js'
+// import { finder } from 'https://medv.io/finder/finder.js'
+
+import { finder } from 'http://localhost:3601/resource/js/finder.js'
+import { getLocator } from 'http://localhost:3600/resource/js/customLocator.js'
+
+try {
+
+} catch (error) {
+
+}
+
 
 const EVENTCONST = {
     click: 'click',
@@ -43,18 +53,29 @@ Object.keys(EVENTCONST).forEach(item => {
             console.log(error)
         }
 
+        let customLocator = getLocator(event.target, selector)
+        //if there is selector from locator function, we will prioritize that one
+        //if there is no selector from locator function yet the target has been changed, 
+        //use new target to generate selector
+        if (customLocator.selector)
+            selector = customLocator.selector
+        else if (customLocator.target != event.target)
+            selector = finder(customLocator.target)
+        let target = customLocator.target
+
         let iframe = getElementAttribute(window.frameElement, BLUESTONE.bluestoneIframePath)
         let framePotentialMatch = getElementAttribute(window.frameElement, BLUESTONE.bluestonePotentialMatchIndexes)
-        let potentialMatch = getElementAttribute(event.target, BLUESTONE.bluestonePotentialMatchIndexes)
+        let potentialMatch = getElementAttribute(target, BLUESTONE.bluestonePotentialMatchIndexes)
 
 
-        const position = getElementPos(event.target)
-        const targetInnerText = event.target.innerText
+        const position = getElementPos(target)
+        const targetInnerText = target.innerText
         let parameter = null
         let command = item
         let targetPicPath = ''
         switch (item) {
             case EVENTCONST.change:
+                //still use original target because the new target may not have value
                 parameter = event.target.value
                 break;
             case EVENTCONST.keydown:
@@ -84,6 +105,15 @@ Object.keys(EVENTCONST).forEach(item => {
             default:
                 break;
         }
+
+        // if (isParentDefinedAndIdentical(event.target, position, potentialMatch)) {
+        //     console.log()
+        //     let parent = event.target.parentElement
+
+        //     potentialMatch = parent.getAttribute(BLUESTONE.bluestonePotentialMatchIndexes)
+
+        //     selector = finder(parent)
+        // }
         const eventDetail = {
             command: command,
             iframe: iframe,
@@ -152,20 +182,32 @@ function getElementPos(element) {
 //draw rectangle and return the selector and inner text of element mouse hover on
 document.addEventListener('mouseover', async event => {
     if (window.isRecording()) {
-        const selector = finder(event.target)
-        const innerText = event.target.innerText
+        let selector = finder(event.target)
+
+        let customLocator = getLocator(event.target, selector)
+        //if there is selector from locator function, we will prioritize that one
+        //if there is no selector from locator function yet the target has been changed, 
+        //use new target to generate selector
+        if (customLocator.selector)
+            selector = customLocator.selector
+        else if (customLocator.target != event.target)
+            selector = finder(customLocator.target)
+        let target = customLocator.target
+
+        const innerText = target.innerText
         let position = {}
         try {
-            position = getElementPos(event.target)
+            position = getElementPos(target)
         } catch (error) {
             console.log(error)
         }
-
+        //style change will only be applied to source element
         const previousStyle = event.target.style.backgroundColor
         event.target.setAttribute(BLUESTONE.previousbackground, previousStyle)
         let iFrame = getElementAttribute(window.frameElement, BLUESTONE.bluestoneIframePath)
         let framePotentialMatch = getElementAttribute(window.frameElement, BLUESTONE.bluestonePotentialMatchIndexes)
-        let potentialMatch = getElementAttribute(event.target, BLUESTONE.bluestonePotentialMatchIndexes)
+        let potentialMatch = getElementAttribute(target, BLUESTONE.bluestonePotentialMatchIndexes)
+
         window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch)
 
         event.target.style.backgroundColor = 'rgba(140, 99, 255,0.7)'
@@ -188,7 +230,23 @@ document.addEventListener("mouseout", event => {
     }
 
 })
+/**
+ * Check parent element as we might defined things at parent level rather than atomic level
+ * @param {*} element  //the element you want to check against
+ * @param {*} position //the bounding rectangle of current parent
+ * @param {*} potentialMatch 
+ */
+function isParentDefinedAndIdentical(element, position, potentialMatch) {
+    let parent = element.parentElement
 
+    if (potentialMatch == '[]' && parent != null && parent.getAttribute(BLUESTONE.bluestonePotentialMatchIndexes) != null) {
+        let parentPos = parent.getBoundingClientRect()
+        if (position.x == parentPos.x && position.y == parentPos.y && parentPos.height == position.height && parentPos.width == position.width) {
+            return true
+        }
+    }
+    return false
+}
 //This function will find all element in the page and report them back to record manager
 
 const Helper = {

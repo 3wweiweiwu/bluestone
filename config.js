@@ -21,7 +21,8 @@ let config = {
         configPath: path.join(__dirname, './test/sample-project/config.js'),
         inbuiltFuncPath: path.join(__dirname, './ptLibrary/bluestone-func.js'),
         pictureFolder: path.join(__dirname, './test/sample-project/componentPic'),
-        urlBlackList: []
+        urlBlackList: [],
+        customLocatorEnginePath: path.join(__dirname, './public/javascript/customLocator.js')
     },
     singlefile: {
         removeHiddenElements: false,
@@ -75,6 +76,10 @@ function configFunc() {
     config.code.configPath = path.join(projectFolder, projectObj.config)
     config.code.pictureFolder = path.join(projectFolder, projectObj.pic)
     config.code.urlBlackList = projectObj.urlBlackList
+
+    if (projectObj.customLocatorEnginePath != null) {
+        config.code.customLocatorEnginePath = path.join(projectFolder, projectObj.customLocatorEnginePath)
+    }
     return config
 }
 
