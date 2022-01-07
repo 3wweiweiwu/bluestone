@@ -122,8 +122,8 @@ class WorkFlowPug {
                 await this.backend.puppeteer.openBluestoneTab('workflow')
                 break
             case WorkFlowPug.inBuiltQueryKey.btnCreateTestcaseQueryKey:
-                if (this.validateForm()) {
-                    let finalPath = await this.backend.writeCodeToDisk(this.textTestSuiteValue, this.textTestCaseValue)
+                if (this.validateForm(true)) {
+                    let finalPath = await this.backend.writeCodeToDisk( this.textTestSuiteValue, this.textTestCaseValue)
                     this.txtValidationStatus = `Script created at: ${finalPath}`
                     this.isValidationPass = true
                 }
@@ -134,10 +134,10 @@ class WorkFlowPug {
     }
     /**
      * Genereate validaton action based on the current validation. If return true, it means no issue is found in current form
-     * @param {Array<import('../../record/class/index').RecordingStep>} steps 
+     * @param {boolean} skipExecutionResultCheck 
      * @param {boolean}
      */
-    validateForm() {
+    validateForm(skipExecutionResultCheck = false) {
         let steps = this.backend.steps
         this.txtValidationStatus = ''
         this.isValidationPass = false
@@ -157,15 +157,17 @@ class WorkFlowPug {
                 return false
             }
         }
-        for (let i = 0; i < steps.length; i++) {
-            let stepInfo = steps[i]
+        if (!skipExecutionResultCheck) {
+            for (let i = 0; i < steps.length; i++) {
+                let stepInfo = steps[i]
 
-            if (!stepInfo.result.isResultPass) {
-                this.txtValidationStatus = `Step ${i} Failed: ${stepInfo.result.resultText}. Please run workflow again or modify the locator`
-                return false
+                if (!stepInfo.result.isResultPass) {
+                    this.txtValidationStatus = `Step ${i} Failed: ${stepInfo.result.resultText}. Please run workflow again or modify the locator`
+                    return false
+                }
             }
+            this.isValidationPass = true
         }
-        this.isValidationPass = true
         return true
     }
 }

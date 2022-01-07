@@ -45,7 +45,7 @@ class UI {
                     await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex, targetStep.iframe)
                 }
                 //update text info
-                this.workflow.validateForm(this.backend.steps)
+                this.workflow.validateForm()
                 break
 
             case Workflow.inBuiltQueryKey.btnLocatorWorkflow:

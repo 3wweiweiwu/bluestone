@@ -116,7 +116,12 @@ class LocatorManager {
         //copy picture into desinanated location
         let newPicName = locatorName.replace(/\W/g, '_') + '.png'
         let newPicPath = path.join(config.code.pictureFolder, newPicName)
-        await fs.copyFile(picPath, newPicPath)
+        try {
+            await fs.copyFile(picPath, newPicPath)
+        } catch (error) {
+
+        }
+
 
         //get relative path for the locator
         let locatorFolder = path.dirname(config.code.locatorPath)
