@@ -148,10 +148,11 @@ class LocatorDefiner {
                 let finalSelection = this.getFinalSelection(locatorCheckResult)
                 if (locatorCheckResult != '') break
                 //check all steps and replicate same setting for same locator
-                this.backend.steps.forEach(item => {
+                for (let i = 0; i < this.backend.steps.length; i++) {
+                    let item = this.backend.steps[i]
                     if (item.target == this.defaultSelector) {
-                        item.finalLocator = finalSelection.finalLocator
-                        item.finalLocatorName = finalSelection.finalLocatorName
+                        this.backend.steps[i].finalLocator = finalSelection.finalLocator
+                        this.backend.steps[i].finalLocatorName = finalSelection.finalLocatorName
                         //specify the locator name in the param
                         let param = item.functionAst.params.find(item => {
                             return item.type.name == 'ElementSelector'
@@ -161,7 +162,8 @@ class LocatorDefiner {
                         }
 
                     }
-                })
+                }
+
 
                 break
             case LocatorDefiner.inBuiltQueryKey.btnNextHtml:

@@ -438,7 +438,7 @@ class WorkflowRecord {
                 }
 
             }
-            if (item.potentialMatch.length == 1) {
+            if (item.potentialMatch.length == 1 && item.finalLocator.length == 1 && item.finalLocator[0] == '') {
                 item.finalLocatorName = item.potentialMatch[0].path
                 item.finalLocator = item.potentialMatch[0].Locator
                 //update ElementSelector in the param
