@@ -1,6 +1,6 @@
 // import { finder } from 'https://medv.io/finder/finder.js'
 
-import { finder } from 'http://localhost:3601/resource/js/finder.js'
+import { finder } from 'http://localhost:3600/resource/js/finder.js'
 import { getLocator } from 'http://localhost:3600/resource/js/customLocator.js'
 
 try {
