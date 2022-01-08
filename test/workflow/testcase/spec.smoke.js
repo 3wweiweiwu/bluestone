@@ -8,6 +8,8 @@ let fs = require('fs').promises
 const fsCb = require('fs')
 const path = require('path')
 describe('Smoke Test', () => {
+    const suite = this;
+
     beforeEach(done => {
         siteBackend = new TestSite()
         bluestoneBackend = new Bluestone()
@@ -20,18 +22,29 @@ describe('Smoke Test', () => {
             .then(done)
 
     })
-    after(done => {
+    after(function (done) {
+        this.timeout(12000);
+
         let directory = path.join(__dirname, '../../../public/temp/componentPic')
         fsCb.readdir(directory, (err, files) => {
             if (err) throw err;
-
+            let deleteQueue = []
             for (const file of files) {
                 if (file == '.placeholder') continue
-                fsCb.unlink(path.join(directory, file), err => {
-                    if (err) throw err;
-                });
+
+                deleteQueue.push(fs.unlink(path.join(directory, file)))
             }
-            done()
+            //wait until all delete is done
+            Promise.all(deleteQueue)
+                .then(() => {
+                    done()
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+
+
+
         });
     })
     it('should launch test harness and bluestone correctly', async () => {
