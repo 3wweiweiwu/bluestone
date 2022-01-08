@@ -1,5 +1,7 @@
+include ../input.pug
+
 //- table mixins
-mixin workflow-table(header,data,removeWorkflowQueryKey,upWorkflowQueryKey,downWorkflowQueryKey,editWorkflowQueryKey,locatorWorkflowQueryKey)
+mixin workflow-table(header,data,removeWorkflowQueryKey,upWorkflowQueryKey,downWorkflowQueryKey,editWorkflowQueryKey,locatorWorkflowQueryKey,updateStepQueryKey)
     - var type = "table-hover"
     table.table(class=type)
         thead
@@ -10,7 +12,8 @@ mixin workflow-table(header,data,removeWorkflowQueryKey,upWorkflowQueryKey,downW
         tbody
             each row,j in data
                 tr
-                    td=j
+                    td
+                        input(class='workflow-step-input' value=j index=j querykey=updateStepQueryKey queryindex='from' onChange="redirectInputOnChange(event)")
                     each col,k in row                        
                         if col.includes('.png')
                             td

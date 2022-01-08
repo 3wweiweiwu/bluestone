@@ -637,7 +637,30 @@ class WorkflowRecord {
         return potentialMatches
     }
 
+    /**
+     * Move step to specific place. If error is observed, return as is 
+    * @param {string} fromIndex 
+    * @param {number} targetIndex 
+     */
+    moveStepTo(fromIndex, toIndex) {
+        try {
+            fromIndex = Number.parseInt(fromIndex)
+            let arr = this.steps
+            toIndex = Number.parseInt(toIndex)
+            //handle extreme case
+            if (toIndex < 0) toIndex = 0
+            if (toIndex >= arr.length) toIndex = arr.length - 1
 
+            var element = arr[fromIndex];
+            arr.splice(fromIndex, 1);
+            arr.splice(toIndex, 0, element);
+            this.steps = arr
+        } catch (error) {
+
+        }
+
+
+    }
 
 
     /**

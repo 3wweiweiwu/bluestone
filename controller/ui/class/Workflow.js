@@ -28,7 +28,8 @@ class WorkFlowPug {
         btnCreateTestcaseQueryKey: 'WORKFLOW_CREATE_TC',
         txtTestSuiteQueryKey: 'WORKFLOW_TEST_SUITE',
         txtTestCaseQueryKey: 'WORKFLOW_TEST_CASE',
-        btnRunWorkflow: 'WORKFLOW_RUN_ALL'
+        btnRunWorkflow: 'WORKFLOW_RUN_ALL',
+        updateStepQueryKey: 'WORKFLOW_UPDATE_STEP'
 
     }
     /**
@@ -93,6 +94,8 @@ class WorkFlowPug {
         let firstKey = queryKeys[0]
         let firstValue = query[firstKey]
         let stepIndex = -1
+        let secondKey = null
+        let secondValue = null
         /**@type {RecordingStep} */
         let targetStep = null
 
@@ -123,10 +126,16 @@ class WorkFlowPug {
                 break
             case WorkFlowPug.inBuiltQueryKey.btnCreateTestcaseQueryKey:
                 if (this.validateForm(true)) {
-                    let finalPath = await this.backend.writeCodeToDisk( this.textTestSuiteValue, this.textTestCaseValue)
+                    let finalPath = await this.backend.writeCodeToDisk(this.textTestSuiteValue, this.textTestCaseValue)
                     this.txtValidationStatus = `Script created at: ${finalPath}`
                     this.isValidationPass = true
                 }
+                break
+            case WorkFlowPug.inBuiltQueryKey.updateStepQueryKey:
+                //from index
+                secondKey = queryKeys[1]
+                secondValue = query[secondKey]
+                this.backend.moveStepTo(secondValue, firstValue)
                 break
             default:
                 break;
