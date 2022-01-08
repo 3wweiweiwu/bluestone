@@ -90,13 +90,17 @@ Object.keys(EVENTCONST).forEach(item => {
                         break;
                     default:
                         //if we see combo key ctrl-q, we will call in-browser plugin
-                        if (event.ctrlKey && event.key === 'q') {
+                        if ((event.ctrlKey || event.altKey) && event.key === 'q') {
                             captureScreenshot()
                             command = null
                             parameter = null
                             getActiveLocator()
                             console.log('call in-browser spy')
                             break
+                        }
+                        if ((event.altKey) && event.key === 'a') {
+                            captureScreenshot()
+                            captureHtml()
                         }
                         //otherwise, we are not going to record any other operation
                         return
