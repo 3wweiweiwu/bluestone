@@ -47,7 +47,8 @@ module.exports = async function (page, elementSelector, timeout, option = Option
         timeSpan = currentTime - startTime
         if (element != null) {
             let clientHeight = await element.evaluate(node => node.clientHeight)
-            if (clientHeight != 0) {
+            let isBlocked = await isElementBlocked(element)
+            if (clientHeight != 0 && !isBlocked) {
                 break
             }
         }
@@ -67,3 +68,91 @@ module.exports = async function (page, elementSelector, timeout, option = Option
     return element
 
 }
+/**
+ * Check if element is covered by anything
+ * @param {ElementHandle} element 
+ */
+async function isElementBlocked(element) {
+    let result = await element.evaluate(element => {
+        function isVisible(elem) {
+            if (!(elem instanceof Element)) throw Error('DomUtil: elem is not an element.');
+            const style = getComputedStyle(elem);
+            if (style.display === 'none') return false;
+            if (style.visibility !== 'visible') return false;
+            if (style.opacity < 0.1) return false;
+            if (elem.offsetWidth + elem.offsetHeight + elem.getBoundingClientRect().height +
+                elem.getBoundingClientRect().width === 0) {
+                return false;
+            }
+            const elemCenter = {
+                x: elem.getBoundingClientRect().left + elem.offsetWidth / 2,
+                y: elem.getBoundingClientRect().top + elem.offsetHeight / 2
+            };
+            if (elemCenter.x < 0) return false;
+            if (elemCenter.x > (document.documentElement.clientWidth || window.innerWidth)) return false;
+            if (elemCenter.y < 0) return false;
+            if (elemCenter.y > (document.documentElement.clientHeight || window.innerHeight)) return false;
+            let pointContainer = document.elementFromPoint(elemCenter.x, elemCenter.y);
+            do {
+                if (pointContainer === elem) return true;
+                try {
+                    pointContainer = pointContainer.parentNode
+                }
+                catch (err) {
+                    break
+                }
+
+            } while (pointContainer);
+            return false;
+        }
+
+        function getZIndex(element) {
+
+            let zIndex = 0
+
+            while (true) {
+                let zIndexStr = window.getComputedStyle(element).zIndex
+                if (zIndexStr != 'auto') {
+                    let currentZIndex = Number.parseInt(zIndexStr)
+                    if (currentZIndex > zIndex)
+                        zIndex = currentZIndex
+                }
+
+                element = element.parentElement
+                if (element == null) break
+            }
+
+            return zIndex
+        }
+        function isSourceCoveredByTarget(sourceRect, targetRect) {
+            let xCenter = (sourceRect.x + sourceRect.width / 2)
+            let yCenter = (sourceRect.y + sourceRect.height / 2)
+
+            let targetXMost = targetRect.x + targetRect.width
+            let targetYMost = targetRect.y + targetRect.height
+
+            return (xCenter > targetRect.x) && (xCenter < targetXMost) && (yCenter > targetRect.y) && (yCenter < targetYMost)
+        }
+
+        function isSourceCoveredByAnyElement(sourceElement) {
+            let allElemenets = [...document.getElementsByTagName('*')]
+            let sourceRect = sourceElement.getBoundingClientRect()
+            let sourceZIndex = getZIndex(sourceElement)
+
+            let coveredElement = allElemenets.find(item => {
+                if (item == sourceElement) return false
+                if (!isVisible(item)) return false
+                let itemRect = item.getBoundingClientRect()
+
+                if (!isSourceCoveredByTarget(sourceRect, itemRect)) return false
+                let itemZIndex = getZIndex(item)
+                return itemZIndex > sourceZIndex
+
+            })
+            return coveredElement
+
+        }
+        return isSourceCoveredByAnyElement(element) != null
+    }, element)
+    return result
+}                                                                       

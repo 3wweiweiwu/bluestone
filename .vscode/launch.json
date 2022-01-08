@@ -25,7 +25,7 @@
       "request": "launch",
       "skipFiles": ["<node_internals>/**"],
       "type": "node",
-      "args": ["start", "C:\\TEMP\\test\\wab-bluestone", "--port", "3601"]
+      "args": ["start", "../wab-bluestone", "--port", "3601"]
     },
     {
       "name": "Launch Record Command line",
