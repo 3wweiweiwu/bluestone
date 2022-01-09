@@ -45,6 +45,14 @@ class HtmlCaptureStatus {
             return false
         }
     }
+    /**
+     * Update html path to something new in case this html is the same as previous one
+     * @param {number} stepIndex 
+     * @param {string} newPath 
+     */
+    updateHtmlPath(stepIndex, newPath) {
+        this.__queue[stepIndex].path = newPath
+    }
     getPendingItems() {
         return this.getPendingItemBeforeIndex()
     }

@@ -36,10 +36,6 @@ module.exports = function (page, recordRepo) {
                         if (currentPendingQueue.length < maxConcurrentWorker) {
                             break
                         }
-                        if (currentPendingQueue.length > maxConcurrentWorker + maxWaitingWorker) {
-                            recordRepo.htmlCaptureStatus.popOperation(htmlIndex)
-                            return
-                        }
                         await new Promise(resolve => setTimeout(resolve, 100))
                     }
                     while (currentPendingQueue.length >= maxConcurrentWorker)
@@ -62,7 +58,8 @@ module.exports = function (page, recordRepo) {
 
                 recordRepo.operation.browserSelection.selectorHtmlPath = htmlPath
                 if (recordRepo.htmlCaptureStatus.lastHtml == pageData.content) {
-                    recordRepo.htmlCaptureStatus.popOperation(htmlIndex)
+                    recordRepo.htmlCaptureStatus.updateHtmlPath(htmlIndex, recordRepo.htmlCaptureStatus.lastFilePath)
+                    recordRepo.htmlCaptureStatus.markWriteDone(htmlIndex)
                 }
                 else {
                     recordRepo.htmlCaptureStatus.markWriteDone(htmlIndex)
