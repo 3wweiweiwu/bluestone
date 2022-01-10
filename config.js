@@ -10,7 +10,6 @@ let config = {
         args: [
             '--disable-web-security',
             '--disable-features=IsolateOrigins,site-per-process',
-            '--window-size=1920,1040'
         ]
 
     },
@@ -78,6 +77,14 @@ function configFunc() {
     config.code.pictureFolder = path.join(projectFolder, projectObj.pic)
     config.code.urlBlackList = projectObj.urlBlackList
 
+    //load puppeteer config
+
+    if (projectObj.config) {
+        let puppeteerConfigPath = path.join(projectFolder, projectObj.config)
+        config.puppeteer = require(puppeteerConfigPath).puppeteer
+    }
+
+    //load locator generator engine
     if (projectObj.customLocatorEnginePath != null) {
         config.code.customLocatorEnginePath = path.join(projectFolder, projectObj.customLocatorEnginePath)
     }
