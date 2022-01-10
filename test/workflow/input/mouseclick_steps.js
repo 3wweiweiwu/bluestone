@@ -212,7 +212,7 @@ module.exports = [
                 ],
                 "screenshot": "componentPic/Header.png",
                 "path": "Header",
-                "selector": false
+                "selector": true
             }
         ],
         "framePotentialMatch": [
@@ -300,7 +300,7 @@ module.exports = [
                 ],
                 "screenshot": "componentPic/Header.png",
                 "path": "Header",
-                "selector": false
+                "selector": true
             }
         ],
         "framePotentialMatch": [
