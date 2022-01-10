@@ -47,6 +47,9 @@ class HtmlCaptureStatus {
         }
         return result
     }
+    refreshTimeStamp() {
+        this.__timestamp = Date.now()
+    }
     get timestamp() {
         return this.__timestamp
     }
@@ -156,6 +159,7 @@ class HtmlCaptureStatus {
             this.__queue[workerIndex].path = path.join(fileFolder, fileName)
         }
         this.__markFileStatus(workerIndex, false)
+        this.refreshTimeStamp()
         return this.__queue[workerIndex].path
     }
     async outputHtml(newPath) {

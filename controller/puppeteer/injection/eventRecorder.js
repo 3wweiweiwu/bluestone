@@ -134,7 +134,8 @@ Object.keys(EVENTCONST).forEach(item => {
                 buttom: position.buttom,
                 height: position.height,
                 width: position.width
-            }
+            },
+            timestamp: Date.now()
 
 
         }

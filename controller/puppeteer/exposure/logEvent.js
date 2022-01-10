@@ -51,10 +51,10 @@ module.exports = function (recordRepo, browser, page, io) {
         //handle page capture
 
         let htmlPath = ''
-        if (page != null) {
-            htmlPath = recordRepo.getHtmlPath()
-            recordRepo.htmlCaptureStatus.outputHtml(htmlPath)
-        }
+        // if (page != null) {
+        // htmlPath = recordRepo.getHtmlPath()
+        // recordRepo.htmlCaptureStatus.outputHtml(htmlPath)
+        // }
         //handle screenshot
 
         let picturePath = ''

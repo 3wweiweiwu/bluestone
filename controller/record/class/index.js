@@ -77,7 +77,7 @@ class RecordingStep {
             this.parameter = JSON.parse(JSON.stringify(recordingStep.functionAst.params))
         }
         this.result = new StepResult()
-        this.timeStamp = Date.now()
+        this.timeStamp = recordingStep.timestamp
 
 
     }
@@ -162,6 +162,7 @@ class RecordingStep {
  * @property {import('../../ast/class/Function')} functionAst
  * @property {Array<RecordingStep>} potentialMatch
  * @property {Array<RecordingStep>} framePotentialMatch
+ * @property {number} timestamp
  */
 
 
@@ -247,8 +248,7 @@ class WorkflowRecord {
         badPathIndexList = badPathIndexList.filter(i => i != 0)
         //fix indexes based on its proximity
         badPathIndexList.forEach(i => {
-            if (i == 0)
-                let closestHtmlRecord = htmlCaptureRepo.getLastCaptureBeforeTimeStamp(this.steps[i].timeStamp)
+            let closestHtmlRecord = htmlCaptureRepo.getLastCaptureBeforeTimeStamp(this.steps[i].timeStamp)
             this.steps[i].__htmlPath = closestHtmlRecord.path
         })
     }
