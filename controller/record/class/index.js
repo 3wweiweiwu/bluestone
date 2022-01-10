@@ -77,6 +77,7 @@ class RecordingStep {
             this.parameter = JSON.parse(JSON.stringify(recordingStep.functionAst.params))
         }
         this.result = new StepResult()
+        this.timeStamp = Date.now()
 
 
     }
@@ -223,6 +224,33 @@ class WorkflowRecord {
     }
     set isNavigationPending(isPending) {
         this.__isNavigationPending = isPending
+    }
+    /**
+     * Scan through html path and fix unavailable path
+     * This function is created because sometimes, certain html file is blank
+     * I cannot find what cause this issue. It is just a workaround.
+     * @param {HtmlCaptureStatus} htmlCaptureRepo 
+     */
+    async fixHtmlPathIssue(htmlCaptureRepo) {
+        let goodPathIndexList = []
+        let badPathIndexList = []
+        //create index for good/bad index
+        for (let i = 0; i < this.steps.length; i++) {
+            try {
+                let htmlPath = this.steps[i].__htmlPath
+                await fs.access(htmlPath)
+                goodPathIndexList.push(i)
+            } catch (error) {
+                badPathIndexList.push(i)
+            }
+        }
+        badPathIndexList = badPathIndexList.filter(i => i != 0)
+        //fix indexes based on its proximity
+        badPathIndexList.forEach(i => {
+            if (i == 0)
+                let closestHtmlRecord = htmlCaptureRepo.getLastCaptureBeforeTimeStamp(this.steps[i].timeStamp)
+            this.steps[i].__htmlPath = closestHtmlRecord.path
+        })
     }
     getCurrentOperation() {
         return this.operation.browserSelection.currentOpeartion

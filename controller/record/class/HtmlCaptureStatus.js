@@ -23,6 +23,32 @@ class HtmlCaptureStatus {
         this.__popIndex = -1
         this.__lastHtml = ''
         this.__lastFilePath = ''
+        this.__timestamp = Date.now()
+    }
+
+    /**
+     * get last html capture before timestamp
+     * @param {number} timestamp 
+     * @returns {HtmlCaptureEntry}
+     */
+    getLastCaptureBeforeTimeStamp(timestamp) {
+        /** @type {HtmlCaptureEntry} */
+        let result = this.__queue[0]
+        for (const item of this.__queue) {
+            if (!item.writeReady) {
+                continue
+            }
+            //if current item is taken before the target time stamp, it is okay, we will resume
+            //otherwise, we will break the loop and return last item
+            if ((item.timeStamp - timestamp) > 0)
+                break
+
+            result = item
+        }
+        return result
+    }
+    get timestamp() {
+        return this.__timestamp
     }
     get lastFilePath() {
         return this.__lastFilePath
@@ -163,7 +189,7 @@ class HtmlCaptureStatus {
             } catch (error) {
                 i = i - 1
             }
-        } while (writeComplete == false)
+        } while (writeComplete != true)
         let filePath = this.__queue[i].path
         this.__queue[i].outputPath.push(newPath)
 

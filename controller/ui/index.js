@@ -39,6 +39,7 @@ class UI {
 
 
                 this.backend.resolveExistingLocatorInSteps()
+                await this.backend.fixHtmlPathIssue(this.backend.htmlCaptureStatus)
                 stepIndex = this.backend.findPendingLocatorInStep()
                 if (stepIndex != -1) {
                     targetStep = this.backend.steps[stepIndex]

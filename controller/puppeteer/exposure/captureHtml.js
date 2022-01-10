@@ -62,12 +62,13 @@ module.exports = function (page, recordRepo) {
                     recordRepo.htmlCaptureStatus.markWriteDone(htmlIndex)
                 }
                 else {
+                    recordRepo.htmlCaptureStatus.lastHtml = pageData.content
+                    recordRepo.htmlCaptureStatus.lastFilePath = htmlPath
                     recordRepo.htmlCaptureStatus.markWriteDone(htmlIndex)
 
                     fs.writeFile(htmlPath, pageData.content)
                         .then(() => {
-                            recordRepo.htmlCaptureStatus.lastHtml = pageData.content
-                            recordRepo.htmlCaptureStatus.lastFilePath = htmlPath
+
                         })
                 }
 
