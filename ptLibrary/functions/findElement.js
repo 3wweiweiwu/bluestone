@@ -46,7 +46,7 @@ module.exports = async function (page, elementSelector, timeout, option = Option
         let currentTime = Date.now()
         timeSpan = currentTime - startTime
         if (element != null) {
-            let clientHeight = await element.evaluate(node => node.clientHeight)
+            let clientHeight = await element.evaluate(node => node.getBoundingClientRect().height)
             let isBlocked = await isElementBlocked(element)
             if (clientHeight != 0 && !isBlocked) {
                 break
