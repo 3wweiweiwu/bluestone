@@ -106,7 +106,8 @@ describe('Smoke Test', () => {
         let res = await bluestoneBackend.getSteps()
         let currentData = res.data
         let baseline = require('../input/mouseclick_steps');
-
+        currentData.forEach(item => item.timeStamp = null)
+        baseline.forEach(item => item.timeStamp = null)
         assert.deepStrictEqual(currentData, baseline)
         // await new Promise(resolve => setTimeout(resolve, 80000))
 
