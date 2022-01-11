@@ -85,7 +85,8 @@ router.get('/locator-definer-sidebar', async function (req, res) {
     txtLocatorName: ui.locatorDefiner.locatorName,
     possibleLocatorMatch: ui.locatorDefiner.possibleLocators,
     possibleLocatorOkQueryKey: PugLocatorDefiner.inBuiltQueryKey.btnLocatorOk,
-    validationText: ui.locatorDefiner.validationText
+    validationText: ui.locatorDefiner.validationText,
+    btnOverrideLocator: PugLocatorDefiner.inBuiltQueryKey.btnOverrideLocator
   }
 
   res.render('locatorDefinerSidebar.pug', variables);

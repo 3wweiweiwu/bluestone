@@ -57,6 +57,7 @@ class LocatorDefiner {
         btnLocatorOk: 'LOCATOR_LOCATOR_OKAY',
         btnNextHtml: 'LOCATOR_NEXT_HTML',
         btnPrevHtml: 'LOCATOR_PREVIOUS_HTML',
+        btnOverrideLocator: 'LOCATOR_OVERRIDE_SELECTOR'
     }
     get locatorName() {
         return this.__locatorName
@@ -124,6 +125,7 @@ class LocatorDefiner {
         let queryKeys = Object.keys(query)
         let firstKey = queryKeys[0]
         let firstValue = query[firstKey]
+        let param = null
         switch (firstKey) {
             case LocatorDefiner.inBuiltQueryKey.btnRevert:
                 this.locatorSelector = this.defaultSelector
@@ -138,6 +140,19 @@ class LocatorDefiner {
             case LocatorDefiner.inBuiltQueryKey.btnLocatorOk:
                 this.locatorName = this.possibleLocators[firstValue].name
                 this.locatorSelector = this.possibleLocators[firstValue].selector
+                break
+            case LocatorDefiner.inBuiltQueryKey.btnOverrideLocator:
+                this.backend.steps[this.stepIndex].finalLocator = [this.locatorSelector]
+                this.backend.steps[this.stepIndex].finalLocatorName = this.locatorName
+                //specify locator function name in the param
+                await this.backend.puppeteer.checkLocatorInDefiner(this.defaultSelector, this.locatorSelector, this.parentFrame)
+                this.validationText += '[Locator Overriden]'
+                param = this.backend.steps[this.stepIndex].functionAst.params.find(item => {
+                    return item.type.name == 'ElementSelector'
+                })
+                if (param) {
+                    param.value = this.locatorName
+                }
                 break
             case LocatorDefiner.inBuiltQueryKey.btnConfirm:
                 //check locator and confirm locator input

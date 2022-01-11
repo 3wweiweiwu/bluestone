@@ -17,6 +17,7 @@ block body
     div(class='row')                
         +a-btn-info('?'+revertQueryKey)='Revert Selector'
         +a-btn-primary('?'+btnCheckQueryKey)='Confirm'
+        +a-btn-danger('?'+btnOverrideLocator)='Force Override'
     div(class='row')                
         if validationText==''
             +panel-success("Success")
