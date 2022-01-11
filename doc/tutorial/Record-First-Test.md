@@ -33,19 +33,21 @@ Create UI automation is easy, here is general breakdown
    8. ![](png/step-view.png)
 3. Correlate Locator when recording is done
    1. Press Alt+q combo key to call bluestone tab
-   2. Go to workflow panel. In the panel, choose workflow (spot 1)
-   3. Specify test suite name and test case name. Please note that, testcase name will be used as file name as well. PLease make sure it does not contain illegal characters (spot 2 and 3)
-   4. Correlate Locator by clicking "Resolve Pending Issue" button (spot 4)
-   5. You expect to see message in the note bar(spot 5) about your action item. Most likely, you will be asked to correlate locator
+   1. Go to workflow panel. In the panel, choose workflow (spot 1)
+   1. Specify test suite name and test case name. 
+      1. Please note that, testcase name will be used as file name as well. PLease make sure it does not contain illegal characters (spot 2 and 3)
+      2. 
+   1. Correlate Locator by clicking "Resolve Pending Issue" button (spot 4)
+   1. You expect to see message in the note bar(spot 5) about your action item. Most likely, you will be asked to correlate locator
    ![](pic/workflow-view.png)
-   6. Go to particular step and click "Edit Locator" Button ![](pic/correlate-step.png)
-   7. In the Locator Definer view, enter locator name (spot 1) and locator (spot 2). bluestone support both selector and xpath. Otherwise, you can click "Revert" button to use default locator. You can click on "Confirm" button once you are done
+   1. Go to particular step and click "Edit Locator" Button ![](pic/correlate-step.png)
+   1. In the Locator Definer view, enter locator name (spot 1) and locator (spot 2). bluestone support both selector and xpath. Otherwise, you can click "Revert" button to use default locator. You can click on "Confirm" button once you are done
       1. On the right side, you expect to see the view where this particular step is taken. Html is incorrect, you can use Previous html or Next html button to navigate through 
       2. If you want to override existing locator with what you provide, you can use "force override" button
       3.  ![](pic/locator-definer.png)
-   8. Repeat 4,5,6,7 until you correlate all locators. You expect to see text like
+   1. Repeat 4,5,6,7 until you correlate all locators. You expect to see text like
       1. Please note that Bluestone will automatically correlate existing locator in its library
       2. ![](pic/correlate-complete.png)
-   9.  At this point, you can click on "Run Workflow Button" to test run your script.
-   10. Output script. Click "Create Testcase Button" to output your script
-       1.  ![](pic/2022-01-11-17-47-28.png)
+4.  At this point, you can click on "Run Workflow Button" to test run your script.
+5.  Output script. Click "Create Testcase Button" to output your script
+   2.  ![](pic/2022-01-11-17-47-28.png)
