@@ -13,7 +13,7 @@
    2. ^test1 test2$, the test suite and test case name. It supports regular expression
 
 ## Configure Runtime in vscode
-1. Install Vscode Extension: "Mocha sidebar" ![](install-mocha-sidebar.png)
+1. Install Vscode Extension: "Mocha sidebar" ![](pic/install-mocha-sidebar.png)
 2. Go to setting menu ![](pic/vscode-setting-menu.png)
 3. In setting, search keyword "mocha"
 4. Go to Mocha>Files: Glob.
