@@ -530,6 +530,7 @@ class WorkflowRecord {
                 break
             }
         }
+        await this.puppeteer.openBluestoneTab('workflow')
         return failedStepIndex
     }
     /**

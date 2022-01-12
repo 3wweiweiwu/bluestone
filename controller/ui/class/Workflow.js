@@ -29,7 +29,8 @@ class WorkFlowPug {
         txtTestSuiteQueryKey: 'WORKFLOW_TEST_SUITE',
         txtTestCaseQueryKey: 'WORKFLOW_TEST_CASE',
         btnRunWorkflow: 'WORKFLOW_RUN_ALL',
-        updateStepQueryKey: 'WORKFLOW_UPDATE_STEP'
+        updateStepQueryKey: 'WORKFLOW_UPDATE_STEP',
+        btnAbortExecution: 'WORKFLOW_ABORT_EXECUTION'
 
     }
     /**
@@ -120,9 +121,12 @@ class WorkFlowPug {
                 this.textTestCaseValue = firstValue
                 break
             case WorkFlowPug.inBuiltQueryKey.btnRunWorkflow:
-                await this.backend.runAllSteps()
+                this.backend.runAllSteps()
                 this.validateForm()
-                await this.backend.puppeteer.openBluestoneTab('workflow')
+                break
+            case WorkFlowPug.inBuiltQueryKey.btnAbortExecution:
+                this.backend.puppeteer.isExecutionOngoing = null
+                this.validateForm()
                 break
             case WorkFlowPug.inBuiltQueryKey.btnCreateTestcaseQueryKey:
                 if (this.validateForm(true)) {
@@ -146,10 +150,15 @@ class WorkFlowPug {
      * @param {boolean} skipExecutionResultCheck 
      * @param {boolean}
      */
+
     validateForm(skipExecutionResultCheck = false) {
         let steps = this.backend.steps
         this.txtValidationStatus = ''
         this.isValidationPass = false
+        if (this.backend.puppeteer.isExecutionOngoing) {
+            this.txtValidationStatus = 'Please wait, execution is going on.'
+            return false
+        }
         if (this.textTestSuiteValue == '') {
             this.txtValidationStatus = 'Please enter test suite name'
             return false

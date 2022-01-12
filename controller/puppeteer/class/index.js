@@ -28,6 +28,13 @@ class PuppeteerControl {
         /** @type {Browser}*/
         this.browser = null
         this.io = null
+        this.__isExecutionOngoing = false //execution status has 3 status. true-> ongoing false-> completed null=>aborted
+    }
+    get isExecutionOngoing() {
+        return this.__isExecutionOngoing
+    }
+    set isExecutionOngoing(status) {
+        this.__isExecutionOngoing = status
     }
     static inbuiltEvent = {
         refresh: 'refresh'
@@ -88,7 +95,7 @@ class PuppeteerControl {
             let currentScope = argumentNContext.currentScope
             currentScope['mainFunc'] = functionAst.mainFunc
             let res = null
-
+            this.isExecutionOngoing = true
             res = _eval(`
             mainFunc(${argumentStr})
                             .then(result => {
@@ -113,11 +120,18 @@ class PuppeteerControl {
                     resultNote = res.err
                     break
                 }
+                if (this.isExecutionOngoing == null) {
+                    isResultPass = false
+                    resultNote = 'Operation is Aborted by User'
+                    break
+                }
             }
         } catch (error) {
             isResultPass = false
             resultNote = `Error during runPtFunc.js: ${error.toString()}`
         }
+        //execution has completed 
+        this.isExecutionOngoing = false
         let pResult = new PuppeteerResult()
         pResult.isResultPass = isResultPass
         pResult.resultText = resultNote
