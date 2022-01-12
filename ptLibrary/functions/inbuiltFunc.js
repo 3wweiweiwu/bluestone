@@ -1,4 +1,4 @@
-const { Page, Frame, ElementHandle } = require('puppeteer-core')
+const { Page, Frame, ElementHandle, Browser } = require('puppeteer-core')
 const ElementSelector = require('../class/ElementSelector')
 const findElement = require('./findElement')
 const assert = require('assert')
@@ -169,4 +169,17 @@ exports.keydown1 = async function (frame, key) {
             break;
     }
     return `Click success!`
+}
+
+/**
+ * Close Browser
+*  @param {Browser} browser 
+ */
+exports.closeBrowser = async function (browser) {
+    //will not quit browser if we are in bluestone simlation env
+    if (process.env.BLUESTONE_SIMULATOR)
+        return 'Browser will on be closed in real puppeteer script execution'
+
+    await browser.close()
+    return `Closed`
 }

@@ -36,6 +36,10 @@ module.exports = {
     gotoFrame: {
         func: inbuiltFunc.gotoFrame,
         locators: [{ locator: ['invalid_locator'] }]
+    },
+    closeBrowser: {
+        func: inbuiltFunc.closeBrowser,
+        locators: [{ locator: ['invalid_locator'] }]
     }
 
 }

@@ -324,7 +324,8 @@ class WorkflowRecord {
         click: 'click',
         goto: 'goto',
         keydown: 'keydown',
-        gotoFrame: 'gotoFrame'
+        gotoFrame: 'gotoFrame',
+        closeBrowser: 'closeBrowser'
     }
     static inbuiltEvent = {
         refresh: PuppeteerControl.inbuiltEvent.refresh
@@ -363,6 +364,7 @@ class WorkflowRecord {
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.click),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.keydown),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.hover),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.closeBrowser),
                 ]
             },
             customizedFunctions: {

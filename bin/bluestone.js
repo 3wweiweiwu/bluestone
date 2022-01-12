@@ -29,6 +29,9 @@ function serverAt(options) {
         if (!process.env.NODE_ENV) {
             process.env.NODE_ENV = 'production';
         }
+        if (!process.env.BLUESTONE_SIMULATOR) {
+            process.env.BLUESTONE_SIMULATOR = '1';
+        }
         let pidPath = getPidPath()
         let runtime = {
             pid: process.pid,
