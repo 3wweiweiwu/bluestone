@@ -17,7 +17,7 @@ Create UI automation is easy, here is general breakdown
    2. ![](pic/start-recording.png)
 
 3. Status Check 
-   1. if there is purple rectangle when you hover your mouse over different elements. If you didn't see that, you may want to close command prompt and redo step 1 and 2
+   1. if there is purple rectangle when you hover your mouse over different elements. You may refresh web browser. Bluestone shall load automatically.
    2. ![](pic/correct-launch.png)
 ## Record Your Step and add validation
 1. Run your workflow. 
