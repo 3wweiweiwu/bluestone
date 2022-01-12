@@ -24,3 +24,5 @@
 7. Go to any test file, you can debug the testcase
    1. ![](pic/debug-1.png)
    2. ![](pic/debug-2.png)
+8. Depends on the length of your test, you may need to update timeout
+   1. ![](pic/update-time-out-mocha.png)
