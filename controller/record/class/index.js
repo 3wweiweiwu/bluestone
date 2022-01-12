@@ -509,7 +509,6 @@ class WorkflowRecord {
      * @returns {number} index of the failed step. -1 if everything pass
      */
     async runAllSteps() {
-        await this.puppeteer.cleanCache()
         let failedStepIndex = -1
         //check if there is any un-correlated locator in step
         failedStepIndex = this.findPendingLocatorInStep()
