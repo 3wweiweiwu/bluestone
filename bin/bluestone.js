@@ -80,6 +80,8 @@ try {
             bluestoneUrl = `http://localhost:${port}`
             axios.post(`${bluestoneUrl}/api/record`, { url: cli.args.url })
             break;
+        case 'function':
+            break;
         case 'help':
             cli.help();
             break;

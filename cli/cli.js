@@ -23,6 +23,14 @@ const options = {
         type: 'string',
         global: false
     },
+    'function name': {
+        description: 'The name of the function. Same name will be used as function file name',
+        type: 'string'
+    },
+    'function relative folder': {
+        description: 'The directory to store the function. It will be under ./function/',
+        type: 'string'
+    }
 }
 
 let argv = yargs
@@ -45,6 +53,16 @@ let argv = yargs
             .wrap(null)
             .example('bluestone record https://www.google.com', 'start record script against https://www.google.com ')
 
+    })
+    .command('function <function relative folder> <function name>', 'Create function template', funcYargs => {
+        funcYargs
+            .usage('Usage: bluestone function <folder> <name>')
+            .help('help')
+            .wrap(null)
+            .positional('folder', options['function relative folder'])
+            .positional('name', options['function name'])
+            .example('bluestone function ./abc testfunction',
+                'creaet a testfunction under ./function/abc/testFunction.js')
     })
     .wrap(null)
     .argv
