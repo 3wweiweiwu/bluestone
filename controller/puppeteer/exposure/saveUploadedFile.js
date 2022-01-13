@@ -1,0 +1,31 @@
+const fs = require('fs').promises
+const { RecordingStep, COMMAND_TYPE, WorkflowRecord } = require('../../record/class/index')
+const os = require('os')
+const path = require('path')
+module.exports = function saveUploadedFile() {
+    /**
+     * Transfer the uploaded file to local disk
+     * @param {FileUploadInfo[]} fileList 
+     */
+    async function main(fileList) {
+        for (const file of fileList) {
+            let base64 = file.base64.split(';base64,').pop();
+            let filePath = path.join(os.tmpdir(), file.name)
+            fs.writeFile(filePath, base64, { encoding: 'base64' })
+        }
+
+    }
+    return main
+}
+
+class FileUploadInfo {
+    /**
+     * Create Entry for each file we upload
+     * @param {string} name 
+     * @param {string} base64 
+     */
+    constructor(name, base64) {
+        this.name = name
+        this.base64 = base64
+    }
+}

@@ -152,7 +152,7 @@ class RecordingStep {
 }
 /**
  * @typedef step
- * @property {'click'|'change'|'dblclick'|'keydown'|'goto'} command
+ * @property {'click'|'change'|'dblclick'|'keydown'|'goto'|'upload'} command
  * @property {string} target
  * @property {Array<ExistingSelector>} matchedSelector
  * @property {number} timeoutMs
