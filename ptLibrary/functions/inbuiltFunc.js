@@ -2,7 +2,7 @@ const { Page, Frame, ElementHandle, Browser } = require('puppeteer-core')
 const ElementSelector = require('../class/ElementSelector')
 const findElement = require('./findElement')
 const assert = require('assert')
-
+const path = require('path')
 const ConstantVar = {
     parentIFrameLocator: 'TOP IFRAME'
 }
@@ -182,4 +182,32 @@ exports.closeBrowser = async function (browser) {
 
     await browser.close()
     return `Closed`
+}
+
+/**
+ * Upload Files
+*  @param {Frame} frame 
+ * @param {ElementSelector} elementSelector element selector object
+ * @param {string} uploadPathes Path to files you want to upload. It's a json array of string.Ex: ["c:\\temp\\a.jpg"]
+ */
+exports.upload = async function (frame, elementSelector, uploadPathes) {
+    /**@type {ElementHandle} */
+    let element = await findElement(frame, elementSelector, 2000)
+    let className = await element.evaluate(node => node.nodeName)
+    if (className != 'INPUT')
+        return Promise.reject('Element has to be INPUT class')
+    /**@type {string[]} */
+    let pathList = JSON.parse(uploadPathes)
+    let mappedPath = pathList.map(fullPath => {
+        return path.relative(process.cwd(), fullPath);
+    })
+    try {
+
+        await element.uploadFile(...mappedPath)
+        await element.evaluate(upload => upload.dispatchEvent(new Event('change', { bubbles: true })));
+    } catch (error) {
+        return Promise.reject(`Unable to Upload ${elementSelector.displayName}`)
+    }
+
+    return `Upload Success!`
 }

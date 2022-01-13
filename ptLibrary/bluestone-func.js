@@ -40,6 +40,10 @@ module.exports = {
     closeBrowser: {
         func: inbuiltFunc.closeBrowser,
         locators: [{ locator: ['invalid_locator'] }]
+    },
+    upload: {
+        func: inbuiltFunc.upload,
+        locators: [{ locator: ['invalid_locator'] }]
     }
 
 }

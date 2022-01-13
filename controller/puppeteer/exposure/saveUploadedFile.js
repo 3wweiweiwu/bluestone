@@ -2,12 +2,18 @@ const fs = require('fs').promises
 const { RecordingStep, COMMAND_TYPE, WorkflowRecord } = require('../../record/class/index')
 const os = require('os')
 const path = require('path')
-module.exports = function saveUploadedFile() {
+/**
+ * 
+ * @param {WorkflowRecord} record 
+ * @returns 
+ */
+module.exports = function saveUploadedFile(record) {
     /**
      * Transfer the uploaded file to local disk
      * @param {FileUploadInfo[]} fileList 
      */
     async function main(fileList) {
+        if (!record.isRecording) return
         for (const file of fileList) {
             let base64 = file.base64.split(';base64,').pop();
             let filePath = path.join(os.tmpdir(), file.name)

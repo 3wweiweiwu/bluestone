@@ -63,7 +63,7 @@ async function startRecording(record, io, url = null) {
     await page.exposeFunction('setSpyVisible', setSpyVisible(record))
     await page.exposeFunction('captureHtml', captureHtml(page, record))
     await page.exposeFunction('captureScreenshot', captureScreenshot(page, record))
-    await page.exposeFunction('saveUploadedFile', saveUploadedFile())
+    await page.exposeFunction('saveUploadedFile', saveUploadedFile(record))
 
     await page.setBypassCSP(true)
 
