@@ -4,7 +4,7 @@
  * @returns 
  */
 export function fileUpload(event) {
-    let createResult = function (name, base64) {
+    let createResult = function (path, base64) {
         return {
             path, base64
         }
@@ -14,7 +14,8 @@ export function fileUpload(event) {
     }
     let fileList = Array.from(event.target.files)
     //generate file name list
-    let filePathList = fileList.map(file => window.getUploadFilePath(`${file.name}-bluestone-${Date.now()}`))
+    let filePathList = fileList.map(file => (`${file.name}-bluestone-${Date.now()}/${file.name}`))
+
     //generate promise chain
     let promiseList = []
     fileList.forEach((file, i) => {

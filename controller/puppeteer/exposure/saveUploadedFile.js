@@ -16,8 +16,14 @@ exports.saveUploadedFile = function saveUploadedFile(record) {
         if (!record.isRecording) return
         for (const file of fileList) {
             let base64 = file.base64.split(';base64,').pop();
-            let filePath = file.path
-            fs.writeFile(filePath, base64, { encoding: 'base64' })
+
+            let folderName = file.path.split('/')[0]
+            let fileFolder = path.join(os.tmpdir(), folderName)
+            await fs.mkdir(fileFolder)
+
+            let filePath = path.join(os.tmpdir(), file.path)
+
+            await fs.writeFile(filePath, base64, { encoding: 'base64' })
         }
 
     }
