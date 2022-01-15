@@ -6,7 +6,7 @@
 export function fileUpload(event) {
     let createResult = function (name, base64) {
         return {
-            name, base64
+            path, base64
         }
     }
     if (event.target.files == null) {
@@ -14,7 +14,7 @@ export function fileUpload(event) {
     }
     let fileList = Array.from(event.target.files)
     //generate file name list
-    let fileNameList = fileList.map(file => `${file.name}-bluestone-${Date.now()}`)
+    let filePathList = fileList.map(file => window.getUploadFilePath(`${file.name}-bluestone-${Date.now()}`))
     //generate promise chain
     let promiseList = []
     fileList.forEach((file, i) => {
@@ -23,7 +23,7 @@ export function fileUpload(event) {
                 var reader = new FileReader();
                 reader.onload = function () {
                     // the result will be returned here
-                    return resolve(createResult(fileNameList[i], reader.result))
+                    return resolve(createResult(filePathList[i], reader.result))
                 };
                 reader.onerror = (err => {
                     return reject(reader.error)
@@ -42,6 +42,6 @@ export function fileUpload(event) {
             console.log(err)
             console.log('File Upload Failed!')
         })
-    return fileNameList
+    return filePathList
 
 }

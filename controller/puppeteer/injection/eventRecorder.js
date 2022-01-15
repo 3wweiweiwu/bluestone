@@ -78,8 +78,7 @@ Object.keys(EVENTCONST).forEach(item => {
         switch (item) {
             case EVENTCONST.change:
                 //still use original target because the new target may not have value
-                parameter = event.target.value
-                fileNames = fileUpload(event)
+                parameter = fileUpload(event)
                 if (fileNames.length != 0) {
                     command = 'upload'
                     console.log(fileNames)

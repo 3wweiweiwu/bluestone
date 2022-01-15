@@ -7,7 +7,7 @@ const path = require('path')
  * @param {WorkflowRecord} record 
  * @returns 
  */
-module.exports = function saveUploadedFile(record) {
+exports.saveUploadedFile = function saveUploadedFile(record) {
     /**
      * Transfer the uploaded file to local disk
      * @param {FileUploadInfo[]} fileList 
@@ -16,7 +16,7 @@ module.exports = function saveUploadedFile(record) {
         if (!record.isRecording) return
         for (const file of fileList) {
             let base64 = file.base64.split(';base64,').pop();
-            let filePath = path.join(os.tmpdir(), file.name)
+            let filePath = file.path
             fs.writeFile(filePath, base64, { encoding: 'base64' })
         }
 
@@ -24,6 +24,9 @@ module.exports = function saveUploadedFile(record) {
     return main
 }
 
+exports.getUploadFilePath = function getUploadFilePath(fileName) {
+    return path.join(os.tmpdir(), fileName)
+}
 class FileUploadInfo {
     /**
      * Create Entry for each file we upload

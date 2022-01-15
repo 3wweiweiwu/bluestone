@@ -42,7 +42,7 @@ module.exports = {
         locators: [{ locator: ['invalid_locator'] }]
     },
     upload: {
-        func: inbuiltFunc.upload,
+        func: inbuiltFunc.uploadByInput,
         locators: [{ locator: ['invalid_locator'] }]
     }
 

@@ -188,25 +188,46 @@ exports.closeBrowser = async function (browser) {
  * Upload Files
 *  @param {Frame} frame 
  * @param {ElementSelector} elementSelector element selector object
- * @param {string} uploadPathes Path to files you want to upload. It's a json array of string.Ex: ["c:\\temp\\a.jpg"]
+ * @param {string} uploadPathes Path to files you want to upload. You can seperate multiple files by ",".Ex: "c:\temp\a.jpg,c:\temp\b.j.jpg"
  */
-exports.upload = async function (frame, elementSelector, uploadPathes) {
+exports.uploadByInput = async function upload(frame, elementSelector, uploadPathes) {
     /**@type {ElementHandle} */
     let element = await findElement(frame, elementSelector, 2000)
+
     let className = await element.evaluate(node => node.nodeName)
-    if (className != 'INPUT')
-        return Promise.reject('Element has to be INPUT class')
+    let typeName = await element.evaluate(node => node.getAttribute('type'))
+    let inputElement = element
+    //search through the page to find 
+    if (className != 'INPUT' || typeName != 'file') {
+        let parentElement = element
+
+        while (true) {
+            parentElement = (await parentElement.$x('..'))[0]
+
+            let potentialInputElements = await parentElement.$x('.//input[@type="file"]')
+            if (potentialInputElements.length == 1) {
+                inputElement = potentialInputElements[0]
+                break
+            }
+            else if (potentialInputElements.length > 1) {
+                return Promise.reject(`Too many file upload inputs. Please try different item`)
+            }
+
+
+        }
+
+    }
     /**@type {string[]} */
-    let pathList = JSON.parse(uploadPathes)
+    let pathList = uploadPathes.split(',')
     let mappedPath = pathList.map(fullPath => {
         return path.relative(process.cwd(), fullPath);
     })
     try {
 
-        await element.uploadFile(...mappedPath)
-        await element.evaluate(upload => upload.dispatchEvent(new Event('change', { bubbles: true })));
+        await inputElement.uploadFile(...mappedPath)
+        await inputElement.evaluate(upload => upload.dispatchEvent(new Event('change', { bubbles: true })));
     } catch (error) {
-        return Promise.reject(`Unable to Upload ${elementSelector.displayName}`)
+        return Promise.reject(`Unable to Upload ${elementSelector.displayName}. Message:"${error.message}"`)
     }
 
     return `Upload Success!`

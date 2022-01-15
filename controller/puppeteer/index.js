@@ -7,7 +7,7 @@ const isSpyVisible = require('./exposure/isSpyVisible')
 const setSpyVisible = require('./exposure/setSpyVisible')
 const ElementSelector = require('../../ptLibrary/class/ElementSelector')
 const captureHtml = require('./exposure/captureHtml')
-const saveUploadedFile = require('./exposure/saveUploadedFile')
+const { saveUploadedFile, getUploadFilePath } = require('./exposure/saveUploadedFile')
 const path = require('path')
 const fs = require('fs').promises
 const { RecordingStep, WorkflowRecord } = require('../record/class')
@@ -64,6 +64,7 @@ async function startRecording(record, io, url = null) {
     await page.exposeFunction('captureHtml', captureHtml(page, record))
     await page.exposeFunction('captureScreenshot', captureScreenshot(page, record))
     await page.exposeFunction('saveUploadedFile', saveUploadedFile(record))
+    await page.exposeFunction('getUploadFilePath', getUploadFilePath)
 
     await page.setBypassCSP(true)
 
