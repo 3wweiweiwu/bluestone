@@ -171,7 +171,7 @@ class WorkFlowPug {
         for (let i = 0; i < steps.length; i++) {
             let stepInfo = steps[i]
             if (stepInfo.finalLocator == '' || stepInfo.finalLocatorName == '') {
-                this.txtValidationStatus = `<a href="?EDIT_LOCATOR=${i}">Locator Missing. Go to step ${i}</a>`
+                this.txtValidationStatus = `<a href="#tr-${i}">Locator Missing. Go to step ${i}</a>`
                 return false
             }
         }
@@ -180,9 +180,8 @@ class WorkFlowPug {
                 let stepInfo = steps[i]
 
                 if (!stepInfo.result.isResultPass) {
-                    let updateLocator = `<a href=?EDIT_LOCATOR=${i}>modify locator </a>`
-                    let editFunction = `<a href=?EDIT_WRKFLOW=${i}>edit function</a>`
-                    this.txtValidationStatus = `Step ${i} Failed: ${stepInfo.result.resultText}. Please run workflow again or ${updateLocator} or ${editFunction}`
+                    let updateLocator = `<a href=#tr-${i}>modify locator or edit function </a>`
+                    this.txtValidationStatus = `Step ${i} Failed: ${stepInfo.result.resultText}. Please run workflow again or ${updateLocator}`
                     return false
                 }
             }

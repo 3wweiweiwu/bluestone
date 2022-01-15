@@ -49,6 +49,9 @@ exports.waitElementExists = async function (frame, elementSelector, timeout) {
  */
 exports.change = async function (frame, elementSelector, text) {
     let element = await findElement(frame, elementSelector, 2000)
+    //clear current input field
+    await element.evaluate(el => el.value = '');
+
     await element.type(text, { delay: 100 })
 
     return `Type value ${text} success!`
