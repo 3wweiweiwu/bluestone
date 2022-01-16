@@ -148,7 +148,10 @@ Object.keys(EVENTCONST).forEach(item => {
 
         }
         // new CustomEvent('eventDetected', { detail: eventDetail });
-        window.logEvent(eventDetail)
+        //will only log event from visible behavior except for file upload
+        //file upload could trigger another element
+        if ((position.height > 0 && position.width > 0) || command == 'upload')
+            window.logEvent(eventDetail)
 
         // console.log(JSON.stringify(event))
     }, { capture: true })

@@ -144,7 +144,7 @@ module.exports = function (recordRepo, browser, page, io) {
 
             await recordRepo.addStep(event)
             await fixRecords(recordRepo.steps)
-            console.log(JSON.stringify(recordRepo.steps))
+            // console.log(JSON.stringify(recordRepo.steps))
             //update last operation time
         }
 
