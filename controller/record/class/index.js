@@ -152,7 +152,7 @@ class RecordingStep {
 }
 /**
  * @typedef step
- * @property {'click'|'change'|'dblclick'|'keydown'|'goto'} command
+ * @property {'click'|'change'|'dblclick'|'keydown'|'goto'|'upload'} command
  * @property {string} target
  * @property {Array<ExistingSelector>} matchedSelector
  * @property {number} timeoutMs
@@ -325,7 +325,8 @@ class WorkflowRecord {
         goto: 'goto',
         keydown: 'keydown',
         gotoFrame: 'gotoFrame',
-        closeBrowser: 'closeBrowser'
+        closeBrowser: 'closeBrowser',
+        upload: 'upload'
     }
     static inbuiltEvent = {
         refresh: PuppeteerControl.inbuiltEvent.refresh
@@ -365,6 +366,7 @@ class WorkflowRecord {
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.keydown),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.hover),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.closeBrowser),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.upload),
                 ]
             },
             customizedFunctions: {
@@ -430,8 +432,13 @@ class WorkflowRecord {
      */
     __addWaitForSteps(step, isFrame = false) {
         let waitCommand = 'waitElementExists'
+        //will not add wait step for those function who does not need to interact with specific element
+        let elementSelectorParam = step.functionAst.params.find(item => item.type.name == 'ElementSelector')
+
+
         //cosntruct wait step. insert wait step only if timeout is greater than 0 and previous command is not wait
-        if (step.command != 'goto' && step.command != waitCommand && step.timeoutMs != 0) {
+
+        if (step.command != 'goto' && step.command != waitCommand && step.timeoutMs != 0 && elementSelectorParam != null) {
             let waitFunctionAst = this.astManager.getFunction(waitCommand)
             let waitStep = JSON.parse(JSON.stringify(step))
             if (isFrame) {
@@ -490,12 +497,16 @@ class WorkflowRecord {
         let stepIndex = -1;
         //find out selector that is pending correlaton
         stepIndex = this.steps.findIndex(item => {
+            //will not check final locator for those steps whose function does not use element selector
+            let elementSelectorParam = item.functionAst.params.find(item => item.type.name == 'ElementSelector')
+            if (elementSelectorParam == null) return false
             return item.finalLocator == '' || item.finalLocator == ''
         })
         return stepIndex
     }
     /**
      * Return all functionAst object for ast purpose
+     * @returns {FunctionAST[]}
      */
     getAllFunctionAst() {
         let result = []

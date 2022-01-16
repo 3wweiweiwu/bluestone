@@ -5,6 +5,7 @@ let AstGenerator = require('./AstGenerator')
 const escodegen = require('escodegen')
 const fs = require("fs").promises
 const path = require('path')
+const preProsessAst = require('./preProsessAst')
 class Coder {
     /**
      * 
@@ -30,7 +31,8 @@ class Coder {
                 projectFuncLibrary: 'projectFunc',
                 puppeteerLibrary: 'puppeteer',
                 bluestoneFuncLibrary: 'bluestoneFunc',
-                configLibrary: 'config'
+                configLibrary: 'config',
+                varSaver: 'vars'
             },
             body: {
                 variableDeclaration: ['element', 'variable', 'frame'],
@@ -105,6 +107,10 @@ class Coder {
         ast = AstGenerator.getPageInitializationStatement(this.inbuiltVarName.body.pageVarName, this.inbuiltVarName.body.browserVarName)
         this.testcaseCodeBody.push(ast)
 
+        //let vars = { currentFileName: __filename };
+        ast = AstGenerator.getVarSaverDeclaration()
+        this.testcaseCodeBody.push(ast)
+
         //frame = page
         ast = AstGenerator.getAssignVarToVarOpeartion(this.inbuiltVarName.body.frameVarName, this.inbuiltVarName.body.pageVarName)
         this.testcaseCodeBody.push(ast)
@@ -137,11 +143,25 @@ class Coder {
         return this.__ast
     }
     async writeCodeToDisk() {
+        this.funcList = await preProsessAst(this.funcList, this.testSuite, this.testCase)
         await this.__generateFinalAst()
         let outputPath = path.join(this.__testFileFolder, this.fileName)
         let testCode = escodegen.generate(this.__ast)
         await fs.writeFile(outputPath, testCode)
         return outputPath
+    }
+    /**
+     * update function ast based on rule in order to output script correctly
+     * @param {FunctionAST[]} astList 
+     */
+    async updateFunctionAstList(astList) {
+        let ruleList = {}
+        for (const ast of astList) {
+            let currentRule = ruleList[ast.name]
+            if (currentRule == null) continue
+            await currentRule()
+        }
+        return astList
     }
 
     /**
@@ -178,6 +198,10 @@ class Coder {
                 case "ElementSelector":
                     let elementVarAst = AstGenerator.getElementSelectorArgAst(this.inbuiltVarName.library.locatorLibrary, param.value)
                     astJson.expression.argument.arguments.push(elementVarAst)
+                    break;
+                case "VarSaver":
+                    let varSaverVarAst = AstGenerator.getVarSaverArgAst(this.inbuiltVarName.library.varSaver, param.value)
+                    astJson.expression.argument.arguments.push(varSaverVarAst)
                     break;
                 case "string":
                     let strVarAst = AstGenerator.getSimpleValue(param.value)

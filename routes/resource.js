@@ -8,6 +8,7 @@ router.get('/js/:dependency', async function (req, res, next) {
 
     let fileDict = {
         'finder.js': path.join(__dirname, '../public/javascript/finder.js'),
+        'fileUpload.js': path.join(__dirname, '../public/javascript/fileUpload.js'),
         'customLocator.js': config.code.customLocatorEnginePath
     }
     let filePath = fileDict[req.params.dependency]

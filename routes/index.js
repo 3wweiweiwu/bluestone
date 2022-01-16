@@ -123,7 +123,8 @@ router.get('/spy', async function (req, res, next) {
     addStepQueryKey: Operation.inbuiltQueryKey.btnAddStep,
     cancelQueryKey: Operation.inbuiltQueryKey.btnCancel,
     runQueryKey: Operation.inbuiltQueryKey.btnRun,
-    result: ui.operation.operationResult
+    result: ui.operation.operationResult,
+    txtSelector: Operation.inbuiltQueryKey.txtSelector
   }
 
   res.render('spy.pug', variables);

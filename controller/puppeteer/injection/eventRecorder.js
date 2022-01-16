@@ -2,6 +2,7 @@
 
 import { finder } from 'http://localhost:3600/resource/js/finder.js'
 import { getLocator } from 'http://localhost:3600/resource/js/customLocator.js'
+import { fileUpload } from 'http://localhost:3600/resource/js/fileUpload.js'
 
 try {
 
@@ -73,10 +74,17 @@ Object.keys(EVENTCONST).forEach(item => {
         let parameter = null
         let command = item
         let targetPicPath = ''
+        let fileNames = []
         switch (item) {
             case EVENTCONST.change:
                 //still use original target because the new target may not have value
                 parameter = event.target.value
+                //handle file upload through input
+                fileNames = fileUpload(event)
+                if (fileNames.length != 0) {
+                    command = 'upload'
+                    parameter = fileNames
+                }
                 break;
             case EVENTCONST.keydown:
                 //currently, we only support enter and esc key
@@ -140,7 +148,10 @@ Object.keys(EVENTCONST).forEach(item => {
 
         }
         // new CustomEvent('eventDetected', { detail: eventDetail });
-        window.logEvent(eventDetail)
+        //will only log event from visible behavior except for file upload
+        //file upload could trigger another element
+        if ((position.height > 0 && position.width > 0) || command == 'upload')
+            window.logEvent(eventDetail)
 
         // console.log(JSON.stringify(event))
     }, { capture: true })

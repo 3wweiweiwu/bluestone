@@ -11,7 +11,7 @@ mixin workflow-table(header,data,removeWorkflowQueryKey,upWorkflowQueryKey,downW
                     th #{head}
         tbody
             each row,j in data
-                tr
+                tr(id='tr-'+j)
                     td
                         input(class='workflow-step-input' value=j index=j querykey=updateStepQueryKey queryindex='from' onChange="redirectInputOnChange(event)")
                     each col,k in row                        

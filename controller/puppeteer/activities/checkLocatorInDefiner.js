@@ -62,6 +62,9 @@ module.exports = async function (browser, targetLocator, currentLocator, parentI
         }
         //get target element
         let targetElement = targetElementList[0]
+        //put rectangle around element to make it easy to identify
+        targetElement.evaluate(node => node.style.border = "thick solid #0000FF")
+
         let targettBox = await targetElement.boundingBox()
         let currentBox = await elements[0].boundingBox()
         if (currentBox == null) {
