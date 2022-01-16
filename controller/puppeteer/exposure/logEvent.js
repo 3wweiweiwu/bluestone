@@ -168,7 +168,7 @@ module.exports = function (recordRepo, browser, page, io) {
  */
 async function fixRecords(steps) {
     let lastStep = steps[steps.length - 1]
-    let actionList = { upload: deleteStepBeforeUpload }
+    let actionList = { upload: upload }
     let action = actionList[lastStep.command]
     if (action)
         await action(steps)
@@ -182,7 +182,7 @@ async function fixRecords(steps) {
  * file chooser
  * @param {Array<import('../../record/class/index').RecordingStep>} steps 
  */
-function deleteStepBeforeUpload(steps) {
+function upload(steps) {
     let lastStepIndex = steps.length - 1
     //convert arry of file names to a fully qualified file path strings seperated by ,
     let paramIndex = steps[lastStepIndex].functionAst.params.findIndex(item => { return item.type.name == 'Number' || item.type.name == 'string' || item.type.name == 'number' || item.type.name == 'Number' })

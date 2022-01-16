@@ -1,8 +1,10 @@
 const { Page, Frame, ElementHandle, Browser } = require('puppeteer-core')
 const ElementSelector = require('../class/ElementSelector')
+const VarSaver = require('../class/VarSaver')
 const findElement = require('./findElement')
 const assert = require('assert')
 const path = require('path')
+const fs = require('fs')
 const ConstantVar = {
     parentIFrameLocator: 'TOP IFRAME'
 }
@@ -192,8 +194,9 @@ exports.closeBrowser = async function (browser) {
 *  @param {Frame} frame 
  * @param {ElementSelector} elementSelector element selector object
  * @param {string} uploadPathes Path to files you want to upload. You can seperate multiple files by ",".Ex: "c:\temp\a.jpg,c:\temp\b.j.jpg"
+ * @param {VarSaver} vars
  */
-exports.uploadByInput = async function upload(frame, elementSelector, uploadPathes) {
+exports.uploadByInput = async function upload(frame, vars, elementSelector, uploadPathes) {
     /**@type {ElementHandle} */
     let element = await findElement(frame, elementSelector, 2000)
 
@@ -222,9 +225,18 @@ exports.uploadByInput = async function upload(frame, elementSelector, uploadPath
     }
     /**@type {string[]} */
     let pathList = uploadPathes.split(',')
-    let mappedPath = pathList.map(fullPath => {
-        return path.relative(process.cwd(), fullPath);
-    })
+    let mappedPath = []
+    for (let i = 0; i < pathList.length; i++) {
+        let fullPath = pathList[i]
+        //in case it is a relative path, full path will be constructed
+        if (!path.isAbsolute(fullPath)) {
+            let currentFileDir = path.dirname(vars.currentFileName)
+            fullPath = path.join(currentFileDir, fullPath)
+        }
+
+        mappedPath.push(path.relative(process.cwd(), fullPath))
+    }
+
     try {
 
         await inputElement.uploadFile(...mappedPath)

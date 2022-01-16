@@ -498,6 +498,7 @@ class WorkflowRecord {
     }
     /**
      * Return all functionAst object for ast purpose
+     * @returns {FunctionAST[]}
      */
     getAllFunctionAst() {
         let result = []
