@@ -62,4 +62,9 @@ describe('AST Generator Class', () => {
         let jsCode = escodegen.generate(ast)
         assert.equal(jsCode, 'var1 = await lib.run.func();')
     })
+    it('should initialize vars correctly', async () => {
+        let ast = AstGenerator.getVarSaverDeclaration()
+        let jsCode = escodegen.generate(ast)
+        assert.equal(jsCode, 'let vars = { currentFileName: __filename };')
+    })
 })
