@@ -48,7 +48,7 @@ class Coder {
             [this.inbuiltVarName.library.locatorLibrary]: path.resolve(projectLocatorPath),
             [this.inbuiltVarName.library.projectFuncLibrary]: path.resolve(projectFuncPath),
             [this.inbuiltVarName.library.puppeteerLibrary]: 'puppeteer',
-            [this.inbuiltVarName.library.bluestoneFuncLibrary]: 'bluestone',
+            [this.inbuiltVarName.library.bluestoneFuncLibrary]: 'bluestone/ptLibrary/bluestone-func',
             [this.inbuiltVarName.library.configLibrary]: configPath
 
         }
@@ -75,10 +75,19 @@ class Coder {
         keys.forEach(key => {
             let linuxPath = this.inbuiltVarName.require[key]
 
-            //check if it is a node_module. For node module, I assume it should never inlucde / \ .
-            if (linuxPath.includes('/') || linuxPath.includes('\\') || linuxPath.includes('.')) {
-                linuxPath = path.relative(this.__testFileFolder, linuxPath).replace(/\\/g, '/')
+            //skip bluestoneFunc as it contains /
+            switch (linuxPath) {
+                case this.inbuiltVarName.require[this.inbuiltVarName.library.bluestoneFuncLibrary]:
+                    //this is a special case that contains /
+                    break;
+                default:
+                    //check if it is a node_module. For node module, I assume it should never inlucde / \ .
+                    if (linuxPath.includes('/') || linuxPath.includes('\\') || linuxPath.includes('.')) {
+                        linuxPath = path.relative(this.__testFileFolder, linuxPath).replace(/\\/g, '/')
+                    }
+                    break;
             }
+
 
             this.__addRequireInfo(key, linuxPath)
         })

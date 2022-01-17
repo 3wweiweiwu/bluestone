@@ -1,2 +1,4 @@
 const ElementSelector = require('./ElementSelector')
-module.exports = { ElementSelector }
+const BluestoneFunc = require('./BluestoneFunc')
+const VarSaver = require('./VarSaver')
+module.exports = { ElementSelector, BluestoneFunc, VarSaver }
