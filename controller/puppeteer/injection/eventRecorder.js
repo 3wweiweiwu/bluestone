@@ -2,6 +2,7 @@
 
 import { finder } from 'http://localhost:3600/resource/js/finder.js'
 import { getLocator } from 'http://localhost:3600/resource/js/customLocator.js'
+import { fileUpload } from 'http://localhost:3600/resource/js/fileUpload.js'
 
 try {
 
@@ -73,10 +74,17 @@ Object.keys(EVENTCONST).forEach(item => {
         let parameter = null
         let command = item
         let targetPicPath = ''
+        let fileNames = []
         switch (item) {
             case EVENTCONST.change:
                 //still use original target because the new target may not have value
                 parameter = event.target.value
+                //handle file upload through input
+                fileNames = fileUpload(event)
+                if (fileNames.length != 0) {
+                    command = 'upload'
+                    parameter = fileNames
+                }
                 break;
             case EVENTCONST.keydown:
                 //currently, we only support enter and esc key
@@ -140,7 +148,10 @@ Object.keys(EVENTCONST).forEach(item => {
 
         }
         // new CustomEvent('eventDetected', { detail: eventDetail });
-        window.logEvent(eventDetail)
+        //will only log event from visible behavior except for file upload
+        //file upload could trigger another element
+        if ((position.height > 0 && position.width > 0) || command == 'upload')
+            window.logEvent(eventDetail)
 
         // console.log(JSON.stringify(event))
     }, { capture: true })
@@ -275,6 +286,17 @@ function getActiveLocator() {
     while (true)
     window.setLocatorStatus(activeLocatorIndexes)
 }
+function getElementByXpath(xpath, source = document) {
+    let result = []
+    let elements = document.evaluate(xpath, source)
+    while (true) {
+        let node = elements.iterateNext()
+        if (node == null) break
+        result.push(node)
+    }
+    return result
+
+}
 async function scanLocator() {
     function resetBsLocatorAttribute() {
         //clearly all bluestone-locator properties from the elements in current frame to reset to clean state
@@ -312,17 +334,18 @@ async function scanLocator() {
         for (let locatorOptionIndex = 0; locatorOptionIndex < currentLocatorOptions.length; locatorOptionIndex++) {
 
             currentLocator = currentLocatorOptions[locatorOptionIndex]
+            let currentElementList = []
             if (currentLocator.startsWith('/')) {
                 //current locator is xpath
-
-                currentElement = document.evaluate(currentLocator, document).iterateNext()
+                currentElementList = getElementByXpath(currentLocator)
             }
             else {
                 //current selector is css selector
-                currentElement = document.querySelector(currentLocator)
+                currentElementList = document.querySelectorAll(currentLocator)
             }
             //if current locator find element, break current loop to save time
-            if (currentElement != null) {
+            if (currentElementList.length == 1) {
+                currentElement = currentElementList[0]
                 break
             }
         }

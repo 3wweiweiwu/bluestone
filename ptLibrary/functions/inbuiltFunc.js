@@ -1,8 +1,10 @@
 const { Page, Frame, ElementHandle, Browser } = require('puppeteer-core')
 const ElementSelector = require('../class/ElementSelector')
+const VarSaver = require('../class/VarSaver')
 const findElement = require('./findElement')
 const assert = require('assert')
-
+const path = require('path')
+const fs = require('fs')
 const ConstantVar = {
     parentIFrameLocator: 'TOP IFRAME'
 }
@@ -49,6 +51,9 @@ exports.waitElementExists = async function (frame, elementSelector, timeout) {
  */
 exports.change = async function (frame, elementSelector, text) {
     let element = await findElement(frame, elementSelector, 2000)
+    //clear current input field
+    await element.evaluate(el => el.value = '');
+
     await element.type(text, { delay: 100 })
 
     return `Type value ${text} success!`
@@ -182,4 +187,63 @@ exports.closeBrowser = async function (browser) {
 
     await browser.close()
     return `Closed`
+}
+
+/**
+ * Upload Files
+*  @param {Frame} frame 
+ * @param {ElementSelector} elementSelector element selector object
+ * @param {string} uploadPathes Path to files you want to upload. You can seperate multiple files by ",".Ex: "c:\temp\a.jpg,c:\temp\b.j.jpg"
+ * @param {VarSaver} vars
+ */
+exports.uploadByInput = async function upload(frame, vars, elementSelector, uploadPathes) {
+    /**@type {ElementHandle} */
+    let element = await findElement(frame, elementSelector, 2000)
+
+    let className = await element.evaluate(node => node.nodeName)
+    let typeName = await element.evaluate(node => node.getAttribute('type'))
+    let inputElement = element
+    //search through the page to find 
+    if (className != 'INPUT' || typeName != 'file') {
+        let parentElement = element
+
+        while (true) {
+            parentElement = (await parentElement.$x('..'))[0]
+
+            let potentialInputElements = await parentElement.$x('.//input[@type="file"]')
+            if (potentialInputElements.length == 1) {
+                inputElement = potentialInputElements[0]
+                break
+            }
+            else if (potentialInputElements.length > 1) {
+                return Promise.reject(`Too many file upload inputs. Please try different item`)
+            }
+
+
+        }
+
+    }
+    /**@type {string[]} */
+    let pathList = uploadPathes.split(',')
+    let mappedPath = []
+    for (let i = 0; i < pathList.length; i++) {
+        let fullPath = pathList[i]
+        //in case it is a relative path, full path will be constructed
+        if (!path.isAbsolute(fullPath)) {
+            let currentFileDir = path.dirname(vars.currentFileName)
+            fullPath = path.join(currentFileDir, fullPath)
+        }
+
+        mappedPath.push(path.relative(process.cwd(), fullPath))
+    }
+
+    try {
+
+        await inputElement.uploadFile(...mappedPath)
+        await inputElement.evaluate(upload => upload.dispatchEvent(new Event('change', { bubbles: true })));
+    } catch (error) {
+        return Promise.reject(`Unable to Upload ${elementSelector.displayName}. Message:"${error.message}"`)
+    }
+
+    return `Upload Success!`
 }

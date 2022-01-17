@@ -136,7 +136,7 @@ class LocatorManager {
         }
 
         //check if update is required for the current locator. If so, update locator and screenshot path
-        if (targetLocator.Locator[0] != locatorValue[0]) {
+        if (targetLocator.Locator[0] != locatorValue[0] || targetLocator.screenshot == '' || targetLocator.screenshot == null) {
             targetLocator.Locator = locatorValue
             targetLocator.screenshot = relativePicPath
         }

@@ -170,8 +170,12 @@ class WorkFlowPug {
 
         for (let i = 0; i < steps.length; i++) {
             let stepInfo = steps[i]
+            //skip steps whose function does not need locator
+            let elementSelectorParam = stepInfo.functionAst.params.find(item => item.type.name == 'ElementSelector')
+            if (elementSelectorParam == null) continue
+
             if (stepInfo.finalLocator == '' || stepInfo.finalLocatorName == '') {
-                this.txtValidationStatus = `Please correlate locator at step ${i}`
+                this.txtValidationStatus = `<a href="#tr-${i}">Locator Missing. Go to step ${i}</a>`
                 return false
             }
         }
@@ -180,7 +184,8 @@ class WorkFlowPug {
                 let stepInfo = steps[i]
 
                 if (!stepInfo.result.isResultPass) {
-                    this.txtValidationStatus = `Step ${i} Failed: ${stepInfo.result.resultText}. Please run workflow again or modify the locator`
+                    let updateLocator = `<a href=#tr-${i}>modify locator or edit function </a>`
+                    this.txtValidationStatus = `Step ${i} Failed: ${stepInfo.result.resultText}. Please run workflow again or ${updateLocator}`
                     return false
                 }
             }

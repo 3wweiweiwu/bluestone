@@ -57,11 +57,14 @@ module.exports = async function (browser, targetLocator, currentLocator, parentI
             return errorText
         }
         else if (targetElementList.length > 1) {
-            errorText = 'More than 1 selector being found. Please contact bluestone team or check your selector generator'
+            errorText = 'Incorrect Original Selector. The current html page is incorrect. Please contact bluestone team or check your selector generator'
             return errorText
         }
         //get target element
         let targetElement = targetElementList[0]
+        //put rectangle around element to make it easy to identify
+        targetElement.evaluate(node => node.style.border = "thick solid #0000FF")
+
         let targettBox = await targetElement.boundingBox()
         let currentBox = await elements[0].boundingBox()
         if (currentBox == null) {

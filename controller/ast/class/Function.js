@@ -52,6 +52,10 @@ class FunctionAST {
             let param = currentOperation.params[i]
             //construct scope
             switch (param.type.name) {
+                case "VarSaver":
+                    currentScope['vars'] = {}
+                    currentParam.push('vars')
+                    break;
                 case "Frame":
                     currentScope['frame'] = frame
                     currentParam.push('frame')

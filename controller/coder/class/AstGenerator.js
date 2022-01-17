@@ -63,7 +63,14 @@ class AstGenerator {
     static getFrameArgAst(frameVarName) {
         return AstGenerator.getSimpleVariableAst(frameVarName)
     }
-
+    /**
+     * create the variable that can be used for var saver
+     * @param {string} varSaverVarName 
+     * @returns 
+     */
+    static getVarSaverArgAst(varSaverVarName) {
+        return AstGenerator.getSimpleVariableAst(varSaverVarName)
+    }
     /**
      * create the variable that can be used for page
      * @param {string} pageVarName 
@@ -125,7 +132,7 @@ class AstGenerator {
             }
         }
     }
-    
+
     /**
      * Create a argument for library and method funcLib.method1.func()
      * @param {string} libraryName in this case, it is funcLib
@@ -495,6 +502,47 @@ class AstGenerator {
             "end": 0,
             "body": [],
             "sourceType": "module"
+        }
+    }
+    /**
+     * let vars = { currentFileName: __filename }
+     * @returns 
+     */
+    static getVarSaverDeclaration() {
+        return {
+            "type": "VariableDeclaration",
+            "declarations": [
+                {
+                    "type": "VariableDeclarator",
+                    "start": 4,
+                    "end": 42,
+                    "id": {
+                        "type": "Identifier",
+                        "name": "vars"
+                    },
+                    "init": {
+                        "type": "ObjectExpression",
+                        "properties": [
+                            {
+                                "type": "Property",
+                                "method": false,
+                                "shorthand": false,
+                                "computed": false,
+                                "key": {
+                                    "type": "Identifier",
+                                    "name": "currentFileName"
+                                },
+                                "value": {
+                                    "type": "Identifier",
+                                    "name": "__filename"
+                                },
+                                "kind": "init"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "kind": "let"
         }
     }
 

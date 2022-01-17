@@ -56,7 +56,8 @@ class Operation {
         currentArgumentIndex: 'currentArgumentIndex',
         btnAddStep: 'btnAddStep',
         btnCancel: 'btnCancel',
-        btnRun: 'btnRun'
+        btnRun: 'btnRun',
+        txtSelector: 'txtSelector'
     }
     static inbuiltOperation = {
         textEqual: 'testTextEqual',
@@ -171,6 +172,9 @@ class Operation {
             case Operation.inbuiltQueryKey.btnCancel:
                 this.backend.isRecording = true
                 this.backend.spyVisible = false
+                break;
+            case Operation.inbuiltQueryKey.txtSelector:
+                this.backend.operation.browserSelection.currentSelector = firstValue
                 break;
             case Operation.inbuiltQueryKey.btnRun:
                 let currentOperation = this.backend.getCurrentOperation()
