@@ -171,10 +171,22 @@ class AST {
         //go to parent node
         let parentNodeIndex = currentNode.ancestors.length - 2
         let parentNode = currentNode.ancestors[parentNodeIndex]
-        let funcNode = parentNode.value.properties.find(item => { return item.key.name == 'func' })
+        //depends on definition type(class or loose object), choose right parser
+        let funcNode = null
+        let libraryName = ''
+        let methodName = ''
+        if (parentNode.value.properties) {
+            funcNode = parentNode.value.properties.find(item => { return item.key.name == 'func' })
+            libraryName = funcNode.value.object.name
+            methodName = funcNode.value.property.name
+        }
+        else if (parentNode.value.type == 'NewExpression') {
+            funcNode = parentNode.value.arguments.find(item => { return item.type == 'MemberExpression' })
+            libraryName = funcNode.object.name
+            methodName = funcNode.property.name
+        }
 
-        let libraryName = funcNode.value.object.name
-        let methodName = funcNode.value.property.name
+
         let bsFunc = new BsFunc(libraryName, methodName)
         return bsFunc
 
