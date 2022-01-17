@@ -57,7 +57,7 @@ module.exports = async function (browser, targetLocator, currentLocator, parentI
             return errorText
         }
         else if (targetElementList.length > 1) {
-            errorText = 'More than 1 selector being found. Please contact bluestone team or check your selector generator'
+            errorText = 'Incorrect Original Selector. The current html page is incorrect. Please contact bluestone team or check your selector generator'
             return errorText
         }
         //get target element
