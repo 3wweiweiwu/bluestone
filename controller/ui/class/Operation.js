@@ -118,14 +118,12 @@ class Operation {
         }
         //all argument need to be populated
         let currentOperation = this.getCurrentOperation()
-        let emptyArgumentIndex = currentOperation.params.findIndex(item => {
+        currentOperation.params.filter(item => {
             //find out empty argument only for string and number input becasue we won't take any other input type here
             return (item.type.name == 'string' || item.type.name == 'number') && (item.value == null || item.value == '')
         })
-        if (emptyArgumentIndex != -1 && this.getCurrentOperation().name != WorkflowRecord.inBuiltFunc.testTextEqual) {
-            this.spy.validation.btnAddStep = `Please enter value for argument`
-            return
-        }
+            .forEach(item => item.value = '')
+
 
 
     }
