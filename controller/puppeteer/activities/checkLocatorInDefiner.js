@@ -38,32 +38,34 @@ module.exports = async function (browser, targetLocator, currentLocator, parentI
             return 'Please use default value as we are switching back to parent frame'
         }
     }
-
+    //check if we are at the right html page
     /** @type {Array<ElementHandle>} */
+    let targetElementList = await getLocator(frame, targetLocator)
+    if (targetElementList.length == 0) {
+        errorText = 'Original Selector cannot be found in current html snapshot. Please click <Previous Html> button and find right snapshot'
+        return errorText
+    }
+    else if (targetElementList.length > 1) {
+        errorText = 'Incorrect Original Selector. The current html page is incorrect. Please contact bluestone team or check your selector generator'
+        return errorText
+    }
+    //get target element
+    let targetElement = targetElementList[0]
+    //put rectangle around element to make it easy to identify
+    targetElement.evaluate(node => node.style.border = "thick solid #0000FF")
+
+    //check current locator user specified
     elements = await getLocator(frame, currentLocator)
 
     if (elements.length == 0) {
-        errorText = 'Cannot find locator specified. Please try something else'
+        errorText = 'Cannot find locator specified. Please try different locator'
     }
     else if (elements.length > 1) {
         errorText = 'More than 1 locator is found. Please try something else'
     }
     else {
         //check if two elements are of the same coordination
-        //check if there is error in original locator
-        let targetElementList = await getLocator(frame, targetLocator)
-        if (targetElementList.length == 0) {
-            errorText = 'Original Selector cannot be found. Please contact bluestone team or check your selector generator'
-            return errorText
-        }
-        else if (targetElementList.length > 1) {
-            errorText = 'Incorrect Original Selector. The current html page is incorrect. Please contact bluestone team or check your selector generator'
-            return errorText
-        }
-        //get target element
-        let targetElement = targetElementList[0]
-        //put rectangle around element to make it easy to identify
-        targetElement.evaluate(node => node.style.border = "thick solid #0000FF")
+
 
         let targettBox = await targetElement.boundingBox()
         let currentBox = await elements[0].boundingBox()

@@ -1,2 +1,6 @@
-let ptLibrary = require('./ptLibrary/bluestone-func')
-module.exports = ptLibrary
+let bluestoneFunc = require('./ptLibrary/bluestone-func')
+let bluestoneClass = require('./ptLibrary/class')
+module.exports = {
+    func: bluestoneFunc,
+    types: bluestoneClass
+}

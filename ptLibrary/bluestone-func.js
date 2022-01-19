@@ -1,4 +1,5 @@
 let inbuiltFunc = require('./functions/inbuiltFunc')
+let BluestoneFunc = require('./class/BluestoneFunc')
 module.exports = {
 
     testTextEqual: {
@@ -13,37 +14,13 @@ module.exports = {
         func: inbuiltFunc.waitTillElementVisible,
         locators: [{ locator: ['invalid_locator'] }]
     },
-    waitElementExists: {
-        func: inbuiltFunc.waitElementExists,
-        locators: [{ locator: ['invalid_locator'] }]
-    },
-    change: {
-        func: inbuiltFunc.change,
-        locators: [{ locator: ['invalid_locator'] }]
-    },
-    click: {
-        func: inbuiltFunc.click,
-        locators: [{ locator: ['invalid_locator'] }]
-    },
-    goto: {
-        func: inbuiltFunc.goto,
-        locators: [{ locator: ['invalid_locator'] }]
-    },
-    keydown: {
-        func: inbuiltFunc.keydown1,
-        locators: [{ locator: ['invalid_locator'] }]
-    },
-    gotoFrame: {
-        func: inbuiltFunc.gotoFrame,
-        locators: [{ locator: ['invalid_locator'] }]
-    },
-    closeBrowser: {
-        func: inbuiltFunc.closeBrowser,
-        locators: [{ locator: ['invalid_locator'] }]
-    },
-    upload: {
-        func: inbuiltFunc.uploadByInput,
-        locators: [{ locator: ['invalid_locator'] }]
-    }
+    waitElementExists: new BluestoneFunc(inbuiltFunc.waitElementExists),
+    change: new BluestoneFunc(inbuiltFunc.change),
+    click: new BluestoneFunc(inbuiltFunc.click),
+    goto: new BluestoneFunc(inbuiltFunc.goto),
+    keydown: new BluestoneFunc(inbuiltFunc.keydown1),
+    gotoFrame: new BluestoneFunc(inbuiltFunc.gotoFrame),
+    closeBrowser: new BluestoneFunc(inbuiltFunc.closeBrowser),
+    upload: new BluestoneFunc(inbuiltFunc.uploadByInput)
 
 }
