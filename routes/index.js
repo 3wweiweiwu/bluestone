@@ -7,7 +7,8 @@ const { hideSpy, runCurrentOperation } = require('../controller/puppeteer/index'
 const checkLocatorInDefiner = require('../controller/puppeteer/activities/checkLocatorInDefiner')
 const config = require('../config')
 const Operation = require('../controller/ui/class/Operation')
-const UI = require('../controller/ui')
+const UI = require('../controller/ui');
+const LocatorDefiner = require('../controller/ui/class/LocatorDefiner');
 /* GET home page. */
 router.get('/', async function (req, res) {
   res.render('index.pug');
@@ -70,7 +71,23 @@ router.get('/locator-definer', async function (req, res) {
   res.render('locatorDefiner.pug', variables);
 
 })
-
+router.get('/decide-view', async function (req, res) {
+  /**
+ * @type {import('../controller/record/class/index.js').WorkflowRecord}
+ */
+  let workflow = req.app.locals.workflow
+  /**@type {UI} */
+  let ui = req.app.locals.ui
+  //if current index has been determined, go to operation view
+  //otherwise, go to locator definer view
+  if (workflow.operation.browserSelection.currentSelectedIndex) {
+    res.redirect('/spy')
+  }
+  else {
+    await ui.updateLocatorDefinerBasedOnSelection()
+    res.redirect('/locator-definer')
+  }
+})
 router.get('/locator-definer-sidebar', async function (req, res) {
 
   /**@type {UI} */

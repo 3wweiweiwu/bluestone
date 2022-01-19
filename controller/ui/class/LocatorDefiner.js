@@ -57,7 +57,7 @@ class LocatorDefiner {
         btnLocatorOk: 'LOCATOR_LOCATOR_OKAY',
         btnNextHtml: 'LOCATOR_NEXT_HTML',
         btnPrevHtml: 'LOCATOR_PREVIOUS_HTML',
-        btnOverrideLocator: 'LOCATOR_OVERRIDE_SELECTOR'
+        btnOverrideLocator: 'LOCATOR_OVERRIDE_SELECTOR',
     }
     get locatorName() {
         return this.__locatorName
@@ -182,12 +182,14 @@ class LocatorDefiner {
 
                 break
             case LocatorDefiner.inBuiltQueryKey.btnNextHtml:
-                this.backend.steps[this.stepIndex].updateHtmlForStep(1, this.backend.htmlCaptureStatus)
-                this.locatorHtml = this.backend.convertLocalPath2RelativeLink(this.backend.steps[this.stepIndex].htmlPath)
+                if (this.stepIndex != -1)
+                    this.backend.steps[this.stepIndex].updateHtmlForStep(1, this.backend.htmlCaptureStatus)
+                this.locatorHtml = this.backend.convertLocalPath2RelativeLink(this.backend.htmlCaptureStatus.getHtmlByPath(this.locatorHtml, 1))
                 break
             case LocatorDefiner.inBuiltQueryKey.btnPrevHtml:
-                this.backend.steps[this.stepIndex].updateHtmlForStep(-1, this.backend.htmlCaptureStatus)
-                this.locatorHtml = this.backend.convertLocalPath2RelativeLink(this.backend.steps[this.stepIndex].htmlPath)
+                if (this.stepIndex != -1)
+                    this.backend.steps[this.stepIndex].updateHtmlForStep(-1, this.backend.htmlCaptureStatus)
+                this.locatorHtml = this.backend.convertLocalPath2RelativeLink(this.backend.htmlCaptureStatus.getHtmlByPath(this.locatorHtml, -1))
                 break
             default:
                 break;

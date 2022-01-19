@@ -207,5 +207,44 @@ class HtmlCaptureStatus {
         }
 
     }
+    /**
+     * Based on the html path, return the diff to the specific html path 
+     * @param {string} html 
+     * @param {number} offSet 
+     */
+    getHtmlByPath(html, offSet) {
+        //get an rough estimate on where current html come from
+        let currentIndex = this.__queue.findIndex(item => { return item.outputPath.includes(html) || item.path == html || item.path.includes(html.split('/').join('\\')) })
+        if (currentIndex == -1) {
+            throw 'Unable to find current html in the html repo'
+        }
+
+        let updatedIndex = currentIndex
+        //find next/previous element that is different from current picture
+        do {
+            updatedIndex = updatedIndex + offSet
+
+
+            //updated index reach maximum limit
+            if (updatedIndex < 0) {
+                updatedIndex = 0
+                break
+            }
+            //updated index reach minimum limit
+            if (updatedIndex >= this.__queue.length) {
+                updatedIndex = this.__queue.length - 1
+                break
+            }
+
+            //the element in the updated index is different from current picture
+            let updatedHtml = this.__queue[updatedIndex]
+            if (updatedHtml.path != html && !updatedHtml.outputPath.includes(html)) {
+                break
+            }
+
+        }
+        while (true)
+        return this.__queue[updatedIndex].path
+    }
 }
 module.exports = HtmlCaptureStatus

@@ -133,7 +133,24 @@ class UI {
             this.backend.operation.spy.result.text = `Unable to find function ${step.command}`
         }
     }
+    async updateLocatorDefinerBasedOnSelection() {
+        let browserSelection = this.backend.operation.browserSelection
+        let selectedIndex = browserSelection.currentSelectedIndex
+        let locatorName = ''
+        let finalSelector = ''
+        let locatorSelector = ''
+        let potentialMatch = browserSelection.potentialMatch
+        if (selectedIndex) {
+            let locator = this.backend.locatorManager.locatorLibrary[selectedIndex]
+            locatorName = locator.path
+            locatorSelector = locator.Locator[0]
+        }
+        let htmlUrl = this.backend.convertLocalPath2RelativeLink(browserSelection.selectorHtmlPath)
 
+
+        this.locatorDefiner = new LocatorDefiner(browserSelection.currentSelector, htmlUrl, locatorName, locatorSelector, potentialMatch, -1, this.backend, browserSelection.parentIframe)
+
+    }
 }
 
 module.exports = UI

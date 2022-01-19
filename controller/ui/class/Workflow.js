@@ -31,7 +31,6 @@ class WorkFlowPug {
         btnRunWorkflow: 'WORKFLOW_RUN_ALL',
         updateStepQueryKey: 'WORKFLOW_UPDATE_STEP',
         btnAbortExecution: 'WORKFLOW_ABORT_EXECUTION'
-
     }
     /**
      * 

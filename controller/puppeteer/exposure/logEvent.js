@@ -109,7 +109,7 @@ module.exports = function (recordRepo, browser, page, io) {
             //display pending work progress
             await drawPendingWorkProgress(page, recordRepo.picCapture, recordRepo.htmlCaptureStatus)
             //display mvt console
-            await openBluestoneTab(browser, "spy")
+            await openBluestoneTab(browser, "decide-view")
 
 
         }

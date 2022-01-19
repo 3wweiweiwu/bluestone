@@ -244,7 +244,7 @@ document.addEventListener('mouseover', async event => {
         //no match mark as no locator found
         if (potentialMatch == '[]') {
             event.target.style.backgroundColor = noLocatorFound
-            window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, currentSelectedIndex)
+            window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, null)
             return
         }
 
@@ -258,7 +258,7 @@ document.addEventListener('mouseover', async event => {
 
         //if toehrwise, 
         event.target.style.backgroundColor = noLocatorFound
-        window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, currentSelectedIndex)
+        window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, null)
 
     }
 
