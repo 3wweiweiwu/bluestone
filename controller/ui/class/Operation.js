@@ -160,6 +160,13 @@ class Operation {
                     //construct operation step
                     let step = new RecordingStep({ command, target, timeoutMs: timeoutMs, targetPicPath, targetInnerText, functionAst: currentOperation, htmlPath: htmlPath, iframe: parentFrame, potentialMatch: potentialMatch })
 
+                    //update step if currentLocatorIndex has been specified
+                    let currentLocatorIndex = this.backend.operation.browserSelection.currentSelectedIndex
+                    if (currentLocatorIndex) {
+                        let locator = this.backend.locatorManager.locatorLibrary[currentLocatorIndex]
+                        step.finalLocatorName = locator.path
+                        step.finalLocator = locator.Locator
+                    }
 
 
                     await this.backend.addStep(step)

@@ -162,6 +162,18 @@ class LocatorDefiner {
 
                 let finalSelection = this.getFinalSelection(locatorCheckResult)
                 if (locatorCheckResult != '') break
+                //add newly added selector to the locator library for future usage
+                let newLocator = await this.backend.locatorManager.updateLocator(this.locatorName, [this.locatorSelector], this.locatorHtml)
+
+                //if we are in live locator generation mode, update finalLocator and potentialMatch list of current locator
+                if (this.stepIndex == -1) {
+                    //update potential match and current selected index for current element
+                    let newLocatorIndex = this.backend.locatorManager.getLocatorIndexByName(this.locatorName)
+                    this.backend.operation.browserSelection.potentialMatch.push(newLocator)
+                    this.backend.operation.browserSelection.potentialMatch = [...new Set(this.backend.operation.browserSelection.potentialMatch)]
+                    this.backend.operation.browserSelection.currentSelectedIndex = newLocatorIndex
+                }
+                //mark currentSelectedIndex in the element to be current locator index
                 //check all steps and replicate same setting for same locator
                 for (let i = 0; i < this.backend.steps.length; i++) {
                     let item = this.backend.steps[i]

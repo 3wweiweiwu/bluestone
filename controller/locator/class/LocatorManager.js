@@ -107,7 +107,7 @@ class LocatorManager {
     /**
      * Update current locator library based on the input value
      * @param {string} locatorName 
-     * @param {string} locatorValue 
+     * @param {string[]} locatorValue 
      * @param {string} picPath 
      * @returns {Locator} if new locator is created, return this locator 
      */
@@ -156,6 +156,10 @@ class LocatorManager {
         let output = escodegen.generate(ast)
         await fs.writeFile(config.code.locatorPath, output)
         this.__initialize()
+    }
+    getLocatorIndexByName(locatorName) {
+        return this.locatorLibrary.findIndex(item => item.path == locatorName)
+
     }
 
 }

@@ -233,6 +233,7 @@ document.addEventListener('mouseover', async event => {
 
         //if we have set the final locator, mark it as green
         let currentSelectedIndex = target.getAttribute(BLUESTONE.bluestoneSelectedLocator)
+        console.log(currentSelectedIndex)
         if (currentSelectedIndex) {
             event.target.style.backgroundColor = locatorFound
             window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, currentSelectedIndex)
@@ -368,14 +369,20 @@ async function scanLocator() {
 
             currentLocator = currentLocatorOptions[locatorOptionIndex]
             let currentElementList = []
-            if (currentLocator.startsWith('/')) {
-                //current locator is xpath
-                currentElementList = getElementByXpath(currentLocator)
+            try {
+                if (currentLocator.startsWith('/')) {
+                    //current locator is xpath
+                    currentElementList = getElementByXpath(currentLocator)
+                }
+                else {
+                    //current selector is css selector
+                    currentElementList = document.querySelectorAll(currentLocator)
+                }
+            } catch (error) {
+                console.log(`Issue on locator at index:${i}`)
+                continue
             }
-            else {
-                //current selector is css selector
-                currentElementList = document.querySelectorAll(currentLocator)
-            }
+
             //if current locator find element, break current loop to save time
             if (currentElementList.length == 1) {
                 currentElement = currentElementList[0]
