@@ -119,7 +119,14 @@ class AST {
             if (!filePath.toLowerCase().endsWith('.js')) {
                 filePath += '.js'
             }
-            let funcJs = (await fs.readFile(filePath))
+            let funcJs = null
+            try {
+                funcJs = (await fs.readFile(filePath))
+            } catch (error) {
+                // in case we cannot find file path (ex: if certain function is coming from bluestone's class, we won't load it)
+                continue
+            }
+
             funcJs = funcJs.toString()
 
             const commentObj = extract(funcJs, {})

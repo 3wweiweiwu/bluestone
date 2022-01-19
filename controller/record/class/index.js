@@ -609,7 +609,7 @@ class WorkflowRecord {
      */
     async refreshActiveFunc() {
 
-        await this.astManager.loadFunctions(config.code.funcPath)
+        // await this.astManager.loadFunctions(config.code.funcPath)
         let activeFuncs = this.getActiveCustomFunctions()
         this.mapOperationToGroups(activeFuncs)
     }
