@@ -101,6 +101,7 @@ Object.keys(EVENTCONST).forEach(item => {
                         //if we see combo key ctrl-q, we will call in-browser plugin
                         if ((event.ctrlKey || event.altKey) && event.key === 'q') {
                             captureScreenshot()
+                            captureHtml()
                             command = null
                             parameter = null
                             getActiveLocator()

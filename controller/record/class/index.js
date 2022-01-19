@@ -211,8 +211,7 @@ class WorkflowRecord {
                 currentOpeartion: null,
                 __htmlCaptureInProcess: [],
                 potentialMatch: [],
-                framePotentialMatch: [],
-                currentSelected
+                framePotentialMatch: []
             },
         }
         this.picCapture = new PicCapture()
