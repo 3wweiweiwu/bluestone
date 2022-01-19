@@ -196,6 +196,7 @@ class WorkflowRecord {
                 result: { isPass: null, text: '' },
             },
             browserSelection: {
+                currentSelectedIndex: null,
                 currentSelector: '',
                 selectorPicture: '',
                 selectorHtmlPath: '',
@@ -210,7 +211,8 @@ class WorkflowRecord {
                 currentOpeartion: null,
                 __htmlCaptureInProcess: [],
                 potentialMatch: [],
-                framePotentialMatch: []
+                framePotentialMatch: [],
+                currentSelected
             },
         }
         this.picCapture = new PicCapture()

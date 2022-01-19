@@ -225,17 +225,17 @@ document.addEventListener('mouseover', async event => {
         let framePotentialMatch = getElementAttribute(window.frameElement, BLUESTONE.bluestonePotentialMatchIndexes)
         let potentialMatch = getElementAttribute(target, BLUESTONE.bluestonePotentialMatchIndexes)
 
-        window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch)
         let noLocatorFound = 'rgba(255, 0, 145, 0.45)'
         let locatorFound = 'rgba(0, 223, 145, 0.45)'
 
         //depends on the color schema, display different color to give user a hint for next step
 
         //if we have set the final locator, mark it as green
-        let currentSelected = getElementAttribute(target, BLUESTONE.bluestoneSelectedLocator)
-        if (currentSelected != '[]') {
+        let currentSelectedIndex = target.getAttribute(BLUESTONE.bluestoneSelectedLocator)
+        if (currentSelectedIndex) {
             event.target.style.backgroundColor = locatorFound
-            console.log(currentSelected)
+            window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, currentSelectedIndex)
+
             return
         }
 
@@ -243,6 +243,7 @@ document.addEventListener('mouseover', async event => {
         //no match mark as no locator found
         if (potentialMatch == '[]') {
             event.target.style.backgroundColor = noLocatorFound
+            window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, currentSelectedIndex)
             return
         }
 
@@ -250,11 +251,13 @@ document.addEventListener('mouseover', async event => {
         if (potentialMatchArray.length == 1) {
             //exact one match, we are good
             event.target.style.backgroundColor = locatorFound
+            window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, 0)
             return
         }
 
         //if toehrwise, 
         event.target.style.backgroundColor = noLocatorFound
+        window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, currentSelectedIndex)
 
     }
 

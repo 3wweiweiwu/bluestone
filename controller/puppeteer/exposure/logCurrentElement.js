@@ -8,7 +8,7 @@ const config = require('../../../config')
  */
 module.exports = function logCurrentElement(recordRepo, page) {
 
-    return async function (selector = '', innerText = '', x, y, height, width, parentFrame, potentialMatch, framePotentialMatch) {
+    return async function (selector = '', innerText = '', x, y, height, width, parentFrame, potentialMatch, framePotentialMatch, currentSelectedIndex) {
         //if current selector has been captured, we will not capture it again
         if (selector == recordRepo.operation.browserSelection.currentSelector && x == recordRepo.operation.browserSelection.x && recordRepo.operation.browserSelection.y == y) {
             return
@@ -53,6 +53,8 @@ module.exports = function logCurrentElement(recordRepo, page) {
             } catch (error) {
 
             }
+
+            recordRepo.operation.browserSelection.currentSelectedIndex = currentSelectedIndex
             //handle screenshot
             let picturePath = recordRepo.getPicPath()
             recordRepo.operation.browserSelection.selectorPicture = picturePath
