@@ -21,7 +21,8 @@ const BLUESTONE = {
     previousbackground: 'bluestone-previous-background',
     dataSingleFileAttributePattern: 'data-single-file-',
     bluestonePotentialMatchIndexes: 'bluestone-potential-match-indexes',
-    bluestoneIframePath: 'bluestone-iframe-path'
+    bluestoneIframePath: 'bluestone-iframe-path',
+    bluestoneSelectedLocator: 'bluestone-selected-locator'
 }
 
 /**
@@ -225,8 +226,36 @@ document.addEventListener('mouseover', async event => {
         let potentialMatch = getElementAttribute(target, BLUESTONE.bluestonePotentialMatchIndexes)
 
         window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch)
+        let noLocatorFound = 'rgba(255, 0, 145, 0.45)'
+        let locatorFound = 'rgba(0, 223, 145, 0.45)'
 
-        event.target.style.backgroundColor = 'rgba(140, 99, 255,0.7)'
+        //depends on the color schema, display different color to give user a hint for next step
+
+        //if we have set the final locator, mark it as green
+        let currentSelected = getElementAttribute(target, BLUESTONE.bluestoneSelectedLocator)
+        if (currentSelected != '[]') {
+            event.target.style.backgroundColor = locatorFound
+            console.log(currentSelected)
+            return
+        }
+
+
+        //no match mark as no locator found
+        if (potentialMatch == '[]') {
+            event.target.style.backgroundColor = noLocatorFound
+            return
+        }
+
+        let potentialMatchArray = JSON.parse(potentialMatch)
+        if (potentialMatchArray.length == 1) {
+            //exact one match, we are good
+            event.target.style.backgroundColor = locatorFound
+            return
+        }
+
+        //if toehrwise, 
+        event.target.style.backgroundColor = noLocatorFound
+
     }
 
 
