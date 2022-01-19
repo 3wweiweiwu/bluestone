@@ -147,18 +147,18 @@ async function endRecording(browser) {
  * switch in-browser spy
  * @param {import('puppeteer').Page} page 
  */
-async function hideSpy(page, isSpyVisible) {
+async function hideSpy(puppeteerControl, isSpyVisible) {
     if (isSpyVisible == true) return
 
     //if spy is invisible, set attribute
     //the fist time we run it, page object may not be ready
-
+    let page = puppeteerControl.page
     await page.bringToFront()
     page.evaluate(() => {
         window.captureHtml()
         captureScreenshot()
     })
-
+    puppeteerControl.scanLocatorInBrowser()
 
 }
 

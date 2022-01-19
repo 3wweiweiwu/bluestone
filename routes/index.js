@@ -122,7 +122,7 @@ router.get('/spy', async function (req, res, next) {
 
   await ui.updateUserInputForSpy(req.query)
   if (req.app.locals.puppeteerControl.page) {
-    hideSpy(req.app.locals.puppeteerControl.page, workflow.spyVisible)
+    hideSpy(req.app.locals.puppeteerControl, workflow.spyVisible, req.app.locals.puppeteerControl.io)
   }
 
   let variables = {

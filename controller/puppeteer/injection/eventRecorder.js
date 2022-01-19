@@ -1,9 +1,9 @@
 // import { finder } from 'https://medv.io/finder/finder.js'
 
-import { finder } from 'http://localhost:3600/resource/js/finder.js'
+import { finder } from 'http://localhost:3600/javascript/finder.js'
 import { getLocator } from 'http://localhost:3600/resource/js/customLocator.js'
 import { fileUpload } from 'http://localhost:3600/resource/js/fileUpload.js'
-
+import { io } from "http://localhost:3600/javascript/socket.io.esm.js";
 try {
 
 } catch (error) {
@@ -22,7 +22,8 @@ const BLUESTONE = {
     dataSingleFileAttributePattern: 'data-single-file-',
     bluestonePotentialMatchIndexes: 'bluestone-potential-match-indexes',
     bluestoneIframePath: 'bluestone-iframe-path',
-    bluestoneSelectedLocator: 'bluestone-selected-locator'
+    bluestoneSelectedLocator: 'bluestone-selected-locator',
+    scanLocator: 'scan-locator'
 }
 
 /**
@@ -233,7 +234,6 @@ document.addEventListener('mouseover', async event => {
 
         //if we have set the final locator, mark it as green
         let currentSelectedIndex = target.getAttribute(BLUESTONE.bluestoneSelectedLocator)
-        console.log(currentSelectedIndex)
         if (currentSelectedIndex) {
             event.target.style.backgroundColor = locatorFound
             window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, currentSelectedIndex)
@@ -521,5 +521,13 @@ captureHtml()
 captureScreenshot()
 getFrameLocator()
 scanLocator()
-
+const socket = io("http://localhost:3600");
+socket.on(BLUESTONE.scanLocator, async function (data) {
+    console.log('locator refreshing!')
+    await scanLocator()
+    console.log('locator refreshed!')
+});
+socket.on("connect", () => {
+    console.log(`socket io connect as ${socket.id}`); // x8WIv7-mJelg7on_ALbx
+});
 //

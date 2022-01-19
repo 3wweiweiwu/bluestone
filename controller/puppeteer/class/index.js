@@ -37,7 +37,8 @@ class PuppeteerControl {
         this.__isExecutionOngoing = status
     }
     static inbuiltEvent = {
-        refresh: 'refresh'
+        refresh: 'refresh',
+        scanLocator: 'scan-locator'
     }
     setPage(page) {
         this.page = page
@@ -70,6 +71,11 @@ class PuppeteerControl {
     refreshSpy() {
         if (this.io) {
             this.io.emit(PuppeteerControl.inbuiltEvent.refresh)
+        }
+    }
+    scanLocatorInBrowser() {
+        if (this.io) {
+            this.io.emit(PuppeteerControl.inbuiltEvent.scanLocator)
         }
     }
     /**

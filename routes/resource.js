@@ -9,7 +9,9 @@ router.get('/js/:dependency', async function (req, res, next) {
     let fileDict = {
         'finder.js': path.join(__dirname, '../public/javascript/finder.js'),
         'fileUpload.js': path.join(__dirname, '../public/javascript/fileUpload.js'),
-        'customLocator.js': config.code.customLocatorEnginePath
+        'customLocator.js': config.code.customLocatorEnginePath,
+        'socket.io.esm.min.js': path.join(__dirname, '../public/javascript/socket.io.esm.min.js'),
+
     }
     let filePath = fileDict[req.params.dependency]
     if (filePath == null) {
