@@ -48,6 +48,7 @@ try {
     let bluestoneUrl = ''
     let runTime = getRuntimeInfo()
     let bluestoneJsonPath = ''
+    let port = runTime.port
     switch (cli.command) {
 
         case 'start':
@@ -76,12 +77,19 @@ try {
             axios.get(`${bluestoneUrl}/spy`)
             break;
         case 'record':
-            let port = runTime.port
+
             bluestoneUrl = `http://localhost:${port}`
             axios.post(`${bluestoneUrl}/api/record`, { url: cli.args.url })
             break;
         case 'function':
             break;
+        case "compile":
+            bluestoneUrl = `http://localhost:${port}`
+            axios.post(`${bluestoneUrl}/api/compile`)
+                .then(() => {
+                    console.log('hot reload complete!')
+                })
+            break
         case 'help':
             cli.help();
             break;

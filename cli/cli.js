@@ -64,6 +64,14 @@ let argv = yargs
             .example('bluestone function ./abc testfunction',
                 'creaet a testfunction under ./function/abc/testFunction.js')
     })
+    .command('compile', 'Do hot reload on customized function', funcYargs => {
+        funcYargs
+            .usage('Usage: bluestone compile')
+            .help('help')
+            .wrap(null)
+            .example('bluestone compile',
+                'Conduct a hot reload on customized function')
+    })
     .wrap(null)
     .argv
 function getCommandLineArgs(command, args) {
