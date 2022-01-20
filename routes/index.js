@@ -80,11 +80,11 @@ router.get('/decide-view', async function (req, res) {
   let ui = req.app.locals.ui
   //if current index has been determined, go to operation view
   //otherwise, go to locator definer view
+  await ui.updateLocatorDefinerBasedOnSelection()
   if (workflow.operation.browserSelection.currentSelectedIndex != null) {
     res.redirect('/spy')
   }
   else {
-    await ui.updateLocatorDefinerBasedOnSelection()
     res.redirect('/locator-definer')
   }
 })

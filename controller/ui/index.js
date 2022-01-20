@@ -73,28 +73,7 @@ class UI {
         let htmlUrl = this.backend.convertLocalPath2RelativeLink(locatorHtmlPath)
 
         //create a new object because we are going to modify screenshot key direclty
-        /** @type {Array<Locator>} */
-        let newPotentialMatch = JSON.parse(JSON.stringify(potentialMatch))
-        //copy over locator pictures to temp folder for visualization
-        let bluestoneFuncFolder = path.dirname(this.backend.locatorManager.locatorPath)
-        for (let i = 0; i < newPotentialMatch.length; i++) {
-            let item = newPotentialMatch[i]
-            //no pic
-            if (item.screenshot == null) {
-                continue
-            }
-            let sourcePath = path.join(bluestoneFuncFolder, item.screenshot)
-            let newPicPath = this.backend.getPicPath()
-            //check if file path is valid
-            try {
-                await fs.access(sourcePath);
-                await fs.copyFile(sourcePath, newPicPath)
-
-            } catch (err) {
-                continue
-            }
-            newPotentialMatch[i].screenshot = this.operation.getSpySelectorPictureForPug(newPicPath)
-        }
+        let newPotentialMatch = await this.__updatePotentialMatchStockPic(potentialMatch)
 
         this.locatorDefiner = new LocatorDefiner(defaultSelector, htmlUrl, locatorName, locatorSelector[0], newPotentialMatch, stepIndex, this.backend, parentFrame)
     }
@@ -133,6 +112,36 @@ class UI {
             this.backend.operation.spy.result.text = `Unable to find function ${step.command}`
         }
     }
+    /**
+     * Update picture in the potential match and copy them from project to local disk
+     * @param {Array<Locator>} potentialMatch 
+     * @returns {Array<Locator>}
+     */
+    async __updatePotentialMatchStockPic(potentialMatch) {
+        /** @type {Array<Locator>} */
+        let newPotentialMatch = JSON.parse(JSON.stringify(potentialMatch))
+        //copy over locator pictures to temp folder for visualization
+        let bluestoneFuncFolder = path.dirname(this.backend.locatorManager.locatorPath)
+        for (let i = 0; i < newPotentialMatch.length; i++) {
+            let item = newPotentialMatch[i]
+            //no pic
+            if (item.screenshot == null) {
+                continue
+            }
+            let sourcePath = path.join(bluestoneFuncFolder, item.screenshot)
+            let newPicPath = this.backend.getPicPath()
+            //check if file path is valid
+            try {
+                await fs.access(sourcePath);
+                await fs.copyFile(sourcePath, newPicPath)
+
+            } catch (err) {
+                continue
+            }
+            newPotentialMatch[i].screenshot = this.operation.getSpySelectorPictureForPug(newPicPath)
+        }
+        return newPotentialMatch
+    }
     async updateLocatorDefinerBasedOnSelection() {
         let browserSelection = this.backend.operation.browserSelection
         let selectedIndex = browserSelection.currentSelectedIndex
@@ -140,6 +149,7 @@ class UI {
         let finalSelector = ''
         let locatorSelector = ''
         let potentialMatch = browserSelection.potentialMatch
+        let newPotentialMatch = await this.__updatePotentialMatchStockPic(potentialMatch)
         if (selectedIndex) {
             let locator = this.backend.locatorManager.locatorLibrary[selectedIndex]
             locatorName = locator.path
@@ -148,7 +158,7 @@ class UI {
         let htmlUrl = this.backend.convertLocalPath2RelativeLink(browserSelection.selectorHtmlPath)
 
 
-        this.locatorDefiner = new LocatorDefiner(browserSelection.currentSelector, htmlUrl, locatorName, locatorSelector, potentialMatch, -1, this.backend, browserSelection.parentIframe)
+        this.locatorDefiner = new LocatorDefiner(browserSelection.currentSelector, htmlUrl, locatorName, locatorSelector, newPotentialMatch, -1, this.backend, browserSelection.parentIframe)
 
     }
 }

@@ -140,6 +140,11 @@ module.exports = function (recordRepo, browser, page, io) {
             } catch (error) {
                 console.log(`Cannot find command ${event.command}`)
             }
+            if (eventDetail.currentSelectedIndex) {
+                let selectedLocator = recordRepo.locatorManager.locatorLibrary[eventDetail.currentSelectedIndex]
+                event.finalLocatorName = selectedLocator.path
+                event.finalLocator = selectedLocator.Locator
+            }
 
 
             await recordRepo.addStep(event)

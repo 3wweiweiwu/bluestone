@@ -131,6 +131,7 @@ class RecordingStep {
  * @property {Array<RecordingStep>} potentialMatch
  * @property {Array<RecordingStep>} framePotentialMatch
  * @property {number} timestamp
+ * @property {number} currentSelectedIndex
  */
 
 

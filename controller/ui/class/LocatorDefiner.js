@@ -170,7 +170,7 @@ class LocatorDefiner {
                     //update potential match and current selected index for current element
                     let newLocatorIndex = this.backend.locatorManager.getLocatorIndexByName(this.locatorName)
                     this.backend.operation.browserSelection.potentialMatch.push(newLocator)
-                    this.backend.operation.browserSelection.potentialMatch = [...new Set(this.backend.operation.browserSelection.potentialMatch)]
+                    this.backend.operation.browserSelection.potentialMatch = [...new Set(this.backend.operation.browserSelection.potentialMatch)].filter(item => item != null)
                     this.backend.operation.browserSelection.currentSelectedIndex = newLocatorIndex
                     //update selector index for current selector
                     this.backend.puppeteer.setSelectorIndexForLocator(this.backend.operation.browserSelection.currentSelector, newLocatorIndex)

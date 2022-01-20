@@ -67,10 +67,13 @@ Object.keys(EVENTCONST).forEach(item => {
         else if (customLocator.target != event.target)
             selector = finder(customLocator.target)
         let target = customLocator.target
+        //will not record any event that is marked as disabled
+        if (target.getAttribute('disabled')) return
 
         let iframe = getElementAttribute(window.frameElement, BLUESTONE.bluestoneIframePath)
         let framePotentialMatch = getElementAttribute(window.frameElement, BLUESTONE.bluestonePotentialMatchIndexes)
         let potentialMatch = getElementAttribute(target, BLUESTONE.bluestonePotentialMatchIndexes)
+        let currentSelectedIndex = target.getAttribute(BLUESTONE.bluestoneSelectedLocatorIndex)
 
 
         const position = getElementPos(target)
@@ -140,6 +143,7 @@ Object.keys(EVENTCONST).forEach(item => {
             framePotentialMatch: framePotentialMatch,
             targetPicPath: targetPicPath,
             potentialMatch: potentialMatch,
+            currentSelectedIndex: currentSelectedIndex,
             pos: {
                 x: position.x,
                 y: position.y,
