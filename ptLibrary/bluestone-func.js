@@ -21,6 +21,7 @@ module.exports = {
     keydown: new BluestoneFunc(inbuiltFunc.keydown1),
     gotoFrame: new BluestoneFunc(inbuiltFunc.gotoFrame),
     closeBrowser: new BluestoneFunc(inbuiltFunc.closeBrowser),
-    upload: new BluestoneFunc(inbuiltFunc.uploadByInput)
+    upload: new BluestoneFunc(inbuiltFunc.uploadByInput),
+    waitForTimeout: new BluestoneFunc(inbuiltFunc.waitForTimeout)
 
 }

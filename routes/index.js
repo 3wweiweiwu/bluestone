@@ -22,6 +22,7 @@ router.get('/workflow', async function (req, res) {
   let ui = req.app.locals.ui
   await ui.updateUserInputForSpy(req.query)
   let variables = {
+    title: `Bluestone Recording: ${workflow.isRecording}`,
     workflow: ui.workflow.getWorkflowForPug(),
     removeWorkflowQueryKey: PugWorkflow.inBuiltQueryKey.btnRemoveWorkflowStep,
     upWorkflowQueryKey: PugWorkflow.inBuiltQueryKey.btnMoveWorkflowUp,
@@ -58,12 +59,17 @@ router.get('/locator-definer', async function (req, res) {
    * @type {UI}
    */
   let ui = req.app.locals.ui
+  /**
+   * @type {import('../controller/record/class/index.js').WorkflowRecord}
+   */
+  let workflow = req.app.locals.workflow
 
   await ui.updateUserInputForSpy(req.query)
 
 
 
   let variables = {
+    title: `Bluestone Recording: ${workflow.isRecording}`,
     locatorHtml: ui.locatorDefiner.locatorHtml,
     btnNextHtmlQueryKey: PugLocatorDefiner.inBuiltQueryKey.btnNextHtml,
     btnPrevHtmlQueryKey: PugLocatorDefiner.inBuiltQueryKey.btnPrevHtml,
@@ -126,7 +132,7 @@ router.get('/spy', async function (req, res, next) {
   }
 
   let variables = {
-    title: 'Express',
+    title: `Bluestone Recording: ${workflow.isRecording}`,
     groups: ui.operation.getSpyGroupsInfoForPug(),
     operations: ui.operation.getOperationInfoForPug(),
     argumentList: ui.operation.getArgumentsInfoForPug(),

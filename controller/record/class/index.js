@@ -296,7 +296,8 @@ class WorkflowRecord {
         keydown: 'keydown',
         gotoFrame: 'gotoFrame',
         closeBrowser: 'closeBrowser',
-        upload: 'upload'
+        upload: 'upload',
+        waitForTimeout: 'waitForTimeout'
     }
     static inbuiltEvent = {
         refresh: PuppeteerControl.inbuiltEvent.refresh
@@ -337,6 +338,7 @@ class WorkflowRecord {
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.hover),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.closeBrowser),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.upload),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.waitForTimeout),
                 ]
             },
             customizedFunctions: {

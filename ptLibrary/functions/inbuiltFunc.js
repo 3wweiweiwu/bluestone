@@ -152,7 +152,15 @@ exports.gotoFrame = async function (page, frame, elementSelector) {
         return Promise.reject(`Unable to go to frame ${elementSelector.displayName}`)
     }
 }
-
+/**
+ * Wait for timeout
+ * @param {Page} page
+ * @param {number} number wait time in ms
+ */
+exports.waitForTimeout = async function (page, number) {
+    await page.waitForTimeout(number)
+    return `wait for ${number}ms`
+}
 /**
  * Press a key
 *  @param {Frame} frame 
