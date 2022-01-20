@@ -448,12 +448,11 @@ class WorkflowRecord {
             if (item.potentialMatch.length == 1 && item.finalLocator.length == 1 && item.finalLocator[0] == '') {
                 item.finalLocatorName = item.potentialMatch[0].path
                 item.finalLocator = item.potentialMatch[0].Locator
-                //update ElementSelector in the param
-                let elementSelectorParam = item.functionAst.params.find(item => { return item.type.name == 'ElementSelector' })
-                if (elementSelectorParam) {
-                    elementSelectorParam.value = item.finalLocatorName
-                }
-
+            }
+            //update ElementSelector in the param
+            let elementSelectorParam = item.functionAst.params.find(item => { return item.type.name == 'ElementSelector' })
+            if (elementSelectorParam) {
+                elementSelectorParam.value = item.finalLocatorName
             }
 
         })

@@ -51,6 +51,7 @@ function getElementAttribute(element, attributeName) {
 
 Object.keys(EVENTCONST).forEach(item => {
     document.addEventListener(item, event => {
+        if (window.isRecording() == false) return
         let selector = ''
         try {
             selector = finder(event.target)

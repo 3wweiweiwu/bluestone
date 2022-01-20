@@ -28,6 +28,14 @@
       "args": ["start", "../wab-bluestone", "--port", "3601"]
     },
     {
+      "name": "Launch Command line for apm-insight-bluestone",
+      "program": "${workspaceFolder}/bin/bluestone.js",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node",
+      "args": ["start", "../apm-insight-bluestone", "--port", "3601"]
+    },
+    {
       "name": "Launch Record Command line",
       "program": "${workspaceFolder}/bin/bluestone.js",
       "request": "launch",
