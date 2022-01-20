@@ -172,6 +172,8 @@ class LocatorDefiner {
                     this.backend.operation.browserSelection.potentialMatch.push(newLocator)
                     this.backend.operation.browserSelection.potentialMatch = [...new Set(this.backend.operation.browserSelection.potentialMatch)]
                     this.backend.operation.browserSelection.currentSelectedIndex = newLocatorIndex
+                    //update selector index for current selector
+                    this.backend.puppeteer.setSelectorIndexForLocator(this.backend.operation.browserSelection.currentSelector, newLocatorIndex)
                 }
                 //mark currentSelectedIndex in the element to be current locator index
                 //check all steps and replicate same setting for same locator

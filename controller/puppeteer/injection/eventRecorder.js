@@ -22,8 +22,10 @@ const BLUESTONE = {
     dataSingleFileAttributePattern: 'data-single-file-',
     bluestonePotentialMatchIndexes: 'bluestone-potential-match-indexes',
     bluestoneIframePath: 'bluestone-iframe-path',
-    bluestoneSelectedLocator: 'bluestone-selected-locator',
-    scanLocator: 'scan-locator'
+    bluestoneSelectedLocatorIndex: 'bluestone-selected-locator',
+    scanLocator: 'scan-locator',
+    markSelectorIndex: 'mark-selector-index'
+
 }
 
 /**
@@ -233,7 +235,7 @@ document.addEventListener('mouseover', async event => {
         //depends on the color schema, display different color to give user a hint for next step
 
         //if we have set the final locator, mark it as green
-        let currentSelectedIndex = target.getAttribute(BLUESTONE.bluestoneSelectedLocator)
+        let currentSelectedIndex = target.getAttribute(BLUESTONE.bluestoneSelectedLocatorIndex)
         if (currentSelectedIndex) {
             event.target.style.backgroundColor = locatorFound
             window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, currentSelectedIndex)
@@ -496,7 +498,23 @@ const mutationObserverCallback = function (mutationsList, observer) {
 
 const observer = new MutationObserver(mutationObserverCallback);
 
+const markElementSelectorIndex = function (currentLocator, index) {
+    let currentElementList = []
+    if (currentLocator.startsWith('/')) {
+        //current locator is xpath
+        currentElementList = getElementByXpath(currentLocator)
+    }
+    else {
+        //current selector is css selector
+        currentElementList = document.querySelectorAll(currentLocator)
+    }
+    //stop mark element operation if locator element did not match
+    if (currentElementList.length != 1) return
 
+    let currentElement = currentElementList[0]
+    currentElement.setAttribute(BLUESTONE.bluestoneSelectedLocatorIndex, index)
+
+}
 
 // Start observing the target node for configured mutations
 observer.observe(document, config);
@@ -530,4 +548,7 @@ socket.on(BLUESTONE.scanLocator, async function (data) {
 socket.on("connect", () => {
     console.log(`socket io connect as ${socket.id}`); // x8WIv7-mJelg7on_ALbx
 });
-//
+socket.on(BLUESTONE.markSelectorIndex, async function (data) {
+    console.log(`Mark selector index :${JSON.stringify(data)}`)
+    markElementSelectorIndex(data.locator, data.index)
+})
