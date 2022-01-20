@@ -4,6 +4,7 @@ import { finder } from 'http://localhost:3600/javascript/finder.js'
 import { getLocator } from 'http://localhost:3600/resource/js/customLocator.js'
 import { fileUpload } from 'http://localhost:3600/resource/js/fileUpload.js'
 import { io } from "http://localhost:3600/javascript/socket.io.esm.js";
+import { getElementPos } from "http://localhost:3600/javascript/getElementPosition.js";
 try {
 
 } catch (error) {
@@ -77,8 +78,9 @@ Object.keys(EVENTCONST).forEach(item => {
         let currentSelectedIndex = target.getAttribute(BLUESTONE.bluestoneSelectedLocatorIndex)
 
 
-        const position = getElementPos(target)
-        const targetInnerText = target.innerText
+        let position = getElementPos(target)
+        console.log(position)
+        let targetInnerText = target.innerText
         let parameter = null
         let command = item
         let targetPicPath = ''
@@ -112,7 +114,7 @@ Object.keys(EVENTCONST).forEach(item => {
                             command = null
                             parameter = null
                             getActiveLocator()
-                            console.log('call in-browser spy')
+                            console.log('call in-browser spy' + JSON.stringify(position))
                             break
                         }
                         if ((event.altKey) && event.key === 'a') {
@@ -160,50 +162,13 @@ Object.keys(EVENTCONST).forEach(item => {
         // new CustomEvent('eventDetected', { detail: eventDetail });
         //will only log event from visible behavior except for file upload
         //file upload could trigger another element
-        if ((position.height > 0 && position.width > 0) || command == 'upload')
+        if ((position.height > 0 && position.width > 0) || command == 'upload' || command == null)
             window.logEvent(eventDetail)
 
         // console.log(JSON.stringify(event))
     }, { capture: true })
 })
-/**
- * get element location even though they are within iframe
- * @param {HTMLElement} element 
- * @returns {DOMRect}
- */
-function getElementPos(element) {
-    /**@type {Array<DOMRect>} */
-    let iframePos = []
-    //build a queue of iframe
-    let currentFrameElement = window
-    let currentWindow = window
-    while (true) {
-        if (currentFrameElement.frameElement == null) {
-            break
-        }
-        currentFrameElement = currentFrameElement.frameElement
-        let leftPadding = window.getComputedStyle(currentFrameElement).getPropertyValue('padding-left').replace('px', '')
-        let topPadding = window.getComputedStyle(currentFrameElement).getPropertyValue('padding-top').replace('px', '')
-        if (currentFrameElement) {
-            let pos = currentFrameElement.getBoundingClientRect()
-            pos.x = pos.x + parseInt(leftPadding)
-            pos.y = pos.y + parseInt(topPadding)
 
-            iframePos.push(pos)
-        }
-
-    }
-    let position = element.getBoundingClientRect()
-    //calculate relative position of current element's iframe
-
-
-    iframePos.forEach(pos => {
-
-        position.x += pos.x
-        position.y += pos.y
-    })
-    return position
-}
 //XXX (RoadMap) Add a way to handle delete operation
 //draw rectangle and return the selector and inner text of element mouse hover on
 document.addEventListener('mouseover', async event => {

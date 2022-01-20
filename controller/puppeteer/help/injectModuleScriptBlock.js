@@ -12,17 +12,20 @@ module.exports = async function (page, injectionPath) {
     let currentUrl = `http://localhost:${config.app.port}`
     eventRecorderScript = eventRecorderScript.split('http://localhost:3600').join(currentUrl)
     let registerEvent = async function (eventRecorderScript) {
-        setTimeout(() => {
-            try {
-                //add script block
-                let finderScript = document.createElement("script");
-                finderScript.setAttribute('type', 'module')
-                finderScript.innerHTML = eventRecorderScript
-                document.body.appendChild(finderScript);
-            } catch (error) {
+        while (true) {
+            await new Promise(resolve => setTimeout(resolve, 50))
+            if (document != null) break
+        }
 
-            }
-        }, 800)
+        try {
+            //add script block
+            let finderScript = document.createElement("script");
+            finderScript.setAttribute('type', 'module')
+            finderScript.innerHTML = eventRecorderScript
+            document.body.appendChild(finderScript);
+        } catch (error) {
+
+        }
 
     }
     await page.evaluateOnNewDocument(registerEvent, eventRecorderScript)

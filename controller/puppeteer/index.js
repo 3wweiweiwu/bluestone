@@ -76,59 +76,6 @@ async function startRecording(record, io, url = null) {
     eventStep.finalLocatorName = 'FAKE locator name to avoid check'
     logEvent(record)(eventStep)
 
-    await page.setRequestInterception(true)
-
-    page.on('request', async request => {
-        if (request.isNavigationRequest()) {
-            let isRecording = record.isRecording
-            if (request.frame().parentFrame() != null) {
-                //will not handle the call from frames
-                await request.continue()
-            }
-            else if (record.htmlCaptureStatus.isHtmlCaptureOngoing) {
-                //wait for 1s so that we have sufficient time to add step
-                await new Promise(resolve => { setTimeout(resolve, 1000) })
-
-
-                //stop capture if navigation pending
-                record.isRecording = false
-
-
-
-                await request.abort('aborted')
-
-                await drawPendingWorkProgress(page, record.picCapture, record.htmlCaptureStatus)
-                record.navigation.initialize(request.url(), request.method(), request.postData(), request.headers(), isRecording)
-
-                await page.goto(request.url())
-
-            }
-            else if (record.navigation.isPending) {
-                //handle navigation
-                let data = record.navigation.getCurrentNavigationData()
-                request.continue(data)
-                record.navigation.redirect()
-
-            }
-            else {
-                if (record.navigation.isPending == null) {
-                    //resume the capture
-                    record.isRecording = record.navigation.isRecording
-                    record.navigation.complete()
-                }
-                request.continue()
-            }
-
-
-        } else {
-            // await new Promise(resolve => { setTimeout(resolve, 1000) })
-            request.continue();
-        }
-    })
-    page.on('frameattached', async frame => {
-        // console.log(frame)
-    })
-
 
     return { browser, page }
 }

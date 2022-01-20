@@ -255,3 +255,31 @@ exports.uploadByInput = async function upload(frame, vars, elementSelector, uplo
 
     return `Upload Success!`
 }
+
+/**
+ * Basic Authentication
+ * @param {Page} page 
+ * @param {string} username usernmae
+ * @param {string} password password
+ */
+exports.basicAuthenticate = async function authenticate(page, username, password) {
+    await page.authenticate({ username, password })
+    return 'authenticate'
+}
+
+/**
+ * Clear browser cache
+ * @param {Page} page 
+ */
+exports.clearBrowserCache = async function clearBrowserCache(page) {
+    try {
+        const client = await page.target().createCDPSession();
+        await client.send('Network.clearBrowserCookies');
+        await client.send('Network.clearBrowserCache');
+        await page.evaluate(() => { localStorage.clear() })
+    } catch (error) {
+
+    }
+
+    return true
+}

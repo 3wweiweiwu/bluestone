@@ -118,6 +118,8 @@ class UI {
      * @returns {Array<Locator>}
      */
     async __updatePotentialMatchStockPic(potentialMatch) {
+        //iframe may not have potentaial match
+        if (potentialMatch == null) return
         /** @type {Array<Locator>} */
         let newPotentialMatch = JSON.parse(JSON.stringify(potentialMatch))
         //copy over locator pictures to temp folder for visualization

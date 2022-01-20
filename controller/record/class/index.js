@@ -297,7 +297,9 @@ class WorkflowRecord {
         gotoFrame: 'gotoFrame',
         closeBrowser: 'closeBrowser',
         upload: 'upload',
-        waitForTimeout: 'waitForTimeout'
+        waitForTimeout: 'waitForTimeout',
+        basicAuthenticate: 'basicAuthenticate',
+        clearBrowserCache: 'clearBrowserCache'
     }
     static inbuiltEvent = {
         refresh: PuppeteerControl.inbuiltEvent.refresh
@@ -339,6 +341,8 @@ class WorkflowRecord {
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.closeBrowser),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.upload),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.waitForTimeout),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.basicAuthenticate),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.clearBrowserCache)
                 ]
             },
             customizedFunctions: {
@@ -374,7 +378,7 @@ class WorkflowRecord {
                 waitStep.target = ptConstant.parentIFrameLocator
             }
             waitStep.iframe = parentIframe
-            waitStep.potentialMatch = step.framePotentialMatch
+            waitStep.potentialMatch = step.framePotentialMatch || []
 
             this.steps.push(waitStep)
         }
@@ -447,7 +451,7 @@ class WorkflowRecord {
                 }
 
             }
-            if (item.potentialMatch.length == 1 && item.finalLocator.length == 1 && item.finalLocator[0] == '') {
+            if (item.potentialMatch && item.potentialMatch.length == 1 && item.finalLocator.length == 1 && item.finalLocator[0] == '') {
                 item.finalLocatorName = item.potentialMatch[0].path
                 item.finalLocator = item.potentialMatch[0].Locator
             }
