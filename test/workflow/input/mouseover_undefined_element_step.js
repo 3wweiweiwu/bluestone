@@ -11,6 +11,7 @@ module.exports = {
     lastOperationTime: null,
     lastOperationTimeoutMs: null,
     currentOpeartion: null,
+    currentSelectedIndex: null,
     __htmlCaptureInProcess: [],
     potentialMatch: [],
     framePotentialMatch: [],

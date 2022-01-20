@@ -13,6 +13,7 @@ module.exports = {
     lastOperationTime: null,
     lastOperationTimeoutMs: null,
     currentOpeartion: null,
+    currentSelectedIndex: 0,
     __htmlCaptureInProcess: [],
     potentialMatch: [
         {
