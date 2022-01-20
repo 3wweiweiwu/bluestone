@@ -367,6 +367,7 @@ class WorkflowRecord {
         //cosntruct wait step. insert wait step only if timeout is greater than 0 and previous command is not wait
         if (step.command != 'goto' && step.command != gotoFrameCommand && step.iframe != null) {
             let switchToFrameAst = this.astManager.getFunction(gotoFrameCommand)
+            /**@type {RecordingStep} */
             let waitStep = JSON.parse(JSON.stringify(step))
             waitStep = RecordingStep.restore(waitStep, switchToFrameAst, gotoFrameCommand)
 
@@ -379,6 +380,10 @@ class WorkflowRecord {
             }
             waitStep.iframe = parentIframe
             waitStep.potentialMatch = step.framePotentialMatch || []
+            let waitTime = step.timeoutMs
+            if (waitTime < 3000)
+                waitTime = 3000
+            waitStep.functionAst.params[3].value = waitTime
 
             this.steps.push(waitStep)
         }
@@ -430,7 +435,9 @@ class WorkflowRecord {
             }
             waitStep = RecordingStep.restore(waitStep, waitFunctionAst, waitCommand)
             //hard code wait time param here
-            waitStep.functionAst.params[2].value = step.timeoutMs
+            let newWaitTime = step.timeoutMs
+            if (newWaitTime < 3000) newWaitTime = 3000
+            waitStep.functionAst.params[2].value = newWaitTime
             this.steps.push(waitStep)
         }
 
@@ -596,7 +603,7 @@ class WorkflowRecord {
         //handle change in iframe
         let lastStep = this.steps[this.steps.length - 1]
         if (lastStep != null && JSON.stringify(event.iframe) != JSON.stringify(lastStep.iframe)) {
-            this.__addWaitForSteps(event, true)
+            // this.__addWaitForSteps(event, true)
             this.__addSwitchIframeForStep(event)
         }
 

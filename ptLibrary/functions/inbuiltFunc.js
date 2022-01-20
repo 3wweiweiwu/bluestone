@@ -138,13 +138,14 @@ exports.goto = async function (page, url) {
  * @param {Page} page
 *  @param {Frame} frame 
  * @param {ElementSelector} elementSelector element selector object
+ * @param {number} timeout wait time(ms) for the frame. Please make it greater than 1000
  */
-exports.gotoFrame = async function (page, frame, elementSelector) {
+exports.gotoFrame = async function (page, frame, elementSelector, timeout) {
     //if current page locator is iframe, we will just go back to the top page
     if (elementSelector.locator == ConstantVar.parentIFrameLocator) {
         return page
     }
-    let element = await findElement(frame, elementSelector, 2000)
+    let element = await findElement(page, elementSelector, timeout)
     try {
         frame = await element.contentFrame()
         return frame
