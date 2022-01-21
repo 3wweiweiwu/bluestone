@@ -11,7 +11,10 @@ let config = require('../config')
 function getPidPath() {
     return path.join(__dirname, 'bluestone.pid')
 }
-
+process.on('unhandledRejection', (reason, promise) => {
+    //supress endless execution context error....
+    if (reason.message.includes('Execution context is not available in detached frame')) return
+});
 function getRuntimeInfo() {
     let runTime = {}
     let runtimePath = getPidPath()
