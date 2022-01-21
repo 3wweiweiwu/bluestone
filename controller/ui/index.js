@@ -102,6 +102,9 @@ class UI {
                 this.operation.browserSelection.selectorPicture = step.targetPicPath
                 this.operation.browserSelection.lastOperationTimeoutMs = step.timeoutMs
                 this.operation.browserSelection.parentIframe = step.iframe
+                for (let i = 0; i < currentOperation.params.length; i++) {
+                    currentOperation.params[i].value = step.functionAst.params[i].value
+                }
                 findOperation = true
                 break
             }
