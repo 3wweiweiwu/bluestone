@@ -14,6 +14,7 @@ function getPidPath() {
 process.on('unhandledRejection', (reason, promise) => {
     //supress endless execution context error....
     if (reason.message.includes('Execution context is not available in detached frame')) return
+    console.log(reason)
 });
 function getRuntimeInfo() {
     let runTime = {}
