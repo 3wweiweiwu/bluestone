@@ -5,6 +5,7 @@ import { getLocator } from 'http://localhost:3600/resource/js/customLocator.js'
 import { fileUpload } from 'http://localhost:3600/resource/js/fileUpload.js'
 import { io } from "http://localhost:3600/javascript/socket.io.esm.js";
 import { getElementPos } from "http://localhost:3600/javascript/getElementPosition.js";
+import { setStateToAllEvents } from "http://localhost:3600/javascript/blockElementInteraction.js";
 try {
 
 } catch (error) {
@@ -25,8 +26,10 @@ const BLUESTONE = {
     bluestoneIframePath: 'bluestone-iframe-path',
     bluestoneSelectedLocatorIndex: 'bluestone-selected-locator',
     scanLocator: 'scan-locator',
-    markSelectorIndex: 'mark-selector-index'
-
+    markSelectorIndex: 'mark-selector-index',
+    prevDisableStatus: 'bluestone-prev-disabled-status',
+    prevFunctionStatus: 'bluestone-prev-func-',
+    bluestoneIgnoreElement: 'bluestone-ignore-element'
 }
 
 /**
@@ -69,8 +72,6 @@ Object.keys(EVENTCONST).forEach(item => {
         else if (customLocator.target != event.target)
             selector = finder(customLocator.target)
         let target = customLocator.target
-        //will not record any event that is marked as disabled
-        if (target.getAttribute('disabled')) return
 
         let iframe = getElementAttribute(window.frameElement, BLUESTONE.bluestoneIframePath)
         let framePotentialMatch = getElementAttribute(window.frameElement, BLUESTONE.bluestonePotentialMatchIndexes)
@@ -79,7 +80,6 @@ Object.keys(EVENTCONST).forEach(item => {
 
 
         let position = getElementPos(target)
-        console.log(position)
         let targetInnerText = target.innerText
         let parameter = null
         let command = item
@@ -159,6 +159,10 @@ Object.keys(EVENTCONST).forEach(item => {
 
 
         }
+        //will not record any event that is marked as ignore.
+        //we will not block event to call bluestone agent
+        if (target.getAttribute(BLUESTONE.bluestoneIgnoreElement && command != null)) return
+
         // new CustomEvent('eventDetected', { detail: eventDetail });
         //will only log event from visible behavior except for file upload
         //file upload could trigger another element
@@ -209,7 +213,8 @@ document.addEventListener('mouseover', async event => {
         if (currentSelectedIndex) {
             event.target.style.backgroundColor = locatorFound
             window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, currentSelectedIndex)
-
+            setStateToAllEvents(false, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
+            console.log('current selected index found')
             return
         }
 
@@ -218,21 +223,28 @@ document.addEventListener('mouseover', async event => {
         if (potentialMatch == '[]') {
             event.target.style.backgroundColor = noLocatorFound
             window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, null)
+            setStateToAllEvents(true, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
+            console.log('no potential match index')
             return
         }
 
         let potentialMatchArray = JSON.parse(potentialMatch)
+        console.log(potentialMatch)
+        console.log(potentialMatchArray)
         if (potentialMatchArray.length == 1) {
             //exact one match, we are good
             event.target.style.backgroundColor = locatorFound
             window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, 0)
+            setStateToAllEvents(false, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
+            console.log('only 1 potential match index')
             return
         }
 
         //if toehrwise, 
+        console.log('more than 1 potential matches')
         event.target.style.backgroundColor = noLocatorFound
         window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, null)
-
+        setStateToAllEvents(true, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
     }
 
 
