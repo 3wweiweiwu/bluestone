@@ -1,17 +1,42 @@
 
 
-export function setStateToAllEvents(isBlocked, bluestoneLockedKey, bluestonePrevDisableStatus) {
+export function setStateToAllEvents(isBlocked, bluestoneLockedKey, bluestonePrevDisableStatus, bluestonePrevPointerEvent) {
     let bluestonePrefix = bluestonePrevDisableStatus
     let elements = [...document.getElementsByTagName('*')]
     if (isBlocked) {
-        elements.forEach(item => blockEventsForElement(item, bluestonePrefix, bluestoneLockedKey))
+        elements.forEach(item => {
+            blockEventsForElement(item, bluestonePrefix, bluestoneLockedKey)
+            // disablePointerEvent(item, bluestonePrevPointerEvent)
+        })
         disableAllElements(bluestonePrevDisableStatus, bluestoneLockedKey)
+
     }
     else {
         enableAllElements(bluestonePrevDisableStatus, bluestoneLockedKey)
-        elements.forEach(item => activeEventsForElement(item, bluestonePrefix, bluestoneLockedKey))
+        elements.forEach(item => {
+            activeEventsForElement(item, bluestonePrefix, bluestoneLockedKey)
+            // enablePointerEvent(item, bluestonePrevPointerEvent)
+        })
     }
 
+}
+function disablePointerEvent(element, bluestonePrevPointerEvent) {
+    let prevPointerEvent = element.getAttribute(bluestonePrevPointerEvent)
+    //if we have attribute already, we will just skip that
+    if (prevPointerEvent != null) return
+
+    let pointerEvents = element.style.pointerEvents
+    element.setAttribute(bluestonePrevPointerEvent, pointerEvents)
+    element.style.pointerEvents = 'none'
+
+
+}
+
+function enablePointerEvent(element, bluestonePrevPointerEvent) {
+    let prevPointerEvent = element.getAttribute(bluestonePrevPointerEvent)
+    //if we have attribute already, we will just skip that    
+    element.style.pointerEvents = prevPointerEvent
+    element.removeAttribute(bluestonePrevPointerEvent)
 }
 function blockEventsForElement(element, bluestonePrefix, bluestoneLockedKey) {
     //mark lock key for current element

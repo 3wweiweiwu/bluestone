@@ -12,7 +12,9 @@ try {
 
 }
 
-
+let globalVar = {
+    isFreezeMode: false
+}
 const EVENTCONST = {
     click: 'click',
     change: 'change',
@@ -29,7 +31,8 @@ const BLUESTONE = {
     markSelectorIndex: 'mark-selector-index',
     prevDisableStatus: 'bluestone-prev-disabled-status',
     prevFunctionStatus: 'bluestone-prev-func-',
-    bluestoneIgnoreElement: 'bluestone-ignore-element'
+    bluestoneIgnoreElement: 'bluestone-ignore-element',
+    bluestonePrevPointerEvent: 'bluestone-prev-pointer-event'
 }
 
 /**
@@ -116,6 +119,10 @@ Object.keys(EVENTCONST).forEach(item => {
                             getActiveLocator()
                             console.log('call in-browser spy' + JSON.stringify(position))
                             break
+                        }
+                        if ((event.altKey) && event.key === 's') {
+                            globalVar.isFreezeMode = !globalVar.isFreezeMode
+                            setStateToAllEvents(globalVar.isFreezeMode, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus, BLUESTONE.bluestonePrevPointerEvent)
                         }
                         if ((event.altKey) && event.key === 'a') {
                             captureScreenshot()
@@ -213,7 +220,7 @@ document.addEventListener('mouseover', async event => {
         if (currentSelectedIndex) {
             event.target.style.backgroundColor = locatorFound
             window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, currentSelectedIndex)
-            setStateToAllEvents(false, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
+            // setStateToAllEvents(false, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
             console.log('current selected index found')
             return
         }
@@ -223,7 +230,7 @@ document.addEventListener('mouseover', async event => {
         if (potentialMatch == '[]') {
             event.target.style.backgroundColor = noLocatorFound
             window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, null)
-            setStateToAllEvents(true, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
+            // setStateToAllEvents(true, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
             console.log('no potential match index')
             return
         }
@@ -235,7 +242,7 @@ document.addEventListener('mouseover', async event => {
             //exact one match, we are good
             event.target.style.backgroundColor = locatorFound
             window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, 0)
-            setStateToAllEvents(false, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
+            // setStateToAllEvents(false, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
             console.log('only 1 potential match index')
             return
         }
@@ -244,7 +251,7 @@ document.addEventListener('mouseover', async event => {
         console.log('more than 1 potential matches')
         event.target.style.backgroundColor = noLocatorFound
         window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, null)
-        setStateToAllEvents(true, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
+        // setStateToAllEvents(true, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
     }
 
 
