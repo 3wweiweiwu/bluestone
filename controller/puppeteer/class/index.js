@@ -19,7 +19,7 @@ const { Page, Browser } = require('puppeteer-core')
 const openBluestoneTab = require('../activities/openBluestoneTab')
 const getFrame = require('../activities/getFrame')
 const checkLocatorInDefiner = require('../activities/checkLocatorInDefiner')
-const PuppeteerResult = require('../../record/class/StepResult')
+const PuppeteerResult = require('../../mocha/class/StepResult')
 const _eval = require('eval')
 class PuppeteerControl {
     constructor() {

@@ -26,14 +26,7 @@ class Coder {
         this.__ast = AstGenerator.getCodeWrapper()
         this.inbuiltVarName = {
             require: {},
-            library: {
-                locatorLibrary: 'locator',
-                projectFuncLibrary: 'projectFunc',
-                puppeteerLibrary: 'puppeteer',
-                bluestoneFuncLibrary: 'bluestoneFunc',
-                configLibrary: 'config',
-                varSaver: 'vars'
-            },
+            library: Coder.ConstVar.library,
             body: {
                 variableDeclaration: ['element', 'variable', 'frame'],
                 browserVarName: 'browser',
@@ -51,6 +44,16 @@ class Coder {
             [this.inbuiltVarName.library.bluestoneFuncLibrary]: 'bluestone/ptLibrary/bluestone-func',
             [this.inbuiltVarName.library.configLibrary]: configPath
 
+        }
+    }
+    static ConstVar = {
+        library: {
+            locatorLibrary: 'locator',
+            projectFuncLibrary: 'projectFunc',
+            puppeteerLibrary: 'puppeteer',
+            bluestoneFuncLibrary: 'bluestoneFunc',
+            configLibrary: 'config',
+            varSaver: 'vars'
         }
     }
     get fileName() {
