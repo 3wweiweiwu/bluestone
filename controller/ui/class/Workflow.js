@@ -124,7 +124,10 @@ class WorkFlowPug {
                 this.validateForm()
                 break
             case WorkFlowPug.inBuiltQueryKey.btnAbortExecution:
-                this.backend.puppeteer.isExecutionOngoing = null
+                try {
+                    this.backend.mochaDriver.abortScript()
+                } catch (error) {
+                }
                 this.validateForm()
                 break
             case WorkFlowPug.inBuiltQueryKey.btnCreateTestcaseQueryKey:

@@ -126,7 +126,8 @@ class TestcaseLoader {
 
             //convert current function's start/end into script line number
             let expressionStatement = item.ancestors[ancestorLength - 6]
-            let scriptLineNumber = scriptBreaker.getStepLineIndexByEndPoint(expressionStatement.end)
+            //convert 0 based index to 1 based line number
+            let scriptLineNumber = scriptBreaker.getStepLineIndexByEndPoint(expressionStatement.end) + 1
             let step = new RecordingStep({ command, functionAst, scriptLineNumber })
             allSteps.push(step)
         }
