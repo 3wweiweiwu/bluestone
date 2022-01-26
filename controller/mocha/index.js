@@ -6,6 +6,8 @@ const { LocatorManager } = require('../locator/index')
 class MochaDriver {
     /**@type {TestcaseLoader} */
     #testcase
+    /**@type {Mocha.Runner} */
+    #runner
     /**
      * 
      * @param {string} filePath 
@@ -19,6 +21,7 @@ class MochaDriver {
         this.__state = null
         this.__result = new MochaResult(false, '')
         this.#testcase = new TestcaseLoader(filePath, locatorManager, astManager)
+        this.#runner = null
     }
     static ConstVar = {
         runningState: {
@@ -54,7 +57,20 @@ class MochaDriver {
                     this.__result = new MochaResult(true, '')
                     return resolve(this.__result)
                 })
+                .on('end', test => {
+                    if (this.__state == MochaDriver.ConstVar.runningState.RUNNING) {
+                        this.__result = new MochaResult(false, 'Script is aborted by user', -1)
+                        return resolve(this.__result)
+                    }
+                })
+            this.#runner = runner
         })
+    }
+    get result() {
+        return this.__result
+    }
+    abortScript() {
+        this.#runner.abort()
     }
     #getErrorStepIndexByLine(filePath, errorStack) {
         let stepIndex = -1

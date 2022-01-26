@@ -28,5 +28,23 @@ describe('mocha driver', () => {
         assert.strictEqual(s1.failedStep, 2)
 
     }).timeout(60000)
-    it('should abort test run successfully')
+    it('should abort test run successfully', async () => {
+        let locatorPath = path.join(__dirname, '../../sample-project/bluestone-locator.js')
+        let funcPath = path.join(__dirname, '../../../ptLibrary/bluestone-func.js')
+        let astManager = new AstManager(locatorPath, funcPath)
+        await astManager.loadFunctions(funcPath)
+        let locatorManager = new LocatorManager(locatorPath)
+
+        let filePath = path.join(__dirname, '../../sample-project/script/spec.sdf1.js')
+        let mocha = new MochaDriver(filePath, locatorManager, astManager, 10)
+        mocha.runScript()
+        await new Promise(resolve => {
+            setTimeout(() => {
+                mocha.abortScript()
+                resolve()
+            }, 500)
+        })
+        assert.strictEqual(s1.isResultPass, true)
+        assert.strictEqual(s1.failedStep, -1)
+    }).timeout(60000)
 })
