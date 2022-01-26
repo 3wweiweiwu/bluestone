@@ -17,7 +17,7 @@ class MochaDriver {
      */
     constructor(filePath, locatorManager, astManager, timeout = 999999) {
         this.__mocha = new Mocha({ timeout: timeout })
-        this.__filePath = filePath.toUpperCase()
+        this.__filePath = filePath
         this.__state = null
         this.__result = new MochaResult(false, '')
         this.#testcase = new TestcaseLoader(filePath, locatorManager, astManager)
@@ -38,7 +38,7 @@ class MochaDriver {
      */
     async runScript() {
         return new Promise((resolve) => {
-            let runner = this.__mocha.addFile(this.__filePath).grep("^test1 sdf1$").run()
+            let runner = this.__mocha.addFile(this.__filePath).run()
             runner
                 .on('start', () => {
                     this.__state = MochaDriver.ConstVar.runningState.RUNNING

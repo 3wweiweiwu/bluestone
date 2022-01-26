@@ -428,6 +428,26 @@ class WorkflowRecord {
             return failedStepIndex
         }
 
+        this.mochaDriver = new MochaDriver(this.codePath, this.locatorManager, this.astManager, 999999)
+        let result = await this.mochaDriver.runScript()
+        //run mark passed result
+        for (let i = 0; i < this.steps.length; i++) {
+            if (result.failedStep == -1 || result.failedStep > i)
+                this.steps[i].result.isResultPass = true
+            else
+                break
+
+        }
+        //mark failed step if any failure is within the range
+        if (result.isResultPass == false && result.failedStep != -1 && result.failedStep < this.steps.length) {
+            this.steps[result.failedStep].result.isResultPass = false
+            this.steps[result.failedStep].result.resultText = result.resultNote
+        }
+        //mark failed step if failure it outside the scope
+        if (result.isResultPass == false && (result.failedStep > this.steps.length || result.failedStep == -1)) {
+            this.steps[0].result.isResultPass = false
+            this.steps[0].result.resultText = 'Unable to find failed step. ' + result.resultNote
+        }
         await this.puppeteer.openBluestoneTab('workflow')
         return failedStepIndex
 

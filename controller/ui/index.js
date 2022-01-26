@@ -49,19 +49,9 @@ class UI {
 
                 //write code to disk automatically
                 if (this.workflow.validateForm(true)) {
-                    //only display this message first time the file is generated
-                    if (this.backend.codePath == '') {
-                        let finalPath = await this.backend.writeCodeToDisk(this.workflow.textTestSuiteValue, this.workflow.textTestCaseValue)
-                        this.workflow.txtValidationStatus = `Script created at: ${finalPath}`
-                        this.workflow.isValidationPass = true
-                    }
-                    else {
-                        //check execution result if there is any for 2nd time
-                        this.workflow.validateForm()
-                        let finalPath = await this.backend.writeCodeToDisk(this.workflow.textTestSuiteValue, this.workflow.textTestCaseValue)
-                        this.workflow.txtValidationStatus += `. File Path: ${finalPath}`
-                    }
-
+                    this.workflow.validateForm()
+                    let finalPath = await this.backend.writeCodeToDisk(this.workflow.textTestSuiteValue, this.workflow.textTestCaseValue)
+                    this.workflow.txtValidationStatus += `. Script Path: ${finalPath}`
                 }
 
 
