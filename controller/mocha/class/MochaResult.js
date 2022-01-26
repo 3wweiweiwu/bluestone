@@ -5,10 +5,10 @@ class MochaResult {
      * @param {string} resultNote 
      * @param {number} failedStep 
      */
-    constructor(isResultPass, resultNote, failedStep) {
+    constructor(isResultPass, resultNote, failedStep = -1) {
         this.isResultPass = isResultPass
         this.resultNote = resultNote
-        this.failedStep = -1
+        this.failedStep = failedStep
     }
 }
 module.exports = MochaResult

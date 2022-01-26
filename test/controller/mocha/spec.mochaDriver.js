@@ -10,24 +10,22 @@ describe('mocha driver', () => {
         let filePath = path.join(__dirname, '../../sample-project/script/spec.sdf1.js')
         let mocha = new MochaDriver(filePath, 99999)
         let s1 = await mocha.runScript()
-        console.log(s1)
+        assert.strictEqual(s1.isResultPass, true)
+        assert.strictEqual(s1.failedStep, -1)
     }).timeout(999999)
-    it('should return error info correctly', (done) => {
-        let mo = new Mocha()
-        let filePath = (path.join(__dirname, '../../sample-project/script/spec.sdf1.js'))
-        // let runner = mo.addFile("C:\\Users\\3wwei\\bluestone\\test\\sample-project\\script\\spec.sdf1.js")
-        let runner = mo.addFile(filePath.toUpperCase())
+    it('should return error info correctly', async () => {
+        let locatorPath = path.join(__dirname, '../../sample-project/bluestone-locator.js')
+        let funcPath = path.join(__dirname, '../../../ptLibrary/bluestone-func.js')
+        let astManager = new AstManager(locatorPath, funcPath)
+        await astManager.loadFunctions(funcPath)
+        let locatorManager = new LocatorManager(locatorPath)
 
-        runner.run(function (failures) {
-            process.exitCode = failures ? 1 : 0;  // exit with non-zero status if there were failures
-        })
-            .on('fail', (test, err) => {
-                done()
-            })
-            .on('pass', test => {
-                done()
-            })
 
+        let filePath = path.join(__dirname, '../../sample-project/script/spec.sdf1_fail.js')
+        let mocha = new MochaDriver(filePath, locatorManager, astManager, 99999)
+        let s1 = await mocha.runScript()
+        assert.strictEqual(s1.isResultPass, false)
+        assert.strictEqual(s1.failedStep, 2)
 
     }).timeout(60000)
     it('should abort test run successfully')
