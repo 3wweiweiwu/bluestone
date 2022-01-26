@@ -68,5 +68,10 @@ module.exports = {
         locator: ['#header'],
         screenshot: 'componentPic/Header.png',
         displayName: 'Header'
+    },
+    '1st Selector': {
+        locator: ['.ng-binding:nth-child(2)'],
+        screenshot: 'componentPic/1st_Selector.png',
+        displayName: '1st Selector'
     }
 };

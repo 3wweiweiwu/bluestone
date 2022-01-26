@@ -1,9 +1,14 @@
 let Mocha = require('mocha')
 let MochaResult = require('./class/MochaResult')
 class MochaDriver {
+    /**
+     * 
+     * @param {string} filePath 
+     * @param {number} timeout 
+     */
     constructor(filePath, timeout = 999999) {
         this.__mocha = new Mocha({ timeout: timeout })
-        this.__filePath = filePath
+        this.__filePath = filePath.toUpperCase()
         this.__state = null
         this.__result = new MochaResult(false, '')
     }
@@ -16,9 +21,13 @@ class MochaDriver {
             ABORTED: 'ABORTED'
         }
     }
+    /**
+     * 
+     * @returns 
+     */
     async runScript() {
         return new Promise((resolve, reject) => {
-            let runner = mocha.addFile(this.__filePath).run()
+            let runner = this.__mocha.addFile(this.__filePath).grep("^test1 sdf1$").run()
             runner
                 .on('start', () => {
                     this.__state = MochaDriver.ConstVar.runningState.RUNNING
@@ -38,3 +47,5 @@ class MochaDriver {
     }
 
 }
+
+module.exports = MochaDriver
