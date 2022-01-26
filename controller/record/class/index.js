@@ -17,6 +17,7 @@ const Navigation = require('../class/NavigationStatus')
 const PicCapture = require('../class/PicCapture')
 const ptConstant = require('../../../ptLibrary/functions/inbuiltFunc').VAR
 const RecordingStep = require('./RecordingStep')
+const MochaDriver = require('../../mocha/index')
 /**
  * @typedef {string} CommandType
  **/
@@ -61,6 +62,7 @@ class WorkflowRecord {
         this.__isRecording = true
         this.astManager = new AstManager(config.code.locatorPath)
         this.__isNavigationPending = false
+        this.__codePath = ''
         this.operationGroup = {
             customizedFunctions: {
                 text: 'Run Customzied Function',
@@ -99,12 +101,17 @@ class WorkflowRecord {
         this.inbuiltFuncPath = path.join(__dirname, '../../../ptLibrary/bluestone-func.js')
         this.astManager.loadFunctions(config.code.funcPath)
         this.astManager.loadFunctions(this.inbuiltFuncPath)
+        /**@type {MochaDriver} */
+        this.mochaDriver = null
     }
     get isNavigationPending() {
         return this.__isNavigationPending
     }
     set isNavigationPending(isPending) {
         this.__isNavigationPending = isPending
+    }
+    get codePath() {
+        return this.__codePath
     }
     /**
      * Scan through html path and fix unavailable path
@@ -148,7 +155,7 @@ class WorkflowRecord {
         coder.testSuite = testSuite
         coder.testCase = testCase
         let finalPath = await coder.writeCodeToDisk()
-
+        this.__codePath = finalPath
         //update locator
         for (let i = 0; i < this.steps.length; i++) {
             let step = this.steps[i]
@@ -408,10 +415,28 @@ class WorkflowRecord {
         return result
     }
     /**
-     * Run All steps and assign result to step.
+     * Run All steps and assign result to step via bluestone
      * @returns {number} index of the failed step. -1 if everything pass
      */
     async runAllSteps() {
+        let failedStepIndex = -1
+        //check if there is any un-correlated locator in step
+        failedStepIndex = this.findPendingLocatorInStep()
+        if (failedStepIndex != -1) {
+            this.steps[failedStepIndex].result = new StepResult()
+            this.steps[failedStepIndex].result.resultText = 'Locator has not been correleated'
+            return failedStepIndex
+        }
+
+        await this.puppeteer.openBluestoneTab('workflow')
+        return failedStepIndex
+
+    }
+    /**
+     * Run All steps and assign result to step via bluestone
+     * @returns {number} index of the failed step. -1 if everything pass
+     */
+    async runAllStepsViaBluestone() {
         let failedStepIndex = -1
         //check if there is any un-correlated locator in step
         failedStepIndex = this.findPendingLocatorInStep()

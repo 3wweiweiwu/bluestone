@@ -45,8 +45,27 @@ class UI {
                     targetStep = this.backend.steps[stepIndex]
                     await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex, targetStep.iframe)
                 }
-                //update text info
-                this.workflow.validateForm()
+
+
+                //write code to disk automatically
+                if (this.workflow.validateForm(true)) {
+                    //only display this message first time the file is generated
+                    if (this.backend.codePath == '') {
+                        let finalPath = await this.backend.writeCodeToDisk(this.workflow.textTestSuiteValue, this.workflow.textTestCaseValue)
+                        this.workflow.txtValidationStatus = `Script created at: ${finalPath}`
+                        this.workflow.isValidationPass = true
+                    }
+                    else {
+                        //check execution result if there is any for 2nd time
+                        this.workflow.validateForm()
+                        let finalPath = await this.backend.writeCodeToDisk(this.workflow.textTestSuiteValue, this.workflow.textTestCaseValue)
+                        this.workflow.txtValidationStatus += `. File Path: ${finalPath}`
+                    }
+
+                }
+
+
+
                 break
 
             case Workflow.inBuiltQueryKey.btnLocatorWorkflow:
