@@ -8,7 +8,13 @@ class LocatorManager {
     /**
      * Create Locator Manager Class     * 
      */
-    constructor() {
+    constructor(locatorPath) {
+
+        this.locatorPath = config.code.locatorPath
+        if (locatorPath != null) {
+            this.locatorPath = locatorPath
+        }
+
         this.__initialize()
     }
     /**
@@ -18,7 +24,6 @@ class LocatorManager {
     __initialize() {
         /** @type {Array<Locator>} */
         this.__locatorLibrary = []
-        this.locatorPath = config.code.locatorPath
         this.__parseLocator(this.locatorPath)
         this.lastRefreshTime = 0 //unit ms
     }

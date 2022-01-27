@@ -49,6 +49,9 @@ function __Recurse(node, ancestors, predicate) {
         let nodeIndex = nodeKyes[i]
         let currentNode = node[nodeIndex]
         let newAncestors = JSON.parse(JSON.stringify(ancestors))
+        if (currentNode == null || currentNode.constructor == null) {
+            continue
+        }
         if (currentNode.constructor.name == "Node") {
             newAncestors.push(currentNode)
         }

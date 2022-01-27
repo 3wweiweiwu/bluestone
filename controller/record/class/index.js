@@ -6,7 +6,7 @@ const FunctionAST = require('../../ast/class/Function')
 const JsDocTag = require('../../ast/class/JsDocTag')
 const { testTextEqual } = require('../../../ptLibrary/functions/inbuiltFunc')
 const _eval = require('eval')
-const StepResult = require('./StepResult')
+const StepResult = require('../../mocha/class/StepResult')
 const ElementSelector = require('../../../ptLibrary/class/ElementSelector')
 const { Page } = require('puppeteer-core')
 const PuppeteerControl = require('../../puppeteer/class')
@@ -16,6 +16,8 @@ const Testcase = require('../../coder/class/Testcase')
 const Navigation = require('../class/NavigationStatus')
 const PicCapture = require('../class/PicCapture')
 const ptConstant = require('../../../ptLibrary/functions/inbuiltFunc').VAR
+const RecordingStep = require('./RecordingStep')
+const MochaDriver = require('../../mocha/index')
 /**
  * @typedef {string} CommandType
  **/
@@ -42,97 +44,6 @@ var COMMAND_TYPE = {
 }
 
 
-class RecordingStep {
-    /** 
-     * @param {step} recordingStep 
-     */
-    constructor(recordingStep) {
-        this.command = recordingStep.command
-        this.target = recordingStep.target
-        /** @type {Array<string>} */
-        this.iframe = recordingStep.iframe
-        if (typeof (recordingStep.iframe) == 'string') {
-            this.iframe = JSON.parse(recordingStep.iframe)
-        }
-
-        /** @type {Array<Locator>} */
-        this.potentialMatch = recordingStep.potentialMatch
-        this.framePotentialMatch = recordingStep.framePotentialMatch
-        this.__htmlPath = recordingStep.htmlPath
-        this.targetInnerText = recordingStep.targetInnerText
-        this.targetPicPath = recordingStep.targetPicPath
-        this.timeoutMs = recordingStep.timeoutMs
-        this.meta = {}
-
-        this.finalLocatorName = ''
-        if (recordingStep.finalLocatorName) {
-            this.finalLocatorName = recordingStep.finalLocatorName
-        }
-        this.finalLocator = ['']
-        if (recordingStep.finalLocator) {
-            this.finalLocator = recordingStep.finalLocator
-        }
-        this.functionAst = recordingStep.functionAst
-        if (this.functionAst) {
-            this.parameter = JSON.parse(JSON.stringify(recordingStep.functionAst.params))
-        }
-        this.result = new StepResult()
-        this.timeStamp = recordingStep.timestamp
-
-
-    }
-    /**
-     * //based on the searalized json file, re-create object
-     * @param {object} json 
-     * @param {FunctionAST} functionAst 
-     * @param {string} command 
-     * @returns {RecordingStep}
-     */
-    static restore(json, functionAst, command) {
-        let result = new RecordingStep(json)
-        let keys = Object.keys(json)
-        keys.forEach(key => {
-            result[key] = json[key]
-        })
-        result.functionAst = functionAst
-        result.command = command
-        return result
-    }
-    get htmlPath() {
-        return this.__htmlPath
-    }
-    set htmlPath(path) {
-        this.__htmlPath = path
-    }
-    setFinalLocator(finalLocatorName, finalLocator) {
-        this.finalLocatorName = finalLocatorName
-        this.finalLocator = finalLocator
-    }
-    /**
-     * Update the html capture and change its index based on its location in htmlCapture repo
-     * @param {Number} offSet 
-     * @param {HtmlCaptureStatus} htmlCaptureRepo 
-     */
-    updateHtmlForStep(offSet, htmlCaptureRepo) {
-        this.__htmlPath = htmlCaptureRepo.getHtmlByPath(this.__htmlPath, offSet)
-
-    }
-}
-/**
- * @typedef step
- * @property {'click'|'change'|'dblclick'|'keydown'|'goto'|'upload'} command
- * @property {string} target
- * @property {Array<ExistingSelector>} matchedSelector
- * @property {number} timeoutMs
- * @property {string} htmlPath
- * @property {string} targetPicPath
- * @property {Array<string>} iframe
- * @property {import('../../ast/class/Function')} functionAst
- * @property {Array<RecordingStep>} potentialMatch
- * @property {Array<RecordingStep>} framePotentialMatch
- * @property {number} timestamp
- * @property {number} currentSelectedIndex
- */
 
 
 class WorkflowRecord {
@@ -151,6 +62,7 @@ class WorkflowRecord {
         this.__isRecording = true
         this.astManager = new AstManager(config.code.locatorPath)
         this.__isNavigationPending = false
+        this.__codePath = ''
         this.operationGroup = {
             customizedFunctions: {
                 text: 'Run Customzied Function',
@@ -189,12 +101,17 @@ class WorkflowRecord {
         this.inbuiltFuncPath = path.join(__dirname, '../../../ptLibrary/bluestone-func.js')
         this.astManager.loadFunctions(config.code.funcPath)
         this.astManager.loadFunctions(this.inbuiltFuncPath)
+        /**@type {MochaDriver} */
+        this.mochaDriver = null
     }
     get isNavigationPending() {
         return this.__isNavigationPending
     }
     set isNavigationPending(isPending) {
         this.__isNavigationPending = isPending
+    }
+    get codePath() {
+        return this.__codePath
     }
     /**
      * Scan through html path and fix unavailable path
@@ -238,7 +155,7 @@ class WorkflowRecord {
         coder.testSuite = testSuite
         coder.testCase = testCase
         let finalPath = await coder.writeCodeToDisk()
-
+        this.__codePath = finalPath
         //update locator
         for (let i = 0; i < this.steps.length; i++) {
             let step = this.steps[i]
@@ -498,10 +415,48 @@ class WorkflowRecord {
         return result
     }
     /**
-     * Run All steps and assign result to step.
+     * Run All steps and assign result to step via bluestone
      * @returns {number} index of the failed step. -1 if everything pass
      */
     async runAllSteps() {
+        let failedStepIndex = -1
+        //check if there is any un-correlated locator in step
+        failedStepIndex = this.findPendingLocatorInStep()
+        if (failedStepIndex != -1) {
+            this.steps[failedStepIndex].result = new StepResult()
+            this.steps[failedStepIndex].result.resultText = 'Locator has not been correleated'
+            return failedStepIndex
+        }
+
+        this.mochaDriver = new MochaDriver(this.codePath, this.locatorManager, this.astManager, 999999)
+        let result = await this.mochaDriver.runScript()
+        //run mark passed result
+        for (let i = 0; i < this.steps.length; i++) {
+            if (result.failedStep == -1 || result.failedStep > i)
+                this.steps[i].result.isResultPass = true
+            else
+                break
+
+        }
+        //mark failed step if any failure is within the range
+        if (result.isResultPass == false && result.failedStep != -1 && result.failedStep < this.steps.length) {
+            this.steps[result.failedStep].result.isResultPass = false
+            this.steps[result.failedStep].result.resultText = result.resultNote
+        }
+        //mark failed step if failure it outside the scope
+        if (result.isResultPass == false && (result.failedStep > this.steps.length || result.failedStep == -1)) {
+            this.steps[0].result.isResultPass = false
+            this.steps[0].result.resultText = 'Unable to find failed step. ' + result.resultNote
+        }
+        await this.puppeteer.openBluestoneTab('workflow')
+        return failedStepIndex
+
+    }
+    /**
+     * Run All steps and assign result to step via bluestone
+     * @returns {number} index of the failed step. -1 if everything pass
+     */
+    async runAllStepsViaBluestone() {
         let failedStepIndex = -1
         //check if there is any un-correlated locator in step
         failedStepIndex = this.findPendingLocatorInStep()
