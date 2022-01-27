@@ -60,7 +60,7 @@ class AST {
      */
     async loadFunctions(funcPath) {
         let jsStr = (await fs.readFile(funcPath)).toString()
-        let ast = acorn.parse(jsStr, { ecmaVersion: 2020 })
+        let ast = acorn.parse(jsStr, { ecmaVersion: 2022 })
         //delete cached library and its dependencies
         if (require.cache[funcPath]) {
             require.cache[funcPath].children.forEach(item => {
@@ -187,10 +187,10 @@ class AST {
             libraryName = funcNode.value.object.name
             methodName = funcNode.value.property.name
         }
-        else if (parentNode.value.type == 'NewExpression') {
-            funcNode = parentNode.value.arguments.find(item => { return item.type == 'MemberExpression' })
-            libraryName = funcNode.object.name
-            methodName = funcNode.property.name
+        else if (parentNode.value.type == 'ClassExpression') {
+            funcNode = parentNode.value.body.body.find(item => item.key.name == 'func')
+            libraryName = funcNode.value.object.name
+            methodName = funcNode.value.property.name
         }
 
 
