@@ -19,8 +19,13 @@ class MochaDriver {
     constructor(filePath, locatorManager, astManager, timeout = 999999) {
         this.__mocha = new Mocha({ timeout: timeout })
         this.__mocha.suite.on('require', function (global, file) {
-            delete require.cache[file];
-            require(file)
+            if (require.cache[file]) {
+                delete require.cache[file];
+            }
+            else {
+                require(file)
+            }
+
 
         });
         this.__filePath = filePath
@@ -91,7 +96,7 @@ class MochaDriver {
     abortScript() {
         this.#runner.emit('dispose')
     }
-    #getErrorStepIndexByLine(filePath, errorStack) {
+    #getErrorStepIndexByLine = function (filePath, errorStack) {
         let stepIndex = -1
         let fileName = path.basename(filePath)
         let errorLine = errorStack.split('\n').find(item => item.includes(fileName + ":"))
