@@ -7,59 +7,59 @@ module.exports = {
 
     testTextEqual: class {
         static func = inbuiltFunc.testTextEqual
-        static locators = ['invalid_locators']
+        static locators = [{ locator: ['invalid_locator'] }]
     },
     hover: class {
         static func = inbuiltFunc.hover
-        static locators = ['invalid_locators']
+        static locators = [{ locator: ['invalid_locator'] }]
     },
     waitElementVisible: class {
         static func = inbuiltFunc.waitTillElementVisible
-        static locators = ['invalid_locators']
+        static locators = [{ locator: ['invalid_locator'] }]
     },
     waitElementExists: class {
         static func = inbuiltFunc.waitElementExists
-        static locators = ['invalid_locators']
+        static locators = [{ locator: ['invalid_locator'] }]
     },
     change: class {
         static func = inbuiltFunc.change
-        static locators = ['invalid_locators']
+        static locators = [{ locator: ['invalid_locator'] }]
     },
     click: class {
         static func = inbuiltFunc.click
-        static locators = ['invalid_locators']
+        static locators = [{ locator: ['invalid_locator'] }]
     },
     goto: class {
         static func = inbuiltFunc.goto
-        static locators = ['invalid_locators']
+        static locators = [{ locator: ['invalid_locator'] }]
     },
     keydown: class {
         static func = inbuiltFunc.keydown1
-        static locators = ['invalid_locators']
+        static locators = [{ locator: ['invalid_locator'] }]
     },
     gotoFrame: class {
         static func = inbuiltFunc.gotoFrame
-        static locators = ['invalid_locators']
+        static locators = [{ locator: ['invalid_locator'] }]
     },
     closeBrowser: class {
         static func = inbuiltFunc.closeBrowser
-        static locators = ['invalid_locators']
+        static locators = [{ locator: ['invalid_locator'] }]
     },
     upload: class {
         static func = inbuiltFunc.uploadByInput
-        static locators = ['invalid_locators']
+        static locators = [{ locator: ['invalid_locator'] }]
     },
     waitForTimeout: class {
         static func = inbuiltFunc.waitForTimeout
-        static locators = ['invalid_locators']
+        static locators = [{ locator: ['invalid_locator'] }]
     },
     basicAuthenticate: class {
         static func = inbuiltFunc.basicAuthenticate
-        static locators = ['invalid_locators']
+        static locators = [{ locator: ['invalid_locator'] }]
     },
     clearBrowserCache: class {
         static func = inbuiltFunc.clearBrowserCache
-        static locators = ['invalid_locators']
+        static locators = [{ locator: ['invalid_locator'] }]
     }
 
 }
