@@ -142,6 +142,7 @@ class LocatorDefiner {
                 this.locatorSelector = this.possibleLocators[firstValue].selector
                 break
             case LocatorDefiner.inBuiltQueryKey.btnOverrideLocator:
+                
                 this.backend.steps[this.stepIndex].finalLocator = [this.locatorSelector]
                 this.backend.steps[this.stepIndex].finalLocatorName = this.locatorName
                 //specify locator function name in the param

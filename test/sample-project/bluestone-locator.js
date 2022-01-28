@@ -73,5 +73,10 @@ module.exports = {
         locator: ['.ng-binding:nth-child(2)'],
         screenshot: 'componentPic/1st_Selector.png',
         displayName: '1st Selector'
+    },
+    'todo-form': {
+        locator: ['.todo-form'],
+        displayName: 'todo form',
+        screenshot: ''
     }
 };

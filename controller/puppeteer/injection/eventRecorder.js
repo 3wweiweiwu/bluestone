@@ -221,7 +221,7 @@ document.addEventListener('mouseover', async event => {
             event.target.style.backgroundColor = locatorFound
             window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, currentSelectedIndex)
             // setStateToAllEvents(false, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
-            console.log('current selected index found')
+            // console.log('current selected index found')
             return
         }
 
@@ -231,24 +231,24 @@ document.addEventListener('mouseover', async event => {
             event.target.style.backgroundColor = noLocatorFound
             window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, null)
             // setStateToAllEvents(true, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
-            console.log('no potential match index')
+            // console.log('no potential match index')
             return
         }
 
         let potentialMatchArray = JSON.parse(potentialMatch)
-        console.log(potentialMatch)
-        console.log(potentialMatchArray)
+        // console.log(potentialMatch)
+        // console.log(potentialMatchArray)
         if (potentialMatchArray.length == 1) {
             //exact one match, we are good
             event.target.style.backgroundColor = locatorFound
             window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, 0)
             // setStateToAllEvents(false, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
-            console.log('only 1 potential match index')
+            // console.log('only 1 potential match index')
             return
         }
 
         //if toehrwise, 
-        console.log('more than 1 potential matches')
+        // console.log('more than 1 potential matches')
         event.target.style.backgroundColor = noLocatorFound
         window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, null)
         // setStateToAllEvents(true, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
@@ -342,7 +342,42 @@ async function scanLocator() {
 
         }
     }
+    class ElementMidPosition {
+        /**
+         * 
+         * @param {HTMLElement} element 
+         * @param {Array<number>} potentialMatch
+         */
+        constructor(element, potentialMatch) {
+            this.element = element
+            let rect = element.getBoundingClientRect()
+            this.x = rect.x
+            this.y = rect.y
+            this.width = rect.width
+            this.height = rect.height
+            this.midX = rect.x + rect.width / 2
+            this.midY = rect.y + rect.height / 2
+            this.potentialMatch = potentialMatch
+        }
+        /**
+         * Check if element can be identified by other element
+         * @param {HTMLElement} element 
+         * @returns {boolean}
+         */
+        isCurrentElementCanbeDefinedByThis(element) {
+            //skip elment itself
+            if (element == this.element)
+                return false
 
+            let pos = element.getBoundingClientRect()
+            let xCheck = ((pos.x + pos.width / 2) == this.midX)
+            let yCheck = ((pos.y + pos.height / 2) == this.midY)
+            return xCheck && yCheck
+        }
+
+    }
+    /**@type {Array<ElementMidPosition>} */
+    let elementMidPintDict = {}
     /** @type {Array<import('../../locator/index').Locator>} */
     let currentLocatorList = await window.getLocator()
     let startTime = Date.now()
@@ -392,11 +427,34 @@ async function scanLocator() {
                 potentialMatchLocatorIndex = JSON.parse(currentPotentialMatch)
                 potentialMatchLocatorIndex.push(i)
             }
-
+            elementMidPintDict[currentElement] = new ElementMidPosition(currentElement, potentialMatchLocatorIndex)
             currentElement.setAttribute(Helper.potentialLocatorMatchIndexes, JSON.stringify(potentialMatchLocatorIndex))
         }
 
     }
+
+    //add potential match to elments who's region contains other element's mid point.
+    //We do this because we might use other element to identify current element
+    let elements = getElementByXpath(`//*[@${Helper.potentialLocatorMatchIndexes}]`)
+    elements.forEach(ele => {
+        for (const midPointElementKey of Object.keys(elementMidPintDict)) {
+            let midPointElement = elementMidPintDict[midPointElementKey]
+            let midPointTestResult = midPointElement.isCurrentElementCanbeDefinedByThis(ele)
+            //skip elemnt that cannot pass mid point test
+            if (!midPointTestResult)
+                continue
+
+            //if passed mid point test, we will add potential match to current element
+            let potentialMatchStr = ele.getAttribute(Helper.potentialLocatorMatchIndexes)
+            let potentialMatch = JSON.parse(potentialMatchStr)
+            let uniqueSet = new Set([...potentialMatch, ...midPointElement.potentialMatch])
+            let uniqueArr = [...uniqueSet]
+
+            ele.setAttribute(Helper.potentialLocatorMatchIndexes, JSON.stringify(uniqueArr))
+        }
+    })
+
+
 }
 
 
