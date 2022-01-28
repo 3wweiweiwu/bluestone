@@ -126,6 +126,7 @@ class LocatorDefiner {
         let firstKey = queryKeys[0]
         let firstValue = query[firstKey]
         let param = null
+        let newLocator = null
         switch (firstKey) {
             case LocatorDefiner.inBuiltQueryKey.btnRevert:
                 this.locatorSelector = this.defaultSelector
@@ -142,18 +143,34 @@ class LocatorDefiner {
                 this.locatorSelector = this.possibleLocators[firstValue].selector
                 break
             case LocatorDefiner.inBuiltQueryKey.btnOverrideLocator:
-                
-                this.backend.steps[this.stepIndex].finalLocator = [this.locatorSelector]
-                this.backend.steps[this.stepIndex].finalLocatorName = this.locatorName
+                if (this.stepIndex != -1) {
+                    this.backend.steps[this.stepIndex].finalLocator = [this.locatorSelector]
+                    this.backend.steps[this.stepIndex].finalLocatorName = this.locatorName
+
+                    param = this.backend.steps[this.stepIndex].functionAst.params.find(item => {
+                        return item.type.name == 'ElementSelector'
+                    })
+                    if (param) {
+                        param.value = this.locatorName
+                    }
+                }
+
+                //if we are in live locator generation mode, update finalLocator and potentialMatch list of current locator
+                if (this.stepIndex == -1) {
+                    newLocator = await this.backend.locatorManager.updateLocator(this.locatorName, [this.locatorSelector], this.locatorHtml)
+                    //update potential match and current selected index for current element
+                    let newLocatorIndex = this.backend.locatorManager.getLocatorIndexByName(this.locatorName)
+                    this.backend.operation.browserSelection.potentialMatch.push(newLocator)
+                    this.backend.operation.browserSelection.potentialMatch = [...new Set(this.backend.operation.browserSelection.potentialMatch)].filter(item => item != null)
+                    this.backend.operation.browserSelection.currentSelectedIndex = newLocatorIndex
+                    //update selector index for current selector
+                    this.backend.puppeteer.setSelectorIndexForLocator(this.backend.operation.browserSelection.currentSelector, newLocatorIndex)
+                }
+
+
                 //specify locator function name in the param
                 await this.backend.puppeteer.checkLocatorInDefiner(this.defaultSelector, this.locatorSelector, this.parentFrame)
                 this.validationText += '[Locator Overriden]'
-                param = this.backend.steps[this.stepIndex].functionAst.params.find(item => {
-                    return item.type.name == 'ElementSelector'
-                })
-                if (param) {
-                    param.value = this.locatorName
-                }
                 break
             case LocatorDefiner.inBuiltQueryKey.btnConfirm:
                 //check locator and confirm locator input
@@ -164,7 +181,7 @@ class LocatorDefiner {
                 let finalSelection = this.getFinalSelection(locatorCheckResult)
                 if (locatorCheckResult != '') break
                 //add newly added selector to the locator library for future usage
-                let newLocator = await this.backend.locatorManager.updateLocator(this.locatorName, [this.locatorSelector], this.locatorHtml)
+                newLocator = await this.backend.locatorManager.updateLocator(this.locatorName, [this.locatorSelector], this.locatorHtml)
 
                 //if we are in live locator generation mode, update finalLocator and potentialMatch list of current locator
                 if (this.stepIndex == -1) {
