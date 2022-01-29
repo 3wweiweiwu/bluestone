@@ -285,24 +285,24 @@ class WorkflowRecord {
         if (step.command != 'goto' && step.command != gotoFrameCommand && step.iframe != null) {
             let switchToFrameAst = this.astManager.getFunction(gotoFrameCommand)
             /**@type {RecordingStep} */
-            let waitStep = JSON.parse(JSON.stringify(step))
-            waitStep = RecordingStep.restore(waitStep, switchToFrameAst, gotoFrameCommand)
+            let switchFrameStep = JSON.parse(JSON.stringify(step))
+            switchFrameStep = RecordingStep.restore(switchFrameStep, switchToFrameAst, gotoFrameCommand)
 
             //for iframe, its parent iframe will be its parent and its locator should be last xpath
             let parentIframe = step.iframe.slice(0, step.iframe.length - 1)
             let currentIframe = step.iframe[step.iframe.length - 1]
-            waitStep.target = currentIframe
+            switchFrameStep.target = currentIframe
             if (currentIframe == null) {
-                waitStep.target = ptConstant.parentIFrameLocator
+                switchFrameStep.target = ptConstant.parentIFrameLocator
             }
-            waitStep.iframe = parentIframe
-            waitStep.potentialMatch = step.framePotentialMatch || []
+            switchFrameStep.iframe = parentIframe
+            switchFrameStep.potentialMatch = step.framePotentialMatch || []
             let waitTime = step.timeoutMs
             if (waitTime < 3000)
                 waitTime = 3000
-            waitStep.functionAst.params[3].value = waitTime
+            switchFrameStep.functionAst.params[3].value = waitTime
 
-            this.steps.push(waitStep)
+            this.steps.push(switchFrameStep)
         }
     }
     /**
@@ -568,10 +568,9 @@ class WorkflowRecord {
 
         this.steps.push(event)
         this.__handleChangeNPressCombo(event)
-        await this.refreshActiveFunc()
-
-
+        this.__handleEnterNClickCombo(event)
         this.setLastOperationTime()
+        await this.refreshActiveFunc()
     }
     /**
      * check if current command is change call and see if prior step is press key and timeout is small (0<x<100ms)
@@ -582,22 +581,45 @@ class WorkflowRecord {
      * @returns 
      */
     async __handleChangeNPressCombo(step) {
-        if (this.steps.length > 3 && step.command == 'change' && this.steps[this.steps.length - 3].command == 'keydown' && step.target == this.steps[this.steps.length - 3].target) {
+        if (this.steps.length > 3 && step.command == 'change'
+            && this.steps[this.steps.length - 3].command == 'keydown'
+            && step.target == this.steps[this.steps.length - 3].target
+            && this.steps[this.steps.length - 3].timeStamp - step.timeStamp < 50 //extremely short timeout to ensure they are two consequtive events
+        ) {
             let waitStepForChange = this.steps[this.steps.length - 2]
             let actionStepForChange = this.steps[this.steps.length - 1]
             let actionStepForPress = this.steps[this.steps.length - 3]
-            let waitStepForPress = this.steps[this.steps.length - 4]
-
-            waitStepForChange.functionAst.params[2].value = waitStepForPress.timeoutMs
 
 
-            this.steps.splice(this.steps.length - 4, 4)
+
+            this.steps.splice(this.steps.length - 3, 3)
             this.steps.push(waitStepForChange)
             this.steps.push(actionStepForChange)
-            this.steps.push(waitStepForPress)
             this.steps.push(actionStepForPress)
 
 
+        }
+    }
+    /**
+     * If a keydown event trigger a click event, we will click event and associated wait
+     * In login page, after user type in username and password, they might press enter key 
+     * Developer might design their UI in a fashion that enter key will trigger the click event login button
+     * Bluestone will capture both enter key and click event
+     * This will break issue later in replay mode because press enter key will trigger click event in login button
+     * and move us to next screen. For next step, the script will try to click login button again.
+     * This will fail the script. In this case, the easiest way to handle this is get rid of 2nd click event
+     * In this case, we will only trigger this if enter event and click event are right next to each other
+     * @param {RecordingStep} step 
+     * @returns 
+     */
+    async __handleEnterNClickCombo(step) {
+        if (this.steps.length > 3 && step.command == 'click'
+            && this.steps[this.steps.length - 3].command == 'keydown'
+
+            && this.steps[this.steps.length - 3].timeStamp - step.timeStamp < 50 //extremly short timeout to ensure it is consecutive event
+        ) {
+
+            this.steps.splice(this.steps.length - 2, 2)
         }
     }
     /**
