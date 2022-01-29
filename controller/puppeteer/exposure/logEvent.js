@@ -92,7 +92,6 @@ module.exports = function (recordRepo, browser, page, io) {
         //if event command is null, call the in-browser console
         if (eventDetail.command == null) {
             recordRepo.spyBrowserSelectionPicPath = picturePath
-            recordRepo.isRecording = false
             recordRepo.spyBrowserSelectionHtmlPath = htmlPath
             console.log('pause recording and call in-browser agent')
             recordRepo.spyVisible = true
@@ -110,6 +109,11 @@ module.exports = function (recordRepo, browser, page, io) {
             await drawPendingWorkProgress(page, recordRepo.picCapture, recordRepo.htmlCaptureStatus)
             //display mvt console
             await openBluestoneTab(browser, "decide-view")
+
+            //give 500ms delay so that it can capture unfinished events(ex: last change event)
+            setTimeout(() => {
+                recordRepo.isRecording = false
+            }, 500)
 
 
         }
