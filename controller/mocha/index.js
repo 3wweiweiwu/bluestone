@@ -17,7 +17,7 @@ class MochaDriver {
      * @param {number} timeout 
      */
     constructor(filePath, locatorManager, astManager, timeout = 999999) {
-        this.__mocha = new Mocha({ timeout: timeout })
+        this.__mocha = new Mocha({ timeout: timeout, fullTrace: true })
         this.__mocha.suite.on('require', function (global, file) {
             if (require.cache[file]) {
                 delete require.cache[file];
