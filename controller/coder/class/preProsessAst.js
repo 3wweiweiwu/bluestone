@@ -37,6 +37,12 @@ async function upload(func, testSuite, testCase) {
     //copy files over and create new file list
     for (let i = 0; i < fileList.length; i++) {
         let filePath = fileList[i]
+        //if file information has been copyed already, will not do that again
+        try {
+            await fs.access(filePath)
+        } catch (error) {
+            continue
+        }
         let immediateDirName = path.basename(path.dirname(filePath))
         let fileName = path.basename(filePath)
         let destinationFolder = path.join(config.code.dataPath, testCase, immediateDirName)
