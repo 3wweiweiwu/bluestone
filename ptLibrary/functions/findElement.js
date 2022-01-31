@@ -84,10 +84,15 @@ async function isElementBlocked(element) {
                 elem.getBoundingClientRect().width === 0) {
                 return false;
             }
+            let elemBoundingRect = elem.getBoundingClientRect()
+            if (elemBoundingRect.width == 0) return false
+            if (elemBoundingRect.height == 0) return false
+
             const elemCenter = {
-                x: elem.getBoundingClientRect().left + elem.offsetWidth / 2,
-                y: elem.getBoundingClientRect().top + elem.offsetHeight / 2
+                x: elemBoundingRect.left + elem.offsetWidth / 2,
+                y: elemBoundingRect.top + elem.offsetHeight / 2
             };
+
             if (elemCenter.x < 0) return false;
             if (elemCenter.x > (document.documentElement.clientWidth || window.innerWidth)) return false;
             if (elemCenter.y < 0) return false;
