@@ -192,6 +192,11 @@ class AST {
             libraryName = funcNode.value.object.name
             methodName = funcNode.value.property.name
         }
+        else if (parentNode.value.type == 'MemberExpression') {
+            libraryName = parentNode.value.object.name
+            methodName = currentNode.node.name
+
+        }
 
 
         let bsFunc = new BsFunc(libraryName, methodName)

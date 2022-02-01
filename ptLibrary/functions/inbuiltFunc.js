@@ -268,19 +268,22 @@ exports.basicAuthenticate = async function authenticate(page, username, password
     return 'authenticate'
 }
 
-/**
- * Clear browser cache
- * @param {Page} page 
- */
-exports.clearBrowserCache = async function clearBrowserCache(page) {
-    try {
-        const client = await page.target().createCDPSession();
-        await client.send('Network.clearBrowserCookies');
-        await client.send('Network.clearBrowserCache');
-        await page.evaluate(() => { localStorage.clear() })
-    } catch (error) {
+exports.clearBrowserCache = class {
+    /**
+     * Clear browser cache
+     * @param {Page} page 
+     */
+    static async func(page) {
+        try {
+            const client = await page.target().createCDPSession();
+            await client.send('Network.clearBrowserCookies');
+            await client.send('Network.clearBrowserCache');
+            await page.evaluate(() => { localStorage.clear() })
+        } catch (error) {
 
+        }
+
+        return true
     }
-
-    return true
+    static locators = [{ locator: ['invalid_locator'] }]
 }

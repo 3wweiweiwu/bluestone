@@ -4,7 +4,7 @@ let BluestoneFunc = require('./class/BluestoneFunc')
 
 
 module.exports = {
-
+    clearBrowserCache: inbuiltFunc.clearBrowserCache,
     testTextEqual: class {
         static func = inbuiltFunc.testTextEqual
         static locators = [{ locator: ['invalid_locator'] }]
@@ -57,9 +57,5 @@ module.exports = {
         static func = inbuiltFunc.basicAuthenticate
         static locators = [{ locator: ['invalid_locator'] }]
     },
-    clearBrowserCache: class {
-        static func = inbuiltFunc.clearBrowserCache
-        static locators = [{ locator: ['invalid_locator'] }]
-    }
 
 }
