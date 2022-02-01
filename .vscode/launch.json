@@ -36,6 +36,14 @@
       "args": ["start", "../apm-insight-bluestone", "--port", "3601"]
     },
     {
+      "name": "Launch Command line for connect bluestone",
+      "program": "${workspaceFolder}/bin/bluestone.js",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node",
+      "args": ["start", "../connect-bluestone", "--port", "3601"]
+    },
+    {
       "name": "Launch Record Command line",
       "program": "${workspaceFolder}/bin/bluestone.js",
       "request": "launch",
