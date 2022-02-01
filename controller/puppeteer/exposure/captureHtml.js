@@ -10,7 +10,7 @@ const fs = require('fs').promises
 module.exports = function (page, recordRepo) {
 
     return async function () {
-        if (page != null && recordRepo.isRecording) {
+        if (page != null && recordRepo.isRecording && recordRepo.isCaptureHtml) {
             let htmlPath = recordRepo.getHtmlPath()
             let htmlIndex = null
             //Use queue to avoid repeated capture for a short period of time to enhance performance

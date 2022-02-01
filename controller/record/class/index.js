@@ -60,6 +60,7 @@ class WorkflowRecord {
         this.steps = []
         this.lastOperationTimestamp = Date.now()
         this.__isRecording = true
+        this.__isCaptureHtml = true
         this.astManager = new AstManager(config.code.locatorPath)
         this.__isNavigationPending = false
         this.__codePath = ''
@@ -531,7 +532,12 @@ class WorkflowRecord {
         this.operation.browserSelection.lastOperationTime = Date.now()
     }
 
-
+    get isCaptureHtml() {
+        return this.__isCaptureHtml
+    }
+    set isCaptureHtml(status) {
+        this.__isCaptureHtml = status
+    }
 
 
     set isRecording(recordStatus) {

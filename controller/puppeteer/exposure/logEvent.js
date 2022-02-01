@@ -91,6 +91,8 @@ module.exports = function (recordRepo, browser, page, io) {
 
         //if event command is null, call the in-browser console
         if (eventDetail.command == null) {
+            recordRepo.isCaptureHtml = false
+
             recordRepo.spyBrowserSelectionPicPath = picturePath
             recordRepo.spyBrowserSelectionHtmlPath = htmlPath
             console.log('pause recording and call in-browser agent')
@@ -113,6 +115,7 @@ module.exports = function (recordRepo, browser, page, io) {
             //give 500ms delay so that it can capture unfinished events(ex: last change event)
             setTimeout(() => {
                 recordRepo.isRecording = false
+                recordRepo.isCaptureHtml = true
             }, 500)
 
 
