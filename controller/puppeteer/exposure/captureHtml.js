@@ -51,6 +51,11 @@ module.exports = function (page, recordRepo) {
 
             try {
                 htmlPath = recordRepo.htmlCaptureStatus.markWriteStarted(htmlIndex)
+                //If recording is in paused state, we will just pop current operation
+                if (recordRepo.isRecording != true || recordRepo.isCaptureHtml != true) {
+                    recordRepo.htmlCaptureStatus.popOperation(htmlIndex)
+                    return
+                }
                 let pageData = await page.evaluate(async (DEFAULT_OPTIONS) => {
                     const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
                     return pageData;
