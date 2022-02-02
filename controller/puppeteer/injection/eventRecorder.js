@@ -58,7 +58,6 @@ function getElementAttribute(element, attributeName) {
 
 Object.keys(EVENTCONST).forEach(item => {
     document.addEventListener(item, event => {
-        if (window.isRecording() == false) return
         let selector = ''
         try {
             selector = finder(event.target)
@@ -212,7 +211,6 @@ document.addEventListener('mouseover', async event => {
 
     let noLocatorFound = 'rgba(255, 0, 145, 0.45)'
     let locatorFound = 'rgba(0, 223, 145, 0.45)'
-    console.log(`is reocrding:${window.isRecording()}`)
     //depends on the color schema, display different color to give user a hint for next step
 
     //if we have set the final locator, mark it as green
@@ -259,7 +257,6 @@ document.addEventListener('mouseover', async event => {
 }, { capture: true })
 
 document.addEventListener("mouseout", event => {
-    if (!window.isRecording()) return
     try {
         const previousStyle = event.target.getAttribute(BLUESTONE.previousbackground)
         if (previousStyle != null) {
