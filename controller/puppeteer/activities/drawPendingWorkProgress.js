@@ -26,6 +26,7 @@ async function drawProgressBar(page, pendingPicCapture, pendingHtmlCapture) {
             progress.style.fontSize = '30px'
             progress.style.background = 'white'
             progress.style.zIndex = 999
+            progress.style.opacity = 0.4
         }
         progress.innerText = `Please wait while we are completing some background work. Pending Html Capture:${pendingHtmlCapture}`
         if (pendingPicCapture != null) {
