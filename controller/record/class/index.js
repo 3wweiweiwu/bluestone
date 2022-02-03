@@ -218,7 +218,9 @@ class WorkflowRecord {
         upload: 'upload',
         waitForTimeout: 'waitForTimeout',
         basicAuthenticate: 'basicAuthenticate',
-        clearBrowserCache: 'clearBrowserCache'
+        clearBrowserCache: 'clearBrowserCache',
+        dragstart: 'dragstart',
+        drop: 'drop'
     }
     static inbuiltEvent = {
         refresh: PuppeteerControl.inbuiltEvent.refresh
@@ -261,7 +263,9 @@ class WorkflowRecord {
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.upload),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.waitForTimeout),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.basicAuthenticate),
-                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.clearBrowserCache)
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.clearBrowserCache),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.dragstart),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.drop)
                 ]
             },
             customizedFunctions: {

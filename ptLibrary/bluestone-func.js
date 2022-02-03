@@ -60,6 +60,14 @@ module.exports = {
     clearBrowserCache: class {
         static func = inbuiltFunc.clearBrowserCache
         static locators = [{ locator: ['invalid_locator'] }]
+    },
+    dragstart: class {
+        static func = inbuiltFunc.dragstart
+        static locators = [{ locator: ['invalid_locator'] }]
+    },
+    drop: class {
+        static func = inbuiltFunc.drop
+        static locators = [{ locator: ['invalid_locator'] }]
     }
 
 }

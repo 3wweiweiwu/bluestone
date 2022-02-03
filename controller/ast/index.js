@@ -34,7 +34,7 @@ class AST {
     }
     getFunction(name) {
         let func = this.__funcRepo.find(item => {
-            return item.name == name
+            return item.name.toUpperCase() == name.toUpperCase()
         })
         if (func == null) {
             return null

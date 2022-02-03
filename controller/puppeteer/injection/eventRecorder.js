@@ -20,6 +20,9 @@ const EVENTCONST = {
     change: 'change',
     dblclick: 'dblclick',
     keydown: 'keydown',
+    dragstart: 'dragstart',
+    drop: 'drop'
+
 }
 const BLUESTONE = {
     previousbackground: 'bluestone-previous-background',
