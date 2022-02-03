@@ -68,6 +68,14 @@ module.exports = {
     drop: class {
         static func = inbuiltFunc.drop
         static locators = [{ locator: ['invalid_locator'] }]
+    },
+    initialize: class {
+        static func = inbuiltFunc.initialize
+        static locators = [{ locator: ['invalid_locator'] }]
+    },
+    waitForDownloadComplete: class {
+        static func = inbuiltFunc.waitForDownloadComplete
+        static locators = [{ locator: ['invalid_locator'] }]
     }
 
 }

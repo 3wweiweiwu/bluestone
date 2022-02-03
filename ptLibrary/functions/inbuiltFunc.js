@@ -2,9 +2,11 @@ const { Page, Frame, ElementHandle, Browser } = require('puppeteer-core')
 const ElementSelector = require('../class/ElementSelector')
 const VarSaver = require('../class/VarSaver')
 const findElement = require('./findElement')
+const initailizeDownload = require('./initiailzeDownload')
 const assert = require('assert')
 const path = require('path')
 const fs = require('fs')
+const chokidar = require('chokidar')
 const ConstantVar = {
     parentIFrameLocator: 'TOP IFRAME'
 }
@@ -344,5 +346,27 @@ exports.drop = async function dragstart(frame, selector) {
 
     }
 
+    return true
+}
+
+/**
+ * Initialize Bluestone Autoamtion
+*  @param {VarSaver} vars 
+ * @param {Page} page
+ */
+exports.initialize = async function (vars, page) {
+    await initailizeDownload(vars, page)
+    //watch download folder
+    return true
+}
+
+/**
+ * Wait for download to complete
+*  @param {VarSaver} vars 
+ * @param {number} timeout Wait time till download to complete
+ */
+exports.waitForDownloadComplete = async function (vars, timeout) {
+
+    await vars.downloadManager.waitDownloadComplete(timeout)
     return true
 }
