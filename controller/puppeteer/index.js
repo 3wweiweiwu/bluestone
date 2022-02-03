@@ -16,6 +16,7 @@ const injectModuleScriptBlock = require('./help/injectModuleScriptBlock')
 const singlefileScript = require('single-file/cli/back-ends/common/scripts')
 const captureScreenshot = require('./exposure/captureScreenshot')
 const checkUrlBlackList = require('./help/checkUrlBlacklist')
+const isHtmlCaptureOngoing = require('./exposure/isHtmlCaptureOngoing')
 const { drawPendingWorkProgress } = require('./activities/drawPendingWorkProgress')
 /**
  * Create a new puppeteer browser instance
@@ -67,6 +68,7 @@ async function startRecording(record, io, url = null) {
     await page.exposeFunction('captureScreenshot', captureScreenshot(page, record))
     await page.exposeFunction('saveUploadedFile', saveUploadedFile(record))
     await page.exposeFunction('getUploadFilePath', getUploadFilePath)
+    await page.exposeFunction('isHtmlCaptureOngoing', isHtmlCaptureOngoing(record))
 
     await page.setBypassCSP(true)
 

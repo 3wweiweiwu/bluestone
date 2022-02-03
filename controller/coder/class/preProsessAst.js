@@ -52,9 +52,12 @@ async function upload(func, testSuite, testCase) {
         let relativeFilepath = path.relative(config.code.scriptFolder, destinationFilePath)
         updatedFileList.push(relativeFilepath)
     }
-    //update file info
-    let newFileInfo = updatedFileList.join(',')
-    func.params[paramIndex].value = newFileInfo
+    //update file info. Keep file info as is if we cannot find any updated file list
+    if (updatedFileList.length != 0) {
+        let newFileInfo = updatedFileList.join(',')
+        func.params[paramIndex].value = newFileInfo
+    }
+
 
 }
 

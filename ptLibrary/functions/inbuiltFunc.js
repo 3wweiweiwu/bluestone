@@ -287,3 +287,65 @@ exports.clearBrowserCache = class {
     }
     static locators = [{ locator: ['invalid_locator'] }]
 }
+
+/**
+ * Start to Drag
+ * @param {Frame} frame 
+ * @param {ElementSelector} selector
+ */
+exports.dragstart = async function dragstart(frame, selector) {
+    try {
+        let element = await findElement(frame, selector, 2000)
+        await element.evaluate(node => {
+            //declare global data transfer element
+            bluestoneDataTransfer = new DataTransfer()
+            let rect = node.getBoundingClientRect()
+            const dragStartEvent = {
+                bubbles: true,
+                cancelable: true,
+                screenX: rect.x,
+                screenY: rect.y,
+                clientX: rect.x,
+                clientY: rect.y,
+                dataTransfer: bluestoneDataTransfer
+            };
+            node.dispatchEvent(new DragEvent('dragstart', dragStartEvent))
+        })
+
+    } catch (error) {
+
+    }
+
+    return true
+}
+
+/**
+ * Drop to Element
+ * @param {Frame} frame 
+ * @param {ElementSelector} selector
+ */
+exports.drop = async function dragstart(frame, selector) {
+    try {
+        let element = await findElement(frame, selector, 2000)
+        await element.evaluate(node => {
+            //retrieve global data transfer object
+            bluestoneDataTransfer = bluestoneDataTransfer
+            let rect = node.getBoundingClientRect()
+            const dropEvent = {
+                bubbles: true,
+                cancelable: true,
+                screenX: rect.x,
+                screenY: rect.y,
+                clientX: rect.x,
+                clientY: rect.y,
+                dataTransfer: bluestoneDataTransfer
+            };
+            node.dispatchEvent(new DragEvent('drop', dropEvent))
+        })
+
+    } catch (error) {
+
+    }
+
+    return true
+}

@@ -20,6 +20,9 @@ const EVENTCONST = {
     change: 'change',
     dblclick: 'dblclick',
     keydown: 'keydown',
+    dragstart: 'dragstart',
+    drop: 'drop'
+
 }
 const BLUESTONE = {
     previousbackground: 'bluestone-previous-background',
@@ -58,7 +61,6 @@ function getElementAttribute(element, attributeName) {
 
 Object.keys(EVENTCONST).forEach(item => {
     document.addEventListener(item, event => {
-        if (window.isRecording() == false) return
         let selector = ''
         try {
             selector = finder(event.target)
@@ -183,83 +185,81 @@ Object.keys(EVENTCONST).forEach(item => {
 //XXX (RoadMap) Add a way to handle delete operation
 //draw rectangle and return the selector and inner text of element mouse hover on
 document.addEventListener('mouseover', async event => {
-    if (window.isRecording()) {
-        let selector = finder(event.target)
 
-        let customLocator = getLocator(event.target, selector)
-        //if there is selector from locator function, we will prioritize that one
-        //if there is no selector from locator function yet the target has been changed, 
-        //use new target to generate selector
-        if (customLocator.selector)
-            selector = customLocator.selector
-        else if (customLocator.target != event.target)
-            selector = finder(customLocator.target)
-        let target = customLocator.target
+    let selector = finder(event.target)
 
-        const innerText = target.innerText
-        let position = {}
-        try {
-            position = getElementPos(target)
-        } catch (error) {
-            console.log(error)
-        }
-        //style change will only be applied to source element
-        const previousStyle = event.target.style.backgroundColor
-        event.target.setAttribute(BLUESTONE.previousbackground, previousStyle)
-        let iFrame = getElementAttribute(window.frameElement, BLUESTONE.bluestoneIframePath)
-        let framePotentialMatch = getElementAttribute(window.frameElement, BLUESTONE.bluestonePotentialMatchIndexes)
-        let potentialMatch = getElementAttribute(target, BLUESTONE.bluestonePotentialMatchIndexes)
+    let customLocator = getLocator(event.target, selector)
+    //if there is selector from locator function, we will prioritize that one
+    //if there is no selector from locator function yet the target has been changed, 
+    //use new target to generate selector
+    if (customLocator.selector)
+        selector = customLocator.selector
+    else if (customLocator.target != event.target)
+        selector = finder(customLocator.target)
+    let target = customLocator.target
 
-        let noLocatorFound = 'rgba(255, 0, 145, 0.45)'
-        let locatorFound = 'rgba(0, 223, 145, 0.45)'
+    const innerText = target.innerText
+    let position = {}
+    try {
+        position = getElementPos(target)
+    } catch (error) {
+        console.log(error)
+    }
+    //style change will only be applied to source element
+    const previousStyle = event.target.style.backgroundColor
+    event.target.setAttribute(BLUESTONE.previousbackground, previousStyle)
+    let iFrame = getElementAttribute(window.frameElement, BLUESTONE.bluestoneIframePath)
+    let framePotentialMatch = getElementAttribute(window.frameElement, BLUESTONE.bluestonePotentialMatchIndexes)
+    let potentialMatch = getElementAttribute(target, BLUESTONE.bluestonePotentialMatchIndexes)
 
-        //depends on the color schema, display different color to give user a hint for next step
+    let noLocatorFound = 'rgba(255, 0, 145, 0.45)'
+    let locatorFound = 'rgba(0, 223, 145, 0.45)'
+    //depends on the color schema, display different color to give user a hint for next step
 
-        //if we have set the final locator, mark it as green
-        let currentSelectedIndex = target.getAttribute(BLUESTONE.bluestoneSelectedLocatorIndex)
-        if (currentSelectedIndex) {
-            event.target.style.backgroundColor = locatorFound
-            window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, currentSelectedIndex)
-            // setStateToAllEvents(false, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
-            // console.log('current selected index found')
-            return
-        }
+    //if we have set the final locator, mark it as green
+    let currentSelectedIndex = target.getAttribute(BLUESTONE.bluestoneSelectedLocatorIndex)
+    if (currentSelectedIndex) {
+        event.target.style.backgroundColor = locatorFound
+        window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, currentSelectedIndex)
+        // setStateToAllEvents(false, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
+        // console.log('current selected index found')
+        return
+    }
 
 
-        //no match mark as no locator found
-        if (potentialMatch == '[]') {
-            event.target.style.backgroundColor = noLocatorFound
-            window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, null)
-            // setStateToAllEvents(true, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
-            // console.log('no potential match index')
-            return
-        }
-
-        let potentialMatchArray = JSON.parse(potentialMatch)
-        // console.log(potentialMatch)
-        // console.log(potentialMatchArray)
-        if (potentialMatchArray.length == 1) {
-            //exact one match, we are good
-            event.target.style.backgroundColor = locatorFound
-            window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, 0)
-            // setStateToAllEvents(false, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
-            // console.log('only 1 potential match index')
-            return
-        }
-
-        //if toehrwise, 
-        // console.log('more than 1 potential matches')
+    //no match mark as no locator found
+    if (potentialMatch == '[]') {
         event.target.style.backgroundColor = noLocatorFound
         window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, null)
         // setStateToAllEvents(true, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
+        // console.log('no potential match index')
+        return
     }
+
+    let potentialMatchArray = JSON.parse(potentialMatch)
+    // console.log(potentialMatch)
+    // console.log(potentialMatchArray)
+    if (potentialMatchArray.length == 1) {
+        //exact one match, we are good
+        event.target.style.backgroundColor = locatorFound
+        window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, 0)
+        // setStateToAllEvents(false, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
+        // console.log('only 1 potential match index')
+        return
+    }
+
+    //if toehrwise, 
+    // console.log('more than 1 potential matches')
+    event.target.style.backgroundColor = noLocatorFound
+    window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, null)
+    // setStateToAllEvents(true, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
+
 
 
 
 }, { capture: true })
 
 document.addEventListener("mouseout", event => {
-    if (!window.isRecording()) return
     try {
         const previousStyle = event.target.getAttribute(BLUESTONE.previousbackground)
         if (previousStyle != null) {

@@ -25,7 +25,8 @@ async function drawProgressBar(page, pendingPicCapture, pendingHtmlCapture) {
             progress.style.height = '40%'
             progress.style.fontSize = '30px'
             progress.style.background = 'white'
-            progress.style.zIndex=999
+            progress.style.zIndex = 999
+            progress.style.opacity = 0.4
         }
         progress.innerText = `Please wait while we are completing some background work. Pending Html Capture:${pendingHtmlCapture}`
         if (pendingPicCapture != null) {
@@ -56,7 +57,7 @@ async function deleteProgressBar(page) {
  * @param {HtmlCaptureStatus} htmlCaptureStatus
  */
 async function drawPendingWorkProgress(page, PicCaptureStatus, htmlCaptureStatus) {
-
+    let maximumWaitingTime = 15 * 1000//ms maximum wiating time is 15s
 
     //keep waiting until capture is all completed
     try {
@@ -64,7 +65,7 @@ async function drawPendingWorkProgress(page, PicCaptureStatus, htmlCaptureStatus
     } catch (error) {
         console.log(error)
     }
-
+    let startTime = Date.now()
     while (htmlCaptureStatus.isHtmlCaptureOngoing) {
         try {
             await new Promise(resolve => setTimeout(resolve, 500))
@@ -72,7 +73,11 @@ async function drawPendingWorkProgress(page, PicCaptureStatus, htmlCaptureStatus
         } catch (error) {
             console.log()
         }
-
+        let currentTime = Date.now()
+        let elapsedTime = currentTime - startTime
+        if (elapsedTime > maximumWaitingTime) {
+            break
+        }
         // await new Promise(resolve => { setTimeout(resolve, 500) })
     }
     await deleteProgressBar(page)

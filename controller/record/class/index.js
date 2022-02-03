@@ -18,6 +18,7 @@ const PicCapture = require('../class/PicCapture')
 const ptConstant = require('../../../ptLibrary/functions/inbuiltFunc').VAR
 const RecordingStep = require('./RecordingStep')
 const MochaDriver = require('../../mocha/index')
+const os = require('os')
 /**
  * @typedef {string} CommandType
  **/
@@ -60,6 +61,7 @@ class WorkflowRecord {
         this.steps = []
         this.lastOperationTimestamp = Date.now()
         this.__isRecording = true
+        this.__isCaptureHtml = true
         this.astManager = new AstManager(config.code.locatorPath)
         this.__isNavigationPending = false
         this.__codePath = ''
@@ -216,7 +218,9 @@ class WorkflowRecord {
         upload: 'upload',
         waitForTimeout: 'waitForTimeout',
         basicAuthenticate: 'basicAuthenticate',
-        clearBrowserCache: 'clearBrowserCache'
+        clearBrowserCache: 'clearBrowserCache',
+        dragstart: 'dragstart',
+        drop: 'drop'
     }
     static inbuiltEvent = {
         refresh: PuppeteerControl.inbuiltEvent.refresh
@@ -259,7 +263,9 @@ class WorkflowRecord {
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.upload),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.waitForTimeout),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.basicAuthenticate),
-                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.clearBrowserCache)
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.clearBrowserCache),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.dragstart),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.drop)
                 ]
             },
             customizedFunctions: {
@@ -531,7 +537,12 @@ class WorkflowRecord {
         this.operation.browserSelection.lastOperationTime = Date.now()
     }
 
-
+    get isCaptureHtml() {
+        return this.__isCaptureHtml
+    }
+    set isCaptureHtml(status) {
+        this.__isCaptureHtml = status
+    }
 
 
     set isRecording(recordStatus) {
@@ -569,8 +580,46 @@ class WorkflowRecord {
         this.steps.push(event)
         this.__handleChangeNPressCombo(event)
         this.__handleEnterNClickCombo(event)
+        this.__handleFileUpload(event)
         this.setLastOperationTime()
         await this.refreshActiveFunc()
+    }
+
+    /**
+     * delete action before upload
+     * In recording mode, we will always do some action to trigger file upload
+     * This is not necessary and the file chooser will cause issue to upcoming steps
+     * In this case, we will delete previous step
+     * This is unnecessary for manual adding mode because manual adding will never trigger 
+     * file chooser
+     * @param {RecordingStep} step 
+     */
+    async __handleFileUpload(step) {
+        //this function is used to handle file upload
+        if (this.steps.length < 3 || step.command != 'upload') {
+            return
+        }
+        let allSteps = this.steps
+        let lastStepIndex = allSteps.length - 1
+        //convert arry of file names to a fully qualified file path strings seperated by ,
+        let paramIndex = allSteps[lastStepIndex].functionAst.params.findIndex(item => { return item.type.name == 'Number' || item.type.name == 'string' || item.type.name == 'number' || item.type.name == 'Number' })
+        let updatedFolderList = allSteps[lastStepIndex].functionAst.params[paramIndex].value.map(fileName => path.join(os.tmpdir(), fileName))
+        let updatedFolderStr = updatedFolderList.join(',')
+        allSteps[lastStepIndex].functionAst.params[paramIndex].value = updatedFolderStr
+
+
+        //take the target from previous step because we use that spot as starting anchor to search for the input
+        allSteps[lastStepIndex].target = allSteps[lastStepIndex - 2].target
+        allSteps[lastStepIndex].potentialMatch = allSteps[lastStepIndex - 2].potentialMatch
+        allSteps[lastStepIndex].finalLocator = allSteps[lastStepIndex - 2].finalLocator
+        allSteps[lastStepIndex].finalLocatorName = allSteps[lastStepIndex - 2].finalLocatorName
+        allSteps[lastStepIndex - 1].target = allSteps[lastStepIndex - 2].target
+        allSteps[lastStepIndex - 1].potentialMatch = allSteps[lastStepIndex - 2].potentialMatch
+        allSteps[lastStepIndex - 1].finalLocator = allSteps[lastStepIndex - 2].finalLocator
+        allSteps[lastStepIndex - 1].finalLocatorName = allSteps[lastStepIndex - 2].finalLocatorName
+
+        //delete the step that will invoke the file picker
+        allSteps.splice(lastStepIndex - 3, 2)
     }
     /**
      * check if current command is change call and see if prior step is press key and timeout is small (0<x<100ms)

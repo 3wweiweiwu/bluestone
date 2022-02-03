@@ -91,6 +91,8 @@ module.exports = function (recordRepo, browser, page, io) {
 
         //if event command is null, call the in-browser console
         if (eventDetail.command == null) {
+            recordRepo.isCaptureHtml = false
+
             recordRepo.spyBrowserSelectionPicPath = picturePath
             recordRepo.spyBrowserSelectionHtmlPath = htmlPath
             console.log('pause recording and call in-browser agent')
@@ -113,6 +115,7 @@ module.exports = function (recordRepo, browser, page, io) {
             //give 500ms delay so that it can capture unfinished events(ex: last change event)
             setTimeout(() => {
                 recordRepo.isRecording = false
+                recordRepo.isCaptureHtml = true
             }, 500)
 
 
@@ -152,7 +155,6 @@ module.exports = function (recordRepo, browser, page, io) {
 
 
             await recordRepo.addStep(event)
-            await fixRecords(recordRepo.steps)
             // console.log(JSON.stringify(recordRepo.steps))
             //update last operation time
         }
@@ -168,42 +170,4 @@ module.exports = function (recordRepo, browser, page, io) {
 
     }
     return logEvent
-}
-/**
- * Fix step sequence or detail after a new step being added. This happen because some
- * of the oepration could behave differently in record mode, we may need to re-arrange sequence
- * or delete previous step(upload by input)
- * @param {Array<import('../../record/class/index').RecordingStep>} steps 
- */
-async function fixRecords(steps) {
-    let lastStep = steps[steps.length - 1]
-    let actionList = { upload: upload }
-    let action = actionList[lastStep.command]
-    if (action)
-        await action(steps)
-}
-/**
- * delete action before upload
- * In recording mode, we will always do some action to trigger file upload
- * This is not necessary and the file chooser will cause issue to upcoming steps
- * In this case, we will delete previous step
- * This is unnecessary for manual adding mode because manual adding will never trigger 
- * file chooser
- * @param {Array<import('../../record/class/index').RecordingStep>} steps 
- */
-function upload(steps) {
-    let lastStepIndex = steps.length - 1
-    //convert arry of file names to a fully qualified file path strings seperated by ,
-    let paramIndex = steps[lastStepIndex].functionAst.params.findIndex(item => { return item.type.name == 'Number' || item.type.name == 'string' || item.type.name == 'number' || item.type.name == 'Number' })
-    let updatedFolderList = steps[lastStepIndex].functionAst.params[paramIndex].value.map(fileName => path.join(os.tmpdir(), fileName))
-    let updatedFolderStr = updatedFolderList.join(',')
-    steps[lastStepIndex].functionAst.params[paramIndex].value = updatedFolderStr
-
-
-    //take the target from previous step because we use that spot as starting anchor to search for the input
-    steps[lastStepIndex].target = steps[lastStepIndex - 2].target
-    steps[lastStepIndex - 1].target = steps[lastStepIndex - 2].target
-
-    //delete the step that will invoke the file picker
-    steps.splice(lastStepIndex - 3, 2)
 }
