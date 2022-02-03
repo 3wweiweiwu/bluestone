@@ -87,10 +87,17 @@ async function isElementBlocked(element) {
             let elemBoundingRect = elem.getBoundingClientRect()
             if (elemBoundingRect.width == 0) return false
             if (elemBoundingRect.height == 0) return false
-
+            let offsetWidth = elem.offsetWidth
+            let offsetHeight = elem.offsetHeight
+            if (elem.offsetWidth == null) {
+                offsetWidth = elemBoundingRect.width
+            }
+            if (elem.offsetHeight == null) {
+                offsetHeight = elemBoundingRect.height
+            }
             const elemCenter = {
-                x: elemBoundingRect.left + elem.offsetWidth / 2,
-                y: elemBoundingRect.top + elem.offsetHeight / 2
+                x: elemBoundingRect.left + offsetWidth / 2,
+                y: elemBoundingRect.top + offsetHeight / 2
             };
 
             if (elemCenter.x < 0) return false;
