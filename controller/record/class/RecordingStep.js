@@ -38,6 +38,9 @@ class RecordingStep {
         }
         this.result = new StepResult()
         this.timeStamp = recordingStep.timestamp
+        if (this.timeStamp == null) {
+            this.timeStamp = recordingStep.timeStamp
+        }
         this.scriptLineNumber = recordingStep.scriptLineNumber
 
     }

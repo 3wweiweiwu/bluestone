@@ -599,6 +599,7 @@ class WorkflowRecord {
 
         //find out potentail file download update
         if (this.steps[lastStepIndex - 1].command != 'waitForDownloadComplete') {
+            this.steps[lastStepIndex].functionAst.params[1].value += 1.5 * (this.steps[lastStepIndex].timeStamp - this.steps[lastStepIndex - 1].timeStamp)
             return
         }
         this.steps[lastStepIndex].functionAst.params[1].value += this.steps[lastStepIndex - 1].functionAst.params[1].value
