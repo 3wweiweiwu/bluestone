@@ -132,7 +132,56 @@ class AstGenerator {
             }
         }
     }
-
+    /**
+     * await bluestoneFunc.initialize.func(vars, page)
+     * @param {string} varsName  vars
+     * @param {string} pageName  page
+     * @returns 
+     */
+    static getInitializeOperation(varsName, pageName) {
+        return {
+            "type": "ExpressionStatement",
+            "expression": {
+                "type": "AwaitExpression",
+                "argument": {
+                    "type": "CallExpression",
+                    "callee": {
+                        "type": "MemberExpression",
+                        "object": {
+                            "type": "MemberExpression",
+                            "object": {
+                                "type": "Identifier",
+                                "name": "bluestoneFunc"
+                            },
+                            "property": {
+                                "type": "Identifier",
+                                "name": "initialize"
+                            },
+                            "computed": false,
+                            "optional": false
+                        },
+                        "property": {
+                            "type": "Identifier",
+                            "name": "func"
+                        },
+                        "computed": false,
+                        "optional": false
+                    },
+                    "arguments": [
+                        {
+                            "type": "Identifier",
+                            "name": varsName
+                        },
+                        {
+                            "type": "Identifier",
+                            "name": pageName
+                        }
+                    ],
+                    "optional": false
+                }
+            }
+        }
+    }
     /**
      * Create a argument for library and method funcLib.method1.func()
      * @param {string} libraryName in this case, it is funcLib

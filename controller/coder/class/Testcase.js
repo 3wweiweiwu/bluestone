@@ -31,7 +31,8 @@ class Coder {
                 variableDeclaration: ['element', 'vars', 'frame'],
                 browserVarName: 'browser',
                 pageVarName: 'page',
-                frameVarName: 'frame'
+                frameVarName: 'frame',
+                varsVarName: 'vars'
             }
         }
 
@@ -131,6 +132,11 @@ class Coder {
         //frame = page
         ast = AstGenerator.getAssignVarToVarOpeartion(this.inbuiltVarName.body.frameVarName, this.inbuiltVarName.body.pageVarName)
         this.testcaseCodeBody.push(ast)
+
+        //await bluestoneFunc.initialize.func(vars, page)
+        ast = AstGenerator.getInitializeOperation(this.inbuiltVarName.body.varsVarName, this.inbuiltVarName.body.pageVarName)
+        this.testcaseCodeBody.push(ast)
+
         //create follow-up step
         let stepList = this.__getTestcaseStep()
         stepList.forEach(item => {

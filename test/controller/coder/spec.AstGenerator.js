@@ -67,4 +67,9 @@ describe('AST Generator Class', () => {
         let jsCode = escodegen.generate(ast)
         assert.equal(jsCode, 'vars = new bluestoneType.VarSaver(__filename);')
     })
+    it('should call initialize function correctly', async () => {
+        let ast = AstGenerator.getInitializeOperation('vars', 'page')
+        let jsCode = escodegen.generate(ast)
+        assert.equal(jsCode, 'await bluestoneFunc.initialize.func(vars, page);')
+    })
 })
