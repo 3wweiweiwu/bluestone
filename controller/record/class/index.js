@@ -581,8 +581,29 @@ class WorkflowRecord {
         this.__handleChangeNPressCombo(event)
         this.__handleEnterNClickCombo(event)
         this.__handleFileUpload(event)
+        this.__handleFileDownloadProgressUpdate(event)
         this.setLastOperationTime()
         await this.refreshActiveFunc()
+    }
+    /**
+     * As we receiving update from file download, try to combine the progress together
+     * @param {RecordingStep} step 
+     * @returns 
+     */
+    async __handleFileDownloadProgressUpdate(step) {
+        if (this.steps.length < 2 || step.command != 'waitForDownloadComplete') {
+            return
+        }
+        let allSteps = this.steps
+        let lastStepIndex = allSteps.length - 1
+
+        //find out potentail file download update
+        if (this.steps[lastStepIndex - 1].command != 'waitForDownloadComplete') {
+            return
+        }
+        this.steps[lastStepIndex].functionAst.params[1].value += this.steps[lastStepIndex - 1].functionAst.params[1].value
+
+        allSteps.splice(lastStepIndex - 1, 1)
     }
 
     /**

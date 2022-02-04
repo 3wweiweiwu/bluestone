@@ -127,7 +127,10 @@ module.exports = function (recordRepo, browser, page, io) {
             if (page != null) {
                 timeoutMs = Date.now() - recordRepo.operation.browserSelection.lastOperationTime
             }
-            eventDetail.timeoutMs = timeoutMs
+            if (eventDetail.timeoutMs == null) {
+                eventDetail.timeoutMs = timeoutMs
+            }
+
             //calculate timeout by subtracting current time to the time from previous step
 
             eventDetail.targetPicPath = picturePath
