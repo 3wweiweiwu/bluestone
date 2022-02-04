@@ -187,10 +187,7 @@ Object.keys(EVENTCONST).forEach(item => {
 document.addEventListener('mouseover', async event => {
 
     let selector = finder(event.target)
-    //will not capture locator for bluestone element
-    if (selector.includes("bluestone")) {
-        return
-    }
+
     let customLocator = getLocator(event.target, selector)
     //if there is selector from locator function, we will prioritize that one
     //if there is no selector from locator function yet the target has been changed, 

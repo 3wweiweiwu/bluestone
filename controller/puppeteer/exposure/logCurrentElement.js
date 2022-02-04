@@ -13,7 +13,7 @@ module.exports = function logCurrentElement(recordRepo, page) {
         if (selector == recordRepo.operation.browserSelection.currentSelector && x == recordRepo.operation.browserSelection.x && recordRepo.operation.browserSelection.y == y) {
             return
         }
-        if (recordRepo.isRecording) {
+        if (recordRepo.isRecording && recordRepo.isCaptureHtml) {
             recordRepo.operation.browserSelection.currentSelector = selector
             recordRepo.operation.browserSelection.currentInnerText = innerText
             recordRepo.operation.browserSelection.x = x
