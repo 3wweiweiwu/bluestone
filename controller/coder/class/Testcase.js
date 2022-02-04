@@ -28,7 +28,7 @@ class Coder {
             require: {},
             library: Coder.ConstVar.library,
             body: {
-                variableDeclaration: ['element', 'variable', 'frame'],
+                variableDeclaration: ['element', 'vars', 'frame'],
                 browserVarName: 'browser',
                 pageVarName: 'page',
                 frameVarName: 'frame'

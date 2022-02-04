@@ -505,46 +505,43 @@ class AstGenerator {
         }
     }
     /**
-     * let vars = { currentFileName: __filename }
+     * vars = new bluestoneType.VarSaver(__filename)
      * @returns 
      */
     static getVarSaverDeclaration() {
         return {
-            "type": "VariableDeclaration",
-            "declarations": [
-                {
-                    "type": "VariableDeclarator",
-                    "start": 4,
-                    "end": 42,
-                    "id": {
-                        "type": "Identifier",
-                        "name": "vars"
+            "type": "ExpressionStatement",
+            "expression": {
+                "type": "AssignmentExpression",
+                "operator": "=",
+                "left": {
+                    "type": "Identifier",
+                    "name": "vars"
+                },
+                "right": {
+                    "type": "NewExpression",
+                    "callee": {
+                        "type": "MemberExpression",
+                        "object": {
+                            "type": "Identifier",
+                            "name": "bluestoneType"
+                        },
+                        "property": {
+                            "type": "Identifier",
+                            "name": "VarSaver"
+                        },
+                        "computed": false,
+                        "optional": false
                     },
-                    "init": {
-                        "type": "ObjectExpression",
-                        "properties": [
-                            {
-                                "type": "Property",
-                                "method": false,
-                                "shorthand": false,
-                                "computed": false,
-                                "key": {
-                                    "type": "Identifier",
-                                    "name": "currentFileName"
-                                },
-                                "value": {
-                                    "type": "Identifier",
-                                    "name": "__filename"
-                                },
-                                "kind": "init"
-                            }
-                        ]
-                    }
+                    "arguments": [
+                        {
+                            "type": "Identifier",
+                            "name": "__filename"
+                        }
+                    ]
                 }
-            ],
-            "kind": "let"
+            }
         }
     }
-
 }
 module.exports = AstGenerator

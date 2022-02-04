@@ -65,6 +65,6 @@ describe('AST Generator Class', () => {
     it('should initialize vars correctly', async () => {
         let ast = AstGenerator.getVarSaverDeclaration()
         let jsCode = escodegen.generate(ast)
-        assert.equal(jsCode, 'let vars = { currentFileName: __filename };')
+        assert.equal(jsCode, 'vars = new bluestoneType.VarSaver(__filename);')
     })
 })

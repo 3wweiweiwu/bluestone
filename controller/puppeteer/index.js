@@ -17,7 +17,7 @@ const singlefileScript = require('single-file/cli/back-ends/common/scripts')
 const captureScreenshot = require('./exposure/captureScreenshot')
 const checkUrlBlackList = require('./help/checkUrlBlacklist')
 const isHtmlCaptureOngoing = require('./exposure/isHtmlCaptureOngoing')
-const { drawPendingWorkProgress } = require('./activities/drawPendingWorkProgress')
+const DownloadWatcher = require('./class/DownloadWatcher')
 /**
  * Create a new puppeteer browser instance
  * @param {import('../record/class/index').WorkflowRecord} record
@@ -37,6 +37,9 @@ const ConstStr = {
 async function startRecording(record, io, url = null) {
     const browser = await puppeteer.launch(config.puppeteer)
     const page = await browser.newPage();
+    //start to watch the download event
+    const download = new DownloadWatcher((record))
+    await download.startWatching()
     //initialize recording object
     record.steps = []
     record.isRecording = true
@@ -71,6 +74,7 @@ async function startRecording(record, io, url = null) {
     await page.exposeFunction('isHtmlCaptureOngoing', isHtmlCaptureOngoing(record))
 
     await page.setBypassCSP(true)
+    await page.client().send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: download.downloadFolder });
 
 
     if (url != null) await page.goto(url)
