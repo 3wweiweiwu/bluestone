@@ -1,6 +1,6 @@
 {
   "name": "bluestone",
-  "version": "0.4.12",
+  "version": "0.4.14",
   "private": false,
   "scripts": {
     "start": "babel-node ./bin/www",
@@ -21,6 +21,7 @@
     "acorn-extract-comments": "^0.2.0",
     "acorn-walk": "^8.1.1",
     "axios": "^0.24.0",
+    "chokidar": "^3.5.3",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "doctrine": "^3.0.0",

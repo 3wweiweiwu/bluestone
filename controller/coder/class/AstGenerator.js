@@ -132,7 +132,56 @@ class AstGenerator {
             }
         }
     }
-
+    /**
+     * await bluestoneFunc.initialize.func(vars, page)
+     * @param {string} varsName  vars
+     * @param {string} pageName  page
+     * @returns 
+     */
+    static getInitializeOperation(varsName, pageName) {
+        return {
+            "type": "ExpressionStatement",
+            "expression": {
+                "type": "AwaitExpression",
+                "argument": {
+                    "type": "CallExpression",
+                    "callee": {
+                        "type": "MemberExpression",
+                        "object": {
+                            "type": "MemberExpression",
+                            "object": {
+                                "type": "Identifier",
+                                "name": "bluestoneFunc"
+                            },
+                            "property": {
+                                "type": "Identifier",
+                                "name": "initialize"
+                            },
+                            "computed": false,
+                            "optional": false
+                        },
+                        "property": {
+                            "type": "Identifier",
+                            "name": "func"
+                        },
+                        "computed": false,
+                        "optional": false
+                    },
+                    "arguments": [
+                        {
+                            "type": "Identifier",
+                            "name": varsName
+                        },
+                        {
+                            "type": "Identifier",
+                            "name": pageName
+                        }
+                    ],
+                    "optional": false
+                }
+            }
+        }
+    }
     /**
      * Create a argument for library and method funcLib.method1.func()
      * @param {string} libraryName in this case, it is funcLib
@@ -505,46 +554,43 @@ class AstGenerator {
         }
     }
     /**
-     * let vars = { currentFileName: __filename }
+     * vars = new bluestoneType.VarSaver(__filename)
      * @returns 
      */
     static getVarSaverDeclaration() {
         return {
-            "type": "VariableDeclaration",
-            "declarations": [
-                {
-                    "type": "VariableDeclarator",
-                    "start": 4,
-                    "end": 42,
-                    "id": {
-                        "type": "Identifier",
-                        "name": "vars"
+            "type": "ExpressionStatement",
+            "expression": {
+                "type": "AssignmentExpression",
+                "operator": "=",
+                "left": {
+                    "type": "Identifier",
+                    "name": "vars"
+                },
+                "right": {
+                    "type": "NewExpression",
+                    "callee": {
+                        "type": "MemberExpression",
+                        "object": {
+                            "type": "Identifier",
+                            "name": "bluestoneType"
+                        },
+                        "property": {
+                            "type": "Identifier",
+                            "name": "VarSaver"
+                        },
+                        "computed": false,
+                        "optional": false
                     },
-                    "init": {
-                        "type": "ObjectExpression",
-                        "properties": [
-                            {
-                                "type": "Property",
-                                "method": false,
-                                "shorthand": false,
-                                "computed": false,
-                                "key": {
-                                    "type": "Identifier",
-                                    "name": "currentFileName"
-                                },
-                                "value": {
-                                    "type": "Identifier",
-                                    "name": "__filename"
-                                },
-                                "kind": "init"
-                            }
-                        ]
-                    }
+                    "arguments": [
+                        {
+                            "type": "Identifier",
+                            "name": "__filename"
+                        }
+                    ]
                 }
-            ],
-            "kind": "let"
+            }
         }
     }
-
 }
 module.exports = AstGenerator
