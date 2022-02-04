@@ -42,7 +42,8 @@ class Coder {
             [this.inbuiltVarName.library.projectFuncLibrary]: path.resolve(projectFuncPath),
             [this.inbuiltVarName.library.puppeteerLibrary]: 'puppeteer',
             [this.inbuiltVarName.library.bluestoneFuncLibrary]: 'bluestone/ptLibrary/bluestone-func',
-            [this.inbuiltVarName.library.configLibrary]: configPath
+            [this.inbuiltVarName.library.configLibrary]: configPath,
+            [this.inbuiltVarName.library.bluestoneType]: 'bluestone/ptLibrary/class/index'
 
         }
     }
@@ -53,7 +54,8 @@ class Coder {
             puppeteerLibrary: 'puppeteer',
             bluestoneFuncLibrary: 'bluestoneFunc',
             configLibrary: 'config',
-            varSaver: 'vars'
+            varSaver: 'vars',
+            bluestoneType: 'bluestoneType'
         }
     }
     get fileName() {
@@ -81,6 +83,9 @@ class Coder {
             //skip bluestoneFunc as it contains /
             switch (linuxPath) {
                 case this.inbuiltVarName.require[this.inbuiltVarName.library.bluestoneFuncLibrary]:
+                    //this is a special case use bluestone's inbuilt library /
+                    break;
+                case this.inbuiltVarName.require[this.inbuiltVarName.library.bluestoneType]:
                     //this is a special case that contains /
                     break;
                 default:
