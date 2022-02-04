@@ -29,10 +29,10 @@ class DownloadWatcher {
     async addStep(fileTracker, record, logEvent, path) {
         let currentTime = Date.now()
         let startTime = currentTime
-        let elapsedTime = 500
+        let elapsedTime = 2000
         if (fileTracker[path]) {
             startTime = fileTracker[path]
-            elapsedTime = currentTime - startTime
+            elapsedTime = (currentTime - startTime) * 2//add more time to avoid timeout issue
         }
         delete fileTracker[path]
 
