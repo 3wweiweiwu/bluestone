@@ -68,7 +68,15 @@ Object.keys(EVENTCONST).forEach(item => {
             console.log(error)
         }
 
-        let customLocator = getLocator(event.target, selector)
+        let customLocator = {
+            target: event.target
+        }
+        try {
+            customLocator = getLocator(event.target, selector)
+        } catch (error) {
+
+        }
+
         //if there is selector from locator function, we will prioritize that one
         //if there is no selector from locator function yet the target has been changed, 
         //use new target to generate selector
@@ -188,7 +196,14 @@ document.addEventListener('mouseover', async event => {
 
     let selector = finder(event.target)
 
-    let customLocator = getLocator(event.target, selector)
+    let customLocator = {
+        target: event.target
+    }
+    try {
+        customLocator = getLocator(event.target, selector)
+    } catch (error) {
+
+    }
     //if there is selector from locator function, we will prioritize that one
     //if there is no selector from locator function yet the target has been changed, 
     //use new target to generate selector
