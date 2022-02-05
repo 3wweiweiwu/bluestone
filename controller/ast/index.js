@@ -8,6 +8,7 @@ const path = require('path')
 const FunctionAST = require('./class/Function')
 const BsFunc = require('./class/BsFunc')
 const Locator = require('../locator/class/Locator')
+const extractCommentForCustomziedFunctionClass = require('./lib/extractCommentForCustomizedFunctionClass')
 class AST {
     /**
      * 
@@ -129,9 +130,10 @@ class AST {
 
             funcJs = funcJs.toString()
 
-            const commentObj = extract(funcJs, {})
-
-
+            //hanlde legacy function definition pattern
+            let commentObj = extract(funcJs, {})
+            let newCommentFromClass = await extractCommentForCustomziedFunctionClass(funcJs)
+            commentObj = [...newCommentFromClass, ...commentObj]
             commentObj.forEach(comment => {
                 //only worry about the comment for the export function
                 if (comment.type != 'BlockComment' || comment.code.context == null || comment.code.context.receiver != 'exports') {
@@ -151,7 +153,11 @@ class AST {
                 jsDocSummary.add(jsDocEntry)
 
             })
+
+
         }
+
+        //use blue
 
         return jsDocSummary
     }

@@ -1,7 +1,10 @@
 class BluestoneFunc {
-    constructor(func, locators = [{ locator: ['invalid_locator'] }]) {
-        this.func = func
-        this.locators = locators
+    constructor() {
+        this.locators = [{ locator: ['invalid_locator'] }]
     }
+    async func() {
+        throw new Error('This function has not been implemented')
+    }
+
 }
 module.exports = BluestoneFunc
