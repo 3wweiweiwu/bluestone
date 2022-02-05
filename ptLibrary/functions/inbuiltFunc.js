@@ -18,9 +18,8 @@ exports.clearBrowserCache = class extends BluestoneFunc {
     /**
      * Clear browser cache
      * @param {Page} page 
-     * @param {string} str this is a test str
      */
-    async func(page, str) {
+    async func(page) {
         try {
             const client = await page.target().createCDPSession();
             await client.send('Network.clearBrowserCookies');
