@@ -191,7 +191,11 @@ class AST {
         if (parentNode.value.properties) {
             funcNode = parentNode.value.properties.find(item => { return item.key.name == 'func' })
             libraryName = funcNode.value.object.name
-            methodName = funcNode.value.property.name
+            methodName = parentNode.key.name
+        }
+        else if (parentNode.value.type == 'NewExpression') {
+            libraryName = parentNode.value.callee.object.name
+            methodName = parentNode.value.callee.property.name
         }
         else if (parentNode.value.type == 'ClassExpression') {
             funcNode = parentNode.value.body.body.find(item => item.key.name == 'func')
