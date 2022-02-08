@@ -31,7 +31,7 @@ module.exports = async function initializeDownload(vars, page) {
     var watcher = chokidar.watch(vars.downloadManager.downloadFolder, { ignored: /\.crdownload$/, persistent: true });
     watcher
         .on('add', function (path) {
-            vars.downloadManager.startDownload(path)
+            vars.downloadManager.completeDownload(path)
             console.log('File', path, 'has been added');
         })
         .on('change', function (path) {

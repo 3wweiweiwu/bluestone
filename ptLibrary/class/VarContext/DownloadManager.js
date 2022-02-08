@@ -18,6 +18,7 @@ class DownloadManager {
     }
     completeDownload(filePath) {
         this.downloading = this.downloading.filter(item => item != filePath)
+        this.downloaded = this.downloaded.filter(item => item != filePath)
         this.downloaded.push(filePath)
         this.__addCompletedCount()
     }
