@@ -554,6 +554,31 @@ class AstGenerator {
         }
     }
     /**
+     * { labelName: new className()}
+     * @returns 
+     */
+    static getNewSimpleClassExpression(labelName, className) {
+        return {
+            "type": "Property",
+            "method": false,
+            "shorthand": false,
+            "computed": false,
+            "key": {
+                "type": "Identifier",
+                "name": labelName
+            },
+            "value": {
+                "type": "NewExpression",
+                "callee": {
+                    "type": "Identifier",
+                    "name": className
+                },
+                "arguments": []
+            },
+            "kind": "init"
+        }
+    }
+    /**
      * vars = new bluestoneType.VarSaver(__filename)
      * @returns 
      */

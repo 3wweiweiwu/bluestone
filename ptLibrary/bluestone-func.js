@@ -5,6 +5,7 @@ let BluestoneFunc = require('./class/BluestoneFunc')
 
 module.exports = {
     clearBrowserCache: new inbuiltFunc.clearBrowserCache(),
+    clearBrowserCache1: new inbuiltFunc.clearBrowserCache(),
     testTextEqual: class {
         static func = inbuiltFunc.testTextEqual
         static locators = [{ locator: ['invalid_locator'] }]
