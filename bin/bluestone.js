@@ -86,10 +86,18 @@ try {
             axios.post(`${bluestoneUrl}/api/record`, { url: cli.args.url })
             break;
         case 'function':
+            bluestoneUrl = `http://localhost:${port}`
+            axios.post(`${bluestoneUrl}/api/function/creation`, {
+                realtiveFolder: cli.args.functionrelativefolder,
+                funcName: cli.args.functionname
+            })
+                .then((res) => {
+                    console.log('function created successfully: ' + res.data)
+                })
             break;
         case "compile":
             bluestoneUrl = `http://localhost:${port}`
-            axios.post(`${bluestoneUrl}/api/compile`)
+            axios.post(`${bluestoneUrl}/api/function/compile`)
                 .then(() => {
                     console.log('hot reload complete!')
                 })

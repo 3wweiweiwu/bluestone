@@ -5,11 +5,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Program",
-      "program": "${workspaceFolder}/bin/www.js",
+      "name": "Launch Via command line",
+      "program": "${workspaceFolder}/bin/bluestone.js",
       "request": "launch",
       "skipFiles": ["<node_internals>/**"],
-      "type": "node"
+      "type": "node",
+      "args": ["function", ".", "test"]
     },
     {
       "name": "Launch Command line",

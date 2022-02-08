@@ -7,11 +7,35 @@ const assert = require('assert')
 const path = require('path')
 const fs = require('fs')
 const chokidar = require('chokidar')
+const BluestoneFunc = require('../class/BluestoneFunc')
 const ConstantVar = {
     parentIFrameLocator: 'TOP IFRAME'
 }
 
 exports.VAR = ConstantVar
+
+exports.clearBrowserCache = class extends BluestoneFunc {
+    /**
+     * Clear browser cache
+     * @param {Page} page 
+     */
+    async func(page) {
+        try {
+            const client = await page.target().createCDPSession();
+            await client.send('Network.clearBrowserCookies');
+            await client.send('Network.clearBrowserCache');
+            await page.evaluate(() => { localStorage.clear() })
+        } catch (error) {
+
+        }
+
+        return true
+    }
+    constructor() {
+        super()
+    }
+}
+
 
 /**
  * Test current text equal to desired value
@@ -268,23 +292,6 @@ exports.uploadByInput = async function upload(frame, vars, elementSelector, uplo
 exports.basicAuthenticate = async function authenticate(page, username, password) {
     await page.authenticate({ username, password })
     return 'authenticate'
-}
-
-/**
- * Clear browser cache
- * @param {Page} page 
- */
-exports.clearBrowserCache = async function clearBrowserCache(page) {
-    try {
-        const client = await page.target().createCDPSession();
-        await client.send('Network.clearBrowserCookies');
-        await client.send('Network.clearBrowserCache');
-        await page.evaluate(() => { localStorage.clear() })
-    } catch (error) {
-
-    }
-
-    return true
 }
 
 /**

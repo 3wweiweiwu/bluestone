@@ -9,6 +9,7 @@ var usersRouter = require('./routes/users');
 var diagnosticsRouter = require('./routes/diagnostics')
 var resourceRouter = require('./routes/resource')
 const recordRouter = require('./routes/record')
+const functionRouter = require('./routes/function')
 const { WorkflowRecord } = require('./controller/record/class/index')
 const PuppeteerControl = require('./controller/puppeteer/class')
 const UI = require('./controller/ui')
@@ -36,6 +37,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/api/function', functionRouter)
 app.use('/api', recordRouter);
 app.use('/diagnostics', diagnosticsRouter);
 app.use('/resource', resourceRouter)

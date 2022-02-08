@@ -1,11 +1,12 @@
 const { Browser, Page, ElementHandle, Frame } = require('puppeteer-core')
 const { ElementSelector, VarSaver } = require('bluestone').types
 const bluestoneFunc = require('bluestone/ptLibrary/bluestone-func');
+const bluestoneFunc = require('../bluestone-locator');
 const bluestoneType = require('bluestone/ptLibrary/class/index');
 const assert = require('assert');
-// const bluestoneLocator = require('../bluestone-locator');
+const bluestoneLocator = require('../bluestone-locator');
 
-exports.clearBrowserCache = class extends bluestoneType.BluestoneFunc {
+exports.test_func = class extends bluestoneType.BluestoneFunc {
     constructor() {
         super()
         /**

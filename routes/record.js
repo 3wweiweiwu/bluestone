@@ -16,12 +16,4 @@ router.delete('/record', async function (req, res) {
 
     res.json()
 });
-router.post('/compile', async function (req, res) {
-    try {
-        await req.app.locals.workflow.astManager.loadFunctions(config.code.funcPath)
-        res.json()
-    } catch (error) {
-        res.status(400).json(error)
-    }
-});
 module.exports = router;
