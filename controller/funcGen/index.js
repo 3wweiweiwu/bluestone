@@ -14,8 +14,9 @@ module.exports = async function generateFunction(relativeFuncFolder, funcName) {
     funcName = funcName.replace(/ /g, '').replace(/-/g, '_')
 
     let bluestonePath = process.env.bluestonePath
+    let bluestoneFolder = path.dirname(bluestonePath)
     //create folder
-    let folder = path.join(bluestonePath, 'function', relativeFuncFolder)
+    let folder = path.join(bluestoneFolder, 'function', relativeFuncFolder)
     try {
         await fs.promises.mkdir(folder, { recursive: true })
     } catch (error) {
@@ -31,14 +32,14 @@ module.exports = async function generateFunction(relativeFuncFolder, funcName) {
 
     //register function in bluestone-func.js
     let realtiveFuncFolderToBluestoneFunc = path.relative(bluestonePath, newFuncPath)
-    let bluestoneJsonPath = path.resolve(path.join(bluestonePath, 'bluestone-func.js'))
+    let bluestoneJsonPath = path.resolve(path.join(bluestoneFolder, 'bluestone-func.js'))
     let bluestoneJsonBin = await fs.promises.readFile(bluestoneJsonPath)
     let bluestoneJsonStr = bluestoneJsonBin.toString()
     let ast = acorn.parse(bluestoneJsonStr)
     //create require statement
     let newFuncRelativePath = path.relative(path.dirname(bluestoneJsonPath), newFuncPath)
     //convert windows-liked path to linux based path
-    newFuncRelativePath = newFuncRelativePath.replace(/\\/g, '/')
+    newFuncRelativePath = './' + newFuncRelativePath.replace(/\\/g, '/')
     //add require information to the top of the file
     let requireAst = astGenerator.getRequireStatement(funcName, newFuncRelativePath)
     ast.body.unshift(requireAst)
@@ -52,4 +53,6 @@ module.exports = async function generateFunction(relativeFuncFolder, funcName) {
     let bluestoneFunc = escodegen.generate(ast)
     await fs.promises.writeFile(bluestoneJsonPath, bluestoneFunc)
 
+    //output function path
+    return Promise.resolve(newFuncPath)
 }

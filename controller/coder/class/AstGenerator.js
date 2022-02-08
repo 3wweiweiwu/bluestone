@@ -570,8 +570,17 @@ class AstGenerator {
             "value": {
                 "type": "NewExpression",
                 "callee": {
-                    "type": "Identifier",
-                    "name": className
+                    "type": "MemberExpression",
+                    "object": {
+                        "type": "Identifier",
+                        "name": className
+                    },
+                    "property": {
+                        "type": "Identifier",
+                        "name": className
+                    },
+                    "computed": false,
+                    "optional": false
                 },
                 "arguments": []
             },
