@@ -1,4 +1,5 @@
 const ElementSelector = require('../class/ElementSelector')
+const { captureHtml } = require('./snapshotCapture')
 const { Browser, Page, ElementHandle } = require('puppeteer-core')
 const Options = {
     /** @type {boolean} if no element is found, should we throw error?*/
@@ -20,6 +21,8 @@ module.exports = async function (page, elementSelector, timeout, option = Option
     /**@type {ElementHandle} */
     let element = null
     let timeSpan = 0
+    await captureHtml(page)
+
     do {
 
         try {
@@ -55,6 +58,7 @@ module.exports = async function (page, elementSelector, timeout, option = Option
     } while (timeSpan < timeout);
 
     if (element == null) {
+        await captureHtml(page)
         let info = `Unable to find UI element: "${elementSelector.displayName}" in ${timeout}ms`
         if (option.throwError) {
             return Promise.reject(info)

@@ -43,6 +43,7 @@ async function startRecording(record, io, url = null) {
     //initialize recording object
     record.steps = []
     record.isRecording = true
+    record.isCaptureHtml = true
 
     //update io for record
     record.puppeteer.setIO(io)

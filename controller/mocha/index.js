@@ -3,6 +3,7 @@ let MochaResult = require('./class/MochaResult')
 let TestcaseLoader = require('../ast/TestCaseLoader')
 const AstManager = require('../ast/index')
 const { LocatorManager } = require('../locator/index')
+const getErrorStepIndexByLine = require('../../ptLibrary/functions/getErrorStepIndexByStack')
 const path = require('path')
 class MochaDriver {
     /**@type {TestcaseLoader} */
@@ -97,25 +98,8 @@ class MochaDriver {
         this.#runner.emit('dispose')
     }
     #getErrorStepIndexByLine = function (filePath, errorStack) {
-        let stepIndex = -1
-        let fileName = path.basename(filePath)
-        let errorLine = errorStack.split('\n').find(item => item.includes(fileName + ":"))
-        if (errorLine == null)
-            return stepIndex
-        let errorContext = errorLine.replace(filePath, '')
-        let lineStr = errorContext.split(':')[1]
 
-        //get line number
-        let lineNumber
-        try {
-            lineNumber = Number.parseInt(lineStr)
-        } catch (error) {
-            return stepIndex
-        }
-
-        //based on line number identify which step are we in
-        stepIndex = this.#testcase.steps.findIndex(item => item.scriptLineNumber == lineNumber)
-        return stepIndex
+        return getErrorStepIndexByLine(filePath, errorStack, this.#testcase)
     }
 
 }

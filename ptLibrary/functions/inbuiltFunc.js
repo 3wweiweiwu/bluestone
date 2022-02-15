@@ -3,11 +3,11 @@ const ElementSelector = require('../class/ElementSelector')
 const VarSaver = require('../class/VarSaver')
 const findElement = require('./findElement')
 const initailizeDownload = require('./initiailzeDownload')
+const { initializePageCapture } = require('./snapshotCapture')
 const assert = require('assert')
 const path = require('path')
-const fs = require('fs')
-const chokidar = require('chokidar')
 const BluestoneFunc = require('../class/BluestoneFunc')
+const TestcaseLoader = require('../../controller/ast/TestCaseLoader')
 const ConstantVar = {
     parentIFrameLocator: 'TOP IFRAME'
 }
@@ -362,8 +362,16 @@ exports.drop = async function dragstart(frame, selector) {
  * @param {Page} page
  */
 exports.initialize = async function (vars, page) {
-    await initailizeDownload(vars, page)
     //watch download folder
+    await initailizeDownload(vars, page)
+    //inject page capture script
+    await initializePageCapture(page)
+    //initialize testcase loader and save tc ast info
+    let tcLoader = new TestcaseLoader(vars.currentFilePath)
+    await tcLoader.parseTc()
+    vars.tcStepInfo = tcLoader
+    vars.exportVarContextToEnv()
+
     return true
 }
 
