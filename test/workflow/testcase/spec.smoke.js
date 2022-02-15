@@ -55,7 +55,7 @@ describe('Smoke Test', () => {
         assert.strictEqual(res.status, 200, 'bluestone backend should launched')
 
 
-    }).timeout(30000)
+    }).timeout(60000)
     it('should record click, change,  and call bluestone console correctly', async () => {
         let happyPathPage = testConfig.testSite.page.happypath
         await bluestoneBackend.startRecording(siteBackend.singlePageHappyPath)
