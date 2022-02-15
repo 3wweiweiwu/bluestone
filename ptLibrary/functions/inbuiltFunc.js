@@ -153,7 +153,7 @@ exports.hover = async function (frame, elementSelector) {
  * @returns 
  */
 exports.goto = async function (page, url) {
-    await page.goto(url)
+    await page.goto(process.env.BLUESTONE_URL || url)
 
 
     return `Goto ${url} success!`
