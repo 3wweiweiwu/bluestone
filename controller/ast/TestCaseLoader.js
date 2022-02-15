@@ -46,7 +46,7 @@ class TestcaseLoader {
     /**@type {LocatorManager} */
     #locatorManager
     /** @type {Array<RecordingStep>} */
-    #steps
+    steps
 
     /**
      * 
@@ -61,13 +61,11 @@ class TestcaseLoader {
         this.#testCase = ''
         this.#astManager = astManager
         this.#locatorManager = locatorManager
-        this.#steps = []
+        this.steps = []
         this.scriptBreaker = null
     }
 
-    get steps() {
-        return this.#steps
-    }
+
     async parseTc() {
         let fileInfo = await fs.readFile(this.#filePath)
         let fileStr = fileInfo.toString()
@@ -76,9 +74,7 @@ class TestcaseLoader {
 
         this.#testSuite = this.#extractTestSuiteName()
         this.#testCase = this.#extractTestcaseName()
-        this.#steps = this.#extractTestStep(this.scriptBreaker)
-        console.log()
-
+        this.steps = this.#extractTestStep(this.scriptBreaker)
     }
     /**
      * Get test suite name from the node
@@ -121,8 +117,14 @@ class TestcaseLoader {
             let command = item.ancestors[ancestorLength - 3].object.property.name
             let args = item.ancestors[ancestorLength - 4].arguments
             //populate function
-            let functionAst = this.#astManager.getFunction(command)
-            functionAst.params = this.#extractFunctionParam(args, functionAst.params)
+            let functionAst
+            try {
+                functionAst = this.#astManager.getFunction(command)
+                functionAst.params = this.#extractFunctionParam(args, functionAst.params)
+            } catch (error) {
+                console.log(error)
+            }
+
 
             //convert current function's start/end into script line number
             let expressionStatement = item.ancestors[ancestorLength - 6]
