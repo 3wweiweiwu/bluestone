@@ -58,6 +58,7 @@ module.exports = async function (page, elementSelector, timeout, option = Option
     } while (timeSpan < timeout);
 
     if (element == null) {
+        await captureHtml(page)
         let info = `Unable to find UI element: "${elementSelector.displayName}" in ${timeout}ms`
         if (option.throwError) {
             return Promise.reject(info)
