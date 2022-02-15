@@ -21,11 +21,12 @@ module.exports = async function (page, elementSelector, timeout, option = Option
     /**@type {ElementHandle} */
     let element = null
     let timeSpan = 0
-    await captureHtml(page)
+
 
     do {
 
         try {
+            await captureHtml(page)
             for (let i = 0; i < locatorOptions.length; i++) {
                 let locator = locatorOptions[i]
 
@@ -58,7 +59,12 @@ module.exports = async function (page, elementSelector, timeout, option = Option
     } while (timeSpan < timeout);
 
     if (element == null) {
-        await captureHtml(page)
+        try {
+            await captureHtml(page)
+        } catch (error) {
+
+        }
+
         let info = `Unable to find UI element: "${elementSelector.displayName}" in ${timeout}ms`
         if (option.throwError) {
             return Promise.reject(info)

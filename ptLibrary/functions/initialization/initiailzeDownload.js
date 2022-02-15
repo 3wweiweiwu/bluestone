@@ -1,11 +1,12 @@
 const { Page, Frame, ElementHandle, Browser } = require('puppeteer-core')
-const ElementSelector = require('../class/ElementSelector')
-const VarSaver = require('../class/VarSaver')
-const findElement = require('./findElement')
+const ElementSelector = require('../../class/ElementSelector')
+const VarSaver = require('../../class/VarSaver')
+const findElement = require('../findElement')
 const assert = require('assert')
 const path = require('path')
 const fs = require('fs')
 const chokidar = require('chokidar')
+const initializeFolder = require('./initializeFolder')
 /**
  * Initialize Download Feature
  * It will clean up the browser and start to watch the folder
@@ -14,16 +15,7 @@ const chokidar = require('chokidar')
  */
 module.exports = async function initializeDownload(vars, page) {
     //create download folder
-
-    if (!fs.existsSync(vars.downloadManager.downloadFolder)) {
-        fs.mkdirSync(vars.downloadManager.downloadFolder, { recursive: true })
-    }
-    else {
-        //remove all files under the download folder
-        fs.readdirSync(vars.downloadManager.downloadFolder).forEach(file => {
-            fs.unlinkSync(file)
-        })
-    }
+    initializeFolder(vars.downloadManager.downloadFolder)
     //set download path
     await page.client().send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: vars.downloadManager.downloadFolder });
 

@@ -2,7 +2,8 @@ const { Page, Frame, ElementHandle, Browser } = require('puppeteer-core')
 const ElementSelector = require('../class/ElementSelector')
 const VarSaver = require('../class/VarSaver')
 const findElement = require('./findElement')
-const initailizeDownload = require('./initiailzeDownload')
+const initailizeDownload = require('./initialization/initiailzeDownload')
+const initializeFolder = require('./initialization/initializeFolder')
 const { initializePageCapture } = require('./snapshotCapture')
 const assert = require('assert')
 const path = require('path')
@@ -366,6 +367,7 @@ exports.initialize = async function (vars, page) {
     await initailizeDownload(vars, page)
     //inject page capture script
     await initializePageCapture(page)
+    initializeFolder(vars.dataOutDir)
     //initialize testcase loader and save tc ast info
     let tcLoader = new TestcaseLoader(vars.currentFilePath)
     await tcLoader.parseTc()

@@ -39,8 +39,6 @@ class VarSaver {
         let rootDir = filePath.split('\\script\\')[0]
 
         let dataOutDir = path.join(rootDir, '/data/out/', fileName)
-        fs.mkdirSync(dataOutDir, { recursive: true })
-        // process.env.dataOutDir = dataOutDir
         return dataOutDir
     }
 }
