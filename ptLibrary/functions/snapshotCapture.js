@@ -21,24 +21,29 @@ async function initializePageCapture(page) {
  */
 async function captureHtml(page) {
     //get env variable
-    let varSav = VarSaver.parseFromEnvVar()
+    try {
+        let varSav = VarSaver.parseFromEnvVar()
 
-    //save current html 
-    let pageData = await page.evaluate(async (DEFAULT_OPTIONS) => {
-        const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
-        return pageData;
-    }, pageCaptureConfig)
+        //save current html 
+        let pageData = await page.evaluate(async (DEFAULT_OPTIONS) => {
+            const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
+            return pageData;
+        }, pageCaptureConfig)
 
-    //Based on call stack, get curret step's info
-    let err = new Error()
-    let stack = err.stack
-    let stepIndex = getErrorStepIndexByStack(varSav.currentFilePath, stack, varSav.tcStepInfo)
+        //Based on call stack, get curret step's info
+        let err = new Error()
+        let stack = err.stack
+        let stepIndex = getErrorStepIndexByStack(varSav.currentFilePath, stack, varSav.tcStepInfo)
 
-    //output html 
-    let fileName = `step-${stepIndex.toString()}-${Date.now()}.html`
-    let filePath = path.join(varSav.dataOutDir, fileName)
-    await fs.writeFile(filePath, pageData.content)
+        //output html 
+        let fileName = `step-${stepIndex.toString()}-${Date.now()}.html`
+        let filePath = path.join(varSav.dataOutDir, fileName)
+        await fs.writeFile(filePath, pageData.content)
 
-    return pageData
+        return pageData
+    } catch (error) {
+        console.log('Unable to capture current screenshot. Error:' + error.toString())
+    }
+
 }
 module.exports = { initializePageCapture, captureHtml }
