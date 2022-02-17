@@ -266,7 +266,7 @@ exports.uploadByInput = async function upload(frame, vars, elementSelector, uplo
         let fullPath = pathList[i]
         //in case it is a relative path, full path will be constructed
         if (!path.isAbsolute(fullPath)) {
-            let currentFileDir = path.dirname(vars.currentFileName)
+            let currentFileDir = path.dirname(vars.currentFilePath)
             fullPath = path.join(currentFileDir, fullPath)
         }
 
