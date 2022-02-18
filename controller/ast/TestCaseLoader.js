@@ -122,7 +122,9 @@ class TestcaseLoader {
                 functionAst = this.#astManager.getFunction(command)
                 functionAst.params = this.#extractFunctionParam(args, functionAst.params)
             } catch (error) {
-                console.log(error)
+                //only print out error in the bluestone main console
+                if (process.env.BLUESTONE_VAR_SAVER == null)
+                    console.log(error)
             }
 
 
