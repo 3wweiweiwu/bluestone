@@ -29,7 +29,7 @@ module.exports = async function (page, elementSelector, timeout, option = Option
             for (let i = 0; i < locatorOptions.length; i++) {
                 let locator = locatorOptions[i]
 
-                if (locator.startsWith('/')) {
+                if (locator.startsWith('/') || locator.startsWith('(')) {
                     //xpath
                     let elementResult = await page.$x(locator)
                     if (elementResult.length > 0) element = elementResult[0]

@@ -337,6 +337,20 @@ function getElementByXpath(xpath, source = document) {
     return result
 
 }
+function getElementsByLocator(currentLocator) {
+    let currentElementList = []
+
+    if (currentLocator.startsWith('/') || currentLocator.startsWith('(')) {
+        //current locator is xpath
+        currentElementList = getElementByXpath(currentLocator)
+    }
+    else {
+        //current selector is css selector
+        currentElementList = document.querySelectorAll(currentLocator)
+    }
+    return currentElementList
+
+}
 async function scanLocator() {
     function resetBsLocatorAttribute() {
         //clearly all bluestone-locator properties from the elements in current frame to reset to clean state
@@ -411,14 +425,7 @@ async function scanLocator() {
             currentLocator = currentLocatorOptions[locatorOptionIndex]
             let currentElementList = []
             try {
-                if (currentLocator.startsWith('/')) {
-                    //current locator is xpath
-                    currentElementList = getElementByXpath(currentLocator)
-                }
-                else {
-                    //current selector is css selector
-                    currentElementList = document.querySelectorAll(currentLocator)
-                }
+                currentElementList = getElementsByLocator(currentLocator)
             } catch (error) {
                 console.log(`Issue on locator at index:${i}`)
                 continue
@@ -562,14 +569,7 @@ const observer = new MutationObserver(mutationObserverCallback);
 
 const markElementSelectorIndex = function (currentLocator, index) {
     let currentElementList = []
-    if (currentLocator.startsWith('/')) {
-        //current locator is xpath
-        currentElementList = getElementByXpath(currentLocator)
-    }
-    else {
-        //current selector is css selector
-        currentElementList = document.querySelectorAll(currentLocator)
-    }
+    currentElementList = getElementsByLocator(currentLocator)
     //stop mark element operation if locator element did not match
     if (currentElementList.length != 1) return
 
