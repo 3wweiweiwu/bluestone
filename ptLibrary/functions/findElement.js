@@ -1,5 +1,5 @@
 const ElementSelector = require('../class/ElementSelector')
-const { captureHtml } = require('./snapshotCapture')
+const { captureSnapshot } = require('./snapshotCapture')
 const { Browser, Page, ElementHandle } = require('puppeteer-core')
 const Options = {
     /** @type {boolean} if no element is found, should we throw error?*/
@@ -58,7 +58,7 @@ module.exports = async function (page, elementSelector, timeout, option = Option
     } while (timeSpan < timeout);
 
     try {
-        await captureHtml(page)
+        await captureSnapshot(page)
     } catch (error) {
     }
 

@@ -378,7 +378,7 @@ exports.initialize = async function (vars, page) {
     await initailizeDownload(vars, page)
     //inject page capture script
     await initializePageCapture(page)
-    initializeFolder(vars.dataOutDir)
+    initializeFolder(vars.dataOutDir, vars.retryCount)
     //initialize testcase loader and save tc ast info
     let tcLoader = new TestcaseLoader(vars.currentFilePath)
     await tcLoader.parseTc()

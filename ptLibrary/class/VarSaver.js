@@ -9,7 +9,7 @@ class VarSaver {
      */
     constructor(currentFilePath, currentRetryCount) {
         this.currentFilePath = currentFilePath
-        this.currentRetryCount = currentRetryCount
+        this.retryCount = currentRetryCount
         this.dataOutDir = this.initializeDataOutDir(this.currentFilePath)
         this.downloadManager = new DownloadManager()
         this.isHealing = false
