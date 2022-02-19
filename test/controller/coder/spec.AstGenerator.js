@@ -44,7 +44,7 @@ describe('AST Generator Class', () => {
     it('should generate test suite and test plan', async () => {
         let ast = AstGenerator.getDescribeItWrapper('test suite 1', 'testcase1')
         let jsCode = escodegen.generate(ast)
-        assert.equal(jsCode, `describe('test suite 1', () => {\n    it('testcase1', async () => {\n    });\n});`)
+        assert.equal(jsCode, `describe('test suite 1', () => {\n    it('testcase1', async function () {\n    });\n});`)
     })
     it('should generate browser statement', async () => {
         let ast = AstGenerator.getBrowserStatement('browser', 'puppeteer', 'config', 'puppeteer')
@@ -65,7 +65,7 @@ describe('AST Generator Class', () => {
     it('should initialize vars correctly', async () => {
         let ast = AstGenerator.getVarSaverDeclaration()
         let jsCode = escodegen.generate(ast)
-        assert.equal(jsCode, 'vars = new bluestoneType.VarSaver(__filename);')
+        assert.equal(jsCode, 'vars = new bluestoneType.VarSaver(__filename, this.runnable().currentRetry());')
     })
     it('should call initialize function correctly', async () => {
         let ast = AstGenerator.getInitializeOperation('vars', 'page')

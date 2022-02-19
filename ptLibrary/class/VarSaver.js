@@ -7,9 +7,9 @@ class VarSaver {
      * @param {Page} page
      * @param {string} currentFilePath The name of the current file
      */
-    constructor(currentFilePath, page) {
+    constructor(currentFilePath, currentRetryCount) {
         this.currentFilePath = currentFilePath
-        this.page = page
+        this.currentRetryCount = currentRetryCount
         this.dataOutDir = this.initializeDataOutDir(this.currentFilePath)
         this.downloadManager = new DownloadManager()
         this.isHealing = false

@@ -10,8 +10,13 @@ const getErrorStepIndexByStack = require('./getErrorStepIndexByStack')
  * @param {Page} page 
  */
 async function initializePageCapture(page) {
-    const injectedScript = await singlefileScript.get(pageCaptureConfig);
-    await page.evaluateOnNewDocument(injectedScript)
+    try {
+        const injectedScript = await singlefileScript.get(pageCaptureConfig);
+        await page.evaluateOnNewDocument(injectedScript)
+    } catch (error) {
+
+    }
+
 
 }
 /**
