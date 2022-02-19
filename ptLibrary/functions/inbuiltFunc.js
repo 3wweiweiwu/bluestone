@@ -378,7 +378,7 @@ exports.initialize = async function (vars, page) {
     await initailizeDownload(vars, page)
     //inject page capture script
     await initializePageCapture(page)
-    initializeFolder(vars.dataOutDir)
+    initializeFolder(vars.dataOutDir, vars.retryCount)
     //initialize testcase loader and save tc ast info
     let tcLoader = new TestcaseLoader(vars.currentFilePath)
     await tcLoader.parseTc()
@@ -394,7 +394,8 @@ exports.initialize = async function (vars, page) {
  * @param {number} timeout Wait time till download to complete
  */
 exports.waitForDownloadComplete = async function (vars, timeout) {
-
+    //increase timeout if we are in retry mode
+    if (vars.retryCount > 0) timeout = timeout * 1.5
     await vars.downloadManager.waitDownloadComplete(timeout)
     return true
 }

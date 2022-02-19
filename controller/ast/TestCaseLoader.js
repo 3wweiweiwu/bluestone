@@ -70,7 +70,7 @@ class TestcaseLoader {
         let fileInfo = await fs.readFile(this.#filePath)
         let fileStr = fileInfo.toString()
         this.scriptBreaker = new ScriptBreaker(fileStr)
-        this.#ast = acorn.parse(fileStr)
+        this.#ast = acorn.parse(fileStr, { ecmaVersion: 2022 })
 
         this.#testSuite = this.#extractTestSuiteName()
         this.#testCase = this.#extractTestcaseName()

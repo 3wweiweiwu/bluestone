@@ -323,7 +323,7 @@ class AstGenerator {
                                                 "value": itShould,
                                             },
                                             {
-                                                "type": "ArrowFunctionExpression",
+                                                "type": "FunctionExpression",
                                                 "id": null,
                                                 "expression": false,
                                                 "generator": false,
@@ -588,7 +588,7 @@ class AstGenerator {
         }
     }
     /**
-     * vars = new bluestoneType.VarSaver(__filename)
+     * vars = new bluestoneType.VarSaver(__filename,this.runnable().currentRetry())
      * @returns 
      */
     static getVarSaverDeclaration() {
@@ -620,6 +620,37 @@ class AstGenerator {
                         {
                             "type": "Identifier",
                             "name": "__filename"
+                        },
+                        {
+                            "type": "CallExpression",
+                            "callee": {
+                                "type": "MemberExpression",
+                                "object": {
+                                    "type": "CallExpression",
+                                    "callee": {
+                                        "type": "MemberExpression",
+                                        "object": {
+                                            "type": "ThisExpression",
+                                        },
+                                        "property": {
+                                            "type": "Identifier",
+                                            "name": "runnable"
+                                        },
+                                        "computed": false,
+                                        "optional": false
+                                    },
+                                    "arguments": [],
+                                    "optional": false
+                                },
+                                "property": {
+                                    "type": "Identifier",
+                                    "name": "currentRetry"
+                                },
+                                "computed": false,
+                                "optional": false
+                            },
+                            "arguments": [],
+                            "optional": false
                         }
                     ]
                 }
