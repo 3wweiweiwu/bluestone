@@ -154,7 +154,7 @@ exports.hover = async function (frame, elementSelector) {
  */
 exports.goto = async function (page, url) {
     let iRetryCount = 0
-    for (iRetryCount = 0; iRetryCount < 5; i++) {
+    for (iRetryCount = 0; iRetryCount < 5; iRetryCount++) {
         try {
             await page.goto(process.env.BLUESTONE_URL || url)
             break
