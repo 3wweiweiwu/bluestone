@@ -5,6 +5,7 @@ const Options = {
     /** @type {boolean} if no element is found, should we throw error?*/
     throwError: false,
 }
+const VarSaver = require('../class/VarSaver')
 /**
  * Find a element within timeout period. If no element is found, a error will be thrown
 *  @param {Page} page 
@@ -21,7 +22,9 @@ module.exports = async function (page, elementSelector, timeout, option = Option
     /**@type {ElementHandle} */
     let element = null
     let timeSpan = 0
-
+    let varSav = VarSaver.parseFromEnvVar()
+    //extends the timeout by 1.5x if we are in the retry mode
+    if (varSav.retryCount > 0) timeout = timeout * 1.5
 
     do {
 
