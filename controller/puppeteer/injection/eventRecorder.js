@@ -567,7 +567,7 @@ const mutationObserverCallback = function (mutationsList, observer) {
     captureHtml()
     getFrameLocator()
     scanLocator()
-    console.log(mutationsList)
+    // console.log(mutationsList)
 }
 
 const observer = new MutationObserver(mutationObserverCallback);
