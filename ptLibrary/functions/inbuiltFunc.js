@@ -153,8 +153,19 @@ exports.hover = async function (frame, elementSelector) {
  * @returns 
  */
 exports.goto = async function (page, url) {
-    await page.goto(process.env.BLUESTONE_URL || url)
-
+    let iRetryCount = 0
+    for (iRetryCount = 0; iRetryCount < 5; i++) {
+        try {
+            await page.goto(process.env.BLUESTONE_URL || url)
+            break
+        } catch (error) {
+            console.log('Unable to go to ' + url)
+            await new Promise(resolve => setTimeout(resolve, 500))
+        }
+    }
+    if (iRetryCount == 5) {
+        assert.fail('Unable to go to ' + url)
+    }
 
     return `Goto ${url} success!`
 

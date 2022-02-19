@@ -94,7 +94,7 @@ module.exports = function (recordRepo, browser, page, io) {
             recordRepo.isCaptureHtml = false
 
             recordRepo.spyBrowserSelectionPicPath = picturePath
-            recordRepo.spyBrowserSelectionHtmlPath = htmlPath
+            // recordRepo.spyBrowserSelectionHtmlPath = htmlPath
             console.log('pause recording and call in-browser agent')
             recordRepo.spyVisible = true
             //populate group info
@@ -120,7 +120,7 @@ module.exports = function (recordRepo, browser, page, io) {
 
 
         }
-        if (recordRepo.isRecording) {
+        if (recordRepo.isRecording && eventDetail.command != null) {
             //If we don't have page element, this indicates that it is a non-UI operation,
             //we will not calculate timeout
             let timeoutMs = null

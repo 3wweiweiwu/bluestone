@@ -78,7 +78,16 @@ async function startRecording(record, io, url = null) {
     await page.client().send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: download.downloadFolder });
 
 
-    if (url != null) await page.goto(url)
+    if (url != null) {
+        for (let i = 0; i < 5; i++) {
+            try {
+                await page.goto(url)
+                break
+            } catch (error) {
+                console.log('Unable to go to ' + url)
+            }
+        }
+    }
     let eventStep = new RecordingStep({ command: 'goto', target: url, iframe: '[]' })
     eventStep.parameter = url
     eventStep.finalLocator = 'FAKE locator to avoid check'

@@ -8,8 +8,8 @@ const config = require('../../../config')
  */
 module.exports = function (page, recordRepo) {
 
-    return async function () {
-        if (page != null && recordRepo.isRecording && recordRepo.picCapture.getPendingItems() < 3) {
+    return async function (reason) {
+        if (page != null && recordRepo.isRecording && recordRepo.picCapture.getPendingItems() < 1) {
             //capture html
 
             let picPath = recordRepo.getPicPath()
@@ -18,7 +18,7 @@ module.exports = function (page, recordRepo) {
                 await page.screenshot({ path: picPath, captureBeyondViewport: false })
 
                 recordRepo.picCapture.markCaptureDone(index)
-                
+
                 recordRepo.picCapture.popOperation()
             } catch (error) {
                 recordRepo.picCapture.popOperation()

@@ -122,7 +122,7 @@ Object.keys(EVENTCONST).forEach(item => {
                     default:
                         //if we see combo key ctrl-q, we will call in-browser plugin
                         if ((event.ctrlKey || event.altKey) && event.key === 'q') {
-                            captureScreenshot()
+                            captureScreenshot('alt+q')
                             captureHtml()
                             command = null
                             parameter = null
@@ -135,7 +135,7 @@ Object.keys(EVENTCONST).forEach(item => {
                             setStateToAllEvents(globalVar.isFreezeMode, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus, BLUESTONE.bluestonePrevPointerEvent)
                         }
                         if ((event.altKey) && event.key === 'a') {
-                            captureScreenshot()
+                            captureScreenshot('alt+a')
                             captureHtml()
                         }
                         //otherwise, we are not going to record any other operation
@@ -193,8 +193,13 @@ Object.keys(EVENTCONST).forEach(item => {
 //XXX (RoadMap) Add a way to handle delete operation
 //draw rectangle and return the selector and inner text of element mouse hover on
 document.addEventListener('mouseover', async event => {
+    let selector = null
+    try {
+        selector = finder(event.target)
+    } catch (error) {
+        return
+    }
 
-    let selector = finder(event.target)
 
     let customLocator = {
         target: event.target
@@ -492,9 +497,9 @@ async function captureHtml() {
 }
 
 
-async function captureScreenshot() {
+async function captureScreenshot(reason) {
     try {
-        await window.captureScreenshot()
+        await window.captureScreenshot(reason)
     } catch (error) {
 
     }
@@ -557,12 +562,12 @@ const mutationObserverCallback = function (mutationsList, observer) {
     if (window.isRecording() == false) {
         return
     }
-    captureScreenshot()
+    captureScreenshot('dom tree change')
     //only proceed change that is introduced by RPA engine or code change
     captureHtml()
     getFrameLocator()
     scanLocator()
-    // console.log(mutationsList)
+    console.log(mutationsList)
 }
 
 const observer = new MutationObserver(mutationObserverCallback);
@@ -593,12 +598,12 @@ document.addEventListener('animationend', () => {
     console.log('Animation ended');
     captureHtml()
     //capture html after 800ms in case there are some animation
-    captureScreenshot()
+    captureScreenshot('animation ended')
 
 }, { capture: true });
 captureHtml()
 // setInterval(captureHtml, 800)
-captureScreenshot()
+captureScreenshot('initial capture')
 getFrameLocator()
 scanLocator()
 const socket = io("http://localhost:3600");
