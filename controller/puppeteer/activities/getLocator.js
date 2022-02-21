@@ -10,7 +10,7 @@ module.exports = async function getLocator(frame, currentLocator) {
     /** @type {Array<ElementHandle>} */
     let elements
 
-    if (currentLocator.startsWith('/')) {
+    if (currentLocator.startsWith('/') || currentLocator.startsWith('(')) {
         try {
             elements = await frame.$x(currentLocator)
         } catch (error) {
