@@ -68,7 +68,7 @@ module.exports = async function (page, elementSelector, timeout, option = Option
     if (element == null) {
         let info = `Unable to find UI element: "${elementSelector.displayName}" in ${timeout}ms`
         if (option.throwError) {
-            return Promise.reject(info)
+            return Promise.reject(new Error(info))
         }
         else {
             console.log(info)
