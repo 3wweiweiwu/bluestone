@@ -28,7 +28,8 @@ class VarSaver {
      */
     static parseFromEnvVar() {
         if (process.env.BLUESTONE_VAR_SAVER == null) {
-            throw new Error('Unable to find bluestone var info in the env vars!')
+            console.log('Unable to find bluestone var info in the env vars!')
+            return new VarSaver('', 0)
         }
 
         return JSON.parse(process.env.BLUESTONE_VAR_SAVER)
