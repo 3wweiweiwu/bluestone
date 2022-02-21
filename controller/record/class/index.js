@@ -652,7 +652,7 @@ class WorkflowRecord {
      * @returns 
      */
     async __handleChangeNPressCombo(step) {
-        if (this.steps.length > 3 && step.command == 'change'
+        if (this.steps.length >= 3 && step.command == 'change'
             && this.steps[this.steps.length - 3].command == 'keydown'
             && step.target == this.steps[this.steps.length - 3].target
             && this.steps[this.steps.length - 3].timeStamp - step.timeStamp < 50 //extremely short timeout to ensure they are two consequtive events
