@@ -684,10 +684,10 @@ class WorkflowRecord {
      * @returns 
      */
     async __handleEnterNClickCombo(step) {
-        if (this.steps.length > 3 && step.command == 'click'
+        if (this.steps.length >= 3 && step.command == 'click'
             && this.steps[this.steps.length - 3].command == 'keydown'
 
-            && this.steps[this.steps.length - 3].timeStamp - step.timeStamp < 50 //extremly short timeout to ensure it is consecutive event
+            && Math.abs(step.timeStamp - this.steps[this.steps.length - 3].timeStamp) < 50 //extremly short timeout to ensure it is consecutive event
         ) {
 
             this.steps.splice(this.steps.length - 2, 2)
