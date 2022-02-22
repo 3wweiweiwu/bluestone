@@ -24,7 +24,8 @@ function getErrorStepIndexByErrorStack(filePath, errorStack, testcase) {
     }
 
     //based on line number identify which step are we in
-    stepIndex = testcase.steps.findIndex(item => item.scriptLineNumber == lineNumber)
+    //-1 to get rid of initialize step as normally we will not record this
+    stepIndex = testcase.steps.findIndex(item => item.scriptLineNumber == lineNumber) - 1
     return stepIndex
 }
 module.exports = getErrorStepIndexByErrorStack
