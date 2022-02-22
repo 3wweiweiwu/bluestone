@@ -125,7 +125,7 @@ exports.click = async function (frame, elementSelector) {
     try {
         await element.click()
     } catch (error) {
-        return Promise.reject(new Error(`Unable to click ${elementSelector.displayName}`))
+        assert.fail(`Unable to click "${elementSelector.displayName}"`)
     }
 
     return `Click success!`

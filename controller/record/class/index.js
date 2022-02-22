@@ -440,8 +440,11 @@ class WorkflowRecord {
         for (let i = 0; i < this.steps.length; i++) {
             if (result.failedStep == -1 || result.failedStep > i)
                 this.steps[i].result.isResultPass = true
-            else
+            else {
+                this.steps[i].result.isResultPass = false
                 break
+            }
+
 
         }
         //mark failed step if any failure is within the range
