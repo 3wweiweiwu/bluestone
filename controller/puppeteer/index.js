@@ -18,6 +18,7 @@ const captureScreenshot = require('./exposure/captureScreenshot')
 const checkUrlBlackList = require('./help/checkUrlBlacklist')
 const isHtmlCaptureOngoing = require('./exposure/isHtmlCaptureOngoing')
 const DownloadWatcher = require('./class/DownloadWatcher')
+const AlertWatcher = require('./class/AlertWatcher')
 /**
  * Create a new puppeteer browser instance
  * @param {import('../record/class/index').WorkflowRecord} record
@@ -40,6 +41,11 @@ async function startRecording(record, io, url = null) {
     //start to watch the download event
     const download = new DownloadWatcher((record))
     await download.startWatching()
+
+    //initialize alert watcher
+    const alert = new AlertWatcher(record, page, logEvent)
+    await alert.startWatching()
+
     //initialize recording object
     record.steps = []
     record.isRecording = true

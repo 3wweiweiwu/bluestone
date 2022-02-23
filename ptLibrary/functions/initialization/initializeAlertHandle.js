@@ -8,8 +8,8 @@ const fs = require('fs')
 const chokidar = require('chokidar')
 const initializeFolder = require('./initializeFolder')
 /**
- * Initialize Download Feature
- * It will clean up the browser and start to watch the folder
+ * Initialize Alert Watcher
+ * It will supress dialog box whenever it appear and register its information into varSaver
 *  @param {VarSaver} vars 
  * @param {Page} page
  */
