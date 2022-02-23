@@ -1,5 +1,5 @@
 const DownloadManager = require('./VarContext/DownloadManager')
-const fs = require('fs')
+const AlertManager = require('./VarContext/AlertManager')
 const path = require('path')
 const { Page } = require('puppeteer')
 class VarSaver {
@@ -12,6 +12,7 @@ class VarSaver {
         this.retryCount = currentRetryCount
         this.dataOutDir = this.initializeDataOutDir(this.currentFilePath)
         this.downloadManager = new DownloadManager()
+        this.alertManager = new AlertManager()
         this.isHealing = false
         this.tcStepInfo = null
         this.exportVarContextToEnv()

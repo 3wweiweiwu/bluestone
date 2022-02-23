@@ -72,6 +72,10 @@ module.exports = {
     waitForDownloadComplete: class {
         static func = inbuiltFunc.waitForDownloadComplete
         static locators = [{ locator: ['invalid_locator'] }]
+    },
+    waitAndHandleForAlert: class {
+        static func = inbuiltFunc.waitAndHandleAlert
+        static locators = [{ locator: ['invalid_locator'] }]
     }
 
 }
