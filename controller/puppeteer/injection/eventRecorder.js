@@ -6,6 +6,8 @@ import { fileUpload } from 'http://localhost:3600/resource/js/fileUpload.js'
 import { io } from "http://localhost:3600/javascript/socket.io.esm.js";
 import { getElementPos } from "http://localhost:3600/javascript/getElementPosition.js";
 import { setStateToAllEvents } from "http://localhost:3600/javascript/blockElementInteraction.js";
+import getXPath from 'https://unpkg.com/get-xpath/index.esm.js';
+
 try {
 
 } catch (error) {
@@ -65,7 +67,7 @@ Object.keys(EVENTCONST).forEach(item => {
         try {
             selector = finder(event.target)
         } catch (error) {
-            console.log(error)
+            selector = getXPath(event.target)
         }
 
         let customLocator = {
@@ -85,7 +87,7 @@ Object.keys(EVENTCONST).forEach(item => {
         else if (customLocator.target != event.target)
             selector = finder(customLocator.target)
         let target = customLocator.target
-
+        if (selector == null) return
         let iframe = getElementAttribute(window.frameElement, BLUESTONE.bluestoneIframePath)
         let framePotentialMatch = getElementAttribute(window.frameElement, BLUESTONE.bluestonePotentialMatchIndexes)
         let potentialMatch = getElementAttribute(target, BLUESTONE.bluestonePotentialMatchIndexes)
@@ -197,7 +199,7 @@ document.addEventListener('mouseover', async event => {
     try {
         selector = finder(event.target)
     } catch (error) {
-        return
+        selector = getXPath(event.target)
     }
 
 
@@ -217,7 +219,7 @@ document.addEventListener('mouseover', async event => {
     else if (customLocator.target != event.target)
         selector = finder(customLocator.target)
     let target = customLocator.target
-
+    if (selector == null) return
     const innerText = target.innerText
     let position = {}
     try {
