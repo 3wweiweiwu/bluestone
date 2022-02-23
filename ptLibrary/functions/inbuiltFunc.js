@@ -3,6 +3,7 @@ const ElementSelector = require('../class/ElementSelector')
 const VarSaver = require('../class/VarSaver')
 const findElement = require('./findElement')
 const initailizeDownload = require('./initialization/initiailzeDownload')
+const initailizeAlertHandle = require('./initialization/initializeAlertHandle')
 const initializeFolder = require('./initialization/initializeFolder')
 const { initializePageCapture } = require('./snapshotCapture')
 const assert = require('assert')
@@ -379,6 +380,7 @@ exports.initialize = async function (vars, page) {
     //inject page capture script
     await initializePageCapture(page)
     initializeFolder(vars.dataOutDir, vars.retryCount)
+    initailizeAlertHandle(vars, page)
     //initialize testcase loader and save tc ast info
     let tcLoader = new TestcaseLoader(vars.currentFilePath)
     await tcLoader.parseTc()
@@ -397,5 +399,17 @@ exports.waitForDownloadComplete = async function (vars, timeout) {
     //increase timeout if we are in retry mode
     if (vars.retryCount > 0) timeout = timeout * 1.5
     await vars.downloadManager.waitDownloadComplete(timeout)
+    return true
+}
+
+/**
+ * Handle alert 
+ * @param {VarSaver} vars 
+ * @param {number} timeout Wait time till download to complete
+ */
+exports.waitAndHandleAlert = async function (vars, timeout) {
+    //increase timeout if we are in retry mode
+    if (vars.retryCount > 0) timeout = timeout * 1.5
+    await vars.alertManager.waitAlertComplete(timeout)
     return true
 }
