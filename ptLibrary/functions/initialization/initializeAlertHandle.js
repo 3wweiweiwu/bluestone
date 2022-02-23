@@ -18,6 +18,6 @@ module.exports = async function initializeAlertHandle(vars, page) {
     page.on('dialog', async dialog => {
         let dialogMessage = dialog.message()
         vars.alertManager.addAlert(dialogMessage)
-        await dialog.dismiss()
+        await dialog.accept()
     })
 }
