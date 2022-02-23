@@ -72,6 +72,8 @@ let argv = yargs
             .example('bluestone compile',
                 'Conduct a hot reload on customized function')
     })
+    .command('install', 'Update registry for windows. Only need to run it once', () => {
+    })
     .wrap(null)
     .argv
 function getCommandLineArgs(command, args) {

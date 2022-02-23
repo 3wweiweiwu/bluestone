@@ -8,6 +8,7 @@ const fs = require('fs').promises
 const fsSync = require('fs')
 const axios = require('axios').default
 let config = require('../config')
+const regedit = require('../controller/regedit')
 function getPidPath() {
     return path.join(__dirname, 'bluestone.pid')
 }
@@ -101,6 +102,9 @@ try {
                 .then(() => {
                     console.log('hot reload complete!')
                 })
+            break
+        case 'install':
+            regedit()
             break
         case 'help':
             cli.help();
