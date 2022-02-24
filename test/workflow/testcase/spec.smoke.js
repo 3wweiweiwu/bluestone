@@ -7,20 +7,14 @@ let testConfig = require('../testConfig')
 let fs = require('fs').promises
 const fsCb = require('fs')
 const path = require('path')
-describe('Smoke Test', () => {
+describe('Smoke Test - Integration', () => {
     const suite = this;
-
-    beforeEach(done => {
+    beforeEach(async function () {
+        this.timeout(60000)
         siteBackend = new TestSite()
+        await siteBackend.launchApp()
         bluestoneBackend = new Bluestone()
-        siteBackend.launchApp()
-            .then(() => {
-                return bluestoneBackend.launchApp()
-            }
-
-            )
-            .then(done)
-
+        await bluestoneBackend.launchApp()
     })
     after(function (done) {
         this.timeout(12000);
@@ -94,7 +88,7 @@ describe('Smoke Test', () => {
         //override data which is irrelevant
         let currentData = res.data
         assert.deepStrictEqual(currentData, baseline)
-    }).timeout(5000)
+    }).timeout(10000)
     it('should record click event in steps correct', async () => {
         let happyPathPage = testConfig.testSite.page.happypath
         await bluestoneBackend.startRecording(siteBackend.singlePageHappyPath)

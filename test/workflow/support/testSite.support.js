@@ -5,6 +5,7 @@ class TestSite {
     constructor() {
         this.url = `http://localhost:${testConfig.testSite.port}`
         this.singlePageHappyPath = `${this.url}/site/singlePageHappyPath.html`
+        this.locator_test_page_1 = `${this.url}/site/locator-1.html`
         this.app = null
     }
 
