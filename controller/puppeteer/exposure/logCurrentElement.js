@@ -8,7 +8,7 @@ const config = require('../../../config')
  */
 module.exports = function logCurrentElement(recordRepo, page) {
 
-    return async function (selector = '', innerText = '', x, y, height, width, parentFrame, potentialMatch, framePotentialMatch, currentSelectedIndex) {
+    return async function (selector = '', innerText = '', x, y, height, width, parentFrame, potentialMatch, framePotentialMatch, currentSelectedIndex, recommendedLocator) {
         //if current selector has been captured, we will not capture it again
         if (selector == recordRepo.operation.browserSelection.currentSelector && x == recordRepo.operation.browserSelection.x && recordRepo.operation.browserSelection.y == y) {
             return
@@ -22,6 +22,7 @@ module.exports = function logCurrentElement(recordRepo, page) {
             recordRepo.operation.browserSelection.width = width
             recordRepo.operation.browserSelection.lastOperationTimeoutMs = Date.now() - recordRepo.operation.browserSelection.lastOperationTime
             recordRepo.operation.browserSelection.parentIframe = []
+            recordRepo.operation.browserSelection.recommendedLocator = recommendedLocator
             try {
                 recordRepo.operation.browserSelection.parentIframe = JSON.parse(parentFrame)
             } catch (error) {

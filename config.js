@@ -24,6 +24,7 @@ let config = {
         urlBlackList: [],
         customLocatorEnginePath: path.join(__dirname, './public/javascript/customLocator.js'),
         dataPath: path.join(__dirname, './test/sample-project/data'),
+        locatorAttributePreference: []
     },
     singlefile: {
         removeHiddenElements: false,
@@ -77,6 +78,7 @@ function configFunc() {
     config.code.configPath = path.join(projectFolder, projectObj.config)
     config.code.pictureFolder = path.join(projectFolder, projectObj.pic)
     config.code.urlBlackList = projectObj.urlBlackList
+    config.code.locatorAttributePreference = [] || projectObj.locatorAttributePreference
 
     //load puppeteer config
 
