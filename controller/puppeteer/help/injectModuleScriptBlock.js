@@ -11,10 +11,6 @@ module.exports = async function (page, injectionPath) {
     //replace place holder http://localhost:3600 with current port
     let currentUrl = `http://localhost:${config.app.port}`
     eventRecorderScript = eventRecorderScript.split('http://localhost:3600').join(currentUrl)
-    //inject user's attribute preference into script
-    let locatorAttributePreferenceStr = JSON.stringify(config.code.locatorAttributePreference)
-    eventRecorderScript = eventRecorderScript.split('const locatorAttributePriority = []').join(`const locatorAttributePriority = ${locatorAttributePreferenceStr}`)
-
     let registerEvent = async function (eventRecorderScript) {
         while (true) {
             await new Promise(resolve => setTimeout(resolve, 50))
