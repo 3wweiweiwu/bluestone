@@ -10,11 +10,33 @@ const config = require('../../../config')
  * @param {Array<string>} parentIframes
  */
 module.exports = async function getRecommendedLocator(browser, targetLocator, parentIframes) {
+    //find bluestone website
+    let currentPageList = await browser.pages()
+
+    let targetPage = null
+    let bluestonePageUrl = `http://localhost:${config.app.port}`
+    //waiting for bluestone page to be ready
+    while (true) {
+        for (let i = 0; i < currentPageList.length; i++) {
+            let page = currentPageList[i]
+            let url = await page.url()
+            if (url.toLowerCase().includes(bluestonePageUrl)) {
+                targetPage = page
+                break
+            }
+        }
+        if (targetPage == null) continue
+        await new Promise(resolve => setTimeout(resolve, 500))
+        break
+    }
+
+
     //sidebar is the id for the locatorDefinerpug
-    let page = await getBluestonePage(browser)
+
+    let page = targetPage
     //find frame that pointes to temp folder. This is the place where we store html page
     let frame = null
-    let iTimeout = 0
+
     do {
 
         await page.waitForTimeout(500)
@@ -25,10 +47,6 @@ module.exports = async function getRecommendedLocator(browser, targetLocator, pa
 
     } while (frame == null)
 
-
-    /** @type {Array<ElementHandle>} */
-    let elements = []
-    let errorText = ''
 
     //if target locator is equal to current locator and equals to null, it means we are dealing with parent locator, just return as it is
 
