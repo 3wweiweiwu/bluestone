@@ -205,6 +205,18 @@ class LocatorDefiner {
                     this.backend.operation.browserSelection.currentSelectedIndex = newLocatorIndex
                     //update selector index for current selector
                     this.backend.puppeteer.setSelectorIndexForLocator(this.backend.operation.browserSelection.currentSelector, newLocatorIndex)
+
+                    //add current selection into locator snapshot library
+                    this.backend.locatorManager.updateSnapshot(
+                        this.locatorName,
+                        this.backend.operation.browserSelection.x,
+                        this.backend.operation.browserSelection.y,
+                        this.backend.operation.browserSelection.width,
+                        this.backend.operation.browserSelection.height,
+                        this.backend.operation.browserSelection.currentInnerText,
+                        this.backend.operation.browserSelection.recommendedLocator
+
+                    )
                 }
                 //mark currentSelectedIndex in the element to be current locator index
                 //check all steps and replicate same setting for same locator

@@ -3,6 +3,7 @@ const fs = require('fs').promises
 const config = require('../../../config')
 const path = require('path')
 const LocatorAstGen = require('./LocatorAstGen')
+const LocatorSnapshot = require('./LocatorSnapshot')
 const escodegen = require('escodegen')
 class LocatorManager {
     /**
@@ -14,7 +15,8 @@ class LocatorManager {
         if (locatorPath != null) {
             this.locatorPath = locatorPath
         }
-
+        /**@type {Array<LocatorSnapshot>} */
+        this.__locatorSnapshot = []
         this.__initialize()
     }
     /**
@@ -40,6 +42,22 @@ class LocatorManager {
         this.locatorLibrary.forEach(item => {
             item.selector = null
         })
+    }
+    /**
+     * Add locator snapshot into recording list
+     * @param {string} name
+     * @param {number} x 
+     * @param {number} y 
+     * @param {number} width 
+     * @param {number} height 
+     * @param {string} innerText 
+     * @param {Array<string>} backupLocators 
+     */
+    updateSnapshot(name, x, y, width, height, innerText, backupLocators) {
+        let snapshot = new LocatorSnapshot(name, x, y, width, height, innerText, backupLocators)
+        //delete locator snapshot with duplicate name
+        this.__locatorSnapshot = this.__locatorSnapshot.filter(item => item.name != name)
+        this.__locatorSnapshot.push(snapshot)
     }
     /**
      * Reset Locator's activation status and mark specific index to be active
