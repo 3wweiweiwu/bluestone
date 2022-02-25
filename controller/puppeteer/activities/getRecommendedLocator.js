@@ -11,12 +11,13 @@ const config = require('../../../config')
  */
 module.exports = async function getRecommendedLocator(browser, targetLocator, parentIframes) {
     //find bluestone website
-    let currentPageList = await browser.pages()
+    let currentPageList = null
 
     let targetPage = null
     let bluestonePageUrl = `http://localhost:${config.app.port}`
     //waiting for bluestone page to be ready
     while (true) {
+        currentPageList = await browser.pages()
         for (let i = 0; i < currentPageList.length; i++) {
             let page = currentPageList[i]
             let url = await page.url()
@@ -25,8 +26,9 @@ module.exports = async function getRecommendedLocator(browser, targetLocator, pa
                 break
             }
         }
-        if (targetPage == null) continue
         await new Promise(resolve => setTimeout(resolve, 500))
+        if (targetPage == null) continue
+
         break
     }
 
