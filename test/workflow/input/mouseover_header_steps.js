@@ -15,6 +15,7 @@ module.exports = {
     currentOpeartion: null,
     currentSelectedIndex: 0,
     __htmlCaptureInProcess: [],
+    recommendedLocator: [],
     potentialMatch: [
         {
             Locator: ["#header"],

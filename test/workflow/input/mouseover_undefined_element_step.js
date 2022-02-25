@@ -13,6 +13,7 @@ module.exports = {
     currentOpeartion: null,
     currentSelectedIndex: null,
     __htmlCaptureInProcess: [],
+    recommendedLocator: [],
     potentialMatch: [],
     framePotentialMatch: [],
 };
