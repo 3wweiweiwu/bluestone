@@ -1,5 +1,7 @@
 const { Browser, Page } = require('puppeteer-core')
 const config = require('../../../../config')
+const path = require('path')
+const fs = require('fs').promises
 /**
  * Search through current browser and see if there is any existing rpa page
  * If there is any existing rpa page, activate it
@@ -28,6 +30,10 @@ module.exports = async function (browser) {
     }
     else {
         targetPage = await browser.newPage()
+        let locatorGenPath = path.join(__dirname, '../../../../public/javascript/robustLocatorGen.js')
+        let locatorGen = await fs.readFile(locatorGenPath)
+        await targetPage.evaluateOnNewDocument(locatorGen.toString())
+        
     }
 
     return targetPage

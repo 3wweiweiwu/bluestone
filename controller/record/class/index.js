@@ -94,7 +94,8 @@ class WorkflowRecord {
                 currentOpeartion: null,
                 __htmlCaptureInProcess: [],
                 potentialMatch: [],
-                framePotentialMatch: []
+                framePotentialMatch: [],
+                recommendedLocator: []
             },
         }
         this.picCapture = new PicCapture()
@@ -114,6 +115,15 @@ class WorkflowRecord {
     }
     get codePath() {
         return this.__codePath
+    }
+    /**
+     * Provide list of locator for target element
+     * @param {string} targetLocator 
+     * @param {Array<string>} parentFrame 
+     */
+    async getRecommendedLocatorFromDefiner(targetLocator, parentFrame) {
+        let locators = await this.puppeteer.getRecommendedLocator(targetLocator, parentFrame)
+        this.operation.browserSelection.recommendedLocator = locators
     }
     /**
      * Scan through html path and fix unavailable path

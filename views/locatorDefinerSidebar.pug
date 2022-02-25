@@ -12,8 +12,10 @@ block body
 
         +input-arguments(txtLocatorNameQueryKey,[{description:'Locator Name',pugType:"input",value:txtLocatorName}],'index')
     div(class='row')        
-
         +input-arguments(txtLocatorQueryKey,[{description:'Locator Selector',pugType:"input",value:txtLocatorValue}],'index')                    
+    div(class='row')
+        +dropdown('Recommended Locator',recommendedLocator)
+
     div(class='row')                
         +a-btn-info('?'+revertQueryKey)='Revert Selector'
         +a-btn-primary('?'+btnCheckQueryKey)='Confirm'

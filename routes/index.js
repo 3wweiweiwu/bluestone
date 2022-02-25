@@ -66,7 +66,7 @@ router.get('/locator-definer', async function (req, res) {
 
   await ui.updateUserInputForSpy(req.query)
 
-
+  ui.backend.getRecommendedLocatorFromDefiner(ui.locatorDefiner.defaultSelector, ui.locatorDefiner.parentFrame)
 
   let variables = {
     title: `Bluestone Recording: ${workflow.isRecording}`,
@@ -110,7 +110,8 @@ router.get('/locator-definer-sidebar', async function (req, res) {
     possibleLocatorMatch: ui.locatorDefiner.possibleLocators,
     possibleLocatorOkQueryKey: PugLocatorDefiner.inBuiltQueryKey.btnLocatorOk,
     validationText: ui.locatorDefiner.validationText,
-    btnOverrideLocator: PugLocatorDefiner.inBuiltQueryKey.btnOverrideLocator
+    btnOverrideLocator: PugLocatorDefiner.inBuiltQueryKey.btnOverrideLocator,
+    recommendedLocator: ui.locatorDefiner.getRecommendedLocator()
   }
 
   res.render('locatorDefinerSidebar.pug', variables);

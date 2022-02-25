@@ -52,7 +52,12 @@ module.exports = async function (browser, targetLocator, currentLocator, parentI
     //get target element
     let targetElement = targetElementList[0]
     //put rectangle around element to make it easy to identify
-    targetElement.evaluate(node => node.style.border = "thick solid #0000FF")
+    targetElement.evaluate(node => {
+        //record previous border info
+        node.setAttribute('bluestone-previous-border', node.style.border)
+        //draw rectangle
+        node.style.border = "thick solid #0000FF"
+    })
 
     //check current locator user specified
     elements = await getLocator(frame, currentLocator)
