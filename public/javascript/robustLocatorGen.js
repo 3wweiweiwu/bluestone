@@ -738,7 +738,7 @@ function evaluateXpathForTargetSelector(targetElement, locatorList) {
 * 6 means the case of there is no element with unique attribute in DOM tree.
 */
 
-export function findRobustLocatorForSelector(elementSelected, userPriority) {
+function findRobustLocatorForSelector(elementSelected, userPriority) {
     let targetElement = elementSelected
     let elementName
     let uniqueAttributeName

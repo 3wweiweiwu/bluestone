@@ -19,6 +19,7 @@ const { Page, Browser } = require('puppeteer-core')
 const openBluestoneTab = require('../activities/openBluestoneTab')
 const getFrame = require('../activities/getFrame')
 const checkLocatorInDefiner = require('../activities/checkLocatorInDefiner')
+const getRecommendedLocator = require('../activities/getRecommendedLocator')
 const PuppeteerResult = require('../../mocha/class/StepResult')
 const _eval = require('eval')
 class PuppeteerControl {
@@ -56,6 +57,15 @@ class PuppeteerControl {
      */
     async openBluestoneTab(bluestonePath) {
         let result = await openBluestoneTab(this.browser, bluestonePath)
+        return result
+    }
+    /**
+     * Provide list of locator for target element
+     * @param {string} targetLocator 
+     * @param {Array<string>} parentFrame 
+     */
+    async getRecommendedLocator(targetLocator, parentFrame) {
+        let result = await getRecommendedLocator(this.browser, targetLocator, parentFrame)
         return result
     }
     /**

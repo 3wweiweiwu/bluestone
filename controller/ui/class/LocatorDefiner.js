@@ -58,6 +58,7 @@ class LocatorDefiner {
         btnNextHtml: 'LOCATOR_NEXT_HTML',
         btnPrevHtml: 'LOCATOR_PREVIOUS_HTML',
         btnOverrideLocator: 'LOCATOR_OVERRIDE_SELECTOR',
+        recommendationDropDown: 'LOCATOR_RECOMMENDATION_DROPDOWN'
     }
     get locatorName() {
         return this.__locatorName
@@ -71,7 +72,15 @@ class LocatorDefiner {
     set locatorName(info) {
         this.__locatorName = info
     }
-
+    getRecommendedLocator() {
+        //list top 10 locators
+        let groupElements = this.backend.operation.browserSelection.recommendedLocator.slice(0, 10)
+        let recommendationGroup = groupElements.map(item => {
+            let encodedStr = encodeURIComponent(item)
+            return { text: item, url: `locator-definer-sidebar?${LocatorDefiner.inBuiltQueryKey.recommendationDropDown}=${encodedStr}` }
+        })
+        return recommendationGroup
+    }
     /**
      * Generate validation text based on locator name and locator validation result
      * If everything looks good, it will returns an empty string
@@ -128,6 +137,10 @@ class LocatorDefiner {
         let param = null
         let newLocator = null
         switch (firstKey) {
+            case LocatorDefiner.inBuiltQueryKey.recommendationDropDown:
+                let recommendationSelection = decodeURIComponent(firstValue)
+                this.locatorSelector = recommendationSelection
+                break
             case LocatorDefiner.inBuiltQueryKey.btnRevert:
                 this.locatorSelector = this.defaultSelector
                 break;

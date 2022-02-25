@@ -78,9 +78,9 @@ function configFunc() {
     config.code.configPath = path.join(projectFolder, projectObj.config)
     config.code.pictureFolder = path.join(projectFolder, projectObj.pic)
     config.code.urlBlackList = projectObj.urlBlackList
-    config.code.locatorAttributePreference = [] || projectObj.locatorAttributePreference
+    config.code.locatorAttributePreference = projectObj.locatorAttributePreference || []
 
-    //load puppeteer config
+    //load puppeteer config6
 
     if (projectObj.config) {
         let puppeteerConfigPath = path.join(projectFolder, projectObj.config)
