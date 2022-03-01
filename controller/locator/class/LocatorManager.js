@@ -15,9 +15,39 @@ class LocatorManager {
         if (locatorPath != null) {
             this.locatorPath = locatorPath
         }
+        this.snapshotFolder = path.join(path.basename(this.locatorPath), 'snapshot')
         /**@type {Array<LocatorSnapshot>} */
         this.__locatorSnapshot = []
         this.__initialize()
+        /**@type {Array<string>} */
+        this.__usedSnapshotNameList = []
+    }
+    initializeSnapshotList() {
+        this.__usedSnapshotNameList = []
+    }
+    /**
+     * Mark snapshot as used
+     * @param {string} name 
+     */
+    markSnapshotAsUsed(name) {
+        this.__usedSnapshotNameList.push(name)
+    }
+    /**
+     * Output used snapshot into disk
+     */
+    outputSnapshotToDisk() {
+        let output = []
+        //pick used selector
+        this.__usedSnapshotNameList.forEach(name => {
+            let currentItem = this.__locatorSnapshot.find(item => {
+                return item.name == name
+            })
+            let filePath = path.join(this.snapshotFolder, name)
+            let itemStr = JSON.stringify(currentItem)
+
+            //output file into the local snapshot folder
+            await fs.writeFile(filePath, itemStr)
+        })
     }
     /**
      * Create Locator Manager Class
@@ -28,6 +58,7 @@ class LocatorManager {
         this.__locatorLibrary = []
         this.__parseLocator(this.locatorPath)
         this.lastRefreshTime = 0 //unit ms
+        fs.mkdir(this.snapshotFolder, { recursive: true })
     }
     get locatorLibrary() {
         return this.__locatorLibrary
