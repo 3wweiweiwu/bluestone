@@ -135,7 +135,7 @@ Object.keys(EVENTCONST).forEach(item => {
                         if ((event.altKey) && event.key === 's') {
                             globalVar.isFreezeMode = !globalVar.isFreezeMode
                             console.log('Current Freeze State is :' + globalVar.isFreezeMode)
-                            setStateToAllEvents(globalVar.isFreezeMode, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus, BLUESTONE.bluestonePrevPointerEvent)
+                            // setStateToAllEvents(globalVar.isFreezeMode, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus, BLUESTONE.bluestonePrevPointerEvent)
                         }
                         if ((event.altKey) && event.key === 'a') {
                             captureScreenshot('alt+a')
