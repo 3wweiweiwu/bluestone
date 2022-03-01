@@ -134,6 +134,7 @@ Object.keys(EVENTCONST).forEach(item => {
                         }
                         if ((event.altKey) && event.key === 's') {
                             globalVar.isFreezeMode = !globalVar.isFreezeMode
+                            console.log('Current Freeze State is :' + globalVar.isFreezeMode)
                             setStateToAllEvents(globalVar.isFreezeMode, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus, BLUESTONE.bluestonePrevPointerEvent)
                         }
                         if ((event.altKey) && event.key === 'a') {
@@ -501,7 +502,8 @@ async function captureHtml() {
 
 async function captureScreenshot(reason) {
     try {
-        await window.captureScreenshot(reason)
+        if (!globalVar.isFreezeMode)
+            await window.captureScreenshot(reason)
     } catch (error) {
 
     }
@@ -600,7 +602,7 @@ document.addEventListener('animationend', () => {
     console.log('Animation ended');
     captureHtml()
     //capture html after 800ms in case there are some animation
-    captureScreenshot('animation ended')
+    // captureScreenshot('animation ended')
 
 }, { capture: true });
 captureHtml()
