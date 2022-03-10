@@ -390,7 +390,7 @@ exports.initialize = async function (vars, page) {
     initailizeAlertHandle(vars, page)
     //initialize testcase loader and save tc ast info
     let tcLoader = new TestcaseLoader(vars.currentFilePath)
-    await tcLoader.parseTc()
+    await tcLoader.parseTc(false)
     vars.tcStepInfo = tcLoader
     vars.exportVarContextToEnv()
 
