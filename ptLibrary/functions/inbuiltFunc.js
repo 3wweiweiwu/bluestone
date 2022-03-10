@@ -88,8 +88,11 @@ exports.change = async function (frame, elementSelector, text) {
     let currentValue = await element.evaluate(el => el.value);
 
     //if current value cannot be changed via typing text, set value directly
-    if (currentValue != text)
+    if (currentValue != text) {
         await element.evaluate((el, text) => el.value = text, text);
+        await element.evaluate(node => node.dispatchEvent(new Event('change', { bubbles: true })));
+    }
+
 
     return `Type value ${text} success!`
 
