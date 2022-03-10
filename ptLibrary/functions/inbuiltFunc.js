@@ -84,6 +84,13 @@ exports.change = async function (frame, elementSelector, text) {
 
     await element.type(text, { delay: 100 })
 
+    //ensure the value has been changed correctly
+    let currentValue = await element.evaluate(el => el.value);
+
+    //if current value cannot be changed via typing text, set value directly
+    if (currentValue != text)
+        await element.evaluate((el, text) => el.value = text, text);
+
     return `Type value ${text} success!`
 
 }
