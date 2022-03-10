@@ -1,13 +1,9 @@
-//test website: https://www.feiniaomy.com/post/541.html
-//ref website: https://blog.csdn.net/weixin_42566993/article/details/96704414
-//userPriority format ["class", "tagContent", "col-id"]
-
 /***********************************************These are the functions that assist the locator formation****************************************/
-
 
 /**
 * this function is used to find the text content of the target element (for multiple contents in tag, it will return all even if there is no text but only \n or \t)
 * @parameter  target element
+* **Be careful, this function so far does not support the case if content has ' or "
 * return   the text content of target element (array)
 */
 
@@ -489,6 +485,7 @@ function attributeCombination(attributeArr,combinationSize){
     return combinationsArray;
 }
 
+
 /**
 * this function receives the attributesCombinationsList and return a list which has those non unique attributes combinations 
 * that can uniquely identify the element
@@ -537,13 +534,19 @@ function validateXpathAttributesCombinations(targetElement, attributesCombinatio
 			                xpath = xpath + " and " + `.=''`
 			            } 
 					}else{
-						for(let k = 0; k <tagContent.length; k++){
-							if(j == 0){
-				                xpath = `text()='${tagContent[k]}'`
-			                }else{
-			                    xpath = xpath + " and " + `text()='${tagContent[k]}'`
-			                } 
-						}
+                        if(j == 0){
+                            for(let k = 0; k <tagContent.length; k++){
+    							if(k == 0){
+    				                xpath = `text()='${tagContent[k]}'`
+    			                }else{
+    			                    xpath = xpath + " and " + `text()='${tagContent[k]}'`
+    			                } 
+    						}
+                        }else{
+                            for(let k = 0; k <tagContent.length; k++){
+    			                xpath = xpath + " and " + `text()='${tagContent[k]}'`
+    						}
+                        }
 					} 
                 }else{
                     attributeName = attributesCombinationsList[i][j]
@@ -646,8 +649,8 @@ function sortLocator(locator_a, locator_b) {
         } else if (locator_a.group < locator_b.group) {
             return -1
         } else {
-            // group == 2 means nonUniqueAttribute only, other groups means uniqueAttribute
-            if(locator_a.group == 2){
+            // group == 2 means nonUniqueAttribute in target element, group == 6 means nonUniqueAttribute in multi element, other groups means uniqueAttribute
+            if(locator_a.group == 2 || locator_a.group == 6){
                 if (locator_a.nonUniqueAttributeNumber > locator_b.nonUniqueAttributeNumber) {
                     return 1
                 } else if (locator_a.nonUniqueAttributeNumber < locator_b.nonUniqueAttributeNumber) {
@@ -680,6 +683,54 @@ function sortLocator(locator_a, locator_b) {
     } else {
         return locator_a.levels > locator_b.levels ? 1 : -1
     }
+}
+
+
+/**
+* This function continue filtering the locator list with user Priority
+* @paremeter   locatorList
+* @parameter   userPriority
+* @return   locatorList with further filtering result
+* 1.  put some lcoator of group 6 to the front of list, these locators attributes length is same to userPriority length and names are same
+*/
+function furtherFilteringLocatorListWithUserPriority(locatorList, userPriority){
+    let locator
+    let locatorTemp
+    let flag = 0
+    let index = 0
+    
+    for(let i = 0; i< locatorList.length; i++){
+        locator = locatorList[i]
+        
+        if("nonUniqueAttributeName" in locator && locator['group'] == 6 && locator['nonUniqueAttributeNumber'] == userPriority.length){
+            for(let j = 0; j < locator["nonUniqueAttributeName"].length; j++){
+                for(let k = 0; k < locator["nonUniqueAttributeName"][j].length; k++){
+                    if(userPriority.indexOf(locator["nonUniqueAttributeName"][j][k]) != -1){
+                        continue
+                    }else{
+                        flag = 1
+                        break
+                    }
+                }
+
+                if(flag == 1){
+                    break
+                }else{
+                    continue
+                }
+            }
+
+            if(flag == 0){
+                locatorTemp = locatorList.splice(i,1)
+                locatorList.splice(index,0,locatorTemp[0])
+                index = index + 1
+            }else{
+                flag = 0
+            }
+        }
+    }
+
+    return locatorList
 }
 
 
@@ -722,25 +773,50 @@ function createLocatorListWithPriority(targetElement, locatorList, userPriority)
                 flag = 0
             }
         }else{
-            //if it is nonUniqueAttribute, then we use a count variable to sum up all weight, then assign to the nonUniqueAttributePriority
-            for(let j = 0; j<locator['nonUniqueAttributeName'].length; j++){
-                for(let k = 0; k<userPriority.length; k++){
-                    if(locator['nonUniqueAttributeName'][j] == userPriority[k]){
-                        count = count + k
-                        flag = 1
-                        break
+            if(locator['group'] == 2){
+                //if it is nonUniqueAttribute, then we use a count variable to sum up all weight, then assign to the nonUniqueAttributePriority
+                for(let j = 0; j<locator['nonUniqueAttributeName'].length; j++){
+                    for(let k = 0; k<userPriority.length; k++){
+                        if(locator['nonUniqueAttributeName'][j] == userPriority[k]){
+                            count = count + k
+                            flag = 1
+                            break
+                        }
+                    }
+                    
+                    if(flag == 0){
+                        count = count + userPriority.length
+                    }else{
+                        flag = 0
+                    }
+                } 
+    
+                locator['nonUniqueAttributePriority'] = count
+                count = 0
+            }
+
+            if(locator['group'] == 6){
+                for(let j = 0; j < locator['nonUniqueAttributeName'].length; j++){
+                    for(let k = 0; k < locator['nonUniqueAttributeName'][j].length; k++){
+                        for(let l = 0; l < userPriority.length; l++){
+                            if(locator['nonUniqueAttributeName'][j][k] == userPriority[l]){
+                                count = count + l
+                                flag = 1
+                                break
+                            }
+                        }
+
+                        if(flag == 0){
+                            count = count + userPriority.length
+                        }else{
+                            flag = 0
+                        }
                     }
                 }
-                
-                if(flag == 0){
-                    count = count + userPriority.length
-                }else{
-                    flag = 0
-                }
-            } 
 
-            locator['nonUniqueAttributePriority'] = count
-            count = 0
+                locator['nonUniqueAttributePriority'] = count
+                count = 0
+            }
         }
     }
 
@@ -788,7 +864,440 @@ function evaluateXpathForTargetSelector(targetElement, locatorList){
 } 
 
 
+/*********************** This program can give the xpath which has multiple elements with multiple attributes ***********************/
+/**
+* reference link: https://bbs.csdn.net/topics/391998625
+* The program running logic is following this way:
+* program starts from function: 
+*     locatorSummaryByMultiElemsMultiAttrs(targetElement, userPriority) ------->  locatorSummaryAfterFiltering
+*         step 1. createFinalXpathListForTargetSelector (element, userPriority)  ------>  elementsCombinationsFinal
+*                     attributesCombinationForMultipleElements (element, userPriority)  ----->   elementsCombinationsXpathList
+*                         findAttributesInElement (element, userPriority)  ------>   attributesInElement
+*                         attributeCombination (attributeArr,combinationSize)  ----->    combinationsArray
+*                         formXpathForAttributesCombinations (element, attributesCombinations)  ------>  attributesCombinationsXpathSummary
+*                             getTagContent (element)  ------>   tagContent
+*         step 2. furtherCombineAllPossibleXpath (elementsCombinationsFinal) ------->  locatorSummary
+*                     createPermutationInArrays (elementsCombinationsFinal)  ------>   xpathCollectionFinal
+*         step 3. filterXpathInLocatorSummary(targetElement, locatorSummary) ------->   locatorSummary
+*         step 4. locatorSummary can be loaded to the main program
+*/
+
+/***************************************************** Step 1 *************************************************************/
+/**
+* This function is used to find any attribute of one element is belonging to the userPriority
+* @parameter   element   the element which wants to be checked
+* @parameter  userPriority   the user priority that user provided, it has format such as ["class","id"]
+* @status  accessory function 1  (done in testing)
+* @return  attributesInElement   this is an array includes the element attributes which is found in user priority
+*/
+function findAttributesInElement(element, userPriority){
+    let attributesInElement = []
+
+    if(userPriority.length == 0){
+        return attributesInElement
+    }else{
+        for(let i = 0; i<userPriority.length; i++){
+            if(userPriority[i] == "tagContent"){
+                attributesInElement.push("tagContent")
+            }else{
+                if(element.hasAttribute(userPriority[i])){
+                    attributesInElement.push(userPriority[i])
+                }else{
+                    continue
+                }
+            }
+        }
+        return attributesInElement
+    }
+}
+
+
+/**
+* This function is used to create the xpath based on the attributes combination of one element
+* @parameter   element   the element which wants to be checked
+* @parameter  attributesCombinations   the attribtues combinations array created from attributeCombination(attributeArr,combinationSize)
+* @status  main function 1  (done in testing)
+* @return  attributesCombinationsXpathSummary   this is a dict includes the element info and all xpath of attribtues combiatnon in "attributesCombinationsXpath"
+*/
+function formXpathForAttributesCombinations(element, attributesCombinations){
+    let xpathForAttributesCombination = []
+    let tagName = element.tagName
+    let tagContent = getTagContent(element)
+
+    let attributeName
+    let attributeValue
+    let xpath = ""
+
+    let attributesCombinationsXpath = []
+    let attributesCombinationsXpathSummary = {"element": null, "attributesCombinationsXpath":null}
+
+    for(let i = 0; i < attributesCombinations.length; i++){
+        for(let j = 0; j < attributesCombinations[i].length; j++){
+            if(attributesCombinations[i][j] == "tagContent"){
+                if(tagContent.length == 0){
+                    if(j == 0){
+                        xpath = `.=''`
+                    }else{
+                        xpath = xpath + " and " + `.=''`
+                    }  
+                }else{
+                    if(j == 0){
+                        for(let k = 0; k <tagContent.length; k++){
+                            if(k == 0){
+                                xpath = `text()='${tagContent[k]}'`
+                            }else{
+                                xpath = xpath + " and " + `text()='${tagContent[k]}'`
+                            } 
+                        }
+                    }else{
+                        for(let k = 0; k <tagContent.length; k++){
+                            xpath = xpath + " and " + `text()='${tagContent[k]}'`
+                        }
+                    }
+                    
+                } 
+            }else{
+                attributeName = attributesCombinations[i][j]
+                attributeValue = element.getAttribute(attributeName)
+                if(j == 0){
+                     xpath = `@${attributeName}='${attributeValue}'`
+                }else{
+                     xpath = xpath + " and " + `@${attributeName}='${attributeValue}'`
+                }
+            }
+        }
+
+        xpath = `//${tagName}[` + xpath + ']'
+        let xpathInfo = {"nonUniqueAttributeName": null, "xpath": null}
+        xpathInfo.nonUniqueAttributeName = attributesCombinations[i]
+        xpathInfo.xpath = xpath
+        attributesCombinationsXpath.push(xpathInfo)
+        xpath = ""
+    }
+
+    attributesCombinationsXpathSummary.element = element
+    attributesCombinationsXpathSummary.attributesCombinationsXpath = attributesCombinationsXpath
+
+    return attributesCombinationsXpathSummary
+}
+
+
+/**
+* This function is used to summary all potential xpath based on different attributes combination of elements (from target element and its parent elements).
+* @parameter   element   the element which wants to be checked
+* @parameter  userPriority   the user priority that user provided, it has format such as ["class","id"]
+* @status  main function 2  (done in testing)
+* @return  elementsCombinationsXpathList   this is a array includes all potential xpaths from target element ti its parents' elements.
+*/
+function attributesCombinationForMultipleElements(element, userPriority){
+    let attributesInElement
+    let attributesCombinations
+    let attributesCombinationsXpathTemp
+    let attributesCombinationsXpathFinal
+    let elementsCombinationsXpathList = []
+
+    while(element!=null){
+        attributesInElement = findAttributesInElement(element, userPriority)
+
+        if(attributesInElement.length == 0){
+            element = element.parentElement
+            continue
+        }
+        
+        for(let i = 1; i <= attributesInElement.length; i++){
+            attributesCombinations = attributeCombination(attributesInElement, i)
+            
+            if(i == 1){
+                attributesCombinationsXpathFinal = formXpathForAttributesCombinations(element, attributesCombinations)
+            }else{
+                attributesCombinationsXpathTemp = formXpathForAttributesCombinations(element, attributesCombinations)
+                for(let i = 0; i<attributesCombinationsXpathTemp.attributesCombinationsXpath.length; i++){
+                    attributesCombinationsXpathFinal.attributesCombinationsXpath.push(attributesCombinationsXpathTemp.attributesCombinationsXpath[i])
+                }
+            }
+        }
+        
+        elementsCombinationsXpathList.push(attributesCombinationsXpathFinal)
+        element = element.parentElement
+    }
+
+    return elementsCombinationsXpathList
+}
+
+
+/**
+* This function is used to create the final xpath list(from target element and its parent elements).
+* @parameter   element   the element which wants to be checked
+* @parameter  userPriority   the user priority that user provided, it has format such as ["class","id"]
+* @status  main function 3  (done in testing)
+* @return  elementsCombinationsFinal   return the final xpaths collection for all possible, including those ones may not working
+*/
+function createFinalXpathListForTargetSelector(element, userPriority){
+    let elementsCombinationsXpathList = attributesCombinationForMultipleElements(element, userPriority)
+    let elementsCombinations
+    let elementsCombinationsFinal = []
+
+    if(elementsCombinationsXpathList.length == 0){
+        return elementsCombinationsFinal
+    }else if(elementsCombinationsXpathList.length == 1){
+        elementsCombinationsFinal.push(elementsCombinationsXpathList[0])
+        return elementsCombinationsFinal
+    }else{
+        let targetElementXpathInfo = elementsCombinationsXpathList.slice(0, 1)
+        let remainElementsXpathInfo = elementsCombinationsXpathList.slice(1, elementsCombinationsXpathList.length)
+ 
+        for(let i = 1; i <= remainElementsXpathInfo.length; i++){
+            elementsCombinations = attributeCombination(remainElementsXpathInfo, i)
+            for(let j = 0; j < elementsCombinations.length; j++){
+                elementsCombinationsFinal.push(elementsCombinations[j])
+            }
+        }
+
+        for(let i = 0; i<elementsCombinationsFinal.length; i++){
+            elementsCombinationsFinal[i].unshift(targetElementXpathInfo[0])
+        }
+
+        //console.log(elementsCombinationsFinal)
+        return elementsCombinationsFinal
+    }
+}
+
+
+/***************************************************** Step 2 ***********************************************************/
+
+/**
+* This function is used to create the permutation of elements (target element and its all parent elements).
+* @parameter   elementsCombinationsFinal   the final xpaths collection for all possible, including those ones may not working
+* @status  main function 4  (done in testing)
+* @case  consider the case if both element and parent element has the same attribute name and value.
+* @return  xpathCollectionFinal   reorganize the xpath collections and output it
+*/
+function createPermutationInArrays(elementsCombinationsFinal){
+
+    let xpathCollection = []
+    let xpathCollectionFinal = []
+    
+    for(let i = 0; i<elementsCombinationsFinal.length; i++){
+        let xpathArr= new Array();
+        
+        for(let j = 0; j<elementsCombinationsFinal[i].length; j++){
+            xpathArr.push(elementsCombinationsFinal[i][j]["attributesCombinationsXpath"]);
+        }
+
+        let result = []
+
+        function permutation(xpathArr){
+            let len = xpathArr.length
+        
+            if(len >= 2){
+                let len_1 = xpathArr[0].length
+                let len_2 = xpathArr[1].length
+        
+                let totalLen = len_1 * len_2
+                let tempArrSum = new Array(totalLen)
+
+                let index = 0
+                    
+                for(let i = 0; i<len_1; i++){
+                    for(let j=0; j<len_2; j++){                  
+                        let tempArr= []
+                        tempArr.push(xpathArr[0][i])
+                        if(Array.isArray(tempArr[0])){
+                            tempArr[0].push(xpathArr[1][j])
+                            tempArrSum[index] = tempArr[0]
+                        }else{
+                            tempArr.push(xpathArr[1][j])
+                            tempArrSum[index] = tempArr
+                        }
+                        index++
+                    }
+                }
+        
+                let newArr= new Array(len - 1)
+                for(var k=2; k<xpathArr.length; k++){
+                    newArr[k-1] = xpathArr[k]
+                }
+                
+                newArr[0] = tempArrSum
+                
+                return permutation(newArr)
+            }else{
+                return xpathArr[0]
+            }
+        }
+
+        result = permutation(xpathArr)
+
+        xpathCollection.push(result)
+    }
+
+    //console.log(xpathCollection)
+    
+    for(let i = 0; i<xpathCollection.length; i++){
+        for(let j = 0; j<xpathCollection[i].length; j++){
+            let elementInfo = {"element": null, "attributesCombinationsXpath":null}
+            let xpathInfo = {"nonUniqueAttributeName":null, "xpath":null}
+            let nonUniqueAttributeName = []
+            let xpath = ""
+            
+            for(let k = 0; k<xpathCollection[i][j].length; k++){
+                nonUniqueAttributeName.push(xpathCollection[i][j][k]["nonUniqueAttributeName"])
+                xpath = xpathCollection[i][j][k]["xpath"] + xpath
+            }
+
+            xpathInfo.nonUniqueAttributeName = nonUniqueAttributeName
+            xpathInfo.xpath = xpath
+
+            elementInfo.element = elementsCombinationsFinal[i][elementsCombinationsFinal[i].length - 1]["element"]
+            elementInfo.attributesCombinationsXpath = xpathInfo
+            xpathCollectionFinal.push(elementInfo)
+        }
+    }
+    
+    return xpathCollectionFinal
+}
+
+
+
+/**
+* This function is used to summary all xpath into the locator summary with a compatible format with the main program.
+* @parameter   elementsCombinationsFinal   the final xpaths collection for all possible, including those ones may not working
+* @status  main function 5  (done in testing)
+* @return  locatorSummary   the locator summary has all locator information.
+*/
+function furtherCombineAllPossibleXpath(elementsCombinationsFinal){
+    let locatorSummary = []
+    let xpathCollectionFinal
+
+    if(elementsCombinationsFinal.length == 0){
+        return locatorSummary
+    }else{
+        xpathCollectionFinal = createPermutationInArrays(elementsCombinationsFinal)
+        for(let i = 0; i < xpathCollectionFinal.length; i++){
+            let locatorInfo = {"element":null, "nonUniqueAttributeName":null, "nonUniqueAttributePriority":null, "nonUniqueAttributeNumber":null, "levels": null, "locator":null, "group": null}
+            locatorInfo.element = xpathCollectionFinal[i]["element"]
+            locatorInfo.nonUniqueAttributeName = xpathCollectionFinal[i]["attributesCombinationsXpath"]["nonUniqueAttributeName"]
+            let totalLength = 0
+            for(let j = 0; j < xpathCollectionFinal[i]["attributesCombinationsXpath"]["nonUniqueAttributeName"].length; j++){
+                totalLength = totalLength + xpathCollectionFinal[i]["attributesCombinationsXpath"]["nonUniqueAttributeName"][j].length
+            }
+            locatorInfo.nonUniqueAttributeNumber = totalLength
+            locatorInfo.levels = xpathCollectionFinal[i]["attributesCombinationsXpath"]["nonUniqueAttributeName"].length
+            locatorInfo.locator = xpathCollectionFinal[i]["attributesCombinationsXpath"]["xpath"]
+            locatorInfo.group = 6
+            locatorSummary.push(locatorInfo)
+            totalLength = 0
+        }
+
+        return locatorSummary
+    }
+}
+
+/***************************************************** Step 3 ***********************************************************/
+
+/**
+* This function is used to filtering the xpath to have the right ones as output, exclude the ones without single result, exclude the ones that is not target element
+* @parameter   elementsCombinationsFinal   the final xpaths collection for all possible, including those ones may not working
+* @status  main function 6  (done in testing)
+* @return  locatorSummary   the locator summary has all correct locator information.
+*/
+function filterXpathInLocatorSummary(targetElement, locatorSummary){
+    let count = 0
+    let result = null
+    let indexArr = []
+
+    if(locatorSummary.length == 0){
+        return locatorSummary
+    }
+    
+    for(let i = 0; i<locatorSummary.length; i++){
+        result = document.evaluate(locatorSummary[i]["locator"], document.cloneNode(true))
+        
+        //judge if the result is one or multiple, only one is acceptable
+        while(result.iterateNext() != null){
+            count = count + 1 
+        }
+    
+        if(count == 1){
+            result = document.evaluate(locatorSummary[i]["locator"], document.cloneNode(true))
+            if(result.iterateNext().isEqualNode(targetElement)){
+                count = 0
+                result = null
+                continue
+            }else{
+                indexArr.push(i)
+            }
+        }else{
+            indexArr.push(i)
+        }
+        
+        count = 0
+        result = null
+    }
+
+    //console.log(indexArr)
+
+    if(indexArr.length == 0){
+        return locatorSummary
+    }else{
+        for(let i = indexArr.length - 1; i >= 0; i--){
+            locatorSummary.splice(indexArr[i],1)
+        }
+        return locatorSummary
+    }
+}
+
+/***************************************************** Step 4 ***********************************************************/
+
+
+/**
+This function is the final one to have all functions above and output the correct locator summary results.
+* @parameter   targetElement   the element that wants to have the xpath
+* @parameter   userPriority    the user priority that includes the priority attribtues
+* @status  main function final (done in testing)
+* @return  locatorSummaryAfterFiltering   the locator summary has all correct locator information.
+*/
+
+function locatorSummaryByMultiElemsMultiAttrs(targetElement, userPriority){
+    let elementsCombinationsFinal
+    let locatorSummary
+    
+    elementsCombinationsFinal = createFinalXpathListForTargetSelector(targetElement, userPriority)
+    locatorSummary = furtherCombineAllPossibleXpath(elementsCombinationsFinal)
+    locatorSummaryAfterFiltering = filterXpathInLocatorSummary(targetElement, locatorSummary)
+
+    return locatorSummaryAfterFiltering
+}
+
+
+
 /*************************************************************This is the main function to find robust locators of target element************************************************/
+
+/**
+* The program running logic is following this way:
+* program starts from function:
+*     findRobustLocatorForSelector(elementSelected, userPriority) ------->  locatorSummary
+*          step 1. findElementUniqueAttribute(targetElement, elementList, "all", userPriority)  ------->  uniqueAttributeSearchResult
+*                      getTagContent(targetElement) ------> tagContent     
+*                      priorityAttribute = selectAttributeBasedOnUserPriority(targetElement, uniqueAttributesDic, userPriority) ------>  priorityAttribute
+*                      createLocatorForTagContent(targetElement, tagContent) ------>  locatorInfo
+*          step 2. unique case:
+*                      createLocatorForTagContent(targetElement, tagContent) ------> locatorInfo
+*          step 3. non-unique case:
+*                      findElementListWithUniqueAttribute(elementList, userPriority) ------> elementListWithUniqueAttribute
+*                          findElementUniqueAttribute(targetElement, elementList, "one", userPriority)  ------> uniqueAttributeSearchResult
+*                      xpathFormationUsingIndex(parentElement, targetElement) ------> results
+*                      findAllAttributesCombination(targetElement, elementList, userPriority) ------> results
+*                          findElementUniqueAttribute(targetElement, elementList, "nonUnique", userPriority) -----> nonUniqueAttributeSearchResult
+*                          attributeCombination(attributeArr,combinationSize) ------> attributesCombinations
+*                          validateXpathAttributesCombinations(targetElement, attributesCombinationsList) ------> locatorSummary
+*                      commonParentNode(targetElement, elementWithUniqueAttribute) ------>  commonParentElement
+*                      findLevelsBetweenTwoNodes(element, targetElement) ------> count
+*                      pathBetweenTwoNodes(targetElement, elementListWithUniqueAttribute[i].element, userPriority)
+*                          findElementUniqueAttribute(targetElement, allChildNodes, "one", userPriority) ------> uniqueAttributeSearchResult
+*                          xpathFormationUsingIndex(parentElement, targetElement) ------> results
+*                      createLocatorListWithPriority(targetElement, locatorSummary, userPriority) ------>  locatorSummary
+*/
 
 /**
 * this is the main function, given a target element, tell me the robust locator to identify this target element
@@ -800,7 +1309,8 @@ function evaluateXpathForTargetSelector(targetElement, locatorList){
 * 3 means the case of common parent element is the target element
 * 4 means the case of common parent element is the element with unique attribute
 * 5 means the case of common parent element is neither target element nor element with unique attribute
-* 6 means the case of there is no element with unique attribute in DOM tree.
+* 6 means the case of using multi elements with multi attributes (all from userPriority) to create xpath (table case)
+* 7 means the case of there is no element with unique attribute in DOM tree.
 */
 
 function findRobustLocatorForSelector(elementSelected, userPriority){
@@ -873,7 +1383,7 @@ function findRobustLocatorForSelector(elementSelected, userPriority){
 			locatorInfo.uniqueAttributeNumber = 1
 			locatorInfo.levels = levels
 			locatorInfo.locator = locator
-			locatorInfo.group = 6
+			locatorInfo.group = 7
 
 			locatorSummary.push(locatorInfo)
 		}else{
@@ -982,9 +1492,19 @@ function findRobustLocatorForSelector(elementSelected, userPriority){
 				levels = 0
 			}
 		}
+
+        //here are the xpaths by multi elements with multi attributes of group 6:
+        let locatorSummaryAfterFiltering = locatorSummaryByMultiElemsMultiAttrs(targetElement, userPriority)
+        if(locatorSummaryAfterFiltering.length != 0){
+            for(let i=0; i<locatorSummaryAfterFiltering.length; i++){
+                locatorSummary.push(locatorSummaryAfterFiltering[i])
+            }
+        }
+        
     }
 
     locatorSummary = createLocatorListWithPriority(targetElement, locatorSummary, userPriority)
+    locatorSummary = furtherFilteringLocatorListWithUserPriority(locatorSummary, userPriority)
 
     return locatorSummary
 
