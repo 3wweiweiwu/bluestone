@@ -1,3 +1,4 @@
+const urljoin = require('url-join')
 /**
  * Based on process.env.BLUESTONE_URL, construct new url name based on current scope
  * @param {string} baseUrl 
