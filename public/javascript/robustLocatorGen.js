@@ -1035,12 +1035,14 @@ function attributesCombinationForMultipleElements(element, userPriority){
 function createFinalXpathListForTargetSelector(element, userPriority){
     let elementsCombinationsXpathList = attributesCombinationForMultipleElements(element, userPriority)
     let elementsCombinations
+    let elementsCombinationsFinalTemp = []
     let elementsCombinationsFinal = []
 
     if(elementsCombinationsXpathList.length == 0){
         return elementsCombinationsFinal
     }else if(elementsCombinationsXpathList.length == 1){
-        elementsCombinationsFinal.push(elementsCombinationsXpathList[0])
+        elementsCombinationsFinalTemp.push(elementsCombinationsXpathList[0])
+        elementsCombinationsFinal.push(elementsCombinationsFinalTemp)
         return elementsCombinationsFinal
     }else{
         let targetElementXpathInfo = elementsCombinationsXpathList.slice(0, 1)
@@ -1075,6 +1077,7 @@ function createFinalXpathListForTargetSelector(element, userPriority){
 function createPermutationInArrays(elementsCombinationsFinal){
 
     let xpathCollection = []
+    let xpathCollectionTemp = []
     let xpathCollectionFinal = []
     
     for(let i = 0; i<elementsCombinationsFinal.length; i++){
@@ -1083,10 +1086,11 @@ function createPermutationInArrays(elementsCombinationsFinal){
         for(let j = 0; j<elementsCombinationsFinal[i].length; j++){
             xpathArr.push(elementsCombinationsFinal[i][j]["attributesCombinationsXpath"]);
         }
-
+        
         let result = []
 
-        function permutation(xpathArr){
+        let count = 1
+        function permutation(xpathArr, count){
             let len = xpathArr.length
         
             if(len >= 2){
@@ -1119,20 +1123,25 @@ function createPermutationInArrays(elementsCombinationsFinal){
                 }
                 
                 newArr[0] = tempArrSum
+                count = count + 1
                 
-                return permutation(newArr)
+                return permutation(newArr, count)
             }else{
-                return xpathArr[0]
+                if(count == 1){
+                    return xpathArr
+                }else{
+                    return xpathArr[0]
+                }
             }
         }
 
-        result = permutation(xpathArr)
+        result = permutation(xpathArr, count)
 
         xpathCollection.push(result)
     }
-
-    //console.log(xpathCollection)
     
+    //console.log(xpathCollection)
+
     for(let i = 0; i<xpathCollection.length; i++){
         for(let j = 0; j<xpathCollection[i].length; j++){
             let elementInfo = {"element": null, "attributesCombinationsXpath":null}
@@ -1153,10 +1162,11 @@ function createPermutationInArrays(elementsCombinationsFinal){
             xpathCollectionFinal.push(elementInfo)
         }
     }
+
+    //console.log(xpathCollectionFinal)
     
     return xpathCollectionFinal
 }
-
 
 
 /**
@@ -1304,11 +1314,11 @@ function locatorSummaryByMultiElemsMultiAttrs(targetElement, userPriority){
 * @parameter   elementSelected
 * @return   locator summary (array)
 * the marker of "group": 
-* 1 means the case of xpath with targetElement of just one unique attribute.
+* 1 means the case of xpath with targetElement of at least one unique attribute.
 * 2 means the case of xpath with targetElement of multiple non unique attribute combinations.
-* 3 means the case of common parent element is the target element
-* 4 means the case of common parent element is the element with unique attribute
-* 5 means the case of common parent element is neither target element nor element with unique attribute
+* 3 means the case of common parent element is the target element (element with unique attribute is the child of target element)
+* 4 means the case of common parent element is the element with unique attribute (target element is the child of element with unique attribute)
+* 5 means the case of common parent element is neither target element nor element with unique attribute (common parent element is the third element)
 * 6 means the case of using multi elements with multi attributes (all from userPriority) to create xpath (table case)
 * 7 means the case of there is no element with unique attribute in DOM tree.
 */
