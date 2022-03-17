@@ -10,6 +10,7 @@ const assert = require('assert')
 const path = require('path')
 const BluestoneFunc = require('../class/BluestoneFunc')
 const TestcaseLoader = require('../../controller/ast/TestCaseLoader')
+const getCurrentUrl = require('./getCurrentUrl')
 const ConstantVar = {
     parentIFrameLocator: 'TOP IFRAME'
 }
@@ -167,7 +168,8 @@ exports.goto = async function (page, url) {
     let iRetryCount = 0
     for (iRetryCount = 0; iRetryCount < 5; iRetryCount++) {
         try {
-            await page.goto(process.env.BLUESTONE_URL || url)
+            url = getCurrentUrl(url)
+            await page.goto(url)
             break
         } catch (error) {
             console.log('Unable to go to ' + url)
