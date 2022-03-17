@@ -51,7 +51,7 @@ exports.testTextEqual = async function (frame, elementSelector, desiredText) {
      * Use javascript to get text content
      */
     let element = await findElement(frame, elementSelector, 2000)
-    let currentText = await element.evaluate(el => el.textContent)
+    let currentText = await element.evaluate(el => el.value || el.textContent)
     //ensure text equal what we want
     assert.strictEqual(currentText, desiredText, `Current value for ${elementSelector.displayName} is ${currentText}. It's different from baseline ${desiredText}`)
     return `Current value "${currentText}"" match baseline`
