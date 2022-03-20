@@ -1,6 +1,10 @@
+class AtomicObjectCategory {
+    static TABLE = 'TABLE'
+    static LIST = 'LIST'
+}
 //build relationship in between atomic element
 class AtomicElementTreeNode {
-    constructor(tooltip, text, textSize, textWeight, placeHolder, sourceElement) {
+    constructor(tooltip, text, textSize, textWeight, placeHolder, sourceElement, category) {
         this.__tooltip = tooltip
         this.__text = text
         this.__children = []
@@ -13,14 +17,35 @@ class AtomicElementTreeNode {
         }
         this.__textWeight = textWeight
         this.__id = this.uuidv4()
+        this.__category = category
     }
-    static parse(atomicObj) {
+    /**
+     * Create atomic element based on element information
+     * @param {HTMLElement} element 
+     * @returns {AtomicElementTreeNode}
+     */
+    static parseFromElement(element) {
+        let placeHolder = element.getAttribute('placeholder')
+        let tooltip = element.getAttribute('Title')
+        let text = element.innerText
+        let textSize = window.getComputedStyle(element).fontSize
+        let textWeight = window.getComputedStyle(element).fontWeight
+        let atomicElement = new AtomicElementTreeNode(tooltip, text, textSize, textWeight, placeHolder, element)
+        return atomicElement
+    }
+    /**
+     * Parse atomic object 
+     * @param {AtomicElementTreeNode} atomicObj 
+     * @returns {AtomicElementTreeNode}
+     */
+    static parseFromObj(atomicObj) {
         let tooltip = atomicObj.__tooltip
         let text = atomicObj.__text
         let textSize = atomicObj.__textSize
         let textWeight = atomicObj.__textWeight
         let placeHolder = atomicObj.__placeHolder
-        let atomicNode = new AtomicElementTreeNode(tooltip, text, textSize, textWeight, placeHolder, null)
+        let category = atomicObj.__category
+        let atomicNode = new AtomicElementTreeNode(tooltip, text, textSize, textWeight, placeHolder, null, category)
         atomicNode.__id = atomicObj.__id
         return atomicNode
     }
@@ -81,14 +106,12 @@ class AtomicElementTreeNode {
 class AtomicElementTree {
     constructor() {
         this.__atomicElements = []
-        this.__current = null
         this.__rootNode = new AtomicElementTreeNode(null, null, null, null, null, document)
         this.__parentList = [this.__rootNode]
     }
     buildTree() {
 
         this.__buildTreeForAtomicElement()
-        this.__trimDownSingleParentNodes()
     }
     static parse(str) {
         let pathList = JSON.parse(str)
@@ -97,7 +120,7 @@ class AtomicElementTree {
         for (let i = 0; i < pathList.length; i++) {
             let path = pathList[i]
             let atomicObj = path[0]
-            let treeNode = AtomicElementTreeNode.parse(atomicObj)
+            let treeNode = AtomicElementTreeNode.parseFromObj(atomicObj)
             atomicElementTree.__atomicElements.push(atomicNode)
             for (let j = 1; j < path.length; j++) {
                 let parentObj = path[j]
@@ -196,66 +219,64 @@ class AtomicElementTree {
         }
 
     }
-    __addAtomicElement(tooltip, text, textSize, textWeight, placeHolder, sourceElement) {
-        let atomicElement = new AtomicElementTreeNode(tooltip, text, textSize, textWeight, placeHolder, sourceElement)
-        this.__current = atomicElement
-        this.__atomicElements.push(atomicElement)
-        //if current atomic element is served as other element's parent node, we will just append it to itself
-        //by doing this, we can keep atomic element and its parent seperate. This will make the logic easier
-        //I also want to get rid of complicated tree search process.
-        let parentElement = this.__parentList.find(ele => ele.sourceElement == sourceElement)
-
-        //if current element is a parent element as well, we will just add children and stop going forward
-        //becauase we don't need to re-add things again
-        if (parentElement) {
-            parentElement.addChildren(atomicElement)
-            atomicElement.parentNode = parentElement
-            this.__current = parentElement
-            return
-        }
-
-        //if current element is not parent of any tree, we will extend current branch and add current element to parent node list
-
+    /**
+     * Build path from starting element all the way to the top
+     * @param {HTMLElement} element 
+     * @returns 
+     */
+    __buildPath(element) {
+        /**@type {AtomicElementTreeNode} */
+        let lastAtomicElement = null
+        let lastText = null
         while (true) {
+            let atomicElement = AtomicElementTreeNode.parseFromElement(element)
 
-            //otherwise, current parent node is brand new, we will register parent element
-            let newParent = new AtomicElementTreeNode(null, null, null, null, null, this.__current.sourceElement.parentElement)
-            parentElement = this.__parentList.find(ele => ele.sourceElement == newParent.sourceElement)
-            //if parent element is already part of parent list, we will just add current element and stop
+            //if current atomic element has been defined in the past, we we will merge trees
+            let parentElement = this.__atomicElements.find(ele => ele.sourceElement == element)
             if (parentElement) {
-                parentElement.addChildren(this.__current)
-                this.__current.parentNode = parentElement
+                atomicElement.children.forEach(item => parentElement.addChildren(item))
+                lastAtomicElement = parentElement
                 break
             }
 
-            newParent.addChildren(this.__current)
-            this.__current.parentNode = newParent
-            this.__parentList.push(newParent)
-            this.__current = newParent
+            //if current element is visible, atomic or belongs to list category, add element to atomic list
+            if (lastAtomicElement != null) {
+                lastText = lastAtomicElement.text
+            }
+            if (isElementAtomic(element, lastText) && !isHidden(element)) {
+                //append qualified item to atomic list
+                this.__atomicElements.push(atomicElement)
+                //build up link between last atomic element and current element
+                if (lastAtomicElement != null) {
+                    atomicElement.children.push(lastAtomicElement)
+                }
+                //refresh last atomic element
+                lastAtomicElement = atomicElement
+            }
 
 
 
-            if (this.__current.sourceElement.parentElement == null) {
-                this.__rootNode.addChildren(this.__current)
-                this.__current.parentNode = this.__rootNode
+            //if we are at the root level, we will just stop
+            if (element.parentElement == null) {
                 break
             }
+
+            element = element.parentElement
         }
-
+        //set root element to be last atomic element for now
+        this.__rootNode = lastAtomicElement
 
     }
+    /**
+     * Go all the way up to the top and find out e
+     */
     __buildTreeForAtomicElement() {
-        let allElements = queryVisibleAtomicElement()
+        let allLeafElements = getAllLeafElements()
         let parentNodeList = []
-        for (let i = 0; i < allElements.length; i++) {
-            let currentElement = allElements[i]
-            let currentParent = currentElement.parentElement
-            let placeHolder = currentElement.getAttribute('placeholder')
-            let title = currentElement.getAttribute('Title')
-            let innerText = currentElement.innerText
-            let fontSize = window.getComputedStyle(currentElement).fontSize
-            let fontWeight = window.getComputedStyle($0).fontWeight
-            this.__addAtomicElement(title, innerText, fontSize, fontWeight, placeHolder, currentElement)
+        for (let i = 0; i < allLeafElements.length; i++) {
+            let currentElement = allLeafElements[i]
+
+            this.__buildPath(currentElement)
         }
     }
 }
@@ -276,11 +297,28 @@ function queryVisibleAtomicElement(startElement = document) {
     return visibleElements
 }
 
-//test if element is atomic
-//We expect element either to contain unique text or has no children elements
-function isElementAtomic(element) {
-    //if current element does not contains children, it must be atomic
-    if (element.childElementCount == 0) return true
+/**
+ * Get all leaf elements
+ * @returns 
+ */
+function getAllLeafElements() {
+    //if current element does not contains children, it must be bottom elements
+    let allElements = document.getElementsByTagName('*')
+    let leafElements = Array.from(allElements).filter(element => {
+        return element.childElementCount == 0
+    })
+    return leafElements
+}
+
+/**
+ * Test if element should be included in the Atomic Element Tree
+ * A element is unique when it contains text node, tooltips, its tag name is input or img
+ * @param {HTMLElement} element 
+ * @param {string} previousText
+ * @returns 
+ */
+function isElementAtomic(element, previousText) {
+
 
     //if current element contains text node and it contains info after trim
     //it must be atomic
@@ -291,10 +329,19 @@ function isElementAtomic(element) {
         }
         return false
     })
-    if (uniqueTextNode != null) {
+    if (uniqueTextNode != null || element.innerText != previousText) {
         return true
     }
 
+
+    //if current element has title, it must be a unique element    
+    if (element.getAttribute('title') != null) {
+        return true
+    }
+    //if current element is input or img, it must be a unique element
+    if (element.tagName == 'INPUT' || element.tagName == 'IMG') {
+        return true
+    }
     return false
 
 }
@@ -335,7 +382,7 @@ function getElementStickiness(element) {
 }
 
 function isHidden(el) {
-    let tagBlackList = ['HTML', 'BODY']
+    let tagBlackList = ['HTML']
     var style = window.getComputedStyle(el);
     let size = el.getBoundingClientRect()
     let styleInvisible = ((style.display === 'none') || (style.visibility === 'hidden'))
