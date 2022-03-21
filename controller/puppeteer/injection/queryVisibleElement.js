@@ -114,6 +114,7 @@ class AtomicElementTreeNode {
 }
 class AtomicElementTree {
     constructor() {
+        /**@type {Array<AtomicElementTreeNode>} */
         this.__atomicElements = []
         this.__rootNode = new AtomicElementTreeNode(null, null, null, null, null, document)
         this.__parentList = [this.__rootNode]
@@ -231,15 +232,19 @@ class AtomicElementTree {
     /**
      * Build path from starting element all the way to the top
      * @param {HTMLElement} element 
+     * @param {HTMLElement} targetElement
      * @returns 
      */
-    __buildPath(element) {
+    __buildPath(element, targetElement) {
         /**@type {AtomicElementTreeNode} */
         let lastAtomicElement = null
         let lastText = null
+        let targetElementFound = false
         while (true) {
             let atomicElement = AtomicElementTreeNode.parseFromElement(element)
-
+            if (element == targetElement) {
+                targetElementFound = true
+            }
             //if current atomic element has been defined in the past, we we will merge trees
             let parentElement = this.__atomicElements.find(ele => ele.sourceElement == element)
             if (parentElement) {
@@ -248,7 +253,10 @@ class AtomicElementTree {
                     lastAtomicElement.parentNode = parentElement
 
                 }
-
+                if (targetElementFound) {
+                    parentElement.isTarget = true
+                    targetElementFound = false
+                }
                 lastAtomicElement = null
                 lastText = null
                 this.__rootNode = parentElement
@@ -267,6 +275,12 @@ class AtomicElementTree {
                 //refresh last atomic element
                 lastAtomicElement = atomicElement
                 lastText = lastAtomicElement.text
+
+                //mark target element
+                if (targetElementFound) {
+                    atomicElement.isTarget = true
+                    targetElementFound = false
+                }
             }
 
 
@@ -283,14 +297,14 @@ class AtomicElementTree {
     }
     /**
      * Go all the way up to the top and find out e
+     * @param {HTMLElement} targetElement
      */
-    __buildTreeForAtomicElement() {
+    __buildTreeForAtomicElement(targetElement) {
         let allLeafElements = getAllLeafElements()
-        let parentNodeList = []
         for (let i = 0; i < allLeafElements.length; i++) {
             let currentElement = allLeafElements[i]
 
-            this.__buildPath(currentElement)
+            this.__buildPath(currentElement, targetElement)
         }
     }
 }
