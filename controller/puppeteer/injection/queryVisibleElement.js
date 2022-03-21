@@ -113,11 +113,16 @@ class AtomicElementTreeNode {
     }
 }
 class AtomicElementTree {
-    constructor() {
+    /**
+     * 
+     * @param {HTMLElement} targetElement 
+     */
+    constructor(targetElement) {
         /**@type {Array<AtomicElementTreeNode>} */
         this.__atomicElements = []
         this.__rootNode = new AtomicElementTreeNode(null, null, null, null, null, document)
         this.__parentList = [this.__rootNode]
+        this.__buildTreeForAtomicElement(targetElement)
     }
     buildTree() {
 
@@ -239,24 +244,16 @@ class AtomicElementTree {
         /**@type {AtomicElementTreeNode} */
         let lastAtomicElement = null
         let lastText = null
-        let targetElementFound = false
         while (true) {
             let atomicElement = AtomicElementTreeNode.parseFromElement(element)
-            if (element == targetElement) {
-                targetElementFound = true
-            }
             //if current atomic element has been defined in the past, we we will merge trees
             let parentElement = this.__atomicElements.find(ele => ele.sourceElement == element)
             if (parentElement) {
                 if (lastAtomicElement) {
                     parentElement.addChildren(lastAtomicElement)
                     lastAtomicElement.parentNode = parentElement
+                }
 
-                }
-                if (targetElementFound) {
-                    parentElement.isTarget = true
-                    targetElementFound = false
-                }
                 lastAtomicElement = null
                 lastText = null
                 this.__rootNode = parentElement
@@ -275,14 +272,11 @@ class AtomicElementTree {
                 //refresh last atomic element
                 lastAtomicElement = atomicElement
                 lastText = lastAtomicElement.text
-
-                //mark target element
-                if (targetElementFound) {
-                    atomicElement.isTarget = true
-                    targetElementFound = false
-                }
             }
 
+            if (element == targetElement && lastAtomicElement != null) {
+                lastAtomicElement.isTarget = true
+            }
 
 
             //if we are at the root level, we will just stop
@@ -425,5 +419,4 @@ function isHidden(el) {
 
 }
 
-let s1 = new AtomicElementTree()
-s1.buildTree()
+
