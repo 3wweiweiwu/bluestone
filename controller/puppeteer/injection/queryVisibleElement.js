@@ -4,11 +4,13 @@ class AtomicObjectCategory {
 }
 //build relationship in between atomic element
 class AtomicElementTreeNode {
-    constructor(tooltip, text, textSize, textWeight, placeHolder, sourceElement, category) {
+    constructor(tooltip, text, textSize, textWeight, placeHolder, sourceElement, category, isTarget = false) {
         this.__tooltip = tooltip
         this.__text = text
+        /**@type {Array<AtomicElementTreeNode>} */
         this.__children = []
         this.__source = sourceElement
+        /**@type {AtomicElementTreeNode} */
         this.__parentNode = null
         this.__placeHolder = placeHolder
         this.__textSize = textSize
@@ -18,6 +20,7 @@ class AtomicElementTreeNode {
         this.__textWeight = textWeight
         this.__id = this.uuidv4()
         this.__category = category
+        this.__isTarget = isTarget
     }
     /**
      * Create atomic element based on element information
@@ -53,6 +56,12 @@ class AtomicElementTreeNode {
         return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
             (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
         );
+    }
+    get isTarget() {
+        return this.__isTarget
+    }
+    set isTarget(result) {
+        this.__isTarget = result
     }
     get id() {
         return this.__id
@@ -234,24 +243,30 @@ class AtomicElementTree {
             //if current atomic element has been defined in the past, we we will merge trees
             let parentElement = this.__atomicElements.find(ele => ele.sourceElement == element)
             if (parentElement) {
-                atomicElement.children.forEach(item => parentElement.addChildren(item))
-                lastAtomicElement = parentElement
+                if (lastAtomicElement) {
+                    parentElement.addChildren(lastAtomicElement)
+                    lastAtomicElement.parentNode = parentElement
+
+                }
+
+                lastAtomicElement = null
+                lastText = null
+                this.__rootNode = parentElement
                 break
             }
 
-            //if current element is visible, atomic or belongs to list category, add element to atomic list
-            if (lastAtomicElement != null) {
-                lastText = lastAtomicElement.text
-            }
+
             if (isElementAtomic(element, lastText) && !isHidden(element)) {
                 //append qualified item to atomic list
                 this.__atomicElements.push(atomicElement)
                 //build up link between last atomic element and current element
                 if (lastAtomicElement != null) {
                     atomicElement.children.push(lastAtomicElement)
+                    lastAtomicElement.parentNode = atomicElement
                 }
                 //refresh last atomic element
                 lastAtomicElement = atomicElement
+                lastText = lastAtomicElement.text
             }
 
 
@@ -263,8 +278,7 @@ class AtomicElementTree {
 
             element = element.parentElement
         }
-        //set root element to be last atomic element for now
-        this.__rootNode = lastAtomicElement
+
 
     }
     /**
@@ -396,3 +410,6 @@ function isHidden(el) {
     if (sizeInvisible) return sizeInvisible
 
 }
+
+let s1 = new AtomicElementTree()
+s1.buildTree()
