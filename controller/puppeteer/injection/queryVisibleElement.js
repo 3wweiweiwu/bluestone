@@ -120,13 +120,35 @@ class AtomicElementTree {
     constructor(targetElement) {
         /**@type {Array<AtomicElementTreeNode>} */
         this.__atomicElements = []
-        this.__rootNode = new AtomicElementTreeNode(null, null, null, null, null, document)
-        this.__parentList = [this.__rootNode]
         this.__buildTreeForAtomicElement(targetElement)
+        this.__rootNode = this.__getRootNode(this.__atomicElements)
     }
-    buildTree() {
-
-        this.__buildTreeForAtomicElement()
+    /**
+     * Get target element
+     * @returns {AtomicElementTreeNode}
+     */
+    getTargetElement() {
+        return this.__atomicElements.filter(item => item.isTarget)
+    }
+    /**
+     * Based on current atomic elemnts, get root node. If atomic elements is empty, return null
+     * @param {Array<AtomicElementTreeNode>} atomicElements 
+     * @returns {AtomicElementTreeNode}
+     */
+    __getRootNode(atomicElements) {
+        let rootNode = null
+        if (this.__atomicElements.length > 0) {
+            let current = this.__atomicElements[0]
+            while (true) {
+                let parent = current.parentNode
+                if (parent == null) {
+                    rootNode = current
+                    break
+                }
+                current = parent
+            }
+        }
+        return rootNode
     }
     static parse(str) {
         let pathList = JSON.parse(str)
@@ -178,62 +200,8 @@ class AtomicElementTree {
         }
         return parentList
     }
-    //get common parent for list of atomic elements
-    getCommonParentForAtomicElement(atomicElementList) {
 
-        let currentUnion = this.__getParents(atomicElementList[0])
-        //convt current union from source to tree nodes
-        this.__parentList
 
-        for (let i = 1; i < atomicElementList.length; i++) {
-            let currentParentList = this.__getParents(atomicElementList[i])
-            currentUnion = currentUnion.filter(item => currentParentList.includes(item))
-        }
-        return currentUnion
-    }
-
-    //trim down single parent node to simplify the tree for the search and analysis
-    __trimDownSingleParentNodes() {
-        //get rid of single parent node who only have 1 child in order to make hierachy obvious
-
-        let trimmedNodeList = [] //save trimmed node in order to improve trim down performance
-        for (let i = 0; i < this.__atomicElements.length; i++) {
-            let atomicNode = this.__atomicElements[i]
-            let currentNode = atomicNode.parentNode
-            while (true) {
-                //if current node has been trimmed in the past, we will just stop the loop as we know the parent has been cleaned already
-                if (trimmedNodeList.includes(currentNode)) {
-                    break
-                }
-
-                //if current node only have 1 child, we will link the only child to its grandparents
-                //and remove current element from the node
-
-                if (currentNode.children.length == 1) {
-                    let singleChild = currentNode.children[0]
-                    let parentNode = currentNode.parentNode
-                    //build 2-way link
-                    parentNode.addChildren(singleChild)
-                    parentNode.removeChildren(currentNode)
-                    singleChild.parent = parentNode
-
-                    //get rid of current node from the list
-                    this.__parentList = this.__parentList.filter(item => item != currentNode)
-                }
-                //add current node to the trimmed list
-                trimmedNodeList.push(currentNode)
-                currentNode = currentNode.parentNode
-
-                //stop when we reach the root
-                if (currentNode == this.__rootNode)
-                    break
-                if (currentNode == null) {
-                    console.log()
-                }
-            }
-        }
-
-    }
     /**
      * Build path from starting element all the way to the top
      * @param {HTMLElement} element 
@@ -253,10 +221,8 @@ class AtomicElementTree {
                     parentElement.addChildren(lastAtomicElement)
                     lastAtomicElement.parentNode = parentElement
                 }
-
                 lastAtomicElement = null
                 lastText = null
-                this.__rootNode = parentElement
                 break
             }
 
