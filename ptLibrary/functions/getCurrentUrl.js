@@ -1,4 +1,3 @@
-const urljoin = require('url-join')
 /**
  * Based on process.env.BLUESTONE_URL, construct new url name based on current scope
  * @param {string} baseUrl 
@@ -9,7 +8,11 @@ module.exports = function (baseUrl) {
     if (process.env.BLUESTONE_URL != null) {
         let originalUrlComponent = new URL(url)
         let newUrlHost = new URL(process.env.BLUESTONE_URL)
-        url = urljoin(newUrlHost.origin, originalUrlComponent.pathname, originalUrlComponent.search)
+        originalUrlComponent.username = newUrlHost.username
+        originalUrlComponent.password = newUrlHost.password
+        originalUrlComponent.host = newUrlHost.host
+        originalUrlComponent.protocol = newUrlHost.protocol
+        url = originalUrlComponent.toString()
     }
     return url
 }
