@@ -42,7 +42,7 @@ class RecordingStep {
             this.timeStamp = recordingStep.timeStamp
         }
         this.scriptLineNumber = recordingStep.scriptLineNumber
-
+        this.healingTree = recordingStep.healingTree
     }
     /**
      * //based on the searalized json file, re-create object
@@ -96,5 +96,6 @@ class RecordingStep {
  * @property {number} timestamp
  * @property {number} currentSelectedIndex
  * @property {number} scriptLineNumber
+ * @property {string} healingTree
  */
 module.exports = RecordingStep

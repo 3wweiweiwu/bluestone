@@ -95,7 +95,8 @@ class WorkflowRecord {
                 __htmlCaptureInProcess: [],
                 potentialMatch: [],
                 framePotentialMatch: [],
-                recommendedLocator: []
+                recommendedLocator: [],
+                atomicTree: ''
             },
         }
         this.picCapture = new PicCapture()
