@@ -1,4 +1,5 @@
 const { Page, Frame, ElementHandle, Browser } = require('puppeteer-core')
+const HealingSnapshot = require('../class/HealingSnapshot')
 const ElementSelector = require('../class/ElementSelector')
 const VarSaver = require('../class/VarSaver')
 const findElement = require('./findElement')
@@ -63,10 +64,11 @@ exports.testTextEqual = async function (frame, elementSelector, desiredText) {
 *  @param {Frame} frame 
  * @param {ElementSelector} elementSelector element selector object
  * @param {number} timeout wait time in ms. If no element appear within this period, an error will be thrown
+ * @param {HealingSnapshot} healingSnapshot healing snapshot file
  * @returns {ElementHandle}
  */
-exports.waitElementExists = async function (frame, elementSelector, timeout) {
-    let element = await findElement(frame, elementSelector, timeout, { throwError: true })
+exports.waitElementExists = async function (frame, elementSelector, timeout, healingSnapshot) {
+    let element = await findElement(frame, elementSelector, timeout, { throwError: true }, healingSnapshot)
     return element
 
 }

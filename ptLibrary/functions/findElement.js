@@ -1,4 +1,5 @@
 const ElementSelector = require('../class/ElementSelector')
+const HealingSnapshot = require('../class/HealingSnapshot')
 const { captureSnapshot } = require('./snapshotCapture')
 const { Browser, Page, ElementHandle } = require('puppeteer-core')
 const assert = require('assert')
@@ -13,9 +14,10 @@ const VarSaver = require('../class/VarSaver')
  * @param {ElementSelector} elementSelector element selector object
  * @param {Options} option 
  * @param {number} timeout wait time in ms
+ * @param {HealingSnapshot} healingSnapshot locator snapshot for auto-healing. File under .\snapshot\
  * @returns {ElementHandle}
  */
-module.exports = async function (page, elementSelector, timeout, option = Options) {
+module.exports = async function (page, elementSelector, timeout, option = Options, healingSnapshot) {
     /**@type {Array<string>} */
     let locatorOptions = elementSelector.locator
     //find locator option within timeout

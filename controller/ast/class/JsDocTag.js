@@ -2,12 +2,13 @@
  * @typedef TypeInfo
  * @property {'string'|'number'|'Browser'|'Page'|'ElementHandle'} typeName
  * @property {string} description
+ * @property {string} value
  */
 
 class TagType {
     /**
      * Enter the type name
-     * @param {'Page'|'Browser'|'string'|'number'|'ElementSelector'|'Frame'|'VarSaver'} typeName 
+     * @param {'Page'|'Browser'|'string'|'number'|'ElementSelector'|'Frame'|'VarSaver'|'HealingSnapshot'} typeName 
      */
     constructor(typeName) {
         this.type = 'NameExpression'
