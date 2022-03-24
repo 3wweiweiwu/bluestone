@@ -915,6 +915,7 @@ function splitLocatorListAndFilteringByWeights(locatorList, userPriority, k_1, k
                 }
             }
         }
+	weights = 0
     }
 
     if(indexArr.length != 0){
