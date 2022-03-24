@@ -638,7 +638,7 @@ function findAllAttributesCombination(targetElement, elementList, userPriority){
 * this function is to sort the locator attributes
 * @parameter    locator_a
 * @paremeter   locator_b
-* @return   1 or -1 (number)
+* @return   0 or 1 or -1 (number)
 * 1. the priority may be changed, in here is levels > groups > uniqueAttributeNumber (nonUniqueAttributeNumber) > uniqueAttributePriority (nonUniqueAttributePriority)
 */
 
@@ -684,55 +684,6 @@ function sortLocator(locator_a, locator_b) {
         return locator_a.levels > locator_b.levels ? 1 : -1
     }
 }
-
-
-/**
-* This function continue filtering the locator list with user Priority
-* @paremeter   locatorList
-* @parameter   userPriority
-* @return   locatorList with further filtering result
-* 1.  put some lcoator of group 6 to the front of list, these locators attributes length is same to userPriority length and names are same
-*/
-function furtherFilteringLocatorListWithUserPriority(locatorList, userPriority){
-    let locator
-    let locatorTemp
-    let flag = 0
-    let index = 0
-    
-    for(let i = 0; i< locatorList.length; i++){
-        locator = locatorList[i]
-        
-        if("nonUniqueAttributeName" in locator && locator['group'] == 6 && locator['nonUniqueAttributeNumber'] == userPriority.length){
-            for(let j = 0; j < locator["nonUniqueAttributeName"].length; j++){
-                for(let k = 0; k < locator["nonUniqueAttributeName"][j].length; k++){
-                    if(userPriority.indexOf(locator["nonUniqueAttributeName"][j][k]) != -1){
-                        continue
-                    }else{
-                        flag = 1
-                        break
-                    }
-                }
-
-                if(flag == 1){
-                    break
-                }else{
-                    continue
-                }
-            }
-
-            if(flag == 0){
-                locatorTemp = locatorList.splice(i,1)
-                locatorList.splice(index,0,locatorTemp[0])
-                index = index + 1
-            }else{
-                flag = 0
-            }
-        }
-    }
-
-    return locatorList
-}
-
 
 /**
 * this function is to give a priority of the locator list
@@ -827,6 +778,162 @@ function createLocatorListWithPriority(targetElement, locatorList, userPriority)
 }
 
 
+/**
+* This function continue filtering the locator list with user Priority
+* @paremeter   locatorList
+* @parameter   userPriority
+* @return   locatorList with further filtering result
+* 1.  put some lcoator of group 6 to the front of list, these locators attributes length is same to userPriority length and names are same
+*/
+function furtherFilteringLocatorListWithUserPriority(locatorList, userPriority){
+    let locator
+    let locatorTemp
+    let flag = 0
+    let index = 0
+	let weights = 0
+	
+	for(let i = 0; i< locatorList.length; i++){
+        locator = locatorList[i]
+        
+        if("nonUniqueAttributeName" in locator && locator['group'] == 6 && locator['nonUniqueAttributeNumber'] <= userPriority.length){
+            for(let j = 0; j < locator["nonUniqueAttributeName"].length; j++){
+                for(let k = 0; k < locator["nonUniqueAttributeName"][j].length; k++){
+                    if(userPriority.indexOf(locator["nonUniqueAttributeName"][j][k]) != -1){
+                        continue
+                    }else{
+                        flag = 1
+                        break
+                    }
+                }
+
+                if(flag == 1){
+                    break
+                }else{
+                    continue
+                }
+            }
+
+            if(flag == 0){
+                locatorTemp = locatorList.splice(i,1)
+                locatorList.splice(index,0,locatorTemp[0])
+                index = index + 1
+            }else{
+                flag = 0
+            }
+        }
+    }
+
+    return locatorList
+}
+
+
+/**
+* this function is to sort the locator by weights attribute value
+* @parameter    locator_a
+* @paremeter   locator_b
+* @return   0 or 1 or -1 (number)
+*/
+
+function sortLocatorByWeights(locator_a, locator_b) {
+    if(locator_a.weights == locator_b.weights){
+        return 0
+    } else {
+        return locator_a.weights > locator_b.weights ? 1 : -1
+    }
+}
+
+
+/**
+* this function is to split the locator list, filtering the new list by weights attribute values and merge the list together
+* @parameter    locatorList   original locator list
+* @paremeter   userPriority   user priority array
+* @parameter   k_1 and k_2   the coefficients to calculate the final weights value
+* @return   newLocatorList
+*/
+
+function splitLocatorListAndFilteringByWeights(locatorList, userPriority, k_1, k_2){
+    let count = 0
+    let result = null
+    let indexArr = []
+    let weights = 0
+    let locator
+    let flag = 0
+    let newLocatorList = []
+
+    for(let i = 0; i<locatorList.length; i++){
+        locator = locatorList[i]
+        if("nonUniqueAttributeName" in locator){
+            if(locator['group'] == 6){
+                for(let j = 0; j < locator["nonUniqueAttributeName"].length; j++){
+                    for(let k = 0; k < locator["nonUniqueAttributeName"][j].length; k++){
+                        if(userPriority.indexOf(locator["nonUniqueAttributeName"][j][k]) != -1){
+                            weights = weights + userPriority.indexOf(locator["nonUniqueAttributeName"][j][k])
+                            continue
+                        }else{
+                            flag = 1
+                            break
+                        }
+                    }
+    
+                    if(flag == 1){
+                        break
+                    }else{
+                        continue
+                    }
+                }
+
+                if(flag == 0){
+                    locator["weights"] = weights * k_1 + locator["levels"] * k_2
+                    indexArr.push(i)
+                }else{
+                    flag = 0
+                }
+            }else{
+                for(let j = 0; j < locator["nonUniqueAttributeName"].length; j++){
+                    if(userPriority.indexOf(locator["nonUniqueAttributeName"][j]) != -1){
+                        weights = weights + userPriority.indexOf(locator["nonUniqueAttributeName"][j])
+                        continue
+                    }else{
+                        flag = 1
+                        break
+                    }
+                }
+
+                if(flag == 0){
+                    locator["weights"] = weights * k_1 + locator["levels"] * k_2
+                    indexArr.push(i)
+                }else{
+                    flag = 0
+                }
+            }
+        }else{
+            if(locator['group'] == 1){
+                if(userPriority.indexOf(locator["uniqueAttributeName"]) != -1){
+                    weights = weights + userPriority.indexOf(locator["uniqueAttributeName"])
+                    locator["weights"] = weights * k_1 + locator["levels"] * k_2
+                    indexArr.push(i)
+                }
+            }
+        }
+    }
+
+    if(indexArr.length != 0){
+        for(let i = indexArr.length - 1; i >= 0; i--){
+            locator = locatorList.splice(indexArr[i],1)
+            newLocatorList.unshift(locator[0])
+        }
+    }
+
+    //do the sorting by weights.
+    newLocatorList.sort(sortLocatorByWeights)
+
+    //concat two array together
+    newLocatorList = newLocatorList.concat(locatorList)
+    
+    return newLocatorList
+
+}
+
 /****************************************************This function is used to validate the locator xpath***********************************************/
 /**
 * this function is to validate the xpath of each locator, if nothing wrong, it will return 0
@@ -897,7 +1004,7 @@ function findAttributesInElement(element, userPriority){
         return attributesInElement
     }else{
         for(let i = 0; i<userPriority.length; i++){
-            if(userPriority[i] == "tagContent"){
+			if(userPriority[i] == "tagContent"){
                 attributesInElement.push("tagContent")
             }else{
                 if(element.hasAttribute(userPriority[i])){
@@ -933,7 +1040,7 @@ function formXpathForAttributesCombinations(element, attributesCombinations){
 
     for(let i = 0; i < attributesCombinations.length; i++){
         for(let j = 0; j < attributesCombinations[i].length; j++){
-            if(attributesCombinations[i][j] == "tagContent"){
+			if(attributesCombinations[i][j] == "tagContent"){
                 if(tagContent.length == 0){
                     if(j == 0){
                         xpath = `.=''`
@@ -1011,8 +1118,8 @@ function attributesCombinationForMultipleElements(element, userPriority){
                 attributesCombinationsXpathFinal = formXpathForAttributesCombinations(element, attributesCombinations)
             }else{
                 attributesCombinationsXpathTemp = formXpathForAttributesCombinations(element, attributesCombinations)
-                for(let i = 0; i<attributesCombinationsXpathTemp.attributesCombinationsXpath.length; i++){
-                    attributesCombinationsXpathFinal.attributesCombinationsXpath.push(attributesCombinationsXpathTemp.attributesCombinationsXpath[i])
+                for(let j = 0; j<attributesCombinationsXpathTemp.attributesCombinationsXpath.length; j++){
+                    attributesCombinationsXpathFinal.attributesCombinationsXpath.push(attributesCombinationsXpathTemp.attributesCombinationsXpath[j])
                 }
             }
         }
@@ -1047,8 +1154,9 @@ function createFinalXpathListForTargetSelector(element, userPriority){
     }else{
         let targetElementXpathInfo = elementsCombinationsXpathList.slice(0, 1)
         let remainElementsXpathInfo = elementsCombinationsXpathList.slice(1, elementsCombinationsXpathList.length)
- 
-        for(let i = 1; i <= remainElementsXpathInfo.length; i++){
+
+		//limit the permutation number to 3 elements for one time at most
+		for(let i = 1; i <= 2; i++){
             elementsCombinations = attributeCombination(remainElementsXpathInfo, i)
             for(let j = 0; j < elementsCombinations.length; j++){
                 elementsCombinationsFinal.push(elementsCombinations[j])
@@ -1338,6 +1446,8 @@ function findRobustLocatorForSelector(elementSelected, userPriority){
     let commonParentElement
     let element
     let issueCount
+    let k_1 = 1
+    let k_2 = 1
 
     let count = 0
 
@@ -1374,147 +1484,148 @@ function findRobustLocatorForSelector(elementSelected, userPriority){
                 levels = 0
             }
         } 
-    }else{
-    	//then collect all other locator from other element with unique attribute to locatorSummary
-		let elementListWithUniqueAttribute = findElementListWithUniqueAttribute(elementList, userPriority)
+    }
+	
+	//then collect all other locator from other element with unique attribute to locatorSummary
+	let elementListWithUniqueAttribute = findElementListWithUniqueAttribute(elementList, userPriority)
 
-		//if not, then if the element list with unique attribute is empty, which means all nodes in DOM tree are not unique, this is very rare, then xpath with index
-		if(elementListWithUniqueAttribute.length == 0){
-			//console.log("There is no element in DOM tree has unique attribute!")
-			let locatorInfo = {"element":null, "uniqueAttributeName":null, "uniqueAttributePriority":null, "uniqueAttributeNumber":null, "levels": null, "locator":null, "group": null}
+	//if not, then if the element list with unique attribute is empty, which means all nodes in DOM tree are not unique, this is very rare, then xpath with index
+	if(elementListWithUniqueAttribute.length == 0){
+		//console.log("There is no element in DOM tree has unique attribute!")
+		let locatorInfo = {"element":null, "uniqueAttributeName":null, "uniqueAttributePriority":null, "uniqueAttributeNumber":null, "levels": null, "locator":null, "group": null}
 
-			results = xpathFormationUsingIndex(document.getElementsByTagName('html')[0], targetElement)
-			path = results.locator
-			levels = results.levels
+		results = xpathFormationUsingIndex(document.getElementsByTagName('html')[0], targetElement)
+		path = results.locator
+		levels = results.levels
 
-			locator = "/" + path
-			locatorInfo.element = document.getElementsByTagName('html')[0]
-			locatorInfo.uniqueAttributeName = null
-			locatorInfo.uniqueAttributeNumber = 1
-			locatorInfo.levels = levels
-			locatorInfo.locator = locator
-			locatorInfo.group = 7
+		locator = "/" + path
+		locatorInfo.element = document.getElementsByTagName('html')[0]
+		locatorInfo.uniqueAttributeName = null
+		locatorInfo.uniqueAttributeNumber = 1
+		locatorInfo.levels = levels
+		locatorInfo.locator = locator
+		locatorInfo.group = 7
 
-			locatorSummary.push(locatorInfo)
-		}else{
-			//collect all non unique attributes combination which can uniquely identify the target element that form the locator and store it to locatorSummary
-            results = findAllAttributesCombination(targetElement, elementList, userPriority)
-            for(let i = 0; i<results.length; i++){
-            	locatorSummary.push(results[i])
-            }
-
-			//if not, and there are nodes with unique attribute, so found the common parent node for each element with unique attribute and target selector
-			for(let i = 0; i<elementListWithUniqueAttribute.length; i++){
-				//skip the case if target element compares to itself (elementListWithUniqueAttribute[i].element)
-				if(elementListWithUniqueAttribute[i].element.isEqualNode(targetElement)){
-					continue
-				}
-
-				let locatorInfo = {"element":null, "uniqueAttributeName":null, "uniqueAttributePriority":null, "uniqueAttributeNumber":null, "levels": null, "locator":null, "group": null}
-
-				commonParentElement = commonParentNode(targetElement, elementListWithUniqueAttribute[i].element)
-
-				//in here, we divide the cases into three situation:
-				//1. element with unique attribute is the parent of target element, the common parent node is first one
-				//2. target element is the parent of the element with unique attribuet, the common parent node is second one
-				//3. target element and element with unique attribute are not in one path, common parent node is some other node.
-				if(commonParentElement.isEqualNode(targetElement)){
-					element = elementListWithUniqueAttribute[i].element
-					count = findLevelsBetweenTwoNodes(element, targetElement)
-
-					elementName = elementListWithUniqueAttribute[i].element.tagName
-					uniqueAttributeName = elementListWithUniqueAttribute[i].uniqueAttributeName
-					uniqueAttributeValue = elementListWithUniqueAttribute[i].uniqueAttributeValue
-
-					//locating the element with unique attribute and find how many parents level to the target element (common parent node)
-					locator = `//${elementName}[@${uniqueAttributeName}='${uniqueAttributeValue}']`
-					levels = 1
-
-					for(let i = 0; i<count; i++){
-						locator = locator + "/.."
-						levels = levels + 1
-					}
-
-					locatorInfo.element = elementListWithUniqueAttribute[i].element
-					locatorInfo.uniqueAttributeName = uniqueAttributeName
-					locatorInfo.uniqueAttributeNumber = 1
-					locatorInfo.levels = levels
-					locatorInfo.locator = locator
-					locatorInfo.group = 3
-
-					locatorSummary.push(locatorInfo)
-
-				}else if(commonParentElement.isEqualNode(elementListWithUniqueAttribute[i].element)){
-					elementName = elementListWithUniqueAttribute[i].element.tagName
-					uniqueAttributeName = elementListWithUniqueAttribute[i].uniqueAttributeName
-					uniqueAttributeValue = elementListWithUniqueAttribute[i].uniqueAttributeValue
-					locator = `//${elementName}[@${uniqueAttributeName}='${uniqueAttributeValue}']`
-
-					results = pathBetweenTwoNodes(targetElement, elementListWithUniqueAttribute[i].element, userPriority)
-					path = results.locator
-					levels = results.levels
-
-					//locating the element with unique attribute (common parent node) and xpath to the targete element
-					locator = locator + path
-					locatorInfo.element = elementListWithUniqueAttribute[i].element
-					locatorInfo.uniqueAttributeName = uniqueAttributeName
-					locatorInfo.uniqueAttributeNumber = 1
-					locatorInfo.levels = levels + 1
-					locatorInfo.locator = locator
-					locatorInfo.group = 4
-
-					locatorSummary.push(locatorInfo)
-
-				}else{
-					elementName =  elementListWithUniqueAttribute[i].element.tagName
-					uniqueAttributeName = elementListWithUniqueAttribute[i].uniqueAttributeName
-					uniqueAttributeValue =  elementListWithUniqueAttribute[i].uniqueAttributeValue
-					locator = `//${elementName}[@${uniqueAttributeName}='${uniqueAttributeValue}']`
-					tempLevels = tempLevels + 1
-
-					element = elementListWithUniqueAttribute[i].element
-					count = findLevelsBetweenTwoNodes(element, commonParentElement)
-
-					for(let i = 0; i<count; i++){
-						locator = locator + "/.."
-						tempLevels = tempLevels + 1
-					}
-
-					results = pathBetweenTwoNodes(targetElement, commonParentElement, userPriority)
-					path = results.locator
-					levels = results.levels
-
-					//locating the element with unique attribute, and then find the common parent node, then the xpath from common parent node to the targete element
-					locator = locator + path
-					levels = levels + tempLevels
-					locatorInfo.element = elementListWithUniqueAttribute[i].element
-					locatorInfo.uniqueAttributeName = uniqueAttributeName
-					locatorInfo.uniqueAttributeNumber = 1
-					locatorInfo.levels = levels
-					locatorInfo.locator = locator
-					locatorInfo.group = 5
-
-					locatorSummary.push(locatorInfo)
-
-					tempLevels = 0
-				}
-
-				levels = 0
-			}
+		locatorSummary.push(locatorInfo)
+	}else{
+		//collect all non unique attributes combination which can uniquely identify the target element that form the locator and store it to locatorSummary
+		results = findAllAttributesCombination(targetElement, elementList, userPriority)
+		for(let i = 0; i<results.length; i++){
+			locatorSummary.push(results[i])
 		}
 
-        //here are the xpaths by multi elements with multi attributes of group 6:
-        let locatorSummaryAfterFiltering = locatorSummaryByMultiElemsMultiAttrs(targetElement, userPriority)
-        if(locatorSummaryAfterFiltering.length != 0){
-            for(let i=0; i<locatorSummaryAfterFiltering.length; i++){
-                locatorSummary.push(locatorSummaryAfterFiltering[i])
-            }
-        }
-        
-    }
+		//if not, and there are nodes with unique attribute, so found the common parent node for each element with unique attribute and target selector
+		for(let i = 0; i<elementListWithUniqueAttribute.length; i++){
+			//skip the case if target element compares to itself (elementListWithUniqueAttribute[i].element)
+			if(elementListWithUniqueAttribute[i].element.isEqualNode(targetElement)){
+				continue
+			}
+
+			let locatorInfo = {"element":null, "uniqueAttributeName":null, "uniqueAttributePriority":null, "uniqueAttributeNumber":null, "levels": null, "locator":null, "group": null}
+
+			commonParentElement = commonParentNode(targetElement, elementListWithUniqueAttribute[i].element)
+
+			//in here, we divide the cases into three situation:
+			//1. element with unique attribute is the parent of target element, the common parent node is first one
+			//2. target element is the parent of the element with unique attribuet, the common parent node is second one
+			//3. target element and element with unique attribute are not in one path, common parent node is some other node.
+			if(commonParentElement.isEqualNode(targetElement)){
+				element = elementListWithUniqueAttribute[i].element
+				count = findLevelsBetweenTwoNodes(element, targetElement)
+
+				elementName = elementListWithUniqueAttribute[i].element.tagName
+				uniqueAttributeName = elementListWithUniqueAttribute[i].uniqueAttributeName
+				uniqueAttributeValue = elementListWithUniqueAttribute[i].uniqueAttributeValue
+
+				//locating the element with unique attribute and find how many parents level to the target element (common parent node)
+				locator = `//${elementName}[@${uniqueAttributeName}='${uniqueAttributeValue}']`
+				levels = 1
+
+				for(let i = 0; i<count; i++){
+					locator = locator + "/.."
+					levels = levels + 1
+				}
+
+				locatorInfo.element = elementListWithUniqueAttribute[i].element
+				locatorInfo.uniqueAttributeName = uniqueAttributeName
+				locatorInfo.uniqueAttributeNumber = 1
+				locatorInfo.levels = levels
+				locatorInfo.locator = locator
+				locatorInfo.group = 3
+
+				locatorSummary.push(locatorInfo)
+
+			}else if(commonParentElement.isEqualNode(elementListWithUniqueAttribute[i].element)){
+				elementName = elementListWithUniqueAttribute[i].element.tagName
+				uniqueAttributeName = elementListWithUniqueAttribute[i].uniqueAttributeName
+				uniqueAttributeValue = elementListWithUniqueAttribute[i].uniqueAttributeValue
+				locator = `//${elementName}[@${uniqueAttributeName}='${uniqueAttributeValue}']`
+
+				results = pathBetweenTwoNodes(targetElement, elementListWithUniqueAttribute[i].element, userPriority)
+				path = results.locator
+				levels = results.levels
+
+				//locating the element with unique attribute (common parent node) and xpath to the targete element
+				locator = locator + path
+				locatorInfo.element = elementListWithUniqueAttribute[i].element
+				locatorInfo.uniqueAttributeName = uniqueAttributeName
+				locatorInfo.uniqueAttributeNumber = 1
+				locatorInfo.levels = levels + 1
+				locatorInfo.locator = locator
+				locatorInfo.group = 4
+
+				locatorSummary.push(locatorInfo)
+
+			}else{
+				elementName =  elementListWithUniqueAttribute[i].element.tagName
+				uniqueAttributeName = elementListWithUniqueAttribute[i].uniqueAttributeName
+				uniqueAttributeValue =  elementListWithUniqueAttribute[i].uniqueAttributeValue
+				locator = `//${elementName}[@${uniqueAttributeName}='${uniqueAttributeValue}']`
+				tempLevels = tempLevels + 1
+
+				element = elementListWithUniqueAttribute[i].element
+				count = findLevelsBetweenTwoNodes(element, commonParentElement)
+
+				for(let i = 0; i<count; i++){
+					locator = locator + "/.."
+					tempLevels = tempLevels + 1
+				}
+
+				results = pathBetweenTwoNodes(targetElement, commonParentElement, userPriority)
+				path = results.locator
+				levels = results.levels
+
+				//locating the element with unique attribute, and then find the common parent node, then the xpath from common parent node to the targete element
+				locator = locator + path
+				levels = levels + tempLevels
+				locatorInfo.element = elementListWithUniqueAttribute[i].element
+				locatorInfo.uniqueAttributeName = uniqueAttributeName
+				locatorInfo.uniqueAttributeNumber = 1
+				locatorInfo.levels = levels
+				locatorInfo.locator = locator
+				locatorInfo.group = 5
+
+				locatorSummary.push(locatorInfo)
+
+				tempLevels = 0
+			}
+
+			levels = 0
+		}
+	}
+
+	
+	//here are the xpaths by multi elements with multi attributes of group 6:
+	let locatorSummaryAfterFiltering = locatorSummaryByMultiElemsMultiAttrs(targetElement, userPriority)
+	if(locatorSummaryAfterFiltering.length != 0){
+		for(let i=0; i<locatorSummaryAfterFiltering.length; i++){
+			locatorSummary.push(locatorSummaryAfterFiltering[i])
+		}
+	}
 
     locatorSummary = createLocatorListWithPriority(targetElement, locatorSummary, userPriority)
     locatorSummary = furtherFilteringLocatorListWithUserPriority(locatorSummary, userPriority)
+    locatorSummary = splitLocatorListAndFilteringByWeights(locatorSummary, userPriority, k_1, k_2)
 
     return locatorSummary
 
