@@ -167,29 +167,44 @@ class AtomicElementTree {
         return atomicElementTree
 
     }
+    /**
+     * Output page model into json format
+     * @returns 
+     */
     stringify() {
         let resultArray = []
+        let backup = []
         //convert linked list into multiple arrays
         for (let i = 0; i < this.__atomicElements.length; i++) {
             let node = this.__atomicElements[i]
-            let nodeList = this.__getParents(node.sourceElement)
-            resultArray.push(nodeList)
-        }
-        //clean up children and parent to avoid circular references
-        resultArray.forEach(line => {
-            line.forEach(node => {
-                node.children = node.children.map((item, index) => {
-                    if (item.id)
-                        return item.id
-                    else
-                        return item
-                })
-                if (node.parentNode != null)
-                    node.parentNode = node.parentNode.id
-                node.sourceElement = null
+            backup.push({
+                sourceElement: node.sourceElement,
+                parentNode: node.parentNode,
+                children: node.children
             })
-        })
-        return JSON.stringify(resultArray)
+            node.sourceElement = null
+            node.parentNode = (node.parentNode == null) ? null : node.parentNode.__id
+            let newChildren = node.children.map(item => item.__id)
+            node.children = newChildren
+            resultArray.push(node)
+        }
+        let result = JSON.stringify(resultArray)
+
+        //restore attributes
+        for (let i = 0; i < this.__atomicElements.length; i++) {
+            let node = this.__atomicElements[i]
+            backup.push({
+                sourceElement: node.sourceElement,
+                parentNode: node.parentNode,
+                children: node.children
+            })
+            node.sourceElement = backup[i].sourceElement
+            node.parentNode = backup[i].parentNode
+
+            node.children = backup[i].children
+            resultArray.push(node)
+        }
+        return result
     }
     __getParents(atomicTreeNode) {
         let currentTreeNode = this.__atomicElements.find(item => item.sourceElement == atomicTreeNode)
