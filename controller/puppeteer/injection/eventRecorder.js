@@ -210,7 +210,7 @@ document.addEventListener('mouseover', async event => {
     try {
         customLocator = getLocator(event.target, selector)
     } catch (error) {
-
+        console.log(error)
     }
     //if there is selector from locator function, we will prioritize that one
     //if there is no selector from locator function yet the target has been changed, 
