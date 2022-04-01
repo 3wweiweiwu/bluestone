@@ -230,8 +230,7 @@ document.addEventListener('mouseover', async event => {
         console.log(error)
     }
 
-    let atomicTree = new AtomicElementTree(target)
-    let atomicTreeStr = atomicTree.stringify()
+
     //style change will only be applied to source element
     const previousStyle = event.target.style.backgroundColor
     event.target.setAttribute(BLUESTONE.previousbackground, previousStyle)
@@ -247,7 +246,7 @@ document.addEventListener('mouseover', async event => {
     let currentSelectedIndex = target.getAttribute(BLUESTONE.bluestoneSelectedLocatorIndex)
     if (currentSelectedIndex) {
         event.target.style.backgroundColor = locatorFound
-        window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, currentSelectedIndex, atomicTreeStr)
+        window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, currentSelectedIndex)
         // setStateToAllEvents(false, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
         // console.log('current selected index found')
         return
@@ -257,7 +256,7 @@ document.addEventListener('mouseover', async event => {
     //no match mark as no locator found
     if (potentialMatch == '[]') {
         event.target.style.backgroundColor = noLocatorFound
-        window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, null, atomicTreeStr)
+        window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, null)
         // setStateToAllEvents(true, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
         // console.log('no potential match index')
         return
@@ -269,7 +268,7 @@ document.addEventListener('mouseover', async event => {
     if (potentialMatchArray.length == 1) {
         //exact one match, we are good
         event.target.style.backgroundColor = locatorFound
-        window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, 0, atomicTreeStr)
+        window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, 0)
         // setStateToAllEvents(false, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
         // console.log('only 1 potential match index')
         return
@@ -278,7 +277,7 @@ document.addEventListener('mouseover', async event => {
     //if toehrwise, 
     // console.log('more than 1 potential matches')
     event.target.style.backgroundColor = noLocatorFound
-    window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, null, atomicTreeStr)
+    window.logCurrentElement(selector, innerText, position.x, position.y, position.height, position.width, iFrame, potentialMatch, framePotentialMatch, null)
     // setStateToAllEvents(true, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus)
 
 
