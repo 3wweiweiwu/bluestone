@@ -54,6 +54,10 @@ exports.testTextEqual = async function (frame, elementSelector, desiredText) {
      */
     let element = await findElement(frame, elementSelector, 2000)
     let currentText = await element.evaluate(el => el.value || el.textContent)
+    //removing escape characters in the event a higher level locator has to be used
+    currentText = currentText.trim()
+    //removing escape characters from desiredtext in the even the removed whitespace from currenttext was supposed to be there
+    desiredText = desiredText.trim() 
     //ensure text equal what we want
     assert.strictEqual(currentText, desiredText, `Current value for ${elementSelector.displayName} is ${currentText}. It's different from baseline ${desiredText}`)
     return `Current value "${currentText}"" match baseline`
