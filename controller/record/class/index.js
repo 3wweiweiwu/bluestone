@@ -156,12 +156,36 @@ class WorkflowRecord {
         return this.operation.browserSelection.currentOpeartion
     }
     /**
+     * Generate auto-healing information and update function parameter to include healing info
+     */
+    async __updateHealingInfo() {
+        for (let i = 0; i < this.steps.length; i++) {
+            let step = this.steps[i]
+            let snapshotPath = this.getSnapshotPath(`Bluestone-Snapshot-${i}`)
+
+            //find out auto-healing param
+            let param = step.functionAst.params.find(item => {
+                return item.type.name == 'HealingSnapshot'
+            })
+            if (param != null) {
+                param.value = snapshotPath
+                await fs.writeFile(snapshotPath, step.healingTree)
+
+            }
+        }
+
+
+
+
+    }
+    /**
      * Write Testcase code into script output folder and update bluestone-locator.js 
      * @param {string} testSuite 
      * @param {string} testCase 
      * @returns {string} output path
      */
     async writeCodeToDisk(testSuite, testCase) {
+        await this.__updateHealingInfo()
         //write code to disk
         let functionAstList = this.getAllFunctionAst()
         let coder = new Testcase(functionAstList, config.code.locatorPath, config.code.funcPath, config.code.configPath, config.code.scriptFolder, config.code.inbuiltFuncPath)
@@ -372,10 +396,6 @@ class WorkflowRecord {
             let newWaitTime = step.timeoutMs
             if (newWaitTime < 3000) newWaitTime = 3000
             waitStep.functionAst.params[2].value = newWaitTime
-            let snapshot = this.getSnapshotPath()
-            waitStep.functionAst.params[3].value = snapshot
-            fs.writeFile(snapshot, step.healingTree)
-
             this.steps.push(waitStep)
         }
 
@@ -770,6 +790,8 @@ class WorkflowRecord {
         if (snapshotName == null) {
             snapshotName = Date.now().toString() + ".snapshot.json"
         }
+        else
+            snapshotName = snapshotName + ".snapshot.json"
         let filePath = path.join(__dirname, '../../../public/temp/componentPic', snapshotName)
         return filePath
 
