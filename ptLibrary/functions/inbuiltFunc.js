@@ -57,7 +57,7 @@ exports.testTextEqual = async function (frame, elementSelector, desiredText) {
     //removing escape characters in the event a higher level locator has to be used
     currentText = currentText.trim()
     //removing escape characters from desiredtext in the even the removed whitespace from currenttext was supposed to be there
-    desiredText = desiredText.trim() 
+    desiredText = desiredText.trim()
     //ensure text equal what we want
     assert.strictEqual(currentText, desiredText, `Current value for ${elementSelector.displayName} is ${currentText}. It's different from baseline ${desiredText}`)
     return `Current value "${currentText}"" match baseline`
@@ -141,7 +141,13 @@ exports.waitTillElementVisible = async function (frame, elementSelector, timeout
 exports.click = async function (frame, elementSelector) {
     let element = await findElement(frame, elementSelector, 2000)
     try {
-        await element.click()
+        try {
+            await element.click()
+        } catch (error) {
+            await element.evaluate(node => {
+                node.dispatchEvent(new Event('click'))
+            })
+        }
     } catch (error) {
         assert.fail(`Unable to click "${elementSelector.displayName}"`)
     }
