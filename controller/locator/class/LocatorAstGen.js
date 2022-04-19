@@ -43,11 +43,12 @@ class LocatorAstGen {
         },
      * @param {string} locatorPath Todo_Page/TODO_Text_Input
      * @param {string} locatorValue /html/body/ng-view/section/header/form/input
-     * @param {string} picPath ./componentPic/1632928449951.pn
+     * @param {string} picPath ./componentPic/1632928449951.png
+     * @param {string} snapshot [...]
      * @returns 
      */
-    static getLocatorStructure(locatorPath, locatorValue, picPath) {
-        return {
+    static getLocatorStructure(locatorPath, locatorValue, picPath, snapshot) {
+        let locator = {
             "type": "Property",
             "method": false,
             "shorthand": false,
@@ -113,6 +114,35 @@ class LocatorAstGen {
             },
             "kind": "init"
         }
+        let snapshotInfo = {
+            "type": "Property",
+            "method": false,
+            "shorthand": false,
+            "computed": false,
+            "key": {
+                "type": "Identifier",
+                "name": "snapshot"
+            },
+            "value": {
+                "type": "CallExpression",
+                "callee": {
+                    "type": "Identifier",
+                    "name": "require"
+                },
+                "arguments": [
+                    {
+                        "type": "Literal",
+                        "value": `./locator/${locatorPath}.json`,
+                    }
+                ],
+                "optional": false
+            },
+            "kind": "init"
+        }
+        if (snapshot != null) {
+            locator.value.properties.push(snapshotInfo)
+        }
+        return locator
     }
 }
 

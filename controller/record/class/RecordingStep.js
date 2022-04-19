@@ -2,6 +2,8 @@ const { Locator } = require('../../locator/index')
 const StepResult = require('../../mocha/class/StepResult')
 const FunctionAST = require('../../ast/class/Function')
 const HtmlCaptureStatus = require('./HtmlCaptureStatus')
+const fs = require('fs').promises
+const path = require('path')
 class RecordingStep {
     /** 
      * @param {step} recordingStep 
@@ -34,6 +36,14 @@ class RecordingStep {
         }
         this.functionAst = recordingStep.functionAst
         if (this.functionAst) {
+            //update step-specific healing snapshot inforamtion
+            let healingSnapshotParam = this.functionAst.params.find(item => item.type.name == 'HealingSnapshot')
+            if (healingSnapshotParam) {
+                let snapshotPath = this.__getSnapshotPath()
+                healingSnapshotParam.value = snapshotPath
+                fs.writeFile(snapshotPath, recordingStep.healingTree)
+            }
+
             this.parameter = JSON.parse(JSON.stringify(recordingStep.functionAst.params))
         }
         this.result = new StepResult()
@@ -45,6 +55,17 @@ class RecordingStep {
         this.healingTree = recordingStep.healingTree
     }
     /**
+     * returns the snapshot path for current step
+     */
+    __getSnapshotPath(snapshotName = null) {
+        if (snapshotName == null) {
+            snapshotName = Date.now().toString() + ".snapshot.json"
+        }
+        let filePath = path.join(__dirname, '../../../public/temp/componentPic', snapshotName)
+        return filePath
+
+    }
+    /**
      * //based on the searalized json file, re-create object
      * @param {object} json 
      * @param {FunctionAST} functionAst 
@@ -52,12 +73,12 @@ class RecordingStep {
      * @returns {RecordingStep}
      */
     static restore(json, functionAst, command) {
+        json.functionAst = functionAst
         let result = new RecordingStep(json)
         let keys = Object.keys(json)
         keys.forEach(key => {
             result[key] = json[key]
         })
-        result.functionAst = functionAst
         result.command = command
         return result
     }

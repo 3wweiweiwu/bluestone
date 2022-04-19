@@ -372,10 +372,6 @@ class WorkflowRecord {
             let newWaitTime = step.timeoutMs
             if (newWaitTime < 3000) newWaitTime = 3000
             waitStep.functionAst.params[2].value = newWaitTime
-            let snapshot = this.getSnapshotPath()
-            waitStep.functionAst.params[3].value = snapshot
-            fs.writeFile(snapshot, step.healingTree)
-
             this.steps.push(waitStep)
         }
 
@@ -763,17 +759,7 @@ class WorkflowRecord {
         arr.splice(toIndex, 0, element);
         this.steps = arr
     }
-    /**
-     * returns the snapshot path for current step
-     */
-    getSnapshotPath(snapshotName = null) {
-        if (snapshotName == null) {
-            snapshotName = Date.now().toString() + ".snapshot.json"
-        }
-        let filePath = path.join(__dirname, '../../../public/temp/componentPic', snapshotName)
-        return filePath
 
-    }
     /**
      * returns the picture path for current step
      */
