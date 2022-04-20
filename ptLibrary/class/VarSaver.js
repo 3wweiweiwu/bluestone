@@ -10,8 +10,10 @@ class VarSaver {
     constructor(currentFilePath, currentRetryCount) {
         this.currentFilePath = currentFilePath
         this.retryCount = currentRetryCount
+        this.testcase = (path.basename(currentFilePath).toLowerCase().split('.js'))[0]
+        this.projectRootPath = currentFilePath.split('script')[0]
         this.dataOutDir = this.initializeDataOutDir(this.currentFilePath)
-        this.dataSnapshotdir = 
+        this.dataSnapshotdir = path.join(this.projectRootPath, '/data/', this.testcase, '/snapshot/')
         this.downloadManager = new DownloadManager()
         this.alertManager = new AlertManager()
         this.isHealing = false
@@ -25,7 +27,7 @@ class VarSaver {
      * @returns {string}
      */
     getSnapshot(snapshotName) {
-        path.join(this.currentFilePath,'../')
+        return path.join(this.dataSnapshotdir, snapshotName + ".json")
     }
     exportVarContextToEnv() {
         let jsonStr = JSON.stringify(this)

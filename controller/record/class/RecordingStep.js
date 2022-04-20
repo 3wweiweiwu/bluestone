@@ -36,14 +36,6 @@ class RecordingStep {
         }
         this.functionAst = recordingStep.functionAst
         if (this.functionAst) {
-            //update step-specific healing snapshot inforamtion
-            let healingSnapshotParam = this.functionAst.params.find(item => item.type.name == 'HealingSnapshot')
-            if (healingSnapshotParam) {
-                let snapshotPath = this.__getSnapshotPath()
-                healingSnapshotParam.value = snapshotPath
-                fs.writeFile(snapshotPath, recordingStep.healingTree)
-            }
-
             this.parameter = JSON.parse(JSON.stringify(recordingStep.functionAst.params))
         }
         this.result = new StepResult()
@@ -53,18 +45,6 @@ class RecordingStep {
         }
         this.scriptLineNumber = recordingStep.scriptLineNumber
         this.healingTree = recordingStep.healingTree
-    }
-    /**
-     * returns the snapshot path for current step
-     */
-    __getSnapshotPath(snapshotName = null) {
-        if (snapshotName == null) {
-            snapshotName = Date.now().toString()
-        }
-        snapshotName = snapshotName + ".snapshot.json"
-        let filePath = path.join(__dirname, '../../../public/temp/componentPic', snapshotName)
-        return filePath
-
     }
     /**
      * //based on the searalized json file, re-create object

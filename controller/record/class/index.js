@@ -157,12 +157,22 @@ class WorkflowRecord {
     }
     /**
      * Generate auto-healing information and update function parameter to include healing info
+     * @param {string} testCase test case name
      */
-    async __updateHealingInfo() {
+    async __updateHealingInfo(testCase) {
+        let snapshotFolder = path.join(config.code.dataPath, testCase, '/snapshot/')
+        try {
+            await fs.access(snapshotFolder)
+        } catch (error) {
+            await fs.mkdir(snapshotFolder, { recursive: true })
+        }
+
         for (let i = 0; i < this.steps.length; i++) {
             let step = this.steps[i]
             let snapshotName = `Bluestone-Snapshot-${i}`
-            let snapshotPath = step.__getSnapshotPath(snapshotName)
+
+
+            let snapshotPath = path.join(snapshotFolder, snapshotName + ".json")
             //find out auto-healing param
             let param = step.functionAst.params.find(item => {
                 return item.type.name == 'HealingSnapshot'
@@ -185,7 +195,7 @@ class WorkflowRecord {
      * @returns {string} output path
      */
     async writeCodeToDisk(testSuite, testCase) {
-        await this.__updateHealingInfo()
+        await this.__updateHealingInfo(testCase)
         //write code to disk
         let functionAstList = this.getAllFunctionAst()
         let coder = new Testcase(functionAstList, config.code.locatorPath, config.code.funcPath, config.code.configPath, config.code.scriptFolder, config.code.inbuiltFuncPath)

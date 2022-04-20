@@ -5,7 +5,6 @@ let config = require('../../../config')
 
 const rules = {
     upload: upload,
-    waitElementExists: waitElementExists
 }
 /**
  * Use Rule to process ast before output
@@ -24,38 +23,6 @@ async function astPreprosessing(funcAstList, testSuite, testCase) {
     return funcAstList
 }
 
-/**
- * Create Snapshot file under test data folder
- * @param {FunctionAst} func 
- * @param {string} testSuite 
- * @param {string} testCase 
- */
-async function waitElementExists(func, testSuite, testCase) {
-    //get input param
-    let paramIndex = 3
-    let filePath = func.params[paramIndex].value
-    //if we cannot find the file, just skip this step
-    try {
-        await fs.access(filePath)
-    } catch (error) {
-        console.log(error)
-        return
-    }
-    //copy file over to target folder
-    let immediateDirName = 'snapshot'
-    let fileName = path.basename(filePath)
-    let destinationFolder = path.join(config.code.dataPath, testCase, immediateDirName)
-    let destinationFilePath = path.join(config.code.dataPath, testCase, immediateDirName, fileName)
-    await fs.mkdir(destinationFolder, { recursive: true })
-    await fs.copyFile(filePath, destinationFilePath)
-    let relativeFilepath = path.relative(config.code.scriptFolder, destinationFilePath)
-
-    //update param in the file folder
-    func.params[paramIndex].value = relativeFilepath
-
-
-
-}
 
 /**
  * Create test file under test data folder
