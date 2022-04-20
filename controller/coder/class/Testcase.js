@@ -235,7 +235,7 @@ class Coder {
                     astJson.expression.argument.arguments.push(numberVarAst)
                     break
                 case "HealingSnapshot":
-                    let healingSnapshotVarAst = AstGenerator.getSimpleValue(param.value)
+                    let healingSnapshotVarAst = AstGenerator.getSnapshotPathAst(param.value)
                     astJson.expression.argument.arguments.push(healingSnapshotVarAst)
                     break;
                 default:

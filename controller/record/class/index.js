@@ -157,18 +157,28 @@ class WorkflowRecord {
     }
     /**
      * Generate auto-healing information and update function parameter to include healing info
+     * @param {string} testCase test case name
      */
-    async __updateHealingInfo() {
+    async __updateHealingInfo(testCase) {
+        let snapshotFolder = path.join(config.code.dataPath, testCase, '/snapshot/')
+        try {
+            await fs.access(snapshotFolder)
+        } catch (error) {
+            await fs.mkdir(snapshotFolder, { recursive: true })
+        }
+
         for (let i = 0; i < this.steps.length; i++) {
             let step = this.steps[i]
-            let snapshotPath = this.getSnapshotPath(`Bluestone-Snapshot-${i}`)
+            let snapshotName = `Bluestone-Snapshot-${i}`
 
+
+            let snapshotPath = path.join(snapshotFolder, snapshotName + ".json")
             //find out auto-healing param
             let param = step.functionAst.params.find(item => {
                 return item.type.name == 'HealingSnapshot'
             })
             if (param != null) {
-                param.value = snapshotPath
+                param.value = snapshotName
                 await fs.writeFile(snapshotPath, step.healingTree)
 
             }
@@ -185,7 +195,7 @@ class WorkflowRecord {
      * @returns {string} output path
      */
     async writeCodeToDisk(testSuite, testCase) {
-        await this.__updateHealingInfo()
+        await this.__updateHealingInfo(testCase)
         //write code to disk
         let functionAstList = this.getAllFunctionAst()
         let coder = new Testcase(functionAstList, config.code.locatorPath, config.code.funcPath, config.code.configPath, config.code.scriptFolder, config.code.inbuiltFuncPath)
@@ -783,19 +793,7 @@ class WorkflowRecord {
         arr.splice(toIndex, 0, element);
         this.steps = arr
     }
-    /**
-     * returns the snapshot path for current step
-     */
-    getSnapshotPath(snapshotName = null) {
-        if (snapshotName == null) {
-            snapshotName = Date.now().toString() + ".snapshot.json"
-        }
-        else
-            snapshotName = snapshotName + ".snapshot.json"
-        let filePath = path.join(__dirname, '../../../public/temp/componentPic', snapshotName)
-        return filePath
 
-    }
     /**
      * returns the picture path for current step
      */

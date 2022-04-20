@@ -10,7 +10,10 @@ class VarSaver {
     constructor(currentFilePath, currentRetryCount) {
         this.currentFilePath = currentFilePath
         this.retryCount = currentRetryCount
+        this.testcase = (path.basename(currentFilePath).toLowerCase().split('.js'))[0]
+        this.projectRootPath = currentFilePath.split('script')[0]
         this.dataOutDir = this.initializeDataOutDir(this.currentFilePath)
+        this.dataSnapshotdir = path.join(this.projectRootPath, '/data/', this.testcase, '/snapshot/')
         this.downloadManager = new DownloadManager()
         this.alertManager = new AlertManager()
         this.isHealing = false
@@ -18,7 +21,14 @@ class VarSaver {
         this.exportVarContextToEnv()
 
     }
-
+    /**
+     * Get snapshot information
+     * @param {string} snapshotName the name of the snapshot
+     * @returns {string}
+     */
+    getSnapshot(snapshotName) {
+        return path.join(this.dataSnapshotdir, snapshotName + ".json")
+    }
     exportVarContextToEnv() {
         let jsonStr = JSON.stringify(this)
         process.env.BLUESTONE_VAR_SAVER = jsonStr

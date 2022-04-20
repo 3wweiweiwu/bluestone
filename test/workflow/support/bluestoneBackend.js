@@ -52,7 +52,11 @@ class TestSite {
                     return item.name != 'timeout'
                 })
             }
-
+            if (currentData[i].parameter) {
+                currentData[i].parameter = currentData[i].parameter.filter(item => {
+                    return item.name != 'timeout' && item.name != 'healingSnapshot'
+                })
+            }
             Object.assign(currentData[i].functionAst, {
                 path: ''
             })

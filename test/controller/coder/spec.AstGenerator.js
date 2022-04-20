@@ -2,6 +2,12 @@ const AstGenerator = require('../../../controller/coder/class/AstGenerator')
 const escodegen = require('escodegen')
 const assert = require('assert')
 describe('AST Generator Class', () => {
+    it('should generate argument to get snapshot path', async () => {
+        let ast = AstGenerator.getSnapshotPathAst('Bluestone-Snapshot-1')
+        let jsCode = escodegen.generate(ast)
+        assert.equal(jsCode, "vars.getSnapshot('Bluestone-Snapshot-1')")
+        console.log()
+    })
     it('should generate simple varable declaration ast', async () => {
         let ast = AstGenerator.getSimpleVariableAst('var1')
         let jsCode = escodegen.generate(ast)
