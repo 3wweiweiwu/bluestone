@@ -36,6 +36,10 @@ module.exports = function (recordRepo, browser, page, io) {
         } catch (error) {
 
         }
+        if (eventDetail.healingTree) {
+            recordRepo.operation.browserSelection.atomicTree = eventDetail.healingTree
+
+        }
         //handle frame potential match
         let framePotentialMatch = []
         try {
