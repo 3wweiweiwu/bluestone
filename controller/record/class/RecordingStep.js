@@ -59,8 +59,9 @@ class RecordingStep {
      */
     __getSnapshotPath(snapshotName = null) {
         if (snapshotName == null) {
-            snapshotName = Date.now().toString() + ".snapshot.json"
+            snapshotName = Date.now().toString()
         }
+        snapshotName = snapshotName + ".snapshot.json"
         let filePath = path.join(__dirname, '../../../public/temp/componentPic', snapshotName)
         return filePath
 

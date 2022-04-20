@@ -161,14 +161,14 @@ class WorkflowRecord {
     async __updateHealingInfo() {
         for (let i = 0; i < this.steps.length; i++) {
             let step = this.steps[i]
-            let snapshotPath = this.getSnapshotPath(`Bluestone-Snapshot-${i}`)
-
+            let snapshotName = `Bluestone-Snapshot-${i}`
+            let snapshotPath = step.__getSnapshotPath(snapshotName)
             //find out auto-healing param
             let param = step.functionAst.params.find(item => {
                 return item.type.name == 'HealingSnapshot'
             })
             if (param != null) {
-                param.value = snapshotPath
+                param.value = snapshotName
                 await fs.writeFile(snapshotPath, step.healingTree)
 
             }
