@@ -3,11 +3,19 @@ const HealingSnapshot = require('../class/HealingSnapshot')
 const { captureSnapshot } = require('./snapshotCapture')
 const { Browser, Page, ElementHandle } = require('puppeteer-core')
 const assert = require('assert')
-const Options = {
-    /** @type {boolean} if no element is found, should we throw error?*/
-    throwError: false,
+class Options {
+    constructor() {
+        /** @type {boolean} if no element is found, should we throw error?*/
+        this.throwError = false
+        this.takeSnapshot = true
+        this.isHealingByLocatorBackup = true
+    }
+
+
 }
 const VarSaver = require('../class/VarSaver')
+
+module.exports = waitForElement
 /**
  * Find a element within timeout period. If no element is found, a error will be thrown
 *  @param {Page} page 
@@ -17,7 +25,7 @@ const VarSaver = require('../class/VarSaver')
  * @param {HealingSnapshot} healingSnapshot locator snapshot for auto-healing. File under .\snapshot\
  * @returns {ElementHandle}
  */
-module.exports = async function (page, elementSelector, timeout, option = Options, healingSnapshot) {
+async function waitForElement(page, elementSelector, timeout, option = new Options(), healingSnapshot) {
     /**@type {Array<string>} */
     let locatorOptions = elementSelector.locator
     //find locator option within timeout
@@ -34,16 +42,8 @@ module.exports = async function (page, elementSelector, timeout, option = Option
         try {
             for (let i = 0; i < locatorOptions.length; i++) {
                 let locator = locatorOptions[i]
+                element = await getElementByLocator(page, locator)
 
-                if (locator.startsWith('/') || locator.startsWith('(')) {
-                    //xpath
-                    let elementResult = await page.$x(locator)
-                    if (elementResult.length > 0) element = elementResult[0]
-                }
-                else {
-                    //selector
-                    element = await page.$(locator)
-                }
                 if (element != null) {
                     break
                 }
@@ -63,9 +63,14 @@ module.exports = async function (page, elementSelector, timeout, option = Option
         }
     } while (timeSpan < timeout);
 
-    try {
-        await captureSnapshot(page)
-    } catch (error) {
+    if (option.takeSnapshot) {
+        try {
+            await captureSnapshot(page)
+        } catch (error) {
+        }
+    }
+    if (option.isHealingByLocatorBackup) {
+        element = await getElementBasedOnLocatorBackup(page, elementSelector, 0.8)
     }
 
     if (element == null) {
@@ -181,4 +186,80 @@ async function isElementBlocked(element) {
         return isSourceCoveredByAnyElement(element) != null
     }, element)
     return result
-}                                                                       
+}
+/**
+ * Based on locator, return element handle
+ * @param {Page} page
+ * @param {string} locator 
+ * @returns {ElementHandle}
+ */
+async function getElementByLocator(page, locator) {
+    let element = null
+    if (locator.startsWith('/') || locator.startsWith('(')) {
+        //xpath
+        let elementResult = await page.$x(locator)
+        if (elementResult.length > 0) element = elementResult[0]
+    }
+    else {
+        //selector
+        element = await page.$(locator)
+    }
+    return element
+}
+/**
+ * Use backup locator to find out element whose similarity score is highest
+*  @param {Page} page 
+ * @param {ElementSelector} elementSelector element selector object
+ * @param {number} similarityBenchmark
+ * @returns {ElementHandle}
+ */
+async function getElementBasedOnLocatorBackup(page, elementSelector, similarityBenchmark) {
+    class ElementInfo {
+        constructor(element) {
+            this.element = element
+            this.count = 0
+        }
+        addCount() {
+            this.count += 1
+        }
+    }
+    let elementDict = []
+    let sum = 0
+    let bestId = null
+    //get existing elements
+    for (const locator of elementSelector.snapshot) {
+        let elementSelector = new ElementSelector([locator])
+        let element = await waitForElement(page, elementSelector, 1, { takeSnapshot: false, throwError: false, isHealingByLocatorBackup: false })
+        if (element != null) {
+            let id = await element.boundingBox()
+            id = JSON.stringify(id)
+            sum += 1
+            if (elementDict[id] == null) {
+                elementDict[id] = new ElementInfo(element)
+            }
+
+            elementDict[id].addCount()
+
+
+
+            //get best element
+            if (bestId == null) {
+                bestId = id
+            }
+            else {
+                if (elementDict[bestId] < elementDict[id]) {
+                    bestId = id
+                }
+            }
+        }
+
+    }
+    //get score for possible locator
+    let bestElement = null
+    let currentSimilarity = elementDict[bestId].count / sum
+    if (currentSimilarity > similarityBenchmark) {
+        bestElement = elementDict[bestId].element
+    }
+
+    return bestElement
+}
