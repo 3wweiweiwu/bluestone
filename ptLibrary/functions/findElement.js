@@ -87,6 +87,7 @@ async function waitForElement(page, elementSelector, timeout, option = new Optio
 
     if (element == null) {
         let info = `Unable to find UI element: "${elementSelector.displayName}" in ${timeout}ms`
+        await varSav.healingInfo.addWorkingLocatorRecord(elementSelector.displayName, false)
         if (option.throwError) {
             assert.fail(info)
         }
@@ -241,7 +242,7 @@ async function getElementBasedOnLocatorBackup(page, elementSelector, similarityB
     let sum = 0
     /**@type {string} */
     let bestId = null
-    let bestElement = null
+    let bestElement = new ElementInfo(null, '')
     if (elementSelector.snapshot == null) {
         return bestElement
     }

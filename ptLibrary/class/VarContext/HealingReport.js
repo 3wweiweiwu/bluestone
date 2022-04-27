@@ -155,10 +155,11 @@ class HealingInfo {
     /**
      * Current locator is found, record that for future decision-making on locator replacement
      * @param {string} locatorName 
+     * @param {Boolean} isLocatorFound
      */
-    async addWorkingLocatorRecord(locatorName) {
+    async addWorkingLocatorRecord(locatorName, isLocatorFound = false) {
         if (this.runId == null || this.runId == '') return
-        this.locatorReport.addRecord(locatorName, false)
+        this.locatorReport.addRecord(locatorName, isLocatorFound)
         this.export(this.runId, this.prescriptionPath)
     }
 
