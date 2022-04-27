@@ -1,5 +1,6 @@
 const DownloadManager = require('./VarContext/DownloadManager')
 const AlertManager = require('./VarContext/AlertManager')
+const HealingInfo = require('./VarContext/HealingReport')
 const path = require('path')
 const { Page } = require('puppeteer')
 class VarSaver {
@@ -16,7 +17,7 @@ class VarSaver {
         this.dataSnapshotdir = path.join(this.projectRootPath, '/data/', this.testcase, '/snapshot/')
         this.downloadManager = new DownloadManager()
         this.alertManager = new AlertManager()
-        this.isHealing = false
+        this.healingInfo = new HealingInfo(process.env.RUN_ID, this.projectRootPath, this.testcase)
         this.tcStepInfo = null
         this.exportVarContextToEnv()
 
@@ -43,9 +44,14 @@ class VarSaver {
             return new VarSaver('', 0)
         }
 
-        return JSON.parse(process.env.BLUESTONE_VAR_SAVER)
+        /**@type {VarSaver} */
+        let varSav = JSON.parse(process.env.BLUESTONE_VAR_SAVER)
+        varSav.healingInfo = new HealingInfo(process.env.RUN_ID, varSav.projectRootPath, varSav.testcase)
+        return varSav
     }
+    initializeAutoHealingDir(rootFolder, executionId, HealingReportPath) {
 
+    }
     initializeDataOutDir(filePath) {
         let fileName = path.basename(filePath).toLowerCase().replace('.js', '')
         let rootDir = filePath.split('\\script\\')[0]

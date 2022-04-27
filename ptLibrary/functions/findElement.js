@@ -32,6 +32,7 @@ async function waitForElement(page, elementSelector, timeout, option = new Optio
     let startTime = Date.now()
     /**@type {ElementHandle} */
     let element = null
+    let elementInfo = null
     let timeSpan = 0
     let varSav = VarSaver.parseFromEnvVar()
     //extends the timeout by 1.5x if we are in the retry mode
@@ -69,8 +70,19 @@ async function waitForElement(page, elementSelector, timeout, option = new Optio
         } catch (error) {
         }
     }
-    if (option.isHealingByLocatorBackup) {
-        element = await getElementBasedOnLocatorBackup(page, elementSelector, 0.8)
+    //locator found correctly, log coverage info
+    if (element != null) {
+        await varSav.healingInfo.createPerscription(elementSelector.displayName, elementSelector.locator, elementSelector.locator, null, varSav.currentFilePath, varSav.tcStepInfo, true)
+    }
+
+    //conduct locator-based auto-healing
+    if (option.isHealingByLocatorBackup && element == null) {
+        elementInfo = await getElementBasedOnLocatorBackup(page, elementSelector, 0.8)
+        element = elementInfo.element
+        if (element != null) {
+            let pageData = await highlightProposedElement(page, element)
+            await varSav.healingInfo.createPerscription(elementSelector.displayName, elementSelector.locator, elementInfo.locator, pageData, varSav.currentFilePath, varSav.tcStepInfo, false)
+        }
     }
 
     if (element == null) {
@@ -86,6 +98,16 @@ async function waitForElement(page, elementSelector, timeout, option = new Optio
 
     return element
 
+}
+class ElementInfo {
+    constructor(element, locator) {
+        this.element = element
+        this.locator = locator
+        this.count = 0
+    }
+    addCount() {
+        this.count += 1
+    }
 }
 /**
  * Check if element is covered by anything
@@ -211,31 +233,28 @@ async function getElementByLocator(page, locator) {
 *  @param {Page} page 
  * @param {ElementSelector} elementSelector element selector object
  * @param {number} similarityBenchmark
- * @returns {ElementHandle}
+ * @returns {ElementInfo}
  */
 async function getElementBasedOnLocatorBackup(page, elementSelector, similarityBenchmark) {
-    class ElementInfo {
-        constructor(element) {
-            this.element = element
-            this.count = 0
-        }
-        addCount() {
-            this.count += 1
-        }
-    }
-    let elementDict = []
+    /**@type {Object.<string,ElementInfo>} */
+    let elementDict = {}
     let sum = 0
+    /**@type {string} */
     let bestId = null
+    let bestElement = null
+    if (elementSelector.snapshot == null) {
+        return bestElement
+    }
     //get existing elements
     for (const locator of elementSelector.snapshot) {
-        let elementSelector = new ElementSelector([locator])
-        let element = await waitForElement(page, elementSelector, 1, { takeSnapshot: false, throwError: false, isHealingByLocatorBackup: false })
+        let newElementSelector = new ElementSelector([locator], null, `Locator-based Auto-healing - ${elementSelector.displayName} - ${locator}`)
+        let element = await waitForElement(page, newElementSelector, 1, { takeSnapshot: false, throwError: false, isHealingByLocatorBackup: false })
         if (element != null) {
             let id = await element.boundingBox()
             id = JSON.stringify(id)
             sum += 1
             if (elementDict[id] == null) {
-                elementDict[id] = new ElementInfo(element)
+                elementDict[id] = new ElementInfo(element, locator)
             }
 
             elementDict[id].addCount()
@@ -255,11 +274,27 @@ async function getElementBasedOnLocatorBackup(page, elementSelector, similarityB
 
     }
     //get score for possible locator
-    let bestElement = null
     let currentSimilarity = elementDict[bestId].count / sum
     if (currentSimilarity > similarityBenchmark) {
-        bestElement = elementDict[bestId].element
+        bestElement = elementDict[bestId]
     }
 
     return bestElement
+}
+/**
+ * 
+ * @param {Page} page 
+ * @param {ElementHandle} element 
+ */
+async function highlightProposedElement(page, element, outputPath) {
+    let borderStyle = await element.evaluate(node => {
+        //record previous border info
+        let borderStyle = node.style.border
+        //draw rectangle
+        node.style.border = "thick solid #0000FF"
+        return borderStyle
+    })
+    let pageData = await page.screenshot({ type: 'png' })
+    return pageData
+
 }

@@ -28,7 +28,7 @@ async function initializePageCapture(page) {
 /**
  * capture html and save result in the designated step folder
  * @param {Page} page 
- * @returns {string}
+ * @returns {string} //file path
  */
 async function captureSnapshot(page) {
     //get env variable
@@ -59,7 +59,7 @@ async function captureSnapshot(page) {
         let filePath = path.join(varSav.dataOutDir, fileName)
         await fs.writeFile(filePath, pageData)
 
-        return pageData
+        return filePath
     } catch (error) {
         console.log('Unable to capture current HTML snapshot. Error:' + error.toString())
     }
