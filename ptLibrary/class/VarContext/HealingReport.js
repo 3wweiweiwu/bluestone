@@ -40,9 +40,10 @@ class PrescriptionReport {
         if (this.info[testcaseName] == null) {
             this.info[testcaseName] = []
         }
-        let duplicateItem = this.info[testcaseName].find(item => item.locatorName == locatorName && item.failureStepIndex)
+        let duplicateItem = this.info[testcaseName].find(item => item.locatorName == locatorName && item.failureStepIndex == failureStepIndex)
 
         if (isOriginalLocatorWork == true && duplicateItem != null) {
+            //if current element is found by its orginal locator, we will remove previous locators
             this.info[testcaseName] = this.info[testcaseName].filter(item => item != duplicateItem)
         }
         else if (duplicateItem == null && isOriginalLocatorWork == false) {
