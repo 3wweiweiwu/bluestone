@@ -70,8 +70,8 @@ async function waitForElement(page, elementSelector, timeout, option = new Optio
         } catch (error) {
         }
     }
-    //locator found correctly, log coverage info
-    if (element != null) {
+    //locator found correctly and it is not part of healing trial, log coverage info
+    if (element != null && option.isHealingByLocatorBackup) {
         await varSav.healingInfo.createPerscription(elementSelector.displayName, elementSelector.locator, elementSelector.locator, null, varSav.currentFilePath, varSav.tcStepInfo, true)
     }
 

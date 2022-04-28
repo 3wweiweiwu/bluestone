@@ -90,7 +90,7 @@ class HealingInfo {
         this.prescriptionReport = new PrescriptionReport()
         this.locatorReport = new LocatorReport()
         this.runId = runId
-        this.perscriptionFolder = path.join(projectRootPath, 'result', 'prescription', runId, '/')
+        this.perscriptionFolder = path.join(projectRootPath, 'result', runId, '/')
         this.prescriptionPath = path.join(this.perscriptionFolder, 'report.json')
         this.picPath = path.join(this.perscriptionFolder, `${testcaseName}-${Date.now().toString()}.png`)
         this.testcasName = testcaseName
@@ -111,18 +111,52 @@ class HealingInfo {
         } catch (error) {
             this.export(runId, perscriptionPath)
         }
-
-        let content = (fs.readFileSync(perscriptionPath)).toString()
         /**@type {HealingInfo} */
-        let obj = JSON.parse(content)
+        let obj = null
+        let varSavContent = process.env.BLUESTONE_VAR_SAVER
+
+        /**@type {import('../VarSaver')} */
+        let varSav = null
+        try {
+            varSav = JSON.parse(varSavContent)
+        } catch (error) {
+
+        }
+
+
+        if (varSav == null || Object.keys(varSav.healingInfo.locatorReport.usage).length == 0) {
+            let content = (fs.readFileSync(perscriptionPath)).toString()
+            obj = JSON.parse(content)
+        }
+        else {
+            obj = varSav.healingInfo
+        }
+
+
+
+        //if locator report is empty, we will try to retrieve inforamtion from disk
+
+
+
         this.prescriptionReport.restore(obj.prescriptionReport)
         this.locatorReport.restore(obj.locatorReport)
-        console.log()
+
     }
     export(runId, perscriptionPath) {
         if (runId == null || runId == '') return
         let log = JSON.stringify(this)
         fs.writeFileSync(perscriptionPath, log)
+
+
+        try {
+            /**@type {import('../VarSaver')} */
+            let varSav = JSON.parse(process.env.BLUESTONE_VAR_SAVER)
+            varSav.healingInfo = this
+            process.env.BLUESTONE_VAR_SAVER = JSON.stringify(varSav)
+        } catch (error) {
+
+        }
+
 
     }
     /**
