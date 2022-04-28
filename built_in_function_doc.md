@@ -1,0 +1,103 @@
+# Bluestone 
+## Built in functions
+
+- testTextEqual
+    - arguments: frame, elementSelector, desiredText
+        - Frame is the frame in which the element being tested can be found
+        - elementSelector is the selector that can be used to find the element 
+        - desiredText is the text we are testing for
+    - Checks to see if the text in the element found via elementSelector is equal to the text in desiredText, ignoring leading spaces in both desiredtext and currenttext
+- Hover
+    - Arguments: frame, elementSelector	
+        - Frame is the frame in which the element in question can be found
+        - elementSelector is the selector that can be used to find the element 
+    - simulates the mouse hovering over the element in question
+- waitElementVisible
+    - arguments: frame, elementSelector, timeout
+        - Frame is the frame in which the element in question can be found
+        - elementSelector is the selector that can be used to find the element 
+        - timeout is the time it will wait before asserting false
+    - will wait for the element to become visible before continuing. If the element does not become visible before timeout, then it asserts false
+- waitElementExists
+    - arguments: frame, elementSelector, timeout, healingSnapshot
+        - Frame is the frame in which the element in question can be found
+        - elementSelector is the selector that can be used to find the element 
+        - timeout is the time it will wait before asserting false
+        - healingSnapshot is not used
+    - will wait for the element to exist before returning the element. If the element does not exist before timeout, then it asserts false
+- change
+    - arguments: frame, elementSelector, text
+        - Frame is the frame in which the element in question can be found
+        - elementSelector is the selector that can be used to find the element 
+        - text is the value you wish to set the element’s text to
+    - if the element’s value can be set via typing, it simulates typing in order to set the element’s value to text. If it can not be set typing, it just sets the value directly
+- click
+    - arguments: frame, elementSelector
+        - Frame is the frame in which the element in question can be found
+        - elementSelector is the selector that can be used to find the element 
+    - Attempts to click on the selected element. Will assert failure in the event of a error.
+- Goto
+    - Arguments: page, url
+        - Page is the page element being used by the main script
+        - url is the url  you wish to go to
+    - Goes to the url specified in the arguments. Otherwise it asserts failure.
+- Keydown
+    - Arguments: frame, key
+        - Frame is the frame element the script is currently operating in
+        - Key is the key to be held down
+    - Will simulate holding down either the enter, tab, or escape keys.
+- gotoFrame
+    - arguments: page, frame, elementSelector, timeout
+        - page is the page element being used by the main script
+        - frame is the frame element the script is currently operating in
+        - elementSelector is the selector for the element whose frame you want to go to
+        - timeout is the time for it to timeout, in milliseconds
+    - Sets frame to be the frame that the element found via elementSelector is in
+- closeBrowser
+    - arguments: browser
+        - browser is the browser being controlled by the script
+    - This function closes the browser. If not used at the end of a script, the browser will remain open.
+- upload
+    - arguments: frame, vars, elementSelector, uploadPathes
+        - frame is the frame in which the element indicated in elementSelector can be found
+        - vars contains various system variables, including the current filepath
+        - elementSelector is the selector for the element that will be used to upload the files
+        - uploadPathes is the paths for the elements to be uploaded, separated by commas
+            - “path1,path2,etc”
+    - Uploads the files indicated in uploadPathes using the element indicated in elementSelector
+- waitForTimeout
+    - arguments: page, number
+        - page is the page element currently being used by the main script
+        - number is the number of milliseconds to wait
+    - this function waits for a number of milliseconds specified in the arguments
+- basicAuthenticate
+    - arguments: page, username, password
+        - page is the page element currently being used by the main script
+        - username is the username used to login
+        - password is the password used to login
+    - sends the username and password specified by the arguments in the http header
+- dragstart
+    - arguments: frame, selector
+        - frame is the frame element the script is currently operating in
+        - selector is the selector for the element to be sent a dragstart event
+    - dispatches a dragstart event to the element in question
+- drop
+    - arguments: frame, selector
+        - frame is the frame element the script is currently operating in
+        - selector is the selector for the element to be sent a drop event
+    - dispatches a drop event to the element in question
+- initialize
+    - arguments: vars, page
+        - vars is the set of variables used by the main script
+        - page is the page element being currently used by the main script
+    - initializes the script in order to properly control the browser beign created
+- waitForDownloadComplete
+    - arguments: vars, timeout
+        - vars is the set of variables used by the main script
+        - timeout is the time, in milliseconds, to wait for the download to complete
+    - waits for a download specified in vars to complete, for a time up to that specified in the timeout argument
+- waitAndHandleAlert
+    - arguments: vars, timeout
+        - vars is the set of variables used by the main script
+        - timeout is the time, in milliseconds, to wait for the alert to be completed
+    - waits for an alert specified in vars.alertManager to be completed, and then returns true
