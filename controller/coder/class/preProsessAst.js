@@ -4,7 +4,7 @@ let fs = require('fs').promises
 let config = require('../../../config')
 
 const rules = {
-    upload: upload
+    upload: upload,
 }
 /**
  * Use Rule to process ast before output
@@ -22,6 +22,7 @@ async function astPreprosessing(funcAstList, testSuite, testCase) {
 
     return funcAstList
 }
+
 
 /**
  * Create test file under test data folder

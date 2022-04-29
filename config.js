@@ -21,6 +21,7 @@ let config = {
         configPath: path.join(__dirname, './test/sample-project/config.js'),
         inbuiltFuncPath: path.join(__dirname, './ptLibrary/bluestone-func.js'),
         pictureFolder: path.join(__dirname, './test/sample-project/componentPic'),
+        locatorSnapshotFolder: path.join(__dirname, './test/sample-project/componentPic'),
         urlBlackList: [],
         customLocatorEnginePath: path.join(__dirname, './public/javascript/customLocator.js'),
         dataPath: path.join(__dirname, './test/sample-project/data'),
@@ -79,7 +80,7 @@ function configFunc() {
     config.code.pictureFolder = path.join(projectFolder, projectObj.pic)
     config.code.urlBlackList = projectObj.urlBlackList
     config.code.locatorAttributePreference = projectObj.locatorAttributePreference || []
-
+    config.code.locatorSnapshotFolder = path.join(projectFolder, 'locator')
     //load puppeteer config6
 
     if (projectObj.config) {

@@ -64,8 +64,8 @@ async function startRecording(record, io, url = null) {
     await page.evaluateOnNewDocument(injectedScript)
 
     //inject getEventListener
-    const eventListener = await fs.readFile(path.join(__dirname, '../../public/javascript/getEventListner.js'))
-    await page.evaluateOnNewDocument(eventListener)
+    // const eventListener = await fs.readFile(path.join(__dirname, '../../public/javascript/getEventListner.js'))
+    // await page.evaluateOnNewDocument(eventListener)
 
     await page.exposeFunction('logEvent', logEvent(record, browser, page, io))
     await page.exposeFunction('isRecording', isRecording(record))

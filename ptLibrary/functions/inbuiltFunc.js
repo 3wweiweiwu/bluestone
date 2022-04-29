@@ -1,4 +1,5 @@
 const { Page, Frame, ElementHandle, Browser } = require('puppeteer-core')
+const HealingSnapshot = require('../class/HealingSnapshot')
 const ElementSelector = require('../class/ElementSelector')
 const VarSaver = require('../class/VarSaver')
 const findElement = require('./findElement')
@@ -10,6 +11,7 @@ const assert = require('assert')
 const path = require('path')
 const BluestoneFunc = require('../class/BluestoneFunc')
 const TestcaseLoader = require('../../controller/ast/TestCaseLoader')
+const getCurrentUrl = require('./getCurrentUrl')
 const ConstantVar = {
     parentIFrameLocator: 'TOP IFRAME'
 }
@@ -51,7 +53,11 @@ exports.testTextEqual = async function (frame, elementSelector, desiredText) {
      * Use javascript to get text content
      */
     let element = await findElement(frame, elementSelector, 2000)
-    let currentText = await element.evaluate(el => el.textContent)
+    let currentText = await element.evaluate(el => el.value || el.textContent)
+    //removing escape characters in the event a higher level locator has to be used
+    currentText = currentText.trim()
+    //removing escape characters from desiredtext in the even the removed whitespace from currenttext was supposed to be there
+    desiredText = desiredText.trim()
     //ensure text equal what we want
     assert.strictEqual(currentText, desiredText, `Current value for ${elementSelector.displayName} is ${currentText}. It's different from baseline ${desiredText}`)
     return `Current value "${currentText}"" match baseline`
@@ -62,10 +68,11 @@ exports.testTextEqual = async function (frame, elementSelector, desiredText) {
 *  @param {Frame} frame 
  * @param {ElementSelector} elementSelector element selector object
  * @param {number} timeout wait time in ms. If no element appear within this period, an error will be thrown
+ * @param {HealingSnapshot} healingSnapshot healing snapshot file
  * @returns {ElementHandle}
  */
-exports.waitElementExists = async function (frame, elementSelector, timeout) {
-    let element = await findElement(frame, elementSelector, timeout, { throwError: true })
+exports.waitElementExists = async function (frame, elementSelector, timeout, healingSnapshot) {
+    let element = await findElement(frame, elementSelector, timeout, { throwError: true }, healingSnapshot)
     return element
 
 }
@@ -83,6 +90,16 @@ exports.change = async function (frame, elementSelector, text) {
     await element.evaluate(el => el.value = '');
 
     await element.type(text, { delay: 100 })
+
+    //ensure the value has been changed correctly
+    let currentValue = await element.evaluate(el => el.value);
+
+    //if current value cannot be changed via typing text, set value directly
+    if (currentValue != text) {
+        await element.evaluate((el, text) => el.value = text, text);
+        await element.evaluate(node => node.dispatchEvent(new Event('change', { bubbles: true })));
+    }
+
 
     return `Type value ${text} success!`
 
@@ -124,7 +141,13 @@ exports.waitTillElementVisible = async function (frame, elementSelector, timeout
 exports.click = async function (frame, elementSelector) {
     let element = await findElement(frame, elementSelector, 2000)
     try {
-        await element.click()
+        try {
+            await element.click()
+        } catch (error) {
+            await element.evaluate(node => {
+                node.dispatchEvent(new Event('click'))
+            })
+        }
     } catch (error) {
         assert.fail(`Unable to click "${elementSelector.displayName}"`)
     }
@@ -157,7 +180,8 @@ exports.goto = async function (page, url) {
     let iRetryCount = 0
     for (iRetryCount = 0; iRetryCount < 5; iRetryCount++) {
         try {
-            await page.goto(process.env.BLUESTONE_URL || url)
+            url = getCurrentUrl(url)
+            await page.goto(url)
             break
         } catch (error) {
             console.log('Unable to go to ' + url)
@@ -383,7 +407,7 @@ exports.initialize = async function (vars, page) {
     initailizeAlertHandle(vars, page)
     //initialize testcase loader and save tc ast info
     let tcLoader = new TestcaseLoader(vars.currentFilePath)
-    await tcLoader.parseTc()
+    await tcLoader.parseTc(false)
     vars.tcStepInfo = tcLoader
     vars.exportVarContextToEnv()
 

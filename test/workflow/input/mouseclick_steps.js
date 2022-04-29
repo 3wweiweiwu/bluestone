@@ -1,358 +1,238 @@
 module.exports = [
     {
-        "command": "goto",
-        "target": "http://localhost:3607/site/singlePageHappyPath.html",
-        "iframe": [
-
-        ],
-        "potentialMatch": [
-
-        ],
-        "framePotentialMatch": [
-
-        ],
-        "__htmlPath": null,
-        "targetPicPath": null,
-        "timeoutMs": null,
-        "meta": {
-
-        },
-        "finalLocatorName": "FAKE locator name to avoid check",
-        "finalLocator": "FAKE locator to avoid check",
-        "functionAst": {
-            "path": "",
-            "name": "goto",
-            "description": "Navigate browser to he url",
-            "params": [
+        command: "goto",
+        target: "http://localhost:3607/site/singlePageHappyPath.html",
+        iframe: [],
+        potentialMatch: [],
+        framePotentialMatch: [],
+        __htmlPath: null,
+        targetPicPath: null,
+        timeoutMs: null,
+        meta: {},
+        finalLocatorName: "FAKE locator name to avoid check",
+        finalLocator: "FAKE locator to avoid check",
+        functionAst: {
+            path: "",
+            name: "goto",
+            description: "Navigate browser to he url",
+            params: [
                 {
-                    "title": "param",
-                    "description": null,
-                    "type": {
-                        "type": "NameExpression",
-                        "name": "Frame"
-                    },
-                    "name": "page"
+                    title: "param",
+                    description: null,
+                    type: { type: "NameExpression", name: "Frame" },
+                    name: "page",
                 },
                 {
-                    "title": "param",
-                    "description": null,
-                    "type": {
-                        "type": "NameExpression",
-                        "name": "string"
-                    },
-                    "name": "url",
-                    "value": "http://localhost:3607/site/singlePageHappyPath.html"
-                }
+                    title: "param",
+                    description: null,
+                    type: { type: "NameExpression", name: "string" },
+                    name: "url",
+                    value: "http://localhost:3607/site/singlePageHappyPath.html",
+                },
             ],
-            "locators": [
-                {
-                    "locator": [
-                        "invalid_locator"
-                    ]
-                }
-            ]
+            locators: [{ locator: ["invalid_locator"] }],
         },
-        "result": {
-            "isResultPass": false,
-            "resultText": ""
-        }
+        result: { isResultPass: false, resultText: "" },
+        timeStamp: null,
     },
     {
-        "command": "waitElementExists",
-        "target": "#div1",
-        "iframe": [
-
-        ],
-        "potentialMatch": [
-
-        ],
-        "framePotentialMatch": [
-
-        ],
-        "__htmlPath": null,
-        "targetInnerText": "This is a paragrah",
-        "targetPicPath": null,
-        "timeoutMs": null,
-        "meta": {
-
-        },
-        "finalLocatorName": "",
-        "finalLocator": [
-            ""
-        ],
-        "functionAst": {
-            "path": "",
-            "name": "waitElementExists",
-            "description": "element exists",
-            "params": [
+        command: "waitElementExists",
+        target: "#div1",
+        iframe: [],
+        potentialMatch: [],
+        framePotentialMatch: [],
+        __htmlPath: null,
+        targetInnerText: "This is a paragrah",
+        targetPicPath: null,
+        timeoutMs: null,
+        meta: {},
+        finalLocatorName: "",
+        finalLocator: [""],
+        functionAst: {
+            path: "",
+            name: "waitElementExists",
+            description: "element exists",
+            params: [
                 {
-                    "title": "param",
-                    "description": null,
-                    "type": {
-                        "type": "NameExpression",
-                        "name": "Frame"
-                    },
-                    "name": "frame"
+                    title: "param",
+                    description: null,
+                    type: { type: "NameExpression", name: "Frame" },
+                    name: "frame",
                 },
                 {
-                    "title": "param",
-                    "description": "element selector object",
-                    "type": {
-                        "type": "NameExpression",
-                        "name": "ElementSelector"
-                    },
-                    "name": "elementSelector"
-                }
+                    title: "param",
+                    description: "element selector object",
+                    type: { type: "NameExpression", name: "ElementSelector" },
+                    name: "elementSelector",
+                },
+                {
+                    title: "param",
+                    description: "healing snapshot file",
+                    type: { type: "NameExpression", name: "HealingSnapshot" },
+                    name: "healingSnapshot",
+                    value: "",
+                },
             ],
-            "locators": [
-                {
-                    "locator": [
-                        "invalid_locator"
-                    ]
-                }
-            ]
+            locators: [{ locator: ["invalid_locator"] }],
         },
-        "parameter": [
+        parameter: [
             {
-                "title": "param",
-                "description": null,
-                "type": {
-                    "type": "NameExpression",
-                    "name": "Frame"
-                },
-                "name": "frame"
+                title: "param",
+                description: null,
+                type: { type: "NameExpression", name: "Frame" },
+                name: "frame",
             },
             {
-                "title": "param",
-                "description": "element selector object",
-                "type": {
-                    "type": "NameExpression",
-                    "name": "ElementSelector"
-                },
-                "name": "elementSelector"
-            }
+                title: "param",
+                description: "element selector object",
+                type: { type: "NameExpression", name: "ElementSelector" },
+                name: "elementSelector",
+            },
         ],
-        "result": {
-            "isResultPass": false,
-            "resultText": ""
-        },
-        "timeStamp": 1641790547704
+        result: { isResultPass: false, resultText: "" },
+        timeStamp: null,
     },
     {
-        "command": "click",
-        "target": "#div1",
-        "iframe": [
-
-        ],
-        "potentialMatch": [
-
-        ],
-        "framePotentialMatch": [
-
-        ],
-        "__htmlPath": null,
-        "targetInnerText": "This is a paragrah",
-        "targetPicPath": null,
-        "timeoutMs": null,
-        "meta": {
-
-        },
-        "finalLocatorName": "",
-        "finalLocator": [
-            ""
-        ],
-        "functionAst": {
-            "path": "",
-            "name": "click",
-            "description": "Click UI element",
-            "params": [
+        command: "click",
+        target: "#div1",
+        iframe: [],
+        potentialMatch: [],
+        framePotentialMatch: [],
+        __htmlPath: null,
+        targetInnerText: "This is a paragrah",
+        targetPicPath: null,
+        timeoutMs: null,
+        meta: {},
+        finalLocatorName: "",
+        finalLocator: [""],
+        functionAst: {
+            path: "",
+            name: "click",
+            description: "Click UI element",
+            params: [
                 {
-                    "title": "param",
-                    "description": null,
-                    "type": {
-                        "type": "NameExpression",
-                        "name": "Frame"
-                    },
-                    "name": "frame"
+                    title: "param",
+                    description: null,
+                    type: { type: "NameExpression", name: "Frame" },
+                    name: "frame",
                 },
                 {
-                    "title": "param",
-                    "description": "element selector object",
-                    "type": {
-                        "type": "NameExpression",
-                        "name": "ElementSelector"
-                    },
-                    "name": "elementSelector"
-                }
+                    title: "param",
+                    description: "element selector object",
+                    type: { type: "NameExpression", name: "ElementSelector" },
+                    name: "elementSelector",
+                },
             ],
-            "locators": [
-                {
-                    "locator": [
-                        "invalid_locator"
-                    ]
-                }
-            ]
+            locators: [{ locator: ["invalid_locator"] }],
         },
-        "result": {
-            "isResultPass": false,
-            "resultText": ""
-        },
-        "timeStamp": 1641790547704
+        result: { isResultPass: false, resultText: "" },
+        timeStamp: null,
     },
     {
-        "command": "waitElementExists",
-        "target": "#header",
-        "iframe": [
-
-        ],
-        "potentialMatch": [
+        command: "waitElementExists",
+        target: "#header",
+        iframe: [],
+        potentialMatch: [
             {
-                "Locator": [
-                    "#header"
-                ],
-                "screenshot": "componentPic/Header.png",
-                "path": "Header",
-                "selector": true
-            }
+                Locator: ["#header"],
+                screenshot: "componentPic/Header.png",
+                path: "Header",
+                selector: true,
+            },
         ],
-        "framePotentialMatch": [
-
-        ],
-        "__htmlPath": null,
-        "targetInnerText": "This is header",
-        "targetPicPath": null,
-        "timeoutMs": null,
-        "meta": {
-
-        },
-        "finalLocatorName": "",
-        "finalLocator": [
-            ""
-        ],
-        "functionAst": {
-            "path": "",
-            "name": "waitElementExists",
-            "description": "element exists",
-            "params": [
+        framePotentialMatch: [],
+        __htmlPath: null,
+        targetInnerText: "This is header",
+        targetPicPath: null,
+        timeoutMs: null,
+        meta: {},
+        finalLocatorName: "",
+        finalLocator: [""],
+        functionAst: {
+            path: "",
+            name: "waitElementExists",
+            description: "element exists",
+            params: [
                 {
-                    "title": "param",
-                    "description": null,
-                    "type": {
-                        "type": "NameExpression",
-                        "name": "Frame"
-                    },
-                    "name": "frame"
+                    title: "param",
+                    description: null,
+                    type: { type: "NameExpression", name: "Frame" },
+                    name: "frame",
                 },
                 {
-                    "title": "param",
-                    "description": "element selector object",
-                    "type": {
-                        "type": "NameExpression",
-                        "name": "ElementSelector"
-                    },
-                    "name": "elementSelector"
-                }
+                    title: "param",
+                    description: "element selector object",
+                    type: { type: "NameExpression", name: "ElementSelector" },
+                    name: "elementSelector",
+                },
+                {
+                    title: "param",
+                    description: "healing snapshot file",
+                    type: { type: "NameExpression", name: "HealingSnapshot" },
+                    name: "healingSnapshot",
+                    value: "",
+                },
             ],
-            "locators": [
-                {
-                    "locator": [
-                        "invalid_locator"
-                    ]
-                }
-            ]
+            locators: [{ locator: ["invalid_locator"] }],
         },
-        "parameter": [
+        parameter: [
             {
-                "title": "param",
-                "description": null,
-                "type": {
-                    "type": "NameExpression",
-                    "name": "Frame"
-                },
-                "name": "frame"
+                title: "param",
+                description: null,
+                type: { type: "NameExpression", name: "Frame" },
+                name: "frame",
             },
             {
-                "title": "param",
-                "description": "element selector object",
-                "type": {
-                    "type": "NameExpression",
-                    "name": "ElementSelector"
-                },
-                "name": "elementSelector"
-            }
+                title: "param",
+                description: "element selector object",
+                type: { type: "NameExpression", name: "ElementSelector" },
+                name: "elementSelector",
+            },
         ],
-        "result": {
-            "isResultPass": false,
-            "resultText": ""
-        },
-        "timeStamp": 1641790548512
+        result: { isResultPass: false, resultText: "" },
+        timeStamp: null,
     },
     {
-        "command": "click",
-        "target": "#header",
-        "iframe": [
-
-        ],
-        "potentialMatch": [
+        command: "click",
+        target: "#header",
+        iframe: [],
+        potentialMatch: [
             {
-                "Locator": [
-                    "#header"
-                ],
-                "screenshot": "componentPic/Header.png",
-                "path": "Header",
-                "selector": true
-            }
+                Locator: ["#header"],
+                screenshot: "componentPic/Header.png",
+                path: "Header",
+                selector: true,
+            },
         ],
-        "framePotentialMatch": [
-
-        ],
-        "__htmlPath": null,
-        "targetInnerText": "This is header",
-        "targetPicPath": null,
-        "timeoutMs": null,
-        "meta": {
-
-        },
-        "finalLocatorName": "",
-        "finalLocator": [
-            ""
-        ],
-        "functionAst": {
-            "path": "",
-            "name": "click",
-            "description": "Click UI element",
-            "params": [
+        framePotentialMatch: [],
+        __htmlPath: null,
+        targetInnerText: "This is header",
+        targetPicPath: null,
+        timeoutMs: null,
+        meta: {},
+        finalLocatorName: "",
+        finalLocator: [""],
+        functionAst: {
+            path: "",
+            name: "click",
+            description: "Click UI element",
+            params: [
                 {
-                    "title": "param",
-                    "description": null,
-                    "type": {
-                        "type": "NameExpression",
-                        "name": "Frame"
-                    },
-                    "name": "frame"
+                    title: "param",
+                    description: null,
+                    type: { type: "NameExpression", name: "Frame" },
+                    name: "frame",
                 },
                 {
-                    "title": "param",
-                    "description": "element selector object",
-                    "type": {
-                        "type": "NameExpression",
-                        "name": "ElementSelector"
-                    },
-                    "name": "elementSelector"
-                }
+                    title: "param",
+                    description: "element selector object",
+                    type: { type: "NameExpression", name: "ElementSelector" },
+                    name: "elementSelector",
+                },
             ],
-            "locators": [
-                {
-                    "locator": [
-                        "invalid_locator"
-                    ]
-                }
-            ]
+            locators: [{ locator: ["invalid_locator"] }],
         },
-        "result": {
-            "isResultPass": false,
-            "resultText": ""
-        },
-        "timeStamp": 1641790548512
-    }
-]
+        result: { isResultPass: false, resultText: "" },
+        timeStamp: null,
+    },
+];

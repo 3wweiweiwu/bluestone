@@ -156,9 +156,10 @@ class Operation {
                     let htmlPath = this.backend.operation.browserSelection.selectorHtmlPath
                     let parentFrame = this.backend.operation.browserSelection.parentIframe
                     let potentialMatch = this.backend.operation.browserSelection.potentialMatch
+                    let atomicTree = this.backend.operation.browserSelection.atomicTree
 
                     //construct operation step
-                    let step = new RecordingStep({ command, target, timeoutMs: timeoutMs, targetPicPath, targetInnerText, functionAst: currentOperation, htmlPath: htmlPath, iframe: parentFrame, potentialMatch: potentialMatch })
+                    let step = new RecordingStep({ command, target, timeoutMs: timeoutMs, targetPicPath, targetInnerText, functionAst: currentOperation, htmlPath: htmlPath, iframe: parentFrame, potentialMatch: potentialMatch, healingTree: atomicTree })
 
                     //update step if currentLocatorIndex has been specified
                     let currentLocatorIndex = this.backend.operation.browserSelection.currentSelectedIndex

@@ -1,0 +1,97 @@
+<html>
+  <body>
+    <h1 id="header">This is header</h1>
+    <h1>
+      This element contains child that has no text
+      <div>
+        <div style="height: 50; width: 50; background-color: brown"></div>
+      </div>
+    </h1>
+    <div>
+      <div title="I contains tooltips">
+        <h3>This Header Contains a Title</h3>
+      </div>
+    </div>
+    <div style="height: 70; width: 365;">
+      <div>divison 1</div>
+      <div>divison 2</div>
+    </div>
+    <div>
+      <h1>
+        This Div has text and contains child
+        <div style="height: 200; width: 200">
+          <div>This is bottom level text</div>
+        </div>
+      </h1>
+    <form id="happy_form" action="/site/singlePageHappyPath.html">
+      <div>
+        <div></div>
+      </div>
+      <div>
+        <label for="happy_form_first_name">First name:</label><br />
+        <input
+          type="text"
+          id="happy_form_first_name"
+          name="fname"
+          value="John"
+        />
+      </div>
+      <br />
+      <label for="happy_form_last_name">Last name:</label><br />
+      <input
+        type="text"
+        id="happy_form_last_name"
+        name="lname"
+        value="Doe"
+      /><br /><br />
+      <input type="submit" id="happy_form_submit" value="Submit" />
+    </form>
+    <h1>Car Table</h1>
+
+    <table>
+      <tr>
+        <th>Brand</th>
+        <th>Year</th>
+        <th>Count</th>
+      </tr>
+      <tr>
+        <td>
+          <div>Subaru</div>
+        </td>
+        <td>
+          <div>2012</div>
+        </td>
+        <td>
+          <div>5</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>Volvo</div>
+        </td>
+        <td>
+          <div>2013</div>
+        </td>
+        <td>
+          <div>5</div>
+        </td>
+      </tr>
+    </table>
+    <h1>List</h1>
+    <ul>
+      <li>Neil Armstrong</li>
+      <li>Alan Bean</li>
+      <li>Peter Conrad</li>
+      <li>Edgar Mitchell</li>
+      <li>Alan Shepard</li>
+    </ul>
+  </body>
+  <script
+    src="https://code.jquery.com/jquery-3.6.0.js"
+    integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+    crossorigin="anonymous"
+  ></script>
+  <script src="/socket.io/socket.io.js"></script>
+
+  <script type="module" src="/javascripts/eventFactory.js"></script>
+</html>

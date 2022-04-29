@@ -66,14 +66,19 @@ class TestcaseLoader {
     }
 
 
-    async parseTc() {
+    async parseTc(isExtractTestInfo = true) {
         let fileInfo = await fs.readFile(this.#filePath)
         let fileStr = fileInfo.toString()
         this.scriptBreaker = new ScriptBreaker(fileStr)
         this.#ast = acorn.parse(fileStr, { ecmaVersion: 2022 })
 
-        this.#testSuite = this.#extractTestSuiteName()
-        this.#testCase = this.#extractTestcaseName()
+        this.#testSuite = ''
+        this.#testCase = ''
+
+        if (isExtractTestInfo) {
+            this.#testSuite = this.#extractTestSuiteName()
+            this.#testCase = this.#extractTestcaseName()
+        }
         this.steps = this.#extractTestStep(this.scriptBreaker)
     }
     /**
@@ -105,12 +110,26 @@ class TestcaseLoader {
      * @returns {Array<RecordingStep>}
      */
     #extractTestStep(scriptBreaker) {
+        // let startTime = Date.now()
+        //narrow down the scope
         let result = walk(this.#ast, (node, ancestor) => {
             if (ancestor.length < 2) return false
             let ancestorCheck = ancestor[ancestor.length - 2].type == 'MemberExpression'
             let nodeCheck = node.type == "Identifier" && (node.name == TestCase.ConstVar.library.projectFuncLibrary || node.name == TestCase.ConstVar.library.bluestoneFuncLibrary)
             return nodeCheck && ancestorCheck
+        }, (node, ancestor, result) => {
+            return ancestor.length > 16 || result.length > 0
         })
+        let newRange = result[0].ancestors[result[0].ancestors.length - 7]
+        result = walk(newRange, (node, ancestor) => {
+            if (ancestor.length < 2) return false
+            let ancestorCheck = ancestor[ancestor.length - 2].type == 'MemberExpression'
+            let nodeCheck = node.type == "Identifier" && (node.name == TestCase.ConstVar.library.projectFuncLibrary || node.name == TestCase.ConstVar.library.bluestoneFuncLibrary)
+            return nodeCheck && ancestorCheck
+        })
+        // let completeTime = Date.now()
+        // console.log((completeTime - startTime) / 1000)
+
         let allSteps = []
         for (const item of result) {
             let ancestorLength = item.ancestors.length

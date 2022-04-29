@@ -6,4 +6,5 @@ cypress.json
 .cache
 public/temp/**/*.html
 public/temp/**/*.png
+public/temp/**/*.snapshot.json
 *.pid

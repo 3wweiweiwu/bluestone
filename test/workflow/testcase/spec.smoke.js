@@ -75,7 +75,7 @@ describe('Smoke Test - Integration', () => {
         let baseline = require('../input/mouseover_header_steps');
         //override data which is irrelevant
         let currentData = res.data
-
+        delete currentData['atomicTree']
         assert.deepStrictEqual(currentData, baseline)
     }).timeout(5000)
     it('should not correlate locator when hovering undefined element', async () => {
@@ -87,6 +87,7 @@ describe('Smoke Test - Integration', () => {
         let baseline = require('../input/mouseover_undefined_element_step');
         //override data which is irrelevant
         let currentData = res.data
+        delete currentData['atomicTree']
         assert.deepStrictEqual(currentData, baseline)
     }).timeout(10000)
     it('should record click event in steps correct', async () => {
@@ -101,6 +102,14 @@ describe('Smoke Test - Integration', () => {
         let currentData = res.data
         let baseline = require('../input/mouseclick_steps');
         currentData.forEach(item => item.timeStamp = null)
+        currentData.forEach(item => delete item['healingTree'])
+        currentData.forEach(item => {
+            let param = item.functionAst.params.find(param => param.name == 'healingSnapshot')
+            if (param != null) {
+                param.value = ''
+            }
+
+        })
         baseline.forEach(item => item.timeStamp = null)
         assert.deepStrictEqual(currentData, baseline)
         // await new Promise(resolve => setTimeout(resolve, 80000))

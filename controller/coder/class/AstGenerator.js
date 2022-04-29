@@ -12,6 +12,36 @@ class AstGenerator {
         }
     }
     /**
+     * Get snapshot path. Sample:   vars.getSnapshot('Bluestone-Snapshot-1')
+     * @param {string} snapshotName 
+     * @returns 
+     */
+    static getSnapshotPathAst(snapshotName) {
+        return {
+            "type": "CallExpression",
+            "callee": {
+                "type": "MemberExpression",
+                "object": {
+                    "type": "Identifier",
+                    "name": "vars"
+                },
+                "property": {
+                    "type": "Identifier",
+                    "name": "getSnapshot"
+                },
+                "computed": false,
+                "optional": false
+            },
+            "arguments": [
+                {
+                    "type": "Literal",
+                    "value": snapshotName,
+                }
+            ],
+            "optional": false
+        }
+    }
+    /**
      * Create simple ast for variable. sample (var1['key1'])
      * @param {string} varName in this case, it will be var1
      * @param {string} keyName in this case, it will be key1

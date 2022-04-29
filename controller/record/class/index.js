@@ -95,7 +95,8 @@ class WorkflowRecord {
                 __htmlCaptureInProcess: [],
                 potentialMatch: [],
                 framePotentialMatch: [],
-                recommendedLocator: []
+                recommendedLocator: [],
+                atomicTree: ''
             },
         }
         this.picCapture = new PicCapture()
@@ -155,12 +156,46 @@ class WorkflowRecord {
         return this.operation.browserSelection.currentOpeartion
     }
     /**
+     * Generate auto-healing information and update function parameter to include healing info
+     * @param {string} testCase test case name
+     */
+    async __updateHealingInfo(testCase) {
+        let snapshotFolder = path.join(config.code.dataPath, testCase, '/snapshot/')
+        try {
+            await fs.access(snapshotFolder)
+        } catch (error) {
+            await fs.mkdir(snapshotFolder, { recursive: true })
+        }
+
+        for (let i = 0; i < this.steps.length; i++) {
+            let step = this.steps[i]
+            let snapshotName = `Bluestone-Snapshot-${i}`
+
+
+            let snapshotPath = path.join(snapshotFolder, snapshotName + ".json")
+            //find out auto-healing param
+            let param = step.functionAst.params.find(item => {
+                return item.type.name == 'HealingSnapshot'
+            })
+            if (param != null) {
+                param.value = snapshotName
+                await fs.writeFile(snapshotPath, step.healingTree)
+
+            }
+        }
+
+
+
+
+    }
+    /**
      * Write Testcase code into script output folder and update bluestone-locator.js 
      * @param {string} testSuite 
      * @param {string} testCase 
      * @returns {string} output path
      */
     async writeCodeToDisk(testSuite, testCase) {
+        await this.__updateHealingInfo(testCase)
         //write code to disk
         let functionAstList = this.getAllFunctionAst()
         let coder = new Testcase(functionAstList, config.code.locatorPath, config.code.funcPath, config.code.configPath, config.code.scriptFolder, config.code.inbuiltFuncPath)
@@ -585,9 +620,6 @@ class WorkflowRecord {
             // this.__addWaitForSteps(event, true)
             this.__addSwitchIframeForStep(event)
         }
-
-
-
         this.__addWaitForSteps(event, false)
 
         this.steps.push(event)
@@ -761,6 +793,7 @@ class WorkflowRecord {
         arr.splice(toIndex, 0, element);
         this.steps = arr
     }
+
     /**
      * returns the picture path for current step
      */

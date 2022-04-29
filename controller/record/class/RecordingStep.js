@@ -2,6 +2,8 @@ const { Locator } = require('../../locator/index')
 const StepResult = require('../../mocha/class/StepResult')
 const FunctionAST = require('../../ast/class/Function')
 const HtmlCaptureStatus = require('./HtmlCaptureStatus')
+const fs = require('fs').promises
+const path = require('path')
 class RecordingStep {
     /** 
      * @param {step} recordingStep 
@@ -42,7 +44,7 @@ class RecordingStep {
             this.timeStamp = recordingStep.timeStamp
         }
         this.scriptLineNumber = recordingStep.scriptLineNumber
-
+        this.healingTree = recordingStep.healingTree
     }
     /**
      * //based on the searalized json file, re-create object
@@ -52,12 +54,12 @@ class RecordingStep {
      * @returns {RecordingStep}
      */
     static restore(json, functionAst, command) {
+        json.functionAst = functionAst
         let result = new RecordingStep(json)
         let keys = Object.keys(json)
         keys.forEach(key => {
             result[key] = json[key]
         })
-        result.functionAst = functionAst
         result.command = command
         return result
     }
@@ -96,5 +98,6 @@ class RecordingStep {
  * @property {number} timestamp
  * @property {number} currentSelectedIndex
  * @property {number} scriptLineNumber
+ * @property {string} healingTree
  */
 module.exports = RecordingStep
