@@ -5,7 +5,7 @@ In several cases we need to prepare the environment before of reproduce a test c
  
  
 
-To help the final user to prepare the environment we can create a customized function, so before of start of the recording the user will be able to call the function to delete the element with the same name and this function will be recorded already in the script  
+To help the final user to prepare the environment we can create a customized function, so before of start to recording the user will be able to call the function to delete the element with the same name and this function will be recorded already in the script  
 
  
  
@@ -18,9 +18,7 @@ To create a new customized function, we need to open a new terminal initialize b
 
 In another terminal we run the command: <br>  
 
-*bluestone function .* 
-
-***FunctionName***<br>  
+bluestone function .  ***FunctionName***<br>  
 
 > Replacing ***FuntionName*** for the name of the function<br> 
 
