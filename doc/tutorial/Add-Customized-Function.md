@@ -39,7 +39,7 @@ In the constructor we can specify the locators that indicate to Bluestone when c
  
  
 
-![locator-area](png/locator-area.png)<br><br> 
+![locator-area](png/addCustomizedFunction/locator-area.png)<br><br> 
 
  
  
@@ -53,7 +53,7 @@ When we create the template of the function the Async Function looks like this<b
  
  
 
-![async-function-begining](png/async-function-begining.png)<br><br> 
+![async-function-begining](png/addCustomizedFunction/async-function-begining.png)<br><br> 
 
  
  
@@ -67,7 +67,7 @@ Also, in the top of all configurations we put a name of the function that the us
  
  
 
-![async-function-variables](png/async-function-variables.png)<br><br> 
+![async-function-variables](png/addCustomizedFunction/async-function-variables.png)<br><br> 
 
  
  
@@ -77,7 +77,7 @@ With the previous configuration the user should see this:<br>
  
  
 
-![async-function-ui](png/async-function-ui.png)<br><br> 
+![async-function-ui](png/addCustomizedFunction/async-function-ui.png)<br><br> 
 
  
  
@@ -95,7 +95,7 @@ For "best practice" we are going to create **API Functions** outside of our **Cu
  
  
 
-![async-function-example-complete](png/async-function-example-complete.png)<br><br> 
+![async-function-example-complete](png/addCustomizedFunction/async-function-example-complete.png)<br><br> 
 
  
  
@@ -159,7 +159,7 @@ To get the requests that the **client** sends to the **server** please follow th
  
  
 
-![inspect](png/inspect.png)<br><br> 
+![inspect](png/addCustomizedFunction/inspect.png)<br><br> 
 
  
  
@@ -169,7 +169,7 @@ To get the requests that the **client** sends to the **server** please follow th
  
  
 
-![inspect-recording](png/inspect-recording.png)<br><br> 
+![inspect-recording](png/addCustomizedFunction/inspect-recording.png)<br><br> 
 
  
  
@@ -179,7 +179,7 @@ To get the requests that the **client** sends to the **server** please follow th
  
  
 
-![request](png/request.png)<br><br> 
+![request](png/addCustomizedFunction/request.png)<br><br> 
 
  
  
@@ -195,12 +195,12 @@ To get the requests that the **client** sends to the **server** please follow th
  
  
 
-![json-text](png/json-text.png)<br><br> 
+![json-text](png/addCustomizedFunction/json-text.png)<br><br> 
 
  
  
 
-![json-viewer](png/json-viewer.png)<br><br> 
+![json-viewer](png/addCustomizedFunction/json-viewer.png)<br><br> 
 
  
  
@@ -219,7 +219,7 @@ The first way with **Access Token**, when the request has an Authorization secti
  
  
 
-![authorization-section](png/authorization-section.png)<br><br> 
+![authorization-section](png/addCustomizedFunction/authorization-section.png)<br><br> 
 
  
  
@@ -237,9 +237,9 @@ The first way with **Access Token**, when the request has an Authorization secti
  
  
 
-![login-request](png/login-request.png)<br><br> 
+![login-request](png/addCustomizedFunction/login-request.png)<br><br> 
 
-![login-request-response](png/login-request-response.png)<br><br> 
+![login-request-response](png/addCustomizedFunction/login-request-response.png)<br><br> 
 
 > In this case we do not need use the JASON Viewer tool because in FireFox the response is already converted in a straightforward way to see 
 
@@ -252,7 +252,7 @@ The first way with **Access Token**, when the request has an Authorization secti
  
  
 
-![authenticate-funcion](png/authenticate-funcion.png)<br><br> 
+![authenticate-funcion](png/addCustomizedFunction/authenticate-funcion.png)<br><br> 
 
  
  
@@ -269,7 +269,7 @@ The first way with **Access Token**, when the request has an Authorization secti
  
  
 
-![api-function-token](png/api-function-token.png)<br><br> 
+![api-function-token](png/addCustomizedFunction/api-function-token.png)<br><br> 
 
  
  
@@ -290,9 +290,9 @@ The first way with **Access Token**, when the request has an Authorization secti
 
 5. Finally we are going to manipulate the information of the response to get the element/s that we need<br> 
 
-![api-function-reference](png/api-function-reference.png)<br><br> 
+![api-function-reference](png/addCustomizedFunction/api-function-reference.png)<br><br> 
 
-![api-function-structured](png/api-function-structured.png)<br><br> 
+![api-function-structured](png/addCustomizedFunction/api-function-structured.png)<br><br> 
 
  
  
