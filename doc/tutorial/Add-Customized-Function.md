@@ -72,21 +72,19 @@ Also, in the top of all configurations we put a name of the function that the us
  
  
 
-With the previous configuration the user should see this:<br>  
+With the previous configuration the user should see this in th UI:<br>  
 
  
  
 
 ![async-function-ui](png/addCustomizedFunction/async-function-ui.png)<br><br> 
 
- 
+ > How you can see all that you define in the code is going to be reflected in the UI<br>
  
  
 
-## API Functions 
+## Sample Customized Function to Prepare Environment via RestApi 
 
- 
- 
 
 The next step is creating the instructions that we want Bluestone to do when the function is called<br> 
 
@@ -100,7 +98,7 @@ For "best practice" we are going to create **API Functions** outside of our **Cu
  
  
 
-How you can see, we called two functions "getAllCatchReports" and "deleteCatchReportForId". The first is called to get some ids and the other is used to delete the elements that correspond to those ids<br> 
+How you can see, we called two **API Functions** "getAllCatchReports" and "deleteCatchReportForId", we called **API Functions** because they are created using the API requests. The first is called to get some ids and the other is used to delete the elements that correspond to those ids<br> 
 
  
  
@@ -123,7 +121,7 @@ A method indicates what is the basic purpose of the request. There are 4 types o
 
 3. URL's request<br> 
 
-Is the most essential element in the request, the URL's request indicates to the server which are the actions needed to execute the request     
+Is the most essential element in the request, the URL's request indicates to the **API** which are the actions needed to execute the request     
 
 4. Header<br> 
 
@@ -131,24 +129,24 @@ In the header we can see a lot of information but the most important is the **UR
 
 5. Payload<br> 
 
-It is the crucial information that the **client** submits to the **server** when the **client** are making an API request, normally is sending with methods **POST** or **PUT** 
+It is the crucial information that the **client** submits to the **API** when the **client** are making an API request, normally is sending with methods **POST** or **PUT** 
 
 6. API key or access token<br> 
 
-The server needs to know if the request is being sent to an authorized user<br> 
+The **API** needs to know if the request is being sent to an authorized user<br> 
 
 There are 2 ways to do it the first is sending the credentials (user, password and sometimes domain) and the second is with the **access token**, to get the **access token** we need to send a request with the credentials and then the **API** should respond us with an **access token**, this **access token** is going to be send it with the request<br> 
 
 7. Response<br> 
 
-When the **server** receives a request, it is going to send a response, the response is sent in JASON format and has information of success or failure and in some cases also has information that the **client** needs to show the information 
+When the **API** receives a request, it is going to send a response, the response is sent in JASON format and has information of success or failure and in some cases also has information that the **client** needs to show the information 
 
  
  
 
 #### Obtain the request needed 
 
-To get the requests that the **client** sends to the **server** please follow the next steps<br> 
+To get the requests that the **client** sends to the **API** please follow the next steps<br> 
 
 1. Open a web browser in incognito view 
 
