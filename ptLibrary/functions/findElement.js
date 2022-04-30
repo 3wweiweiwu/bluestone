@@ -87,7 +87,14 @@ async function waitForElement(page, elementSelector, timeout, option = new Optio
 
     if (element == null) {
         let info = `Unable to find UI element: "${elementSelector.displayName}" in ${timeout}ms`
-        await varSav.healingInfo.addWorkingLocatorRecord(elementSelector.displayName, false)
+        //only add result to locator report only when original locator is not found
+        //otherwise, it will log the locator that is used as part of auto-healing process into the log
+        //, we only want to see if original locator is working. We don't care failure during 
+        //locator healing
+        if (option.isHealingByLocatorBackup) {
+            await varSav.healingInfo.addWorkingLocatorRecord(elementSelector.displayName, false)
+        }
+
         if (option.throwError) {
             assert.fail(info)
         }
