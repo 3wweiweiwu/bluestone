@@ -66,6 +66,12 @@ function JSONReporter(runner, options = {}) {
             failures: failures.map(clean),
             passes: passes.map(clean),
         };
+        //further analyze passes and divide it into true pass and review categories
+
+        let truePasses = getTruePassAndReviews(obj.passes)
+        obj.passes = truePasses.passes
+        obj['reviews'] = truePasses.reviews
+
         runner.testResults = obj;
         var json = JSON.stringify(obj, null, 2);
         if (output) {
@@ -149,8 +155,42 @@ function getLocatorUsageStats() {
 }
 function getLocatorPrescriptionInfo() {
     let varSav = VarSaver.parseFromEnvVar()
-    let testcase = varSav.healingInfo.testcasName
-    let prescription = varSav.healingInfo.prescriptionReport.info[testcase]
+    let prescription = varSav.healingInfo.prescriptionReport.info
     return prescription
+}
+class TestContext {
+    constructor() {
+        this.title = ''
+        this.fullTitle = ''
+        this.file = ''
+        this.duration = ''
+        this.currentRetry = 0
+        this.speed = ''
+        this.err = {}
+    }
+}
+/**
+ * Filter testcases and only leave testcases that we never used healing in the past
+ * @param {TestContext[]} passes 
+ */
+function getTruePassAndReviews(passes) {
+    let prescription = getLocatorPrescriptionInfo()
+    let testCaseNameList = Object.keys(prescription)
+    //only worry about those testcase that has prescription associate with that
+    testCaseNameList = testCaseNameList.filter(item => prescription[item].length > 0)
+
+    let filteredPasses = passes.filter(item => testCaseNameList.includes(item.title) == false)
+    let reviews = passes.filter(item => testCaseNameList.includes(item.title))
+
+    //add perscription info into log
+    reviews = reviews.map(item => {
+        let currentPrescription = prescription[item.title]
+        item['prescription'] = currentPrescription
+        return item
+    })
+    return {
+        passes: filteredPasses,
+        reviews: reviews
+    }
 }
 JSONReporter.description = "single JSON object";
