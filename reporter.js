@@ -15,7 +15,7 @@ var EVENT_TEST_PENDING = constants.EVENT_TEST_PENDING;
 var EVENT_TEST_FAIL = constants.EVENT_TEST_FAIL;
 var EVENT_TEST_END = constants.EVENT_TEST_END;
 var EVENT_RUN_END = constants.EVENT_RUN_END;
-const VarSaver = require('./class/VarSaver')
+const VarSaver = require('./ptLibrary/class/VarSaver')
 /**
  * Expose `JSON`.
  */
