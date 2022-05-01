@@ -65,12 +65,17 @@ function JSONReporter(runner, options = {}) {
             pending: pending.map(clean),
             failures: failures.map(clean),
             passes: passes.map(clean),
+            reviews: []
         };
         //further analyze passes and divide it into true pass and review categories
 
         let truePasses = getTruePassAndReviews(obj.passes)
         obj.passes = truePasses.passes
-        obj['reviews'] = truePasses.reviews
+        obj.reviews = truePasses.reviews
+
+        //update info in the stats field
+        obj.stats.passes = obj.passes.length
+        obj.stats['reviews'] = obj.reviews.length
 
         runner.testResults = obj;
         var json = JSON.stringify(obj, null, 2);
