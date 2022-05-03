@@ -66,6 +66,11 @@ class TestSite {
                 __htmlPath: null
             })
         }
+        currentData.forEach(step => {
+            step.potentialMatch.forEach(match => {
+                match.selector = null
+            })
+        })
         res.data = currentData
         return res
     }
@@ -87,6 +92,10 @@ class TestSite {
                 lastOperationTime: null,
                 lastOperationTimeoutMs: null,
                 currentOpeartion: null,
+            })
+            //remove isSelector Attribute because this feature has been obsolete
+            currentData.potentialMatch.forEach(item => {
+                item.selector = null
             })
             res.data = currentData
             return res
