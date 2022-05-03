@@ -3,11 +3,19 @@ const HealingSnapshot = require('../class/HealingSnapshot')
 const { captureSnapshot } = require('./snapshotCapture')
 const { Browser, Page, ElementHandle } = require('puppeteer-core')
 const assert = require('assert')
-const Options = {
-    /** @type {boolean} if no element is found, should we throw error?*/
-    throwError: false,
+class Options {
+    constructor() {
+        /** @type {boolean} if no element is found, should we throw error?*/
+        this.throwError = false
+        this.takeSnapshot = true
+        this.isHealingByLocatorBackup = true
+    }
+
+
 }
 const VarSaver = require('../class/VarSaver')
+
+module.exports = waitForElement
 /**
  * Find a element within timeout period. If no element is found, a error will be thrown
 *  @param {Page} page 
@@ -17,13 +25,14 @@ const VarSaver = require('../class/VarSaver')
  * @param {HealingSnapshot} healingSnapshot locator snapshot for auto-healing. File under .\snapshot\
  * @returns {ElementHandle}
  */
-module.exports = async function (page, elementSelector, timeout, option = Options, healingSnapshot) {
+async function waitForElement(page, elementSelector, timeout, option = new Options(), healingSnapshot) {
     /**@type {Array<string>} */
     let locatorOptions = elementSelector.locator
     //find locator option within timeout
     let startTime = Date.now()
     /**@type {ElementHandle} */
     let element = null
+    let elementInfo = null
     let timeSpan = 0
     let varSav = VarSaver.parseFromEnvVar()
     //extends the timeout by 1.5x if we are in the retry mode
@@ -34,16 +43,8 @@ module.exports = async function (page, elementSelector, timeout, option = Option
         try {
             for (let i = 0; i < locatorOptions.length; i++) {
                 let locator = locatorOptions[i]
+                element = await getElementByLocator(page, locator)
 
-                if (locator.startsWith('/') || locator.startsWith('(')) {
-                    //xpath
-                    let elementResult = await page.$x(locator)
-                    if (elementResult.length > 0) element = elementResult[0]
-                }
-                else {
-                    //selector
-                    element = await page.$(locator)
-                }
                 if (element != null) {
                     break
                 }
@@ -63,13 +64,37 @@ module.exports = async function (page, elementSelector, timeout, option = Option
         }
     } while (timeSpan < timeout);
 
-    try {
-        await captureSnapshot(page)
-    } catch (error) {
+    if (option.takeSnapshot) {
+        try {
+            await captureSnapshot(page)
+        } catch (error) {
+        }
+    }
+    //locator found correctly and it is not part of healing trial, log coverage info
+    if (element != null && option.isHealingByLocatorBackup) {
+        await varSav.healingInfo.createPerscription(elementSelector.displayName, elementSelector.locator, elementSelector.locator, null, varSav.currentFilePath, varSav.tcStepInfo, true)
+    }
+
+    //conduct locator-based auto-healing
+    if (option.isHealingByLocatorBackup && element == null) {
+        elementInfo = await getElementBasedOnLocatorBackup(page, elementSelector, 0.8)
+        element = elementInfo.element
+        if (element != null) {
+            let pageData = await highlightProposedElement(page, element)
+            await varSav.healingInfo.createPerscription(elementSelector.displayName, elementSelector.locator, elementInfo.locator, pageData, varSav.currentFilePath, varSav.tcStepInfo, false)
+        }
     }
 
     if (element == null) {
         let info = `Unable to find UI element: "${elementSelector.displayName}" in ${timeout}ms`
+        //only add result to locator report only when original locator is not found
+        //otherwise, it will log the locator that is used as part of auto-healing process into the log
+        //, we only want to see if original locator is working. We don't care failure during 
+        //locator healing
+        if (option.isHealingByLocatorBackup) {
+            await varSav.healingInfo.addWorkingLocatorRecord(elementSelector.displayName, false)
+        }
+
         if (option.throwError) {
             assert.fail(info)
         }
@@ -81,6 +106,16 @@ module.exports = async function (page, elementSelector, timeout, option = Option
 
     return element
 
+}
+class ElementInfo {
+    constructor(element, locator) {
+        this.element = element
+        this.locator = locator
+        this.count = 0
+    }
+    addCount() {
+        this.count += 1
+    }
 }
 /**
  * Check if element is covered by anything
@@ -181,4 +216,93 @@ async function isElementBlocked(element) {
         return isSourceCoveredByAnyElement(element) != null
     }, element)
     return result
-}                                                                       
+}
+/**
+ * Based on locator, return element handle
+ * @param {Page} page
+ * @param {string} locator 
+ * @returns {ElementHandle}
+ */
+async function getElementByLocator(page, locator) {
+    let element = null
+    if (locator.startsWith('/') || locator.startsWith('(')) {
+        //xpath
+        let elementResult = await page.$x(locator)
+        if (elementResult.length > 0) element = elementResult[0]
+    }
+    else {
+        //selector
+        element = await page.$(locator)
+    }
+    return element
+}
+/**
+ * Use backup locator to find out element whose similarity score is highest
+*  @param {Page} page 
+ * @param {ElementSelector} elementSelector element selector object
+ * @param {number} similarityBenchmark
+ * @returns {ElementInfo}
+ */
+async function getElementBasedOnLocatorBackup(page, elementSelector, similarityBenchmark) {
+    /**@type {Object.<string,ElementInfo>} */
+    let elementDict = {}
+    let sum = 0
+    /**@type {string} */
+    let bestId = null
+    let bestElement = new ElementInfo(null, '')
+    if (elementSelector.snapshot == null) {
+        return bestElement
+    }
+    //get existing elements
+    for (const locator of elementSelector.snapshot) {
+        let newElementSelector = new ElementSelector([locator], null, `Locator-based Auto-healing - ${elementSelector.displayName} - ${locator}`)
+        let element = await waitForElement(page, newElementSelector, 1, { takeSnapshot: false, throwError: false, isHealingByLocatorBackup: false })
+        if (element != null) {
+            let id = await element.boundingBox()
+            id = JSON.stringify(id)
+            sum += 1
+            if (elementDict[id] == null) {
+                elementDict[id] = new ElementInfo(element, locator)
+            }
+
+            elementDict[id].addCount()
+
+
+
+            //get best element
+            if (bestId == null) {
+                bestId = id
+            }
+            else {
+                if (elementDict[bestId] < elementDict[id]) {
+                    bestId = id
+                }
+            }
+        }
+
+    }
+    //get score for possible locator
+    let currentSimilarity = elementDict[bestId].count / sum
+    if (currentSimilarity > similarityBenchmark) {
+        bestElement = elementDict[bestId]
+    }
+
+    return bestElement
+}
+/**
+ * 
+ * @param {Page} page 
+ * @param {ElementHandle} element 
+ */
+async function highlightProposedElement(page, element, outputPath) {
+    let borderStyle = await element.evaluate(node => {
+        //record previous border info
+        let borderStyle = node.style.border
+        //draw rectangle
+        node.style.border = "thick solid #0000FF"
+        return borderStyle
+    })
+    let pageData = await page.screenshot({ type: 'png' })
+    return pageData
+
+}

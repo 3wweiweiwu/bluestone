@@ -72,7 +72,7 @@ exports.testTextEqual = async function (frame, elementSelector, desiredText) {
  * @returns {ElementHandle}
  */
 exports.waitElementExists = async function (frame, elementSelector, timeout, healingSnapshot) {
-    let element = await findElement(frame, elementSelector, timeout, { throwError: true }, healingSnapshot)
+    let element = await findElement(frame, elementSelector, timeout, { throwError: true, isHealingByLocatorBackup: true, takeSnapshot: true }, healingSnapshot)
     return element
 
 }

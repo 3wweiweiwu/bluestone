@@ -21,7 +21,7 @@ module.exports = {
             Locator: ["#header"],
             screenshot: "componentPic/Header.png",
             path: "Header",
-            selector: false,
+            selector: null,
         },
     ],
     framePotentialMatch: [],

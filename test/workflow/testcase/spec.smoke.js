@@ -77,7 +77,7 @@ describe('Smoke Test - Integration', () => {
         let currentData = res.data
         delete currentData['atomicTree']
         assert.deepStrictEqual(currentData, baseline)
-    }).timeout(5000)
+    }).timeout(50000)
     it('should not correlate locator when hovering undefined element', async () => {
         let happyPathPage = testConfig.testSite.page.happypath
         await bluestoneBackend.startRecording(siteBackend.singlePageHappyPath)
