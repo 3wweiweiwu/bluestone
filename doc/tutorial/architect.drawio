@@ -1,0 +1,128 @@
+<mxfile host="65bd71144e">
+    <diagram id="w8Rq53mOUfrG1kxvk9YA" name="Bluestone Start">
+        <mxGraphModel dx="1196" dy="1717" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="6" value="parse string to object&lt;br&gt;and feed it to backend" style="edgeStyle=none;html=1;" edge="1" parent="1" source="2" target="5">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="cli (command line interface)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="280" y="100" width="70" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="Provide Start Command&lt;br&gt;with inforamtion of Autoamtion&lt;br&gt;Source code Path and Port(optional)" style="edgeStyle=none;html=1;" edge="1" parent="1" source="3" target="2">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="Actor" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+                    <mxGeometry x="20" y="145" width="30" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="(Load Locators/ Locator Generator/ Customized Function)" style="edgeStyle=none;html=1;" edge="1" parent="1" source="5" target="7">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="Bluestone Backend" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="520" y="100" width="70" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="Automation Source Code" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="520" y="-130" width="70" height="150" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="8KDQTIzTPI6Y8WU8lAvb" name="Bluestone Record">
+        <mxGraphModel dx="1989" dy="588" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="_T6fSS8-JBwzcnJjwPZ7-0"/>
+                <mxCell id="_T6fSS8-JBwzcnJjwPZ7-1" parent="_T6fSS8-JBwzcnJjwPZ7-0"/>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-0" value="parse string to object&lt;br&gt;and feed it to backend" style="edgeStyle=none;html=1;" edge="1" parent="_T6fSS8-JBwzcnJjwPZ7-1" source="We8dICCK3b-tkzM1zfyz-1" target="We8dICCK3b-tkzM1zfyz-5">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-1" value="cli (command line interface)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="_T6fSS8-JBwzcnJjwPZ7-1">
+                    <mxGeometry x="280" y="100" width="70" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-2" value="Run Record Command&lt;br&gt;to provide url to website" style="edgeStyle=none;html=1;" edge="1" parent="_T6fSS8-JBwzcnJjwPZ7-1" source="We8dICCK3b-tkzM1zfyz-3" target="We8dICCK3b-tkzM1zfyz-1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-3" value="Actor" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="_T6fSS8-JBwzcnJjwPZ7-1">
+                    <mxGeometry x="20" y="145" width="30" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-5" value="Bluestone Backend" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="_T6fSS8-JBwzcnJjwPZ7-1">
+                    <mxGeometry x="520" y="100" width="70" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-10" value="Navigate to url" style="edgeStyle=none;html=1;" edge="1" parent="_T6fSS8-JBwzcnJjwPZ7-1" source="We8dICCK3b-tkzM1zfyz-5" target="We8dICCK3b-tkzM1zfyz-9">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="820" y="175" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-9" value="Browser" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="_T6fSS8-JBwzcnJjwPZ7-1">
+                    <mxGeometry x="740" y="100" width="90" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-11" value="High Level View" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="_T6fSS8-JBwzcnJjwPZ7-1">
+                    <mxGeometry x="440" y="40" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-12" value="What happend in Bluestone Backend" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="_T6fSS8-JBwzcnJjwPZ7-1">
+                    <mxGeometry x="330" y="310" width="275" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-15" value="" style="edgeStyle=none;html=1;" edge="1" parent="_T6fSS8-JBwzcnJjwPZ7-1" source="We8dICCK3b-tkzM1zfyz-13" target="We8dICCK3b-tkzM1zfyz-14">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-13" value="Router&lt;br&gt;get /Record&lt;br&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="_T6fSS8-JBwzcnJjwPZ7-1">
+                    <mxGeometry x="70" y="400" width="70" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-17" value="" style="edgeStyle=none;html=1;" edge="1" parent="_T6fSS8-JBwzcnJjwPZ7-1" source="We8dICCK3b-tkzM1zfyz-14" target="We8dICCK3b-tkzM1zfyz-16">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-19" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="_T6fSS8-JBwzcnJjwPZ7-1" source="We8dICCK3b-tkzM1zfyz-14" target="We8dICCK3b-tkzM1zfyz-18">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-20" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="_T6fSS8-JBwzcnJjwPZ7-1" source="We8dICCK3b-tkzM1zfyz-14" target="We8dICCK3b-tkzM1zfyz-21">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="400" y="600" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-22" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="_T6fSS8-JBwzcnJjwPZ7-1" source="We8dICCK3b-tkzM1zfyz-14" target="We8dICCK3b-tkzM1zfyz-23">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="400" y="700" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-14" value="Initializeation Layer" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="_T6fSS8-JBwzcnJjwPZ7-1">
+                    <mxGeometry x="220" y="400" width="70" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-16" value="Initialize Download Watcher" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="_T6fSS8-JBwzcnJjwPZ7-1">
+                    <mxGeometry x="400" y="390" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-18" value="Start Alert Watcher" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="_T6fSS8-JBwzcnJjwPZ7-1">
+                    <mxGeometry x="407.5" y="470" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-27" value="" style="edgeStyle=none;html=1;" edge="1" parent="_T6fSS8-JBwzcnJjwPZ7-1" source="We8dICCK3b-tkzM1zfyz-21" target="We8dICCK3b-tkzM1zfyz-26">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-21" value="Initialize step &lt;br&gt;Storage" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="_T6fSS8-JBwzcnJjwPZ7-1">
+                    <mxGeometry x="400" y="570" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-25" value="" style="edgeStyle=none;html=1;" edge="1" parent="_T6fSS8-JBwzcnJjwPZ7-1" source="We8dICCK3b-tkzM1zfyz-23" target="We8dICCK3b-tkzM1zfyz-24">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-23" value="Start Browser and Page and navigate to url user provided" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="_T6fSS8-JBwzcnJjwPZ7-1">
+                    <mxGeometry x="400" y="680" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-24" value="Inject Bluestone Library to facilitate recording" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="_T6fSS8-JBwzcnJjwPZ7-1">
+                    <mxGeometry x="590" y="680" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-26" value="Add Navigate Step to step storage as first command" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="_T6fSS8-JBwzcnJjwPZ7-1">
+                    <mxGeometry x="580" y="570" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-29" value="" style="endArrow=classic;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="_T6fSS8-JBwzcnJjwPZ7-1" target="We8dICCK3b-tkzM1zfyz-13">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="-60" y="480" as="sourcePoint"/>
+                        <mxPoint x="10" y="500" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="We8dICCK3b-tkzM1zfyz-30" value="Record url" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="We8dICCK3b-tkzM1zfyz-29">
+                    <mxGeometry x="-0.536" relative="1" as="geometry">
+                        <mxPoint x="40" y="-4" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

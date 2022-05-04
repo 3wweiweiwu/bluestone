@@ -78,8 +78,6 @@ try {
 
             //launch app
             server.start(process.env.port);
-            bluestoneUrl = `http://localhost:${cli.args.port}`
-            axios.get(`${bluestoneUrl}/spy`)
             break;
         case 'record':
 
