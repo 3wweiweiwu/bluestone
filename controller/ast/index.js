@@ -9,6 +9,8 @@ const FunctionAST = require('./class/Function')
 const BsFunc = require('./class/BsFunc')
 const Locator = require('../locator/class/Locator')
 const extractCommentForCustomziedFunctionClass = require('./lib/extractCommentForCustomizedFunctionClass')
+const cliProgress = require('cli-progress');
+const colors = require('ansi-colors');
 class AST {
     /**
      * 
@@ -75,9 +77,16 @@ class AST {
 
         let requireInfo = await this.__getRequireInfo(ast, funcPath)
 
+        const b1 = new cliProgress.SingleBar({
+            format: 'Loading ' + funcPath + ' [{bar}] {percentage}% | {value}/{total}'
+        }, cliProgress.Presets.shades_classic);
 
+        b1.start(functionKeys.length, 0, {
+            speed: "N/A"
+        })
 
         for (let i = 0; i < functionKeys.length; i++) {
+            b1.increment()
             let funcName = functionKeys[i]
             //extract dynamic function info
             let mainFunc = bsFunction[funcName].func
@@ -98,6 +107,7 @@ class AST {
 
 
         }
+        b1.stop();
 
     }
 
@@ -110,6 +120,8 @@ class AST {
     async __getRequireInfo(ast, funcPath) {
         let result = walk(ast, (node, ancestor) => {
             return (node.type == 'CallExpression') && node.callee.name == 'require' && node.arguments[0].type == 'Literal'
+        }, (node, ancestors) => {
+            return ancestors.length > 5
         })
         let jsFolder = path.dirname(funcPath)
         let jsDocSummary = new JsDocSummary()
@@ -173,6 +185,8 @@ class AST {
         let currentNodeList = walk(ast, (node, ancestors) => {
             let parentAncestorIndex = ancestors.length - 2
             return node.type == 'Identifier' && node.name == funcName && ancestors[parentAncestorIndex].type == 'Property'
+        }, (node, ancestors) => {
+            return ancestors.length > 6
         })
         if (currentNodeList.length != 1) {
             throw "Cannot find node specified. Need fix!"
