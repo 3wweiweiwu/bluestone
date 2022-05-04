@@ -305,15 +305,3 @@ In that case first we need to identify where the problem is<br>
 To identify it we can put Debugger Points in the **API Functions** specifically in the catch areas and then run manually a test case which is calling the **Customized Function**, with this we can know in which API Function is the problem<br> 
 
 Once we identify which is the API Function that we need to fix we are going to record again the request that the site uses to make the action and we will compare, if there is something different, we only need no replace it 
-
- 
- 
-
-# How to use API to prepare pre-requisites for testing 
-
- 
- 
- 
- 
-
- 
