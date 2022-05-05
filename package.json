@@ -35,6 +35,7 @@
     "jimp": "^0.16.1",
     "mocha": "^9.2.0",
     "morgan": "~1.9.1",
+    "mssql": "^8.1.0",
     "pug": "2.0.3",
     "pug-bootstrap": "0.0.16",
     "puppeteer": "^13.4.0",
