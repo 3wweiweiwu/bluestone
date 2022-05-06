@@ -62,6 +62,7 @@ async function waitForElement(page, elementSelector, timeout, option = new Optio
                 break
             }
         }
+        element = null
     } while (timeSpan < timeout);
 
     if (option.takeSnapshot) {
@@ -72,7 +73,12 @@ async function waitForElement(page, elementSelector, timeout, option = new Optio
     }
     //locator found correctly and it is not part of healing trial, log coverage info
     if (element != null && option.isHealingByLocatorBackup) {
-        await varSav.healingInfo.createPerscription(elementSelector.displayName, elementSelector.locator, elementSelector.locator, null, varSav.currentFilePath, varSav.tcStepInfo, true)
+        try {
+            await varSav.healingInfo.createPerscription(elementSelector.displayName, elementSelector.locator, elementSelector.locator, null, varSav.currentFilePath, varSav.tcStepInfo, true)
+        } catch (error) {
+
+        }
+
     }
 
     //conduct locator-based auto-healing
