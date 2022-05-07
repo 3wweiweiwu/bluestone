@@ -17,7 +17,8 @@ class VarSaver {
         this.dataSnapshotdir = path.join(this.projectRootPath, '/data/', this.testcase, '/snapshot/')
         this.downloadManager = new DownloadManager()
         this.alertManager = new AlertManager()
-        this.healingInfo = new HealingInfo(process.env.RUN_ID, this.projectRootPath, this.testcase)
+        this.healingInfo = new HealingInfo(process.env.BLUESTONE_RUN_ID, this.projectRootPath, this.testcase)
+        this.isTakeSnapshot = process.env.BLUESTONE_AUTO_SNAPSHOT || true
         this.tcStepInfo = null
         this.exportVarContextToEnv()
 
@@ -46,7 +47,7 @@ class VarSaver {
 
         /**@type {VarSaver} */
         let varSav = JSON.parse(process.env.BLUESTONE_VAR_SAVER)
-        varSav.healingInfo = new HealingInfo(process.env.RUN_ID, varSav.projectRootPath, varSav.testcase)
+        varSav.healingInfo = new HealingInfo(process.env.BLUESTONE_RUN_ID, varSav.projectRootPath, varSav.testcase)
         return varSav
     }
     initializeAutoHealingDir(rootFolder, executionId, HealingReportPath) {
