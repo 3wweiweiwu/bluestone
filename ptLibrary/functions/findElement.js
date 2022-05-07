@@ -57,8 +57,10 @@ async function waitForElement(page, elementSelector, timeout, option = new Optio
         timeSpan = currentTime - startTime
         if (element != null) {
             let clientHeight = await element.evaluate(node => node.getBoundingClientRect().height)
+            // let x = await element.evaluate(node => node.getBoundingClientRect().x)
+            // let y = await element.evaluate(node => node.getBoundingClientRect().y)
             let isBlocked = await isElementBlocked(element)
-            if (clientHeight != 0 && !isBlocked) {
+            if (clientHeight != null && clientHeight != 0 && !isBlocked) {
                 break
             }
         }
