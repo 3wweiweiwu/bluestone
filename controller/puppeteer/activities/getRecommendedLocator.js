@@ -61,9 +61,9 @@ module.exports = async function getRecommendedLocator(browser, targetLocator, pa
     /** @type {Array<ElementHandle>} */
     let targetElementList = await getLocator(frame, targetLocator)
 
-    //if there are more than 1 lcoator, we cannot proceed
+    //Due to html snapshot issue, we are unable to find locator correctly
     if (targetElementList.length != 1) {
-        console.warn('More than 1 target locator found!')
+        console.warn(`Error: ${targetElementList.length} locators found!`)
         return []
     }
 
