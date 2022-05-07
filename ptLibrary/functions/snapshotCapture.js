@@ -36,6 +36,9 @@ async function captureSnapshot(page) {
         let varSav = VarSaver.parseFromEnvVar()
         let pageData = null
         let extensionName = ''
+        if (varSav.isTakeSnapshot == false) {
+            return ''
+        }
         //only run under retry mode
         if (varSav.retryCount == 0) {
             pageData = await page.screenshot({ type: 'png' })
