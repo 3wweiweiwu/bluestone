@@ -34,7 +34,7 @@
       "request": "launch",
       "skipFiles": ["<node_internals>/**"],
       "type": "node",
-      "args": ["start", "C:\\Users\\administrator\\Desktop\\Raiz\\Bluestone2\\Apm Insights\\apm-insight-bluestone", "--port", "3601"]
+      "args": ["start", "../apm-insight-bluestone", "--port", "3601"]
     },
     {
       "name": "Launch Command line for connect bluestone",

@@ -63,6 +63,11 @@ async function startRecording(record, io, url = null) {
     const injectedScript = await singlefileScript.get(config.puppeteer);
     await page.evaluateOnNewDocument(injectedScript)
 
+    //inject robust Locator Generator
+    let robustLocatorPath = path.join(__dirname, '../../public/javascript/robustLocatorGen.js')
+    let robustLocatorGenScript = await fs.readFile(robustLocatorPath)
+    await page.evaluateOnNewDocument(robustLocatorGenScript.toString())
+
     //inject getEventListener
     // const eventListener = await fs.readFile(path.join(__dirname, '../../public/javascript/getEventListner.js'))
     // await page.evaluateOnNewDocument(eventListener)

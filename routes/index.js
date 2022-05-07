@@ -66,7 +66,7 @@ router.get('/locator-definer', async function (req, res) {
 
   await ui.updateUserInputForSpy(req.query)
 
-  ui.backend.getRecommendedLocatorFromDefiner(ui.locatorDefiner.defaultSelector, ui.locatorDefiner.parentFrame)
+  // ui.backend.getRecommendedLocatorFromDefiner(ui.locatorDefiner.defaultSelector, ui.locatorDefiner.parentFrame)
 
   let variables = {
     title: `Bluestone Recording: ${workflow.isRecording}`,

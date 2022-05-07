@@ -65,7 +65,7 @@ class PuppeteerControl {
      * @param {Array<string>} parentFrame 
      */
     async getRecommendedLocator(targetLocator, parentFrame) {
-        let result = await getRecommendedLocator(this.browser, targetLocator, parentFrame)
+        let result = await getRecommendedLocator(this.browser, this.page, targetLocator, parentFrame)
         return result
     }
     /**

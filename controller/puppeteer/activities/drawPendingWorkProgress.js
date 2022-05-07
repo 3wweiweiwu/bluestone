@@ -56,7 +56,7 @@ async function deleteProgressBar(page) {
  * @param {PicCaptureStatus} PicCaptureStatus 
  * @param {HtmlCaptureStatus} htmlCaptureStatus
  */
-async function drawPendingWorkProgress(page, PicCaptureStatus, htmlCaptureStatus) {
+async function drawPendingWorkProgress(page, PicCaptureStatus, htmlCaptureStatus, task) {
     let maximumWaitingTime = 15 * 1000//ms maximum wiating time is 15s
 
     //keep waiting until capture is all completed
@@ -65,6 +65,7 @@ async function drawPendingWorkProgress(page, PicCaptureStatus, htmlCaptureStatus
     } catch (error) {
         console.log(error)
     }
+    await task
     let startTime = Date.now()
     while (htmlCaptureStatus.isHtmlCaptureOngoing) {
         try {

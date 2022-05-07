@@ -110,9 +110,9 @@ module.exports = function (recordRepo, browser, page, io) {
                 recordRepo.operation.spy.result.isPass = false
                 recordRepo.operation.spy.result.text = `Unable to load bluestone-func.js: ${error.toString()}`
             }
-
+            let task1 = recordRepo.getRecommendedLocatorFromDefiner(recordRepo.operation.browserSelection.currentSelector, eventDetail.iframe)
             //display pending work progress
-            await drawPendingWorkProgress(page, recordRepo.picCapture, recordRepo.htmlCaptureStatus)
+            await drawPendingWorkProgress(page, recordRepo.picCapture, recordRepo.htmlCaptureStatus, task1)
             //display mvt console
             await openBluestoneTab(browser, "decide-view")
 
