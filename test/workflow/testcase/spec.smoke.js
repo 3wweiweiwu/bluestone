@@ -16,6 +16,22 @@ describe('Smoke Test - Integration', () => {
         bluestoneBackend = new Bluestone()
         await bluestoneBackend.launchApp()
     })
+    afterEach(function (done) {
+        this.timeout(120000)
+        siteBackend.closeApp()
+            .then(() => {
+                return bluestoneBackend.stopRecording()
+            })
+            .then(() => {
+                return bluestoneBackend.closeApp()
+            })
+            .then(() => {
+                done()
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    })
     after(function (done) {
         this.timeout(12000);
 
@@ -41,6 +57,7 @@ describe('Smoke Test - Integration', () => {
 
         });
     })
+
     it('should launch test harness and bluestone correctly', async () => {
         let res = await siteBackend.getMainPage()
         assert.strictEqual(res.status, 200, 'test harness site should launched')
@@ -116,20 +133,4 @@ describe('Smoke Test - Integration', () => {
 
 
     }).timeout(500000)
-    afterEach(function (done) {
-        this.timeout(120000)
-        siteBackend.closeApp()
-            .then(() => {
-                return bluestoneBackend.stopRecording()
-            })
-            .then(() => {
-                return bluestoneBackend.closeApp()
-            })
-            .then(() => {
-                done()
-            })
-            .catch(err => {
-                console.log(err)
-            })
-    })
 })

@@ -1,6 +1,5 @@
 const axios = require('axios').default
 const testConfig = require('../testConfig')
-const app = require('../../../app').app
 class TestSite {
     constructor() {
         this.port = testConfig.bluestone.port
@@ -12,6 +11,8 @@ class TestSite {
     async launchApp() {
         return new Promise((resolve) => {
             try {
+                delete require.cache[require.resolve('../../../app')];
+                const app = require('../../../app').app
                 this.app = app.listen(this.port, () => {
                     axios.get(`${this.url}/spy`)
                     resolve()
