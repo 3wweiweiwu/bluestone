@@ -84,6 +84,7 @@ class AST {
         b1.start(functionKeys.length, 0, {
             speed: "N/A"
         })
+        let funcStaicInfoList = await this.__getBsFuncInfoList(ast, functionKeys)
 
         for (let i = 0; i < functionKeys.length; i++) {
             b1.increment()
@@ -93,7 +94,7 @@ class AST {
             let locators = bsFunction[funcName].locators
 
             //extract static function info for current call
-            let funcStaicInfo = await this.__getBsFuncInfo(ast, funcName)
+            let funcStaicInfo = funcStaicInfoList[i]
             //Based on the static library and method name, correlate dynamic info
             let methodDetail = requireInfo.repo.find(info => {
                 return info.libraryName == funcStaicInfo.libraryName && info.methodName == funcStaicInfo.methodName
@@ -175,16 +176,16 @@ class AST {
     }
 
     /**
-     * Based on the bluestone function static info, return library name and method name
+     * Based on the bluestone function static info, return list of library name and method name
      * @param {*} ast 
-     * @param {string} funcName 
-     * @returns {BsFunc}
+     * @param {string[]} funcNameList 
+     * @returns {BsFunc[]}
      */
-    async __getBsFuncInfo(ast, funcName) {
+    async __getBsFuncInfoList(ast, funcNameList) {
         //extract static function info
         let currentNodeList = walk(ast, (node, ancestors) => {
             let parentAncestorIndex = ancestors.length - 2
-            return node.type == 'Identifier' && node.name == funcName && ancestors[parentAncestorIndex].type == 'Property'
+            return node.type == 'Identifier' && funcNameList.includes(node.name) && ancestors[parentAncestorIndex].type == 'Property'
         }, (node, ancestors) => {
             try {
                 if (ancestors[0].type != 'ExpressionStatement') return true
@@ -198,43 +199,42 @@ class AST {
             }
             return false
         })
-        if (currentNodeList.length != 1) {
-            throw "Cannot find node specified. Need fix!"
-        }
+        let bsFuncList = []
+        for (const currentNode of currentNodeList) {
+            //get current function signature
+            //go to parent node
+            let parentNodeIndex = currentNode.ancestors.length - 2
+            let parentNode = currentNode.ancestors[parentNodeIndex]
+            //depends on definition type(class or loose object), choose right parser
+            let funcNode = null
+            let libraryName = ''
+            let methodName = ''
+            if (parentNode.value.properties) {
+                funcNode = parentNode.value.properties.find(item => { return item.key.name == 'func' })
+                libraryName = funcNode.value.object.name
+                methodName = funcNode.value.property.name
+            }
+            else if (parentNode.value.type == 'NewExpression') {
+                libraryName = parentNode.value.callee.object.name
+                methodName = parentNode.value.callee.property.name
+            }
+            else if (parentNode.value.type == 'ClassExpression') {
+                funcNode = parentNode.value.body.body.find(item => item.key.name == 'func')
+                libraryName = funcNode.value.object.name
+                methodName = funcNode.value.property.name
+            }
+            else if (parentNode.value.type == 'MemberExpression') {
+                libraryName = parentNode.value.object.name
+                methodName = currentNode.node.name
+
+            }
 
 
-        let currentNode = currentNodeList[0]
-        //get current function signature
-        //go to parent node
-        let parentNodeIndex = currentNode.ancestors.length - 2
-        let parentNode = currentNode.ancestors[parentNodeIndex]
-        //depends on definition type(class or loose object), choose right parser
-        let funcNode = null
-        let libraryName = ''
-        let methodName = ''
-        if (parentNode.value.properties) {
-            funcNode = parentNode.value.properties.find(item => { return item.key.name == 'func' })
-            libraryName = funcNode.value.object.name
-            methodName = funcNode.value.property.name
-        }
-        else if (parentNode.value.type == 'NewExpression') {
-            libraryName = parentNode.value.callee.object.name
-            methodName = parentNode.value.callee.property.name
-        }
-        else if (parentNode.value.type == 'ClassExpression') {
-            funcNode = parentNode.value.body.body.find(item => item.key.name == 'func')
-            libraryName = funcNode.value.object.name
-            methodName = funcNode.value.property.name
-        }
-        else if (parentNode.value.type == 'MemberExpression') {
-            libraryName = parentNode.value.object.name
-            methodName = currentNode.node.name
-
+            let bsFunc = new BsFunc(libraryName, methodName)
+            bsFuncList.push(bsFunc)
         }
 
-
-        let bsFunc = new BsFunc(libraryName, methodName)
-        return bsFunc
+        return bsFuncList
 
     }
     /**
