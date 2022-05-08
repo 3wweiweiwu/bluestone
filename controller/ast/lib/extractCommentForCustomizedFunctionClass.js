@@ -19,6 +19,17 @@ async function extractCommentForCustomziedFunctionClass(jsStr) {
     let ast = acorn.parse(jsStr, { ecmaVersion: 2022 })
     let resultEntries = walk(ast, (node, ancestor) => {
         return node.type == 'MethodDefinition' && node.key.name == 'func' && ancestor.length >= 4
+    }, (node, ancestors) => {
+        try {
+            if (ancestors[0].type != 'ExpressionStatement') return true
+            if (ancestors[1].type != 'AssignmentExpression') return true
+            if (ancestors[2].type != 'ClassExpression') return true
+            if (ancestors[3].type != 'ClassBody') return true
+            if (ancestors.length > 6) return true
+        } catch (error) {
+
+        }
+        return false
     })
     for (const result of resultEntries) {
         let ancestorLength = result.ancestors.length

@@ -186,7 +186,17 @@ class AST {
             let parentAncestorIndex = ancestors.length - 2
             return node.type == 'Identifier' && node.name == funcName && ancestors[parentAncestorIndex].type == 'Property'
         }, (node, ancestors) => {
-            return ancestors.length > 6
+            try {
+                if (ancestors[0].type != 'ExpressionStatement') return true
+                if (ancestors[1].type != 'AssignmentExpression') return true
+                if (ancestors[2].type != 'ObjectExpression') return true
+                if (ancestors[3].type != 'Property') return true
+                if (ancestors[4].type != 'Identifier') return true
+                if (ancestors.length > 6) return true
+            } catch (error) {
+
+            }
+            return false
         })
         if (currentNodeList.length != 1) {
             throw "Cannot find node specified. Need fix!"
