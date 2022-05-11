@@ -230,8 +230,10 @@ document.addEventListener('mouseover', async event => {
         console.log(error)
     }
 
-    let atomicTree = new AtomicElementTree(target)
-    let atomicTreeStr = atomicTree.stringify()
+    // let atomicTree = new AtomicElementTree(target)
+    // let atomicTreeStr = atomicTree.stringify()
+    let atomicTree = {}
+    let atomicTreeStr = '{}'
     //style change will only be applied to source element
     const previousStyle = event.target.style.backgroundColor
     event.target.setAttribute(BLUESTONE.previousbackground, previousStyle)
