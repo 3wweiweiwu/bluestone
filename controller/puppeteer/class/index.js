@@ -18,10 +18,12 @@ const ElementSelector = require('../../../ptLibrary/class/ElementSelector')
 const { Page, Browser } = require('puppeteer-core')
 const openBluestoneTab = require('../activities/openBluestoneTab')
 const getFrame = require('../activities/getFrame')
-const checkLocatorInDefiner = require('../activities/checkLocatorInDefiner')
+const getLocator = require('../activities/getLocator')
+
 const getRecommendedLocator = require('../activities/getRecommendedLocator')
 const PuppeteerResult = require('../../mocha/class/StepResult')
 const _eval = require('eval')
+const ptInbuiltFunc = require('../../../ptLibrary/functions/inbuiltFunc')
 class PuppeteerControl {
     constructor() {
         /** @type {Page}*/
@@ -68,17 +70,6 @@ class PuppeteerControl {
         let result = await getRecommendedLocator(this.browser, this.page, targetLocator, parentFrame)
         return result
     }
-    /**
-     * Check if current locator exists in definer
-     * @param {string} targetLocator 
-     * @param {string} currentLocator
-     * @param {Array<string>} parentFrame 
-     * @returns 
-     */
-    async checkLocatorInDefiner(targetLocator, currentLocator, parentFrame) {
-        let result = await checkLocatorInDefiner(this.browser, targetLocator, currentLocator, parentFrame)
-        return result
-    }
     refreshSpy() {
         if (this.io) {
             this.io.emit(PuppeteerControl.inbuiltEvent.refresh)
@@ -95,6 +86,99 @@ class PuppeteerControl {
                 locator, index
             })
         }
+    }
+    async checkLocatorBasedOnDefiner(targetLocator, currentLocator, parentIframes) {
+        //sidebar is the id for the locatorDefinerpug
+        let page = this.page
+        await this.page.bringToFront()
+
+        /** @type {Array<ElementHandle>} */
+        let elements = []
+        let errorText = ''
+
+        //if target locator is equal to current locator and equals to null, it means we are dealing with parent locator, just return as it is
+
+        //navigate through frames and get to current elements
+        let frame = await getFrame(this.page, parentIframes)
+        if (frame == null) {
+            return `Unable to navigate to iframe ${JSON.stringify(parentIframes)}`
+        }
+
+        if (parentIframes.length == 0 && targetLocator == ptInbuiltFunc.VAR.parentIFrameLocator) {
+            //we are swithcing back to the top frame
+            if (currentLocator == ptInbuiltFunc.VAR.parentIFrameLocator) {
+                return errorText
+            }
+            else {
+                return 'Please use default value as we are switching back to parent frame'
+            }
+        }
+        //check if we are at the right html page
+        /** @type {Array<ElementHandle>} */
+        let targetElementList = await getLocator(frame, targetLocator, 10000)
+        if (targetElementList.length == 0) {
+            errorText = 'Original Selector cannot be found in current html snapshot. Please click <Previous Html> button and find right snapshot'
+            return errorText
+        }
+        else if (targetElementList.length > 1) {
+            errorText = 'Incorrect Original Selector. The current html page is incorrect. Please contact bluestone team or check your selector generator'
+            return errorText
+        }
+        //get target element
+        let targetElement = targetElementList[0]
+        //put rectangle around element to make it easy to identify
+        targetElement.evaluate(node => {
+            //record previous border info
+            node.setAttribute('bluestone-previous-border', node.style.border)
+            //draw rectangle
+            node.style.border = "thick solid #0000FF"
+        })
+
+        //check current locator user specified
+        elements = await getLocator(frame, currentLocator, 10000)
+
+        if (elements.length == 0) {
+            errorText = 'Cannot find locator specified. Please try different locator'
+        }
+        else if (elements.length > 1) {
+            errorText = 'More than 1 locator is found. Please try something else'
+        }
+        else {
+            //check if two elements are of the same coordination
+
+
+            let targettBox = await targetElement.boundingBox()
+            let currentBox = await elements[0].boundingBox()
+            if (currentBox == null) {
+                //when targebox and current box is invisible, conduct blind check
+                if (targettBox != currentBox) {
+                    errorText = 'The current element is not found'
+                }
+            }
+            else if (targettBox == null) {
+                //target element cannot be found. Conduct blind check
+                return errorText
+            }
+            else if (targettBox.height + targettBox.y < currentBox.height + currentBox.y ||
+                //check if current element is within the target element.
+                targettBox.width + targettBox.x < currentBox.width + currentBox.x ||
+                targettBox.x > currentBox.x ||
+                targettBox.y > currentBox.y
+            ) {
+                errorText = 'The current element is not contained within target element'
+            }
+
+            //check if current element and target element has same inner text. This is important becasue we might use current value for text validation
+            let targetText = await targetElement.evaluate(el => el.textContent);
+            let currentText = await elements[0].evaluate(el => el.textContent);
+            if (errorText == '' && targetText != currentText) {
+                errorText = `Inner Text is different. The target locator has inner text "${targetText}" while the current locator has inner text "${currentText}"`
+            }
+        }
+        return errorText
+
+
+
     }
     /**
      * Run current step

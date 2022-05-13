@@ -495,7 +495,7 @@ async function scanLocator() {
 
 async function captureHtml() {
     try {
-        await window.captureHtml()
+        // await window.captureHtml()
     } catch (error) {
 
     }
