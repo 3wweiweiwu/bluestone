@@ -1,5 +1,6 @@
 const yargs = require('yargs')
 const path = require('path')
+const { option } = require('yargs')
 const options = {
     path: {
         description: 'The path to the folder where we can find bluestone.json',
@@ -30,6 +31,14 @@ const options = {
     'function relative folder': {
         description: 'The directory to store the function. It will be under ./function/',
         type: 'string'
+    },
+    'test result': {
+        description: 'The path to the result file. This result file will help with auto-healing',
+        type: 'string',
+    },
+    'tcId': {
+        description: 'The name of test case. The testcase need to under ./script folder',
+        type: 'string',
     }
 }
 
@@ -44,6 +53,15 @@ let argv = yargs
             .options({ port: options.port })
             .example('bluestone start ./sample_project --port 3600',
                 'Starts on port 3600')
+    })
+    .command('edit <tcId>', 'Edit Testcase', recordYargs => {
+        recordYargs
+            .usage('Usage: Edit Testcase specified <tcId>. If you parse in execution report through <result> arg, auto-healing may save you maintenance time')
+            .help('help')
+            .positional('tcId', options.tcId)
+            .options({ tcResult: options['test result'] })
+            .wrap(null)
+            .example('bluestone edit testcaseName --result ./result.json', 'Edit testcaseName based on result from ./result.json')
     })
     .command('record <url>', 'Record new workflow', recordYargs => {
         recordYargs
