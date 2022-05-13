@@ -101,6 +101,8 @@ try {
                     console.log('hot reload complete!')
                 })
             break
+        case "edit":
+            break
         case 'install':
             regedit()
             break

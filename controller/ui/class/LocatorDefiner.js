@@ -2,6 +2,7 @@
 const Locator = require('../../locator/class/Locator')
 const { WorkflowRecord } = require('../../record/class/index')
 const checkLocatorInDefiner = require('../../puppeteer/activities/checkLocatorInDefiner')
+const ElementSelector = require('../../../ptLibrary/class/ElementSelector')
 class FinalLocatorSelection {
     constructor() {
         this.finalLocatorName = ''
@@ -187,8 +188,9 @@ class LocatorDefiner {
                 break
             case LocatorDefiner.inBuiltQueryKey.btnConfirm:
                 //check locator and confirm locator input
-                let locatorCheckResult = await this.backend.puppeteer.checkLocatorInDefiner(this.defaultSelector, this.locatorSelector, this.parentFrame)
+                let locatorCheckResult = await this.backend.puppeteer.checkLocatorBasedOnDefiner(this.defaultSelector, this.locatorSelector, this.parentFrame)
                 //will not update the locator if current locator is not valid
+                await this.backend.puppeteer.openBluestoneTab("locator-definer")
 
 
                 let finalSelection = this.getFinalSelection(locatorCheckResult)

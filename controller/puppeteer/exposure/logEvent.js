@@ -5,6 +5,7 @@ const fs = require('fs').promises
 const os = require('os')
 const openBluestoneTab = require('../../puppeteer/activities/openBluestoneTab')
 const { drawPendingWorkProgress } = require('../../puppeteer/activities/drawPendingWorkProgress')
+const takeScreenshotForLocatorDefiner = require('../../puppeteer/activities/takeScreenshotForLocatorDefiner')
 const Operation = require('../../puppeteer/class/index')
 /**
  * 
@@ -69,6 +70,7 @@ module.exports = function (recordRepo, browser, page, io) {
         if (page != null) {
             picturePath = recordRepo.getPicPath()
 
+            takeScreenshotForLocatorDefiner(page)
             if (eventDetail.target == '') {
                 //handle those element that will be destroyed right after interaaction
                 picturePath = recordRepo.operation.browserSelection.selectorPicture
