@@ -25,6 +25,7 @@ const getRecommendedLocator = require('../activities/getRecommendedLocator')
 const PuppeteerResult = require('../../mocha/class/StepResult')
 const _eval = require('eval')
 const ptInbuiltFunc = require('../../../ptLibrary/functions/inbuiltFunc')
+const takeScreenshotForLocatorDefiner = require('../activities/takeScreenshotForLocatorDefiner')
 class PuppeteerControl {
     constructor() {
         /** @type {Page}*/
@@ -134,14 +135,7 @@ class PuppeteerControl {
             //draw rectangle
             node.style.border = "thick solid #0000FF"
         })
-        let picPath = path.join(__dirname, '../../../public/temp/componentPic/', 'locatorDefiner.png')
-
-        try {
-            await fs.promises.unlink(picPath)
-        } catch (error) {
-
-        }
-        await page.screenshot({ path: picPath })
+        await takeScreenshotForLocatorDefiner(this.page)
         targetElement.evaluate(node => {
             //remove rectangle
             let prevBorder = node.getAttribute('bluestone-previous-border')
