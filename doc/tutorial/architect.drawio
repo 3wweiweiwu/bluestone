@@ -187,7 +187,7 @@
         </mxGraphModel>
     </diagram>
     <diagram id="XTzrMPFHOp2KuJLS0OQC" name="Mocha">
-        <mxGraphModel dx="786" dy="472" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="529" dy="472" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0WCBXv9GbKTtgIwWn1Cd-0"/>
                 <mxCell id="0WCBXv9GbKTtgIwWn1Cd-1" parent="0WCBXv9GbKTtgIwWn1Cd-0"/>
@@ -274,6 +274,57 @@
                 </mxCell>
                 <mxCell id="7OXyfcv1KJ1wNxzSMZQO-32" value="after" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="0WCBXv9GbKTtgIwWn1Cd-1">
                     <mxGeometry x="250" y="460" width="120" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="A84EzF5VY5uCZHv76IuZ" name="Integration Test Process">
+        <mxGraphModel dx="809" dy="472" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="1ede3eHRVBTnjT_EvUyh-0"/>
+                <mxCell id="1ede3eHRVBTnjT_EvUyh-1" parent="1ede3eHRVBTnjT_EvUyh-0"/>
+                <mxCell id="1ede3eHRVBTnjT_EvUyh-2" value="How realworld user interact with Bluestone" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1ede3eHRVBTnjT_EvUyh-1">
+                    <mxGeometry x="180" y="80" width="290" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="1ede3eHRVBTnjT_EvUyh-5" value="click/change/hover/drag/drop...etc" style="edgeStyle=none;html=1;" edge="1" parent="1ede3eHRVBTnjT_EvUyh-1" source="1ede3eHRVBTnjT_EvUyh-3" target="1ede3eHRVBTnjT_EvUyh-4">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="1ede3eHRVBTnjT_EvUyh-3" value="Actor" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1ede3eHRVBTnjT_EvUyh-1">
+                    <mxGeometry x="30" y="150" width="30" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="1ede3eHRVBTnjT_EvUyh-7" value="logEvent.js" style="edgeStyle=none;html=1;" edge="1" parent="1ede3eHRVBTnjT_EvUyh-1" source="1ede3eHRVBTnjT_EvUyh-4" target="1ede3eHRVBTnjT_EvUyh-6">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="1ede3eHRVBTnjT_EvUyh-4" value="Browser" style="whiteSpace=wrap;html=1;verticalAlign=top;" vertex="1" parent="1ede3eHRVBTnjT_EvUyh-1">
+                    <mxGeometry x="290" y="150" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="1ede3eHRVBTnjT_EvUyh-6" value="Bluestone Backend" style="whiteSpace=wrap;html=1;verticalAlign=top;" vertex="1" parent="1ede3eHRVBTnjT_EvUyh-1">
+                    <mxGeometry x="600" y="150" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="1ede3eHRVBTnjT_EvUyh-10" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1ede3eHRVBTnjT_EvUyh-1" source="1ede3eHRVBTnjT_EvUyh-8" target="1ede3eHRVBTnjT_EvUyh-9">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="1ede3eHRVBTnjT_EvUyh-8" value="Browser (controoled by bluestone' pupeeter)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1ede3eHRVBTnjT_EvUyh-1">
+                    <mxGeometry x="320" y="290" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="1ede3eHRVBTnjT_EvUyh-9" value="Bluestone Backend" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1ede3eHRVBTnjT_EvUyh-1">
+                    <mxGeometry x="580" y="290" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="1ede3eHRVBTnjT_EvUyh-12" value="&#10;&#10;&lt;span style=&quot;color: rgb(240, 240, 240); font-family: helvetica; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: center; text-indent: 0px; text-transform: none; word-spacing: 0px; background-color: rgb(42, 42, 42); display: inline; float: none;&quot;&gt;click/change/hover/drag/drop...etc&lt;/span&gt;&#10;&#10;" style="edgeStyle=none;html=1;entryX=0.015;entryY=0.638;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1ede3eHRVBTnjT_EvUyh-1" source="1ede3eHRVBTnjT_EvUyh-11" target="1ede3eHRVBTnjT_EvUyh-8">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="1ede3eHRVBTnjT_EvUyh-15" value="chek if desired value has been added or changed in the backend" style="edgeStyle=none;html=1;entryX=0.667;entryY=1.055;entryDx=0;entryDy=0;entryPerimeter=0;curved=1;" edge="1" parent="1ede3eHRVBTnjT_EvUyh-1" source="1ede3eHRVBTnjT_EvUyh-11" target="1ede3eHRVBTnjT_EvUyh-9">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="390" y="460"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="1ede3eHRVBTnjT_EvUyh-11" value="Integration Test Runner" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1ede3eHRVBTnjT_EvUyh-1">
+                    <mxGeometry y="300" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="1ede3eHRVBTnjT_EvUyh-16" value="Integration Test Process" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1ede3eHRVBTnjT_EvUyh-1">
+                    <mxGeometry x="235" y="240" width="290" height="30" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>

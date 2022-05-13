@@ -1,4 +1,7 @@
 # LogEvent Function
+## Usage
+Take the inforamtion from browser and convert that, depends on the operation, it will either save the current operation to the backend object or start Bluestone Agent
+
 ## Common Logic
     * Parse potential locator match from string to json
     * Parse Auto-healing infroamtion from string to json

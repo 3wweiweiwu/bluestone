@@ -21,12 +21,12 @@
       "args": ["start", "../sample-bluestone-project", "--port", "3601"]
     },
     {
-      "name": "Launch Command line for wab-bluestone",
+      "name": "Launch Command line for brm-bluestone",
       "program": "${workspaceFolder}/bin/bluestone.js",
       "request": "launch",
       "skipFiles": ["<node_internals>/**"],
       "type": "node",
-      "args": ["start", "../wab-bluestone", "--port", "3601"]
+      "args": ["start", "../bluestone-batch-release-manager", "--port", "3601"]
     },
     {
       "name": "Launch Command line for apm-insight-bluestone",
