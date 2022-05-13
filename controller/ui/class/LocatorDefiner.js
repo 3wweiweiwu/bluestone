@@ -190,7 +190,7 @@ class LocatorDefiner {
                 //check locator and confirm locator input
                 let locatorCheckResult = await this.backend.puppeteer.checkLocatorBasedOnDefiner(this.defaultSelector, this.locatorSelector, this.parentFrame)
                 //will not update the locator if current locator is not valid
-                await this.backend.puppeteer.openBluestoneTab("spy")
+                await this.backend.puppeteer.openBluestoneTab("locator-definer")
 
 
                 let finalSelection = this.getFinalSelection(locatorCheckResult)

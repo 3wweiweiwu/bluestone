@@ -19,7 +19,8 @@ const { Page, Browser } = require('puppeteer-core')
 const openBluestoneTab = require('../activities/openBluestoneTab')
 const getFrame = require('../activities/getFrame')
 const getLocator = require('../activities/getLocator')
-
+const path = require('path')
+const fs = require('fs')
 const getRecommendedLocator = require('../activities/getRecommendedLocator')
 const PuppeteerResult = require('../../mocha/class/StepResult')
 const _eval = require('eval')
@@ -133,7 +134,20 @@ class PuppeteerControl {
             //draw rectangle
             node.style.border = "thick solid #0000FF"
         })
+        let picPath = path.join(__dirname, '../../../public/temp/componentPic/', 'locatorDefiner.png')
 
+        try {
+            await fs.promises.unlink(picPath)
+        } catch (error) {
+
+        }
+        await page.screenshot({ path: picPath })
+        targetElement.evaluate(node => {
+            //remove rectangle
+            let prevBorder = node.getAttribute('bluestone-previous-border')
+            node.removeAttribute('bluestone-previous-border')
+            node.style.border = prevBorder
+        })
         //check current locator user specified
         elements = await getLocator(frame, currentLocator, 10000)
 
