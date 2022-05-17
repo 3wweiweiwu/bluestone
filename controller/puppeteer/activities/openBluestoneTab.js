@@ -14,4 +14,7 @@ module.exports = async function (browser, bluestonePath) {
     //navigate to bluestone url
     await targetPage.goto(`${bluestonePageUrl}/${bluestonePath}`)
     await targetPage.bringToFront()
+    await targetPage.evaluate(() => {
+        location.reload(true)
+    })
 }

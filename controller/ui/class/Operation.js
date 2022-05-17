@@ -189,7 +189,7 @@ class Operation {
                 let result = await this.backend.puppeteer.runCurrentStep(currentOperation, elementSelector, this.backend.operation.browserSelection.parentIframe)
                 this.backend.operation.spy.result.isPass = result.isResultPass
                 this.backend.operation.spy.result.text = result.resultText
-                this.backend.puppeteer.refreshSpy()
+                // this.backend.puppeteer.refreshSpy()
                 await this.backend.puppeteer.openBluestoneTab("spy")
                 break;
             case Operation.inbuiltQueryKey.currentArgument:
