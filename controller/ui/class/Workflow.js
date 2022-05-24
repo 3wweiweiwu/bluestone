@@ -115,9 +115,11 @@ class WorkFlowPug {
 
             case WorkFlowPug.inBuiltQueryKey.txtTestSuiteQueryKey:
                 this.textTestSuiteValue = firstValue
+                this.backend.testSuiteName = firstValue
                 break
             case WorkFlowPug.inBuiltQueryKey.txtTestCaseQueryKey:
                 this.textTestCaseValue = firstValue
+                this.backend.testcaseName = firstValue
                 break
             case WorkFlowPug.inBuiltQueryKey.btnRunWorkflow:
                 this.backend.runAllSteps()
@@ -161,11 +163,11 @@ class WorkFlowPug {
             this.txtValidationStatus = 'Please wait, execution is going on.'
             return false
         }
-        if (this.textTestSuiteValue == '') {
+        if (this.backend.testSuiteName == '') {
             this.txtValidationStatus = 'Please enter test suite name'
             return false
         }
-        if (this.textTestCaseValue == '') {
+        if (this.backend.testcaseName == '') {
             this.txtValidationStatus = 'Please enter test case name'
             return false
         }

@@ -99,5 +99,7 @@ class RecordingStep {
  * @property {number} currentSelectedIndex
  * @property {number} scriptLineNumber
  * @property {string} healingTree
+ * @property {string} finalLocatorName
+ * @property {string} finalLocator
  */
 module.exports = RecordingStep

@@ -7,6 +7,8 @@ const TestCase = require('../coder/class/Testcase')
 const RecordingStep = require('../record/class/RecordingStep')
 const AstManager = require('../ast/index')
 const { LocatorManager } = require('../locator/index')
+const config = require('../../config');
+const path = require('path');
 class ScriptBreaker {
     constructor(script) {
         this.script = script
@@ -65,7 +67,12 @@ class TestcaseLoader {
         this.scriptBreaker = null
     }
 
-
+    get testCase() {
+        return this.#testCase
+    }
+    get testSuite() {
+        return this.#testSuite
+    }
     async parseTc(isExtractTestInfo = true) {
         let fileInfo = await fs.readFile(this.#filePath)
         let fileStr = fileInfo.toString()
@@ -80,6 +87,27 @@ class TestcaseLoader {
             this.#testCase = this.#extractTestcaseName()
         }
         this.steps = this.#extractTestStep(this.scriptBreaker)
+    }
+
+    /**
+     * copy locator picture to public folder for display
+     * @param {Function} pathGenFunc 
+     */
+    async copyStockLocatorPic(pathGenFunc) {
+
+        for (const step of this.steps) {
+            if (step.targetPicPath == '') continue
+            try {
+                await fs.access(step.targetPicPath)
+            } catch (error) {
+                /**@param {string} */
+                let picPath = pathGenFunc()
+                let sourcePicPath = path.join(config.code.pictureFolder, '..', step.targetPicPath)
+                await fs.copyFile(sourcePicPath, picPath)
+                step.targetPicPath = picPath
+            }
+
+        }
     }
     /**
      * Get test suite name from the node
@@ -135,11 +163,29 @@ class TestcaseLoader {
             let ancestorLength = item.ancestors.length
             let command = item.ancestors[ancestorLength - 3].object.property.name
             let args = item.ancestors[ancestorLength - 4].arguments
+            //populate target field
+            let target = 'place holder'
             //populate function
             let functionAst
+            let targetPicPath = ''
+            let finalLocatorName = ''
+            let finalLocator = ['']
+            let htmlPath = ''
+            let potentialMatch = []
             try {
                 functionAst = this.#astManager.getFunction(command)
                 functionAst.params = this.#extractFunctionParam(args, functionAst.params)
+                //populate target inforamtion
+                let targetParam = functionAst.params.find(item => item.type.name == 'ElementSelector')
+                if (targetParam != null) {
+                    finalLocatorName = targetParam.value
+                    let locatorObj = this.#locatorManager.locatorLibrary.find(item => item.path == finalLocatorName)
+                    finalLocator = locatorObj.Locator
+                    target = finalLocator[0]
+                    targetPicPath = locatorObj.screenshot
+                    htmlPath = ''
+                }
+
             } catch (error) {
                 //only print out error in the bluestone main console
                 if (process.env.BLUESTONE_VAR_SAVER == null)
@@ -151,7 +197,7 @@ class TestcaseLoader {
             let expressionStatement = item.ancestors[ancestorLength - 6]
             //convert 0 based index to 1 based line number
             let scriptLineNumber = scriptBreaker.getStepLineIndexByEndPoint(expressionStatement.end) + 1
-            let step = new RecordingStep({ command, functionAst, scriptLineNumber })
+            let step = new RecordingStep({ command, functionAst, scriptLineNumber, target, finalLocator, finalLocatorName, targetPicPath, htmlPath, potentialMatch })
             allSteps.push(step)
         }
         return allSteps

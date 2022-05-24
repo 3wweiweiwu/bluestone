@@ -18,7 +18,9 @@ const PicCapture = require('../class/PicCapture')
 const ptConstant = require('../../../ptLibrary/functions/inbuiltFunc').VAR
 const RecordingStep = require('./RecordingStep')
 const MochaDriver = require('../../mocha/index')
+const TestCaseLoader = require("../../ast/TestCaseLoader")
 const os = require('os')
+const TestcaseLoader = require('../../ast/TestCaseLoader')
 /**
  * @typedef {string} CommandType
  **/
@@ -55,6 +57,8 @@ class WorkflowRecord {
         //TODO: seperate step into another class
         this.puppeteer = puppeteer
         this.name = ''
+        this.testcaseName = ''
+        this.testSuiteName = ''
         /** 
          * @type {Array<RecordingStep>} 
          */
@@ -184,7 +188,11 @@ class WorkflowRecord {
             })
             if (param != null) {
                 param.value = snapshotName
-                await fs.writeFile(snapshotPath, step.healingTree)
+                try {
+                    await fs.writeFile(snapshotPath, step.healingTree)
+                } catch (error) {
+
+                }
 
             }
         }
@@ -195,11 +203,11 @@ class WorkflowRecord {
     }
     /**
      * Write Testcase code into script output folder and update bluestone-locator.js 
-     * @param {string} testSuite 
-     * @param {string} testCase 
      * @returns {string} output path
      */
-    async writeCodeToDisk(testSuite, testCase) {
+    async writeCodeToDisk() {
+        let testSuite = this.testSuiteName
+        let testCase = this.testcaseName
         await this.__updateHealingInfo(testCase)
         //write code to disk
         let functionAstList = this.getAllFunctionAst()
@@ -822,8 +830,38 @@ class WorkflowRecord {
         return filePath
 
     }
+    /**
+     * @param {string} relativeScriptPath path to the file
+     * @returns {WorkflowRecord}
+     */
+    async loadTestcase(relativeScriptPath) {
+        //get full script path
+        let bluestonePath = process.env.bluestonePath
+        let bluestoneFolder = path.dirname(bluestonePath)
+        let bluestoneScriptFolder = path.join(bluestoneFolder, 'script')
+        //apend .js file name if it not included
+        if (!relativeScriptPath.toLowerCase().endsWith('.js')) {
+            relativeScriptPath += '.js'
+        }
+        let scriptPath = path.join(bluestoneScriptFolder, relativeScriptPath)
+
+        //check if file exists
+        try {
+            await fs.access(scriptPath)
+        } catch (error) {
+            throw new Error(`Unable to find file at ${scriptPath}`)
+        }
 
 
+        let tcLoader = new TestcaseLoader(scriptPath, this.locatorManager, this.astManager)
+        await tcLoader.parseTc(true)
+        await tcLoader.copyStockLocatorPic(this.getPicPath)
+        //update test step information based on new files
+        this.steps = tcLoader.steps
+        this.testSuiteName = tcLoader.testSuite
+        this.testcaseName = tcLoader.testCase
+
+    }
 }
 
 module.exports = { WorkflowRecord, RecordingStep, COMMAND_TYPE }
