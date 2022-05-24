@@ -70,7 +70,7 @@ module.exports = function (recordRepo, browser, page, io) {
         if (page != null) {
             picturePath = recordRepo.getPicPath()
 
-            takeScreenshotForLocatorDefiner(page)
+
             if (eventDetail.target == '') {
                 //handle those element that will be destroyed right after interaaction
                 picturePath = recordRepo.operation.browserSelection.selectorPicture
@@ -97,6 +97,7 @@ module.exports = function (recordRepo, browser, page, io) {
 
         //if event command is null, call the in-browser console
         if (eventDetail.command == null) {
+            takeScreenshotForLocatorDefiner(page)
             recordRepo.isCaptureHtml = false
 
             recordRepo.spyBrowserSelectionPicPath = picturePath
