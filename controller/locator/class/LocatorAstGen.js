@@ -91,7 +91,7 @@ class LocatorAstGen {
                         },
                         "value": {
                             "type": "Literal",
-                            "value": picPath,
+                            "value": picPath || '',
                         },
                         "kind": "init"
                     },
