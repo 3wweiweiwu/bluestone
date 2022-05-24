@@ -37,7 +37,7 @@ async function waitForElement(page, elementSelector, timeout, option = new Optio
     let varSav = VarSaver.parseFromEnvVar()
     //extends the timeout by 1.5x if we are in the retry mode
     if (varSav.retryCount > 0) timeout = timeout * 1.5
-
+    let blockedElement = null
     do {
 
         try {
@@ -64,6 +64,7 @@ async function waitForElement(page, elementSelector, timeout, option = new Optio
                 break
             }
         }
+        blockedElement = element
         element = null
     } while (timeSpan < timeout);
 
@@ -92,7 +93,11 @@ async function waitForElement(page, elementSelector, timeout, option = new Optio
             await varSav.healingInfo.createPerscription(elementSelector.displayName, elementSelector.locator, elementInfo.locator, pageData, varSav.currentFilePath, varSav.tcStepInfo, false)
         }
     }
-
+    //in case element is blocked and we cannot find any good alternative, use blocked element
+    //as a final workaround
+    if (element == null && blockedElement != null) {
+        element = blockedElement
+    }
     if (element == null) {
         let info = `Unable to find UI element: "${elementSelector.displayName}" in ${timeout}ms`
         //only add result to locator report only when original locator is not found
