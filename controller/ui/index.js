@@ -38,7 +38,7 @@ class UI {
             case Workflow.inBuiltQueryKey.btnResolveLocatorQueryKey:
 
                 this.backend.resolveExistingLocatorInSteps()
-                await this.backend.fixHtmlPathIssue(this.backend.htmlCaptureStatus)
+                // await this.backend.fixHtmlPathIssue(this.backend.htmlCaptureStatus)
                 stepIndex = this.backend.findPendingLocatorInStep()
                 if (stepIndex != -1) {
                     targetStep = this.backend.steps[stepIndex]
