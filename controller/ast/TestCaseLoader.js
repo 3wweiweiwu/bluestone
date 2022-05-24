@@ -1,4 +1,5 @@
 const fs = require('fs').promises
+const fsSync = require('fs')
 const acorn = require("acorn");
 const walk = require('./lib/walk')
 const FunctionAst = require('../ast/class/Function')
@@ -109,6 +110,17 @@ class TestcaseLoader {
 
         }
     }
+    async getStepHealingInfo() {
+        for (const step of this.steps) {
+            try {
+                await fs.access(step.healingTree)
+                let healingBinary = await fs.readFile(step.healingTree)
+                step.healingTree = healingBinary.toString()
+            } catch (error) {
+            }
+
+        }
+    }
     /**
      * Get test suite name from the node
      * @returns {string}
@@ -164,7 +176,7 @@ class TestcaseLoader {
             let command = item.ancestors[ancestorLength - 3].object.property.name
             let args = item.ancestors[ancestorLength - 4].arguments
             //populate target field
-            let target = 'place holder'
+            let target = 'no target'
             //populate function
             let functionAst
             let targetPicPath = ''
@@ -172,6 +184,7 @@ class TestcaseLoader {
             let finalLocator = ['']
             let htmlPath = ''
             let potentialMatch = []
+            let healingTree = '{}'
             try {
                 functionAst = this.#astManager.getFunction(command)
                 functionAst.params = this.#extractFunctionParam(args, functionAst.params)
@@ -185,7 +198,14 @@ class TestcaseLoader {
                     targetPicPath = locatorObj.screenshot
                     htmlPath = ''
                 }
+                //populate healing information
+                targetParam = functionAst.params.find(item => item.type.name == 'HealingSnapshot')
+                if (targetParam != null) {
+                    let snapshotFolder = path.join(config.code.dataPath, this.testCase, '/snapshot/')
+                    let healingSnapshotFile = targetParam.value + '.json'
+                    healingTree = path.join(snapshotFolder, healingSnapshotFile)
 
+                }
             } catch (error) {
                 //only print out error in the bluestone main console
                 if (process.env.BLUESTONE_VAR_SAVER == null)
@@ -197,7 +217,7 @@ class TestcaseLoader {
             let expressionStatement = item.ancestors[ancestorLength - 6]
             //convert 0 based index to 1 based line number
             let scriptLineNumber = scriptBreaker.getStepLineIndexByEndPoint(expressionStatement.end) + 1
-            let step = new RecordingStep({ command, functionAst, scriptLineNumber, target, finalLocator, finalLocatorName, targetPicPath, htmlPath, potentialMatch })
+            let step = new RecordingStep({ command, functionAst, scriptLineNumber, target, finalLocator, finalLocatorName, targetPicPath, htmlPath, potentialMatch, healingTree })
             allSteps.push(step)
         }
         return allSteps
@@ -215,6 +235,9 @@ class TestcaseLoader {
             }
             if (item.type.name == 'ElementSelector') {
                 item.value = args[index].property.value
+            }
+            if (item.type.name == 'HealingSnapshot') {
+                item.value = args[3].arguments[0].value
             }
         })
         return functionParams

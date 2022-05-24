@@ -856,8 +856,11 @@ class WorkflowRecord {
         let tcLoader = new TestcaseLoader(scriptPath, this.locatorManager, this.astManager)
         await tcLoader.parseTc(true)
         await tcLoader.copyStockLocatorPic(this.getPicPath)
+        await tcLoader.getStepHealingInfo()
         //update test step information based on new files
         this.steps = tcLoader.steps
+        //remove first initailize step
+        this.steps.splice(0, 1)
         this.testSuiteName = tcLoader.testSuite
         this.testcaseName = tcLoader.testCase
 
