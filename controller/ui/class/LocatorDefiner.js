@@ -183,8 +183,9 @@ class LocatorDefiner {
 
 
                 //specify locator function name in the param
-                await this.backend.puppeteer.checkLocatorInDefiner(this.defaultSelector, this.locatorSelector, this.parentFrame)
+                await this.backend.puppeteer.checkLocatorBasedOnDefiner(this.defaultSelector, this.locatorSelector, this.parentFrame)
                 this.validationText += '[Locator Overriden]'
+                await this.backend.puppeteer.openBluestoneTab("locator-definer")
                 break
             case LocatorDefiner.inBuiltQueryKey.btnConfirm:
                 //check locator and confirm locator input
