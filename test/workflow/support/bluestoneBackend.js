@@ -6,6 +6,7 @@ class TestSite {
         this.url = `http://localhost:${this.port}`
         this.app = null
         process.env.port = this.port
+        this.operationUrl = `${this.url}/spy`
     }
 
     async launchApp() {

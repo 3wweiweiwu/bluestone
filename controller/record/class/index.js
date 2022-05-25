@@ -109,8 +109,8 @@ class WorkflowRecord {
         this.inbuiltFuncPath = path.join(__dirname, '../../../ptLibrary/bluestone-func.js')
         this.initializeFunctions()
         /**@type {MochaDriver} */
-        this.mochaDriver = null
-    }
+            this.mochaDriver = null
+        }
     async initializeFunctions() {
         console.log('Initializing Bluestone...')
         await this.astManager.loadFunctions(config.code.funcPath)
