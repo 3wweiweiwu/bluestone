@@ -132,6 +132,7 @@ class WorkFlowPug {
                 break
             case WorkFlowPug.inBuiltQueryKey.btnAbortExecution:
                 try {
+                    this.backend.puppeteer.StepAbortManager.abortStepExecution()
                     this.backend.mochaDriver.abortScript()
                 } catch (error) {
                 }

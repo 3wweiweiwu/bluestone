@@ -90,7 +90,7 @@ async function waitForElement(page, elementSelector, timeout, option = new Optio
     }
     if (option.takeSnapshot) {
         try {
-            if (pageData == null) {
+            if (pageData == null && varSav.isTakeSnapshot) {
                 pageData = await highlightProposedElement(page, element)
             }
             await captureSnapshot(pageData)

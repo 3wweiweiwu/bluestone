@@ -124,7 +124,7 @@ class HealingInfo {
         }
 
 
-        if (varSav == null || Object.keys(varSav.healingInfo.locatorReport.usage).length == 0) {
+        if (varSav == null || varSav.healingInfo == null || Object.keys(varSav.healingInfo.locatorReport.usage).length == 0) {
             let content = (fs.readFileSync(perscriptionPath)).toString()
             obj = JSON.parse(content)
         }

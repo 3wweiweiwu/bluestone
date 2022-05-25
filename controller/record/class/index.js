@@ -561,6 +561,8 @@ class WorkflowRecord {
             let elementSelector = new ElementSelector(step.finalLocator, '', step.finalLocatorName)
 
             let result = await this.puppeteer.runCurrentStep(step.functionAst, elementSelector, step.iframe)
+            await this.puppeteer.StepAbortManager.stopStepAbortMonitor()
+            await new Promise(resolve => setTimeout(resolve, 300))
             this.steps[i].result = result
             if (!result.isResultPass) {
                 failedStepIndex = i
