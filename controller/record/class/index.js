@@ -117,6 +117,24 @@ class WorkflowRecord {
         await this.astManager.loadFunctions(this.inbuiltFuncPath)
         console.log('Bluestone has started')
     }
+    /**
+     * Based on the path specified, update picture in locator definer
+     * @param {string} picPath 
+     */
+    async updateLocatorDefinerPic(picPath) {
+        let targetPath = path.join(__dirname, '../../../public/temp/componentPic/locatorDefiner.png')
+        try {
+            await fs.unlink(targetPath)
+        } catch (error) {
+
+        }
+        try {
+            await fs.access(picPath)
+            await fs.copyFile(picPath, targetPath)
+        } catch (error) {
+            return
+        }
+    }
     get isNavigationPending() {
         return this.__isNavigationPending
     }
@@ -521,9 +539,11 @@ class WorkflowRecord {
     }
     /**
      * Run All steps and assign result to step via bluestone
+     * @param {number} startingIndex
+     * @param {number} endIndex
      * @returns {number} index of the failed step. -1 if everything pass
      */
-    async runAllStepsViaBluestone() {
+    async runAllStepsViaBluestone(startingIndex = 0, endIndex = null) {
         let failedStepIndex = -1
         //check if there is any un-correlated locator in step
         failedStepIndex = this.findPendingLocatorInStep()
@@ -532,9 +552,11 @@ class WorkflowRecord {
             this.steps[failedStepIndex].result.resultText = 'Locator has not been correleated'
             return failedStepIndex
         }
-
+        if (endIndex == null) {
+            endIndex = this.steps.length
+        }
         //run step one by one
-        for (let i = 0; i < this.steps.length; i++) {
+        for (let i = startingIndex; i < endIndex; i++) {
             let step = this.steps[i]
             let elementSelector = new ElementSelector(step.finalLocator, '', step.finalLocatorName)
 
@@ -543,6 +565,16 @@ class WorkflowRecord {
             if (!result.isResultPass) {
                 failedStepIndex = i
                 break
+            }
+
+            let stepSnapshotPath = path.join(os.tmpdir(), 'stepSnapshot.png')
+            let proposedSnapshotPath = this.getPicPath()
+            try {
+                await fs.access(stepSnapshotPath)
+                await fs.copyFile(stepSnapshotPath, proposedSnapshotPath)
+                this.steps[i].htmlPath = proposedSnapshotPath
+            } catch (error) {
+
             }
         }
         await this.puppeteer.openBluestoneTab('workflow')
@@ -857,6 +889,7 @@ class WorkflowRecord {
         await tcLoader.parseTc(true)
         await tcLoader.copyStockLocatorPic(this.getPicPath)
         await tcLoader.getStepHealingInfo()
+        await tcLoader.getIFrameInfo()
         //update test step information based on new files
         this.steps = tcLoader.steps
         //remove first initailize step

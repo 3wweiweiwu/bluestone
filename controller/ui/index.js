@@ -82,7 +82,7 @@ class UI {
 
         //create a new object because we are going to modify screenshot key direclty
         let newPotentialMatch = await this.__updatePotentialMatchStockPic(potentialMatch)
-
+        await this.backend.updateLocatorDefinerPic(locatorHtmlPath)
         this.locatorDefiner = new LocatorDefiner(defaultSelector, htmlUrl, locatorName, locatorSelector[0], newPotentialMatch, stepIndex, this.backend, parentFrame)
     }
     /**

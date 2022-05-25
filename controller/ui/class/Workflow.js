@@ -30,7 +30,8 @@ class WorkFlowPug {
         txtTestCaseQueryKey: 'WORKFLOW_TEST_CASE',
         btnRunWorkflow: 'WORKFLOW_RUN_ALL',
         updateStepQueryKey: 'WORKFLOW_UPDATE_STEP',
-        btnAbortExecution: 'WORKFLOW_ABORT_EXECUTION'
+        btnAbortExecution: 'WORKFLOW_ABORT_EXECUTION',
+        btnFixScreenshotByRunTC: 'WORKFLOW_FIX_SCREENSHOT_BY_RUN_TESTCASE'
     }
     /**
      * 
@@ -123,6 +124,10 @@ class WorkFlowPug {
                 break
             case WorkFlowPug.inBuiltQueryKey.btnRunWorkflow:
                 this.backend.runAllSteps()
+                this.validateForm()
+                break
+            case WorkFlowPug.inBuiltQueryKey.btnFixScreenshotByRunTC:
+                this.backend.runAllStepsViaBluestone()
                 this.validateForm()
                 break
             case WorkFlowPug.inBuiltQueryKey.btnAbortExecution:

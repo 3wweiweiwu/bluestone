@@ -35,6 +35,7 @@ async function waitForElement(page, elementSelector, timeout, option = new Optio
     let elementInfo = null
     let timeSpan = 0
     let varSav = VarSaver.parseFromEnvVar()
+    let pageData = null
     //extends the timeout by 1.5x if we are in the retry mode
     if (varSav.retryCount > 0) timeout = timeout * 1.5
     let blockedElement = null
@@ -68,12 +69,6 @@ async function waitForElement(page, elementSelector, timeout, option = new Optio
         element = null
     } while (timeSpan < timeout);
 
-    if (option.takeSnapshot) {
-        try {
-            await captureSnapshot(page)
-        } catch (error) {
-        }
-    }
     //locator found correctly and it is not part of healing trial, log coverage info
     if (element != null && option.isHealingByLocatorBackup) {
         try {
@@ -89,8 +84,17 @@ async function waitForElement(page, elementSelector, timeout, option = new Optio
         elementInfo = await getElementBasedOnLocatorBackup(page, elementSelector, 0.8)
         element = elementInfo.element
         if (element != null) {
-            let pageData = await highlightProposedElement(page, element)
+            pageData = await highlightProposedElement(page, element)
             await varSav.healingInfo.createPerscription(elementSelector.displayName, elementSelector.locator, elementInfo.locator, pageData, varSav.currentFilePath, varSav.tcStepInfo, false)
+        }
+    }
+    if (option.takeSnapshot) {
+        try {
+            if (pageData == null) {
+                pageData = await highlightProposedElement(page, element)
+            }
+            await captureSnapshot(pageData)
+        } catch (error) {
         }
     }
     //in case element is blocked and we cannot find any good alternative, use blocked element
@@ -307,7 +311,7 @@ async function getElementBasedOnLocatorBackup(page, elementSelector, similarityB
  * @param {Page} page 
  * @param {ElementHandle} element 
  */
-async function highlightProposedElement(page, element, outputPath) {
+async function highlightProposedElement(page, element) {
     let borderStyle = await element.evaluate(node => {
         //record previous border info
         let borderStyle = node.style.border
@@ -316,6 +320,9 @@ async function highlightProposedElement(page, element, outputPath) {
         return borderStyle
     })
     let pageData = await page.screenshot({ type: 'png' })
+    await element.evaluate((node, prevBorderStyle) => {
+        node.style.border = prevBorderStyle
+    }, borderStyle)
     return pageData
 
 }

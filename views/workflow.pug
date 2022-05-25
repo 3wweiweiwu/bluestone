@@ -3,5 +3,5 @@ include ./component/workflow/workflowTable.pug
 include ./component/workflow/testcaseControl.pug
 block content
     link(rel='stylesheet' href='/stylesheets/workflow.css')    
-    +testcase-control(btnResolveLocatorQueryKey,btnCreateTestcaseQueryKey,txtTestSuiteQueryKey,textTestSuiteValue,txtTestCaseQueryKey,textTestCaseValue,txtValidationStatus,isValidationPass,btnAbortExecution)
+    +testcase-control(btnResolveLocatorQueryKey,btnCreateTestcaseQueryKey,txtTestSuiteQueryKey,textTestSuiteValue,txtTestCaseQueryKey,textTestCaseValue,txtValidationStatus,isValidationPass,btnAbortExecution,btnFixScreenshotByRunTC)
     +workflow-table(workflow.header,workflow.info,removeWorkflowQueryKey,upWorkflowQueryKey,downWorkflowQueryKey,editWorkflowQueryKey,locatorWorkflowQueryKey,updateStepQueryKey)

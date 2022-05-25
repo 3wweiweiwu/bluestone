@@ -110,6 +110,9 @@ class TestcaseLoader {
 
         }
     }
+    /**
+     * Populate healing inforamtion
+     */
     async getStepHealingInfo() {
         for (const step of this.steps) {
             try {
@@ -119,6 +122,16 @@ class TestcaseLoader {
             } catch (error) {
             }
 
+        }
+    }
+    async getIFrameInfo() {
+        let iFrame = []
+        for (const step of this.steps) {
+            step.iframe = iFrame
+            if (step.command == 'gotoFrame') {
+                let elementSelectorParam = step.functionAst.params.find(item => item.type.name == 'ElementSelector')
+                iFrame = [elementSelectorParam.value]
+            }
         }
     }
     /**
