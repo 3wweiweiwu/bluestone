@@ -148,8 +148,8 @@ Object.keys(EVENTCONST).forEach(item => {
                 break;
             case EVENTCONST.scroll:
                 parameter = `${event.target.scrollTop.toString()},${event.target.scrollLeft.toString()}`
-                // return
-                break;
+                return
+            // break;
             default:
                 break;
         }
