@@ -97,7 +97,7 @@ module.exports = function (recordRepo, browser, page, io) {
 
         //if event command is null, call the in-browser console
         if (eventDetail.command == null) {
-            takeScreenshotForLocatorDefiner(page)
+            await takeScreenshotForLocatorDefiner(page)
             recordRepo.isCaptureHtml = false
 
             recordRepo.spyBrowserSelectionPicPath = picturePath
@@ -113,6 +113,7 @@ module.exports = function (recordRepo, browser, page, io) {
                 recordRepo.operation.spy.result.isPass = false
                 recordRepo.operation.spy.result.text = `Unable to load bluestone-func.js: ${error.toString()}`
             }
+
             let task1 = recordRepo.getRecommendedLocatorFromDefiner(recordRepo.operation.browserSelection.currentSelector, eventDetail.iframe)
             //display pending work progress
             await drawPendingWorkProgress(page, recordRepo.picCapture, recordRepo.htmlCaptureStatus, task1)
