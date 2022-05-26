@@ -131,7 +131,7 @@ async function hideSpy(puppeteerControl, isSpyVisible) {
     let page = puppeteerControl.page
     await page.bringToFront()
     page.evaluate(() => {
-        window.captureHtml()
+        // window.captureHtml()
         captureScreenshot()
     })
     puppeteerControl.scanLocatorInBrowser()

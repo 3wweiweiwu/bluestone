@@ -133,7 +133,7 @@ class WorkflowRecord {
          * Since locator generation is time-consuming, we will do it in background
          * Once it is finish, it will update locator with place holder in place
          */
-        let locatorPlaceHolderId = `//*[@Please-Wait-For-Locator-To-Be-Generated='${Date.now().toString()}']`
+        let locatorPlaceHolderId = `//*[@Refresh-Page-To-Load-Recommendations='${Date.now().toString()}']`
         this.operation.browserSelection.recommendedLocator = [locatorPlaceHolderId]
         let locators = await this.puppeteer.getRecommendedLocator(targetLocator, parentFrame)
         this.operation.browserSelection.recommendedLocator = locators

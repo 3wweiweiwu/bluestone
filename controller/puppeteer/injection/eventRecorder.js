@@ -101,6 +101,7 @@ Object.keys(EVENTCONST).forEach(item => {
         let command = item
         let targetPicPath = ''
         let fileNames = []
+        let isCallBluestoneConsole = false
         switch (item) {
             case EVENTCONST.change:
                 //still use original target because the new target may not have value
@@ -130,6 +131,7 @@ Object.keys(EVENTCONST).forEach(item => {
                             command = null
                             parameter = null
                             getActiveLocator()
+                            isCallBluestoneConsole = true
                             console.log('call in-browser spy' + JSON.stringify(position))
                             break
                         }
@@ -147,7 +149,10 @@ Object.keys(EVENTCONST).forEach(item => {
                 }
                 break;
             case EVENTCONST.scroll:
-                parameter = `${event.target.scrollTop.toString()},${event.target.scrollLeft.toString()}`
+                parameter = JSON.stringify({
+                    x: event.target.scrollTop,
+                    y: event.target.scrollLeft
+                })
                 return
             // break;
             default:
@@ -162,8 +167,17 @@ Object.keys(EVENTCONST).forEach(item => {
 
         //     selector = finder(parent)
         // }
-        let atomicTree = ''//new AtomicElementTree(target)
-        let atomicTreeStr = ''//atomicTree.stringify()
+
+        let atomicTree = ""
+        let atomicTreeStr = ""//atomicTree.stringify()
+        if (command != EVENTCONST.scroll && !isCallBluestoneConsole) {
+            //will not capture auto-healing information during scroll
+            //it will significantly slow down the user experience
+            // will collect auto-healing when call bluestone console
+            // this will create noticible user experience slow down
+            atomicTree = new AtomicElementTree(target)
+            atomicTreeStr = atomicTree.stringify(atomicTree)
+        }
         const eventDetail = {
             command: command,
             iframe: iframe,
