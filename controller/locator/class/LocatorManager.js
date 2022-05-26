@@ -164,7 +164,8 @@ class LocatorManager {
         //output locator informaiton
         let ast = LocatorAstGen.getModuleExportWrapper()
         this.locatorLibrary.forEach(item => {
-            let locatorAst = LocatorAstGen.getLocatorStructure(item.path, item.Locator[0], item.screenshot, item.locatorSnapshot)
+            let cleanedLocatorSnapshotName = Support.getValidFileName(item.path)
+            let locatorAst = LocatorAstGen.getLocatorStructure(item.path, item.Locator[0], item.screenshot, item.locatorSnapshot, cleanedLocatorSnapshotName)
             ast.body[0].expression.right.properties.push(locatorAst)
             if (item.locatorSnapshot) {
                 locatorSnapshotList.push(item)
@@ -199,7 +200,13 @@ class LocatorManager {
         return this.locatorLibrary.findIndex(item => item.path == locatorName)
 
     }
-
+    /**
+     * When recommended locator generation is ready, update recommended locator field 
+     * @param {string} placeHolder the place holder id
+     */
+    setRecommendedLocator(placeHolder) {
+        // this.locatorLibrary.find(item=>item.)
+    }
 }
 
 module.exports = LocatorManager
