@@ -105,8 +105,8 @@ class WorkflowRecord {
         this.inbuiltFuncPath = path.join(__dirname, '../../../ptLibrary/bluestone-func.js')
         this.initializeFunctions()
         /**@type {MochaDriver} */
-            this.mochaDriver = null
-        }
+        this.mochaDriver = null
+    }
     async initializeFunctions() {
         console.log('Initializing Bluestone...')
         await this.astManager.loadFunctions(config.code.funcPath)
@@ -128,8 +128,16 @@ class WorkflowRecord {
      * @param {Array<string>} parentFrame 
      */
     async getRecommendedLocatorFromDefiner(targetLocator, parentFrame) {
+        /**
+         * From implementation perspective, we will first assign a place holder token
+         * Since locator generation is time-consuming, we will do it in background
+         * Once it is finish, it will update locator with place holder in place
+         */
+        let locatorPlaceHolderId = `//*[@Please-Wait-For-Locator-To-Be-Generated='${Date.now().toString()}']`
+        this.operation.browserSelection.recommendedLocator = [locatorPlaceHolderId]
         let locators = await this.puppeteer.getRecommendedLocator(targetLocator, parentFrame)
         this.operation.browserSelection.recommendedLocator = locators
+        this.locatorManager.setRecommendedLocator(locatorPlaceHolderId, locators)
     }
     /**
      * Scan through html path and fix unavailable path

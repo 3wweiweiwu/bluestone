@@ -203,9 +203,12 @@ class LocatorManager {
     /**
      * When recommended locator generation is ready, update recommended locator field 
      * @param {string} placeHolder the place holder id
+     * @param {string[]} recommendedLocator recommended locator list
      */
-    setRecommendedLocator(placeHolder) {
-        // this.locatorLibrary.find(item=>item.)
+    setRecommendedLocator(placeHolder, recommendedLocator) {
+        let targetLocator = this.locatorLibrary.find(item => item.locatorSnapshot && item.locatorSnapshot[0] == placeHolder)
+        if (targetLocator == null) return
+        targetLocator.locatorSnapshot = recommendedLocator
     }
 }
 
