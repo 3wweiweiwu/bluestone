@@ -23,7 +23,8 @@ const EVENTCONST = {
     dblclick: 'dblclick',
     keydown: 'keydown',
     dragstart: 'dragstart',
-    drop: 'drop'
+    drop: 'drop',
+    scroll: 'scroll'
 
 }
 const BLUESTONE = {
@@ -145,6 +146,10 @@ Object.keys(EVENTCONST).forEach(item => {
                         return
                 }
                 break;
+            case EVENTCONST.scroll:
+                parameter = `${event.target.scrollTop.toString()},${event.target.scrollLeft.toString()}`
+                // return
+                break;
             default:
                 break;
         }
@@ -157,8 +162,8 @@ Object.keys(EVENTCONST).forEach(item => {
 
         //     selector = finder(parent)
         // }
-        let atomicTree = new AtomicElementTree(target)
-        let atomicTreeStr = atomicTree.stringify()
+        let atomicTree = ''//new AtomicElementTree(target)
+        let atomicTreeStr = ''//atomicTree.stringify()
         const eventDetail = {
             command: command,
             iframe: iframe,
@@ -187,8 +192,9 @@ Object.keys(EVENTCONST).forEach(item => {
         // new CustomEvent('eventDetected', { detail: eventDetail });
         //will only log event from visible behavior except for file upload
         //file upload could trigger another element
-        if ((position.height > 0 && position.width > 0) || command == 'upload' || command == null)
+        if ((position.height > 0 && position.width > 0) || command == 'upload' || command == null) {
             window.logEvent(eventDetail)
+        }
 
         // console.log(JSON.stringify(event))
     }, { capture: true })
