@@ -15,7 +15,8 @@ try {
 }
 
 let globalVar = {
-    isFreezeMode: false
+    isFreezeMode: false,
+    isRecordScroll: false
 }
 const EVENTCONST = {
     click: 'click',
@@ -140,6 +141,11 @@ Object.keys(EVENTCONST).forEach(item => {
                             console.log('Current Freeze State is :' + globalVar.isFreezeMode)
                             // setStateToAllEvents(globalVar.isFreezeMode, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus, BLUESTONE.bluestonePrevPointerEvent)
                         }
+                        if ((event.altKey) && event.key === 'r') {
+                            globalVar.isRecordScroll = !globalVar.isRecordScroll
+                            console.log('Current Scroll Capture State is :' + globalVar.isRecordScroll)
+                            // setStateToAllEvents(globalVar.isFreezeMode, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus, BLUESTONE.bluestonePrevPointerEvent)
+                        }
                         if ((event.altKey) && event.key === 'a') {
                             captureScreenshot('alt+a')
                             captureHtml()
@@ -149,12 +155,12 @@ Object.keys(EVENTCONST).forEach(item => {
                 }
                 break;
             case EVENTCONST.scroll:
+                if (!globalVar.isRecordScroll) return
                 parameter = JSON.stringify({
-                    x: event.target.scrollTop,
-                    y: event.target.scrollLeft
+                    y: event.target.scrollTop,
+                    x: event.target.scrollLeft
                 })
-                return
-            // break;
+                break;
             default:
                 break;
         }

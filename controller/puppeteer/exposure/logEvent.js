@@ -154,6 +154,20 @@ module.exports = function (recordRepo, browser, page, io) {
                 if (eventDetail.parameter && eventDetail.parameter != '') {
                     let paramIndex = event.functionAst.params.findIndex(item => { return item.type.name == 'Number' || item.type.name == 'string' || item.type.name == 'number' || item.type.name == 'Number' })
                     event.functionAst.params[paramIndex].value = eventDetail.parameter
+
+                    try {
+                        let paramterObj = JSON.parse(eventDetail.parameter)
+                        let paramNameList = Object.keys(paramterObj)
+                        for (const paramName of paramNameList) {
+                            let funcParam = event.functionAst.params.find(funcParam => funcParam.name == paramName)
+                            if (funcParam == null) continue
+                            funcParam.value = paramterObj[paramName]
+                        }
+
+                    } catch (error) {
+
+                    }
+
                 }
             } catch (error) {
                 console.log(`Cannot find command ${event.command}`)

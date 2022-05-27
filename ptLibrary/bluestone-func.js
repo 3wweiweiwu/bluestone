@@ -76,6 +76,10 @@ module.exports = {
     waitAndHandleForAlert: class {
         static func = inbuiltFunc.waitAndHandleAlert
         static locators = [{ locator: ['invalid_locator'] }]
+    },
+    scroll: class {
+        static func = inbuiltFunc.scroll
+        static locators = [{ locator: ['invalid_locator'] }]
     }
 
 }
