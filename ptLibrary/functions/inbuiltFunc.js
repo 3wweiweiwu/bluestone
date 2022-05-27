@@ -439,3 +439,16 @@ exports.waitAndHandleAlert = async function (vars, timeout) {
     await vars.alertManager.waitAlertComplete(timeout)
     return true
 }
+/**
+ * Scroll the element to the specific coordinnate
+ * @param {Frame} frame 
+ * @param {ElementSelector} elementSelector 
+ * @param {number} x x-coordinnate you want to scroll to
+ * @param {number} y y-coordinnate you want to scroll to
+ * @returns 
+ */
+exports.scroll = async function (frame, elementSelector, x, y) {
+    let element = await findElement(frame, elementSelector, 2000)
+    await element.evaluate((node, x, y) => { node.scroll(x, y) }, x, y)
+    return true
+}

@@ -278,7 +278,8 @@ class WorkflowRecord {
         basicAuthenticate: 'basicAuthenticate',
         clearBrowserCache: 'clearBrowserCache',
         dragstart: 'dragstart',
-        drop: 'drop'
+        drop: 'drop',
+        scroll: 'scroll'
     }
     static inbuiltEvent = {
         refresh: PuppeteerControl.inbuiltEvent.refresh
@@ -323,7 +324,8 @@ class WorkflowRecord {
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.basicAuthenticate),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.clearBrowserCache),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.dragstart),
-                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.drop)
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.drop),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.scroll)
                 ]
             },
             customizedFunctions: {
@@ -640,6 +642,7 @@ class WorkflowRecord {
         this.__handleEnterNClickCombo(event)
         this.__handleFileUpload(event)
         this.__handleFileDownloadProgressUpdate(event)
+        this.__handleScroll(event)
         this.setLastOperationTime()
         await this.refreshActiveFunc()
     }
@@ -663,6 +666,27 @@ class WorkflowRecord {
         this.steps[lastStepIndex].functionAst.params[1].value += this.steps[lastStepIndex - 1].functionAst.params[1].value
 
         allSteps.splice(lastStepIndex - 1, 1)
+    }
+    /**
+     * Check if there is previous step is a scroll from similar element,
+     * If so, delete as we only need final scroll operation
+     * We do this because scroll's x\y is absolute
+     * @param {RecordingStep} step 
+     * @returns 
+     */
+    async __handleScroll(step) {
+        if (this.steps.length < 3 || step.command != 'scroll') {
+            return
+        }
+        let allSteps = this.steps
+        let lastStepIndex = allSteps.length - 1
+
+        let i = lastStepIndex - 2
+        let priorOperation = this.steps[i]
+        if (priorOperation.command == 'scroll' && priorOperation.target == step.target) {
+            allSteps.splice(i, 2)
+        }
+
     }
 
     /**
