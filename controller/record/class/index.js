@@ -109,8 +109,8 @@ class WorkflowRecord {
         this.inbuiltFuncPath = path.join(__dirname, '../../../ptLibrary/bluestone-func.js')
         this.initializeFunctions()
         /**@type {MochaDriver} */
-            this.mochaDriver = null
-        }
+        this.mochaDriver = null
+    }
     async initializeFunctions() {
         console.log('Initializing Bluestone...')
         await this.astManager.loadFunctions(config.code.funcPath)
@@ -150,8 +150,16 @@ class WorkflowRecord {
      * @param {Array<string>} parentFrame 
      */
     async getRecommendedLocatorFromDefiner(targetLocator, parentFrame) {
+        /**
+         * From implementation perspective, we will first assign a place holder token
+         * Since locator generation is time-consuming, we will do it in background
+         * Once it is finish, it will update locator with place holder in place
+         */
+        let locatorPlaceHolderId = `//*[@Refresh-Page-To-Load-Recommendations='${Date.now().toString()}']`
+        this.operation.browserSelection.recommendedLocator = [locatorPlaceHolderId]
         let locators = await this.puppeteer.getRecommendedLocator(targetLocator, parentFrame)
         this.operation.browserSelection.recommendedLocator = locators
+        this.locatorManager.setRecommendedLocator(locatorPlaceHolderId, locators)
     }
     /**
      * Scan through html path and fix unavailable path
@@ -296,7 +304,8 @@ class WorkflowRecord {
         basicAuthenticate: 'basicAuthenticate',
         clearBrowserCache: 'clearBrowserCache',
         dragstart: 'dragstart',
-        drop: 'drop'
+        drop: 'drop',
+        scroll: 'scroll'
     }
     static inbuiltEvent = {
         refresh: PuppeteerControl.inbuiltEvent.refresh
@@ -341,7 +350,8 @@ class WorkflowRecord {
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.basicAuthenticate),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.clearBrowserCache),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.dragstart),
-                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.drop)
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.drop),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.scroll)
                 ]
             },
             customizedFunctions: {
@@ -674,6 +684,7 @@ class WorkflowRecord {
         this.__handleEnterNClickCombo(event)
         this.__handleFileUpload(event)
         this.__handleFileDownloadProgressUpdate(event)
+        this.__handleScroll(event)
         this.setLastOperationTime()
         await this.refreshActiveFunc()
     }
@@ -697,6 +708,27 @@ class WorkflowRecord {
         this.steps[lastStepIndex].functionAst.params[1].value += this.steps[lastStepIndex - 1].functionAst.params[1].value
 
         allSteps.splice(lastStepIndex - 1, 1)
+    }
+    /**
+     * Check if there is previous step is a scroll from similar element,
+     * If so, delete as we only need final scroll operation
+     * We do this because scroll's x\y is absolute
+     * @param {RecordingStep} step 
+     * @returns 
+     */
+    async __handleScroll(step) {
+        if (this.steps.length < 3 || step.command != 'scroll') {
+            return
+        }
+        let allSteps = this.steps
+        let lastStepIndex = allSteps.length - 1
+
+        let i = lastStepIndex - 2
+        let priorOperation = this.steps[i]
+        if (priorOperation.command == 'scroll' && priorOperation.target == step.target) {
+            allSteps.splice(i, 2)
+        }
+
     }
 
     /**

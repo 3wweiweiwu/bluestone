@@ -97,7 +97,7 @@ module.exports = function (recordRepo, browser, page, io) {
 
         //if event command is null, call the in-browser console
         if (eventDetail.command == null) {
-            takeScreenshotForLocatorDefiner(page)
+            await takeScreenshotForLocatorDefiner(page)
             recordRepo.isCaptureHtml = false
 
             recordRepo.spyBrowserSelectionPicPath = picturePath
@@ -113,6 +113,7 @@ module.exports = function (recordRepo, browser, page, io) {
                 recordRepo.operation.spy.result.isPass = false
                 recordRepo.operation.spy.result.text = `Unable to load bluestone-func.js: ${error.toString()}`
             }
+
             let task1 = recordRepo.getRecommendedLocatorFromDefiner(recordRepo.operation.browserSelection.currentSelector, eventDetail.iframe)
             //display pending work progress
             await drawPendingWorkProgress(page, recordRepo.picCapture, recordRepo.htmlCaptureStatus, task1)
@@ -153,6 +154,20 @@ module.exports = function (recordRepo, browser, page, io) {
                 if (eventDetail.parameter && eventDetail.parameter != '') {
                     let paramIndex = event.functionAst.params.findIndex(item => { return item.type.name == 'Number' || item.type.name == 'string' || item.type.name == 'number' || item.type.name == 'Number' })
                     event.functionAst.params[paramIndex].value = eventDetail.parameter
+
+                    try {
+                        let paramterObj = JSON.parse(eventDetail.parameter)
+                        let paramNameList = Object.keys(paramterObj)
+                        for (const paramName of paramNameList) {
+                            let funcParam = event.functionAst.params.find(funcParam => funcParam.name == paramName)
+                            if (funcParam == null) continue
+                            funcParam.value = paramterObj[paramName]
+                        }
+
+                    } catch (error) {
+
+                    }
+
                 }
             } catch (error) {
                 console.log(`Cannot find command ${event.command}`)

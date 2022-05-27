@@ -15,7 +15,8 @@ try {
 }
 
 let globalVar = {
-    isFreezeMode: false
+    isFreezeMode: false,
+    isRecordScroll: false
 }
 const EVENTCONST = {
     click: 'click',
@@ -23,7 +24,8 @@ const EVENTCONST = {
     dblclick: 'dblclick',
     keydown: 'keydown',
     dragstart: 'dragstart',
-    drop: 'drop'
+    drop: 'drop',
+    scroll: 'scroll'
 
 }
 const BLUESTONE = {
@@ -100,6 +102,7 @@ Object.keys(EVENTCONST).forEach(item => {
         let command = item
         let targetPicPath = ''
         let fileNames = []
+        let isCallBluestoneConsole = false
         switch (item) {
             case EVENTCONST.change:
                 //still use original target because the new target may not have value
@@ -129,12 +132,18 @@ Object.keys(EVENTCONST).forEach(item => {
                             command = null
                             parameter = null
                             getActiveLocator()
+                            isCallBluestoneConsole = true
                             console.log('call in-browser spy' + JSON.stringify(position))
                             break
                         }
                         if ((event.altKey) && event.key === 's') {
                             globalVar.isFreezeMode = !globalVar.isFreezeMode
                             console.log('Current Freeze State is :' + globalVar.isFreezeMode)
+                            // setStateToAllEvents(globalVar.isFreezeMode, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus, BLUESTONE.bluestonePrevPointerEvent)
+                        }
+                        if ((event.altKey) && event.key === 'r') {
+                            globalVar.isRecordScroll = !globalVar.isRecordScroll
+                            console.log('Current Scroll Capture State is :' + globalVar.isRecordScroll)
                             // setStateToAllEvents(globalVar.isFreezeMode, BLUESTONE.bluestoneIgnoreElement, BLUESTONE.prevDisableStatus, BLUESTONE.bluestonePrevPointerEvent)
                         }
                         if ((event.altKey) && event.key === 'a') {
@@ -144,6 +153,13 @@ Object.keys(EVENTCONST).forEach(item => {
                         //otherwise, we are not going to record any other operation
                         return
                 }
+                break;
+            case EVENTCONST.scroll:
+                if (!globalVar.isRecordScroll) return
+                parameter = JSON.stringify({
+                    y: event.target.scrollTop,
+                    x: event.target.scrollLeft
+                })
                 break;
             default:
                 break;
@@ -157,8 +173,17 @@ Object.keys(EVENTCONST).forEach(item => {
 
         //     selector = finder(parent)
         // }
-        let atomicTree = new AtomicElementTree(target)
-        let atomicTreeStr = atomicTree.stringify()
+
+        let atomicTree = ""
+        let atomicTreeStr = ""//atomicTree.stringify()
+        if (command != EVENTCONST.scroll && !isCallBluestoneConsole) {
+            //will not capture auto-healing information during scroll
+            //it will significantly slow down the user experience
+            // will collect auto-healing when call bluestone console
+            // this will create noticible user experience slow down
+            atomicTree = new AtomicElementTree(target)
+            atomicTreeStr = atomicTree.stringify(atomicTree)
+        }
         const eventDetail = {
             command: command,
             iframe: iframe,
@@ -187,8 +212,9 @@ Object.keys(EVENTCONST).forEach(item => {
         // new CustomEvent('eventDetected', { detail: eventDetail });
         //will only log event from visible behavior except for file upload
         //file upload could trigger another element
-        if ((position.height > 0 && position.width > 0) || command == 'upload' || command == null)
+        if ((position.height > 0 && position.width > 0) || command == 'upload' || command == null) {
             window.logEvent(eventDetail)
+        }
 
         // console.log(JSON.stringify(event))
     }, { capture: true })

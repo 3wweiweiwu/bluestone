@@ -45,9 +45,10 @@ class LocatorAstGen {
      * @param {string} locatorValue /html/body/ng-view/section/header/form/input
      * @param {string} picPath ./componentPic/1632928449951.png
      * @param {string} snapshot [...]
+     * @param {string} cleanedLocatorSnapshotName TODO_PAGE_TODO_TEXT_INPUT
      * @returns 
      */
-    static getLocatorStructure(locatorPath, locatorValue, picPath, snapshot) {
+    static getLocatorStructure(locatorPath, locatorValue, picPath, snapshot, cleanedLocatorSnapshotName) {
         let locator = {
             "type": "Property",
             "method": false,
@@ -132,7 +133,7 @@ class LocatorAstGen {
                 "arguments": [
                     {
                         "type": "Literal",
-                        "value": `./locator/${locatorPath}.json`,
+                        "value": `./locator/${cleanedLocatorSnapshotName}.json`,
                     }
                 ],
                 "optional": false

@@ -65,7 +65,6 @@ async function drawPendingWorkProgress(page, PicCaptureStatus, htmlCaptureStatus
     } catch (error) {
         console.log(error)
     }
-    await task
     let startTime = Date.now()
     while (htmlCaptureStatus.isHtmlCaptureOngoing) {
         try {
