@@ -100,8 +100,7 @@ class LocatorManager {
             let potentialLocator = value['locator']
             if (potentialLocator != null && Array.isArray(potentialLocator) && potentialLocator.length > 0) {
 
-
-                let newLocator = new Locator(value['locator'], value['screenshot'], newPath)
+                let newLocator = new Locator(value['locator'], value['screenshot'], newPath, value.snapshot)
                 this.__locatorLibrary.push(newLocator)
                 continue
             }
