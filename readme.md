@@ -1,4 +1,4 @@
-AI-Driven No-Code Development Platform for Quality
+No-Code Development Platform for Web Automation
 
 ## Installation
 
