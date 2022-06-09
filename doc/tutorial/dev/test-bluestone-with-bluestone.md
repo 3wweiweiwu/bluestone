@@ -10,18 +10,17 @@ Can we use Bluestone to test Bluestone?
 
 2. Use Puppeteer to test Bluestone Agent's UI operation
    1. Use Puppeteer to interact with Bluestone
-
-3. Send API Request to Bluestone backend and check if desired change has been made
+   2. Send API Request to Bluestone backend and check if desired change has been made
 
 # How can we make this happen?
-1. Environment Preparation
+1. Environment Preparation (Bluestone from local source)
    1. Give test a long timeout (999999s)
    2. Set up Bluestone Backend
    3. Setup test website
    4. Send request to test website to simualte opeartion
    5. Call Bleustone Agent
    6. Wait here for a long timeout
-2. Launch bluestone and record the workflow
+2. Launch bluestone and record the workflow (Bluestone from global scope)
    1. How to avoid 2 bluestone fight with each other?
       1. ensure two bluestone are listening to different ports than 3600/3607
    2. Procedure
