@@ -25,5 +25,11 @@ router.get('/page-count', async function (req, res) {
 router.get('/html-queue', async function (req, res) {
     res.json(req.app.locals.workflow.htmlCaptureStatus.__queue)
 })
+router.get('/ui/operation', async function (req, res) {
+    /**@type {UI} */
+    let ui = req.app.locals.ui
+    res.json(ui.operation.spy)
+
+})
 
 module.exports = router;
