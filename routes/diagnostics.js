@@ -7,6 +7,16 @@ router.get('/steps', async function (req, res) {
     let ui = req.app.locals.ui
     res.json(JSON.stringify(ui.backend.steps))
 })
+router.get('/userSelection', async function (req, res) {
+    /**@type {UI} */
+    let ui = req.app.locals.ui
+    res.json(JSON.stringify(ui.operation.spy.userSelection))
+})
+router.get('/operationGroup', async function (req, res) {
+    /**@type {UI} */
+    let ui = req.app.locals.ui
+    res.json(JSON.stringify(ui.backend.operationGroup))
+})
 router.get('/backend-operation', async function (req, res) {
     /**@type {UI} */
     let ui = req.app.locals.ui
@@ -25,5 +35,6 @@ router.get('/page-count', async function (req, res) {
 router.get('/html-queue', async function (req, res) {
     res.json(req.app.locals.workflow.htmlCaptureStatus.__queue)
 })
+
 
 module.exports = router;

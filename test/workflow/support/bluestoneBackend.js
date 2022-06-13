@@ -1,5 +1,6 @@
 const axios = require('axios').default
 const testConfig = require('../testConfig')
+
 class TestSite {
     constructor() {
         this.port = testConfig.bluestone.port
@@ -105,6 +106,25 @@ class TestSite {
             console.log(error)
         }
 
+    }
+    async getUserSelection(){
+        try {
+            let res = await axios.get(`${this.url}/diagnostics/userSelection`)
+            let currentData = JSON.parse(res.data)
+            return currentData
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async getOperationGroup(){
+        try {
+            let res = await axios.get(`${this.url}/diagnostics/operationGroup`)
+            let currentData = JSON.parse(res.data)
+            return currentData
+        } catch (error) {
+            console.log(error)
+        }
     }
 }
 module.exports = TestSite

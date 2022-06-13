@@ -63,5 +63,10 @@ class TestSite {
 
         return res
     }
+
+    async sendSpy(param, value) {
+        let res = await axios.get(`http://localhost:${testConfig.bluestone.port}/spy?${param}=${value}`)
+        return res
+    }
 }
 module.exports = TestSite
