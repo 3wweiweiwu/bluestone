@@ -1,6 +1,6 @@
 const { Page } = require('puppeteer')
 const bluestoneConfig = require('../../../config')
-const singlefileScript = require('single-file/cli/back-ends/common/scripts')
+// const singlefileScript = require('single-file/cli/back-ends/common/scripts')
 const TestcaseLoader = require('../../../controller/ast/TestCaseLoader')
 class HtmlInfo {
     constructor(stepIndex, labelIndex) {
@@ -34,11 +34,11 @@ class HtmlSnapshotManager {
         }
     }
     captureHtml() {
-        singlefileScript.get(bluestoneConfig.singlefile)
-        let pageData = await page.evaluate(async (DEFAULT_OPTIONS) => {
-            const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
-            return pageData;
-        }, bluestoneConfig.singlefile)
+        // singlefileScript.get(bluestoneConfig.singlefile)
+        // let pageData = await page.evaluate(async (DEFAULT_OPTIONS) => {
+        //     const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
+        //     return pageData;
+        // }, bluestoneConfig.singlefile)
     }
 }
 module.exports = HtmlSnapshotManager
