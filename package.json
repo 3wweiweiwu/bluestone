@@ -42,7 +42,6 @@
     "puppeteer-core": "^13.4.0",
     "regedit": "^5.0.0",
     "sharp": "^0.29.0",
-    "single-file": "git+https://github.com/3wweiweiwu/SingleFile.git",
     "socket.io": "^4.2.0",
     "swagger-ui-express": "^4.1.6",
     "ts-morph": "^12.0.0",

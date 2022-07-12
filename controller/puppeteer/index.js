@@ -13,7 +13,6 @@ const fs = require('fs').promises
 const { RecordingStep, WorkflowRecord } = require('../record/class')
 const { getLocator, setLocatorStatus } = require('./exposure/LocatorManager')
 const injectModuleScriptBlock = require('./help/injectModuleScriptBlock')
-const singlefileScript = require('single-file/cli/back-ends/common/scripts')
 const captureScreenshot = require('./exposure/captureScreenshot')
 const checkUrlBlackList = require('./help/checkUrlBlacklist')
 const isHtmlCaptureOngoing = require('./exposure/isHtmlCaptureOngoing')
