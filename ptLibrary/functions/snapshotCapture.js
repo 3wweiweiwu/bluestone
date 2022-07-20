@@ -1,4 +1,4 @@
-const singlefileScript = require('single-file/cli/back-ends/common/scripts')
+// const singlefileScript = require('single-file/cli/back-ends/common/scripts')
 const pageCaptureConfig = require('../../config').singlefile
 const VarSaver = require('../class/VarSaver')
 const { Page } = require('puppeteer')
@@ -18,8 +18,8 @@ async function initializePageCapture(page) {
         if (varSav.retryCount == 0) return
 
         //in retry mode
-        const injectedScript = await singlefileScript.get(pageCaptureConfig);
-        await page.evaluateOnNewDocument(injectedScript)
+        // const injectedScript = await singlefileScript.get(pageCaptureConfig);
+        // await page.evaluateOnNewDocument(injectedScript)
     } catch (error) {
         console.log('In retry-mode yet we cannot inject single file library to capture html')
     }
@@ -69,10 +69,10 @@ async function captureSnapshot(pageData) {
  */
 async function captureHtmlSnapshot(page) {
     //save current html 
-    let pageData = await page.evaluate(async (DEFAULT_OPTIONS) => {
-        const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
-        return pageData;
-    }, pageCaptureConfig)
-    return pageData
+    // let pageData = await page.evaluate(async (DEFAULT_OPTIONS) => {
+    //     const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
+    //     return pageData;
+    // }, pageCaptureConfig)
+    // return pageData
 }
 module.exports = { initializePageCapture, captureSnapshot }
