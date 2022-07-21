@@ -25,6 +25,9 @@ class RecordingStep {
         this.targetPicPath = recordingStep.targetPicPath
         this.timeoutMs = recordingStep.timeoutMs
         this.meta = {}
+        this.isRequiredReview = recordingStep.isRequiredReview || false
+        this.isRequiredLocatorUpdate = recordingStep.isRequiredLocatorUpdate || false
+        this.isRequiredNewNameAndLocator = recordingStep.isRequiredNewNameAndLocator || false
 
         this.finalLocatorName = ''
         if (recordingStep.finalLocatorName) {
@@ -101,5 +104,8 @@ class RecordingStep {
  * @property {string} healingTree
  * @property {string} finalLocatorName
  * @property {string} finalLocator
+ * @property {boolean} isRequiredReview
+ * @property {boolean} isRequiredLocatorUpdate
+ * @property {boolean} isRequiredNewNameAndLocator
  */
 module.exports = RecordingStep

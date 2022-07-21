@@ -188,6 +188,10 @@ class WorkFlowPug {
                 this.txtValidationStatus = `<a href="#tr-${i}">Locator Missing. Go to step ${i}</a>`
                 return false
             }
+            if (stepInfo.isRequiredReview) {
+                this.txtValidationStatus = `<a href="#tr-${i}">Bluestone has automatically fix a locator change. Go to step ${i} to review proposal</a>`
+                return false
+            }
         }
         if (!skipExecutionResultCheck) {
             for (let i = 0; i < steps.length; i++) {

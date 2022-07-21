@@ -8,3 +8,5 @@ public/temp/**/*.html
 public/temp/**/*.png
 public/temp/**/*.snapshot.json
 *.pid
+testrun.json
+result/testrun/report.json

@@ -104,7 +104,8 @@ try {
         case "edit":
             bluestoneUrl = `http://localhost:${port}`
             axios.put(`${bluestoneUrl}/api/record`, {
-                relativePath: cli.args.tcId
+                relativePath: cli.args.tcId,
+                testResultPath: cli.args.tcResult
             })
                 .then(() => {
                     console.log('Load script successfully')

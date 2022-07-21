@@ -491,7 +491,7 @@ class WorkflowRecord {
             //will not check final locator for those steps whose function does not use element selector
             let elementSelectorParam = item.functionAst.params.find(item => item.type.name == 'ElementSelector')
             if (elementSelectorParam == null) return false
-            return item.finalLocator == '' || item.finalLocator == ''
+            return item.finalLocator == '' || item.finalLocator == '' || item.isRequiredReview
         })
         return stepIndex
     }
@@ -558,9 +558,7 @@ class WorkflowRecord {
         //check if there is any un-correlated locator in step
         failedStepIndex = this.findPendingLocatorInStep()
         if (failedStepIndex != -1) {
-            this.steps[failedStepIndex].result = new StepResult()
-            this.steps[failedStepIndex].result.resultText = 'Locator has not been correleated'
-            return failedStepIndex
+            endIndex = failedStepIndex
         }
         if (endIndex == null) {
             endIndex = this.steps.length
@@ -897,14 +895,16 @@ class WorkflowRecord {
 
     }
     /**
-     * @param {string} relativeScriptPath path to the file
+     * @param {string} relativeScriptPath path to the script file
+     * @param {string} abosoluteResultPath path to the test result .json file
      * @returns {WorkflowRecord}
      */
-    async loadTestcase(relativeScriptPath) {
+    async loadTestcase(relativeScriptPath, abosoluteResultPath) {
         //get full script path
         let bluestonePath = process.env.bluestonePath
         let bluestoneFolder = path.dirname(bluestonePath)
         let bluestoneScriptFolder = path.join(bluestoneFolder, 'script')
+        let tcName = relativeScriptPath
         //apend .js file name if it not included
         if (!relativeScriptPath.toLowerCase().endsWith('.js')) {
             relativeScriptPath += '.js'
@@ -930,7 +930,51 @@ class WorkflowRecord {
         this.steps.splice(0, 1)
         this.testSuiteName = tcLoader.testSuite
         this.testcaseName = tcLoader.testCase
+        await this.updateTestStepBasedOnAutoHealingInfo(abosoluteResultPath, tcName)
 
+    }
+    /**
+     * Based on the test step information, update auto-healing inforamtion
+     * @param {string} testResultPath path to the mocha result file
+     * @param {string} tcName name of the testcase
+     */
+    async updateTestStepBasedOnAutoHealingInfo(testResultPath, tcName) {
+        if (testResultPath == null) return
+        try {
+            //load test result file
+            let resultBinary = await fs.readFile(testResultPath)
+            let resultText = resultBinary.toString()
+            let resultObj = JSON.parse(resultText)
+
+            //navigate to the screenshot for the auto-healing steps
+            let bluestonePath = process.env.bluestonePath
+            let bluestoneFolder = path.dirname(bluestonePath)
+            let bluestoneScriptFolder = path.join(bluestoneFolder, './result/', `./${resultObj.runId}/`)
+
+            //identify prescription screenshot and assign it to the step
+            let currentTc = resultObj.reviews.find(item => item.title == tcName)
+            //current test is passed... no more inforamtion to pass
+            if (currentTc == null) {
+                return
+            }
+            for (let prescription of currentTc.prescription) {
+                let newPicPath = this.getPicPath()
+                let sourcePicPath = path.join(bluestoneScriptFolder, prescription.newLocatorSnapshotPath)
+                fs.copyFile(sourcePicPath, newPicPath)
+                let failedStepIndex = prescription.failureStepIndex
+                this.steps[failedStepIndex].isRequiredReview = true
+
+                //populate screenshot picture
+                this.steps[failedStepIndex].targetPicPath = newPicPath
+                this.steps[failedStepIndex].htmlPath = newPicPath
+                //update locator to proposed value
+                this.steps[failedStepIndex].finalLocator = [prescription.newLocator]
+                this.steps[failedStepIndex].target = prescription.newLocator
+            }
+            console.log()
+        } catch (error) {
+            console.log('')
+        }
     }
 }
 

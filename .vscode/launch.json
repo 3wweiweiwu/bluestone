@@ -45,6 +45,14 @@
       "args": ["start", "../connect-bluestone", "--port", "3601"]
     },
     {
+      "name": "Debug Cli",
+      "program": "${workspaceFolder}/bin/bluestone.js",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node",
+      "args": ["edit", "s2", "--tcResult", "${workspaceFolder}/testrun.json"]
+    },
+    {
       "name": "Launch Record Command line",
       "program": "${workspaceFolder}/bin/bluestone.js",
       "request": "launch",
@@ -70,16 +78,18 @@
       "name": "Debug Mocha",
       "request": "launch",
       "type": "node",
-      "program": "${workspaceFolder}/node_modules/.bin/_mocha",
-      "stopOnEntry": false,
-      "args": ["--compilers", "js:babel-register"],
-      "cwd": ".",
-      "runtimeExecutable": null,
-      "runtimeArgs": ["--nolazy"],
-      "env": {
-        "NODE_ENV": "development"
-      },
-      "sourceMaps": true
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "args": [
+        "C:\\Users\\3wwei\\sample-bluestone-project\\script\\",
+        "--exit",
+        "true",
+        "--grep",
+        "^st s2$",
+        "--reporter",
+        "${workspaceFolder}\\reporter.js",
+        "--reporter-option",
+        "output=testrun.json"
+      ]
     }
   ]
 }
