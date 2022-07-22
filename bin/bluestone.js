@@ -102,6 +102,17 @@ try {
                 })
             break
         case "edit":
+            bluestoneUrl = `http://localhost:${port}`
+            axios.put(`${bluestoneUrl}/api/record`, {
+                relativePath: cli.args.tcId,
+                testResultPath: cli.args.tcResult
+            })
+                .then(() => {
+                    console.log('Load script successfully')
+                })
+                .catch(err => {
+                    console.log(err)
+                })
             break
         case 'install':
             regedit()

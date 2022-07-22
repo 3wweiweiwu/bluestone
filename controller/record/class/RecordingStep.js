@@ -20,11 +20,14 @@ class RecordingStep {
         /** @type {Array<Locator>} */
         this.potentialMatch = recordingStep.potentialMatch
         this.framePotentialMatch = recordingStep.framePotentialMatch
-        this.__htmlPath = recordingStep.htmlPath
+        this.htmlPath = recordingStep.htmlPath
         this.targetInnerText = recordingStep.targetInnerText
         this.targetPicPath = recordingStep.targetPicPath
         this.timeoutMs = recordingStep.timeoutMs
         this.meta = {}
+        this.isRequiredReview = recordingStep.isRequiredReview || false
+        this.isRequiredLocatorUpdate = recordingStep.isRequiredLocatorUpdate || false
+        this.isRequiredNewNameAndLocator = recordingStep.isRequiredNewNameAndLocator || false
 
         this.finalLocatorName = ''
         if (recordingStep.finalLocatorName) {
@@ -79,13 +82,13 @@ class RecordingStep {
      * @param {HtmlCaptureStatus} htmlCaptureRepo 
      */
     updateHtmlForStep(offSet, htmlCaptureRepo) {
-        this.__htmlPath = htmlCaptureRepo.getHtmlByPath(this.__htmlPath, offSet)
+        this.htmlPath = htmlCaptureRepo.getHtmlByPath(this.htmlPath, offSet)
 
     }
 }
 /**
  * @typedef step
- * @property {'click'|'change'|'dblclick'|'keydown'|'goto'|'upload'|'waitForDownloadComplete'|'waitAndHandleForAlert'|'scroll'} command
+ * @property {'click'|'change'|'dblclick'|'keydown'|'goto'|'upload'|'waitForDownloadComplete'|'waitAndHandleForAlert'|'scroll'|'gotoFrame'} command
  * @property {string} target
  * @property {Array<ExistingSelector>} matchedSelector
  * @property {number} timeoutMs
@@ -99,5 +102,10 @@ class RecordingStep {
  * @property {number} currentSelectedIndex
  * @property {number} scriptLineNumber
  * @property {string} healingTree
+ * @property {string} finalLocatorName
+ * @property {string} finalLocator
+ * @property {boolean} isRequiredReview
+ * @property {boolean} isRequiredLocatorUpdate
+ * @property {boolean} isRequiredNewNameAndLocator
  */
 module.exports = RecordingStep

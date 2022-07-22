@@ -31,10 +31,11 @@ const ConstStr = {
  * 
  * @param {import('../record/class').WorkflowRecord} record 
  * @param {*} io 
- * @param {string} url 
+ * @param {string} url
+ * @param {boolean} isCleanSteps clean prior steps. will not clean step if we are in testcase edit mode
  * @returns 
  */
-async function startRecording(record, io, url = null) {
+async function startRecording(record, io, url = null, isCleanSteps = true) {
     const browser = await puppeteer.launch(config.puppeteer)
     const page = await browser.newPage();
     //start to watch the download event
@@ -46,9 +47,17 @@ async function startRecording(record, io, url = null) {
     await alert.startWatching()
 
     //initialize recording object
-    record.steps = []
-    record.isRecording = true
-    record.isCaptureHtml = true
+    if (isCleanSteps) {
+        record.steps = []
+        record.isRecording = true
+        record.isCaptureHtml = true
+    }
+    else {
+        //will not record steps by default
+        record.isRecording = false
+        record.isCaptureHtml = false
+    }
+
 
     //update io for record
     record.puppeteer.setIO(io)

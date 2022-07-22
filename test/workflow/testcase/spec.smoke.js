@@ -76,13 +76,13 @@ describe('Smoke Test - Integration', () => {
         await siteBackend.sendOperation('click', happyPathPage.button_submit_form)
         await new Promise(resolve => setTimeout(resolve, 500))
         await siteBackend.callBluestoneTab(happyPathPage.header)
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 3000))
         let res = await bluestoneBackend.getPageCount()
 
         assert.strictEqual(res.data.value, 3)
         // await new Promise(resolve => setTimeout(resolve, 500000))
 
-    }).timeout(10000)
+    }).timeout(15000)
     it('should correlate existing locator when hovering defined element', async () => {
         let happyPathPage = testConfig.testSite.page.happypath
         await bluestoneBackend.startRecording(siteBackend.singlePageHappyPath)
@@ -106,7 +106,7 @@ describe('Smoke Test - Integration', () => {
         let currentData = res.data
         delete currentData['atomicTree']
         assert.deepStrictEqual(currentData, baseline)
-    }).timeout(10000)
+    }).timeout(15000)
     it('should record click event in steps correct', async () => {
         let happyPathPage = testConfig.testSite.page.happypath
         await bluestoneBackend.startRecording(siteBackend.singlePageHappyPath)

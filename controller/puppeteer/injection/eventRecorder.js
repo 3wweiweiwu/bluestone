@@ -128,7 +128,7 @@ Object.keys(EVENTCONST).forEach(item => {
                         //if we see combo key ctrl-q, we will call in-browser plugin
                         if ((event.ctrlKey || event.altKey) && event.key === 'q') {
                             captureScreenshot('alt+q')
-                            captureHtml()
+                            // captureHtml()
                             command = null
                             parameter = null
                             getActiveLocator()
@@ -148,7 +148,7 @@ Object.keys(EVENTCONST).forEach(item => {
                         }
                         if ((event.altKey) && event.key === 'a') {
                             captureScreenshot('alt+a')
-                            captureHtml()
+                            // captureHtml()
                         }
                         //otherwise, we are not going to record any other operation
                         return
@@ -600,7 +600,7 @@ const mutationObserverCallback = function (mutationsList, observer) {
     }
     captureScreenshot('dom tree change')
     //only proceed change that is introduced by RPA engine or code change
-    captureHtml()
+    // captureHtml()
     getFrameLocator()
     scanLocator()
     // console.log(mutationsList)
@@ -632,12 +632,12 @@ document.addEventListener('animationstart', () => {
 }, { capture: true });
 document.addEventListener('animationend', () => {
     console.log('Animation ended');
-    captureHtml()
+    // captureHtml()
     //capture html after 800ms in case there are some animation
     // captureScreenshot('animation ended')
 
 }, { capture: true });
-captureHtml()
+// captureHtml()
 // setInterval(captureHtml, 800)
 captureScreenshot('initial capture')
 getFrameLocator()
