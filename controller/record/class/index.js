@@ -21,6 +21,7 @@ const MochaDriver = require('../../mocha/index')
 const TestCaseLoader = require("../../ast/TestCaseLoader")
 const os = require('os')
 const TestcaseLoader = require('../../ast/TestCaseLoader')
+const getErrorStepIndexByErrorStack = require('../../../ptLibrary/functions/getErrorStepIndexByStack')
 /**
  * @typedef {string} CommandType
  **/
@@ -988,6 +989,28 @@ class WorkflowRecord {
                 let stepIndex = tcLoader.getStepIndexFromLine(screenshotRecord.lineNumber)
                 this.steps[stepIndex].htmlPath = newPicPath
             }
+
+            //if test failed, attach failure information to the step
+            let currentFailureTc = resultObj.failures.find(item => item.title == tcName)
+            let failureStepIndex = 0
+            if (currentFailureTc != null) {
+                let errorMessage = currentFailureTc.err.message
+                let failureLine = getErrorStepIndexByErrorStack(currentFailureTc.file, currentFailureTc.err.stack)
+                failureStepIndex = tcLoader.getStepIndexFromLine(failureLine)
+                if (failureStepIndex == -1) {
+                    failureStepIndex = 0
+                }
+                this.steps[failureStepIndex].result.isResultPass = false
+                this.steps[failureStepIndex].result.resultText = errorMessage
+            }
+            // Make all steps pass till we hit failure
+            for (let i = 0; i < this.steps.length; i++) {
+                if (i == failureStepIndex) {
+                    break
+                }
+                this.steps[i].result.isResultPass = true
+            }
+
 
 
             //identify prescription screenshot and assign it to the step

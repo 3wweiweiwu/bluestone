@@ -88,7 +88,9 @@
         "--reporter",
         "${workspaceFolder}\\reporter.js",
         "--reporter-option",
-        "output=testrun.json"
+        "output=testrun.json",
+        "--timeout",
+        "999999"
       ]
     }
   ]
