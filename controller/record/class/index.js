@@ -491,7 +491,23 @@ class WorkflowRecord {
             //will not check final locator for those steps whose function does not use element selector
             let elementSelectorParam = item.functionAst.params.find(item => item.type.name == 'ElementSelector')
             if (elementSelectorParam == null) return false
-            return item.finalLocator == '' || item.finalLocator == '' || item.isRequiredReview
+            return item.finalLocator == '' || item.finalLocator == ''
+        })
+        return stepIndex
+    }
+    /**
+     * Get index of the step that runs failed or required review
+     * -1 if nothing being found
+     * @returns {number}
+     */
+    getFailedOrReviewRequiredStepIndex() {
+        let stepIndex = -1;
+        //find out selector that is pending correlaton
+        stepIndex = this.steps.findIndex(item => {
+            //will not check final locator for those steps whose function does not use element selector
+            let elementSelectorParam = item.functionAst.params.find(item => item.type.name == 'ElementSelector')
+            if (elementSelectorParam == null) return false
+            return item.isRequiredReview || item.result.isResultPass == false
         })
         return stepIndex
     }
@@ -556,12 +572,16 @@ class WorkflowRecord {
     async runAllStepsViaBluestone(startingIndex = 0, endIndex = null) {
         let failedStepIndex = -1
         //check if there is any un-correlated locator in step
-        failedStepIndex = this.findPendingLocatorInStep()
-        if (failedStepIndex != -1) {
-            endIndex = failedStepIndex
-        }
-        if (endIndex == null) {
+        let pendingLocatorStepIndex = this.findPendingLocatorInStep()
+        let failedOrReviewRequiredStepIndex = this.getFailedOrReviewRequiredStepIndex()
+        //find out smallest non -1 element in between pendingLocatorStepIndex and failedOrReviewRequiredStepIndex
+        // that number will become our end index
+        let sortedList = [pendingLocatorStepIndex, failedOrReviewRequiredStepIndex].filter(item => item != -1).sort((a, b) => a - b)
+        if (sortedList.length == 0) {
             endIndex = this.steps.length
+        }
+        else {
+            endIndex = sortedList[0]
         }
         //run step one by one
         for (let i = startingIndex; i < endIndex; i++) {
@@ -930,16 +950,17 @@ class WorkflowRecord {
         this.steps.splice(0, 1)
         this.testSuiteName = tcLoader.testSuite
         this.testcaseName = tcLoader.testCase
-        await this.updateTestStepBasedOnAutoHealingInfo(abosoluteResultPath, tcName)
+        await this.updateTestStepBasedOnAutoHealingInfo(abosoluteResultPath, tcLoader)
 
     }
     /**
      * Based on the test step information, update auto-healing inforamtion
      * @param {string} testResultPath path to the mocha result file
-     * @param {string} tcName name of the testcase
+     * @param {TestcaseLoader} tcLoader name of the testcase
      */
-    async updateTestStepBasedOnAutoHealingInfo(testResultPath, tcName) {
+    async updateTestStepBasedOnAutoHealingInfo(testResultPath, tcLoader) {
         if (testResultPath == null) return
+        let tcName = tcLoader.testCase
         try {
             //load test result file
             let resultBinary = await fs.readFile(testResultPath)
@@ -961,9 +982,10 @@ class WorkflowRecord {
                 let newPicPath = this.getPicPath()
                 let sourcePicPath = path.join(bluestoneScriptFolder, prescription.newLocatorSnapshotPath)
                 fs.copyFile(sourcePicPath, newPicPath)
-                let failedStepIndex = prescription.failureStepIndex
-                this.steps[failedStepIndex].isRequiredReview = true
 
+                //convert to stepIndex
+                let failedStepIndex = tcLoader.getStepIndexFromLine(prescription.failureStepIndex)
+                this.steps[failedStepIndex].isRequiredReview = true
                 //populate screenshot picture
                 this.steps[failedStepIndex].targetPicPath = newPicPath
                 this.steps[failedStepIndex].htmlPath = newPicPath

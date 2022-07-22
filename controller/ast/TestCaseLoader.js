@@ -198,6 +198,7 @@ class TestcaseLoader {
             let htmlPath = ''
             let potentialMatch = []
             let healingTree = '{}'
+            let locatorSnapshot = []
             try {
                 functionAst = this.#astManager.getFunction(command)
                 functionAst.params = this.#extractFunctionParam(args, functionAst.params)
@@ -210,6 +211,7 @@ class TestcaseLoader {
                     target = finalLocator[0]
                     targetPicPath = locatorObj.screenshot
                     htmlPath = ''
+                    locatorSnapshot = locatorObj.locatorSnapshot
                 }
                 //populate healing information
                 targetParam = functionAst.params.find(item => item.type.name == 'HealingSnapshot')
@@ -254,6 +256,15 @@ class TestcaseLoader {
             }
         })
         return functionParams
+    }
+    /**
+     * convert line number to step index
+     * @param {number} lineNumber 
+     * @returns {number}
+     */
+    getStepIndexFromLine(lineNumber) {
+        let stepIndex = this.steps.findIndex(item => item.scriptLineNumber == lineNumber)
+        return stepIndex
     }
 }
 

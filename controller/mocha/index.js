@@ -64,7 +64,8 @@ class MochaDriver {
                 .on('fail', async (test, err) => {
                     this.__state = MochaDriver.ConstVar.runningState.FAIL
                     await this.#testcase.parseTc()
-                    let stepIndex = this.#getErrorStepIndexByLine(this.__filePath, err.stack)
+                    let lineNumber = this.#getErrorStepIndexByLine(this.__filePath, err.stack)
+                    let stepIndex = this.#testcase.getStepIndexFromLine(lineNumber) - 1
                     this.__result = new MochaResult(false, err.toString(), stepIndex)
 
                     return resolve(this.__result)

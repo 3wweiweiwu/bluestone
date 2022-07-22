@@ -72,7 +72,7 @@ async function waitForElement(page, elementSelector, timeout, option = new Optio
     //locator found correctly and it is not part of healing trial, log coverage info
     if (element != null && option.isHealingByLocatorBackup) {
         try {
-            await varSav.healingInfo.createPerscription(elementSelector.displayName, elementSelector.locator, elementSelector.locator, null, varSav.currentFilePath, varSav.tcStepInfo, true)
+            await varSav.healingInfo.createPerscription(elementSelector.displayName, elementSelector.locator, elementSelector.locator, null, varSav.currentFilePath, true)
         } catch (error) {
 
         }
@@ -85,7 +85,7 @@ async function waitForElement(page, elementSelector, timeout, option = new Optio
         element = elementInfo.element
         if (element != null) {
             pageData = await highlightProposedElement(page, element)
-            await varSav.healingInfo.createPerscription(elementSelector.displayName, elementSelector.locator, elementInfo.locator, pageData, varSav.currentFilePath, varSav.tcStepInfo, false)
+            await varSav.healingInfo.createPerscription(elementSelector.displayName, elementSelector.locator, elementInfo.locator, pageData, varSav.currentFilePath, false)
         }
     }
     if (option.takeSnapshot) {

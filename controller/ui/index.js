@@ -45,7 +45,12 @@ class UI {
                     await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex, targetStep.iframe)
                 }
 
-
+                stepIndex = this.backend.getFailedOrReviewRequiredStepIndex()
+                if (stepIndex != -1) {
+                    targetStep = this.backend.steps[stepIndex]
+                    await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex, targetStep.iframe)
+                }
+                
                 //write code to disk automatically
                 if (this.workflow.validateForm(true)) {
                     this.workflow.validateForm()
