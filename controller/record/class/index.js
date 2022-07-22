@@ -978,7 +978,12 @@ class WorkflowRecord {
             for (let screenshotRecord of currentTestScreenshots) {
                 //copy file to bluestone folder and make it ready for display
                 let newPicPath = this.getPicPath()
-                await fs.copyFile(screenshotRecord.picPath, newPicPath)
+                try {
+                    await fs.copyFile(screenshotRecord.picPath, newPicPath)
+                } catch (error) {
+                    console.log(error)
+                }
+
                 //assign picture to right step
                 let stepIndex = tcLoader.getStepIndexFromLine(screenshotRecord.lineNumber)
                 this.steps[stepIndex].htmlPath = newPicPath
@@ -994,7 +999,12 @@ class WorkflowRecord {
             for (let prescription of currentTc.prescription) {
                 let newPicPath = this.getPicPath()
                 let sourcePicPath = path.join(bluestoneScriptFolder, prescription.newLocatorSnapshotPath)
-                await fs.copyFile(sourcePicPath, newPicPath)
+                try {
+                    await fs.copyFile(sourcePicPath, newPicPath)
+                } catch (error) {
+                    console.log(error)
+                }
+
 
                 //convert to stepIndex
                 let failedStepIndex = tcLoader.getStepIndexFromLine(prescription.failureStepIndex)
