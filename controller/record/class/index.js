@@ -1002,6 +1002,7 @@ class WorkflowRecord {
                 }
                 this.steps[failureStepIndex].result.isResultPass = false
                 this.steps[failureStepIndex].result.resultText = errorMessage
+                this.steps[failureStepIndex].isRequiredLocatorUpdate = true
             }
             // Make all steps pass till we hit failure
             for (let i = 0; i < this.steps.length; i++) {

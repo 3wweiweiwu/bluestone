@@ -50,7 +50,7 @@ class UI {
                     targetStep = this.backend.steps[stepIndex]
                     await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex, targetStep.iframe)
                 }
-                
+
                 //write code to disk automatically
                 if (this.workflow.validateForm(true)) {
                     this.workflow.validateForm()
@@ -65,7 +65,7 @@ class UI {
             case Workflow.inBuiltQueryKey.btnLocatorWorkflow:
                 stepIndex = Number.parseInt(firstValue)
                 targetStep = this.backend.steps[stepIndex]
-                await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex, targetStep.iframe, targetStep.isRequiredReview)
+                await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex, targetStep.iframe, targetStep.isRequiredReview, targetStep.isRequiredLocatorUpdate)
                 break
             default:
                 break;
@@ -82,14 +82,14 @@ class UI {
      * @param {number} stepIndex
      * @param {boolean} isReviewMode
      */
-    async refreshLocatorDefiner(defaultSelector, locatorHtmlPath, locatorName, locatorSelector, potentialMatch, stepIndex, parentFrame, isReviewMode = false) {
+    async refreshLocatorDefiner(defaultSelector, locatorHtmlPath, locatorName, locatorSelector, potentialMatch, stepIndex, parentFrame, isReviewMode = false, isRequiredLocatorUpdate = false) {
         //convert html path from local file to relative url
         let htmlUrl = this.backend.convertLocalPath2RelativeLink(locatorHtmlPath)
 
         //create a new object because we are going to modify screenshot key direclty
         let newPotentialMatch = await this.__updatePotentialMatchStockPic(potentialMatch)
         await this.backend.updateLocatorDefinerPic(locatorHtmlPath)
-        this.locatorDefiner = new LocatorDefiner(defaultSelector, htmlUrl, locatorName, locatorSelector[0], newPotentialMatch, stepIndex, this.backend, parentFrame, isReviewMode)
+        this.locatorDefiner = new LocatorDefiner(defaultSelector, htmlUrl, locatorName, locatorSelector[0], newPotentialMatch, stepIndex, this.backend, parentFrame, isReviewMode, isRequiredLocatorUpdate)
     }
     /**
      * Based on the current step in the workflow, repopulate operation view

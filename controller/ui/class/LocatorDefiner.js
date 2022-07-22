@@ -23,7 +23,7 @@ class LocatorDefiner {
      * @param {Array<string>} parentFrame the parent frame hierachy
      * @param {boolean} isReviewMode if we are in review mode, we will not validate final locator if it match proposed value
      */
-    constructor(defaultSelector, locatorHtmlPath, locatorName, locatorSelector, potentialMatch, stepIndex, backend, parentFrame, isReviewMode = false) {
+    constructor(defaultSelector, locatorHtmlPath, locatorName, locatorSelector, potentialMatch, stepIndex, backend, parentFrame, isReviewMode = false, isRequiredLocatorUpdate = false) {
 
         this.__selectorValidationNote = ''
         this.defaultSelector = defaultSelector
@@ -43,6 +43,7 @@ class LocatorDefiner {
         this.fullLocatorFromPossibleLocator = null
         this.parentFrame = parentFrame
         this.isReviewMode = isReviewMode
+        this.isRequiredLocatorUpdate = isRequiredLocatorUpdate
     }
     get validationText() {
         return this.__validationText
@@ -195,7 +196,7 @@ class LocatorDefiner {
                 }
                 else {
                     //check locator and confirm locator input
-                    locatorCheckResult = await this.backend.puppeteer.checkLocatorBasedOnDefiner(this.defaultSelector, this.locatorSelector, this.parentFrame)
+                    locatorCheckResult = await this.backend.puppeteer.checkLocatorBasedOnDefiner(this.defaultSelector, this.locatorSelector, this.parentFrame, this.isRequiredLocatorUpdate)
                     //will not update the locator if current locator is not valid
                     await this.backend.puppeteer.openBluestoneTab("locator-definer")
                 }

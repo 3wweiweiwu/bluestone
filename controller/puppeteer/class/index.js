@@ -91,7 +91,15 @@ class PuppeteerControl {
             })
         }
     }
-    async checkLocatorBasedOnDefiner(targetLocator, currentLocator, parentIframes) {
+    /**
+     * 
+     * @param {string} targetLocator the locator for target element
+     * @param {string} currentLocator current locator user provided
+     * @param {string} parentIframes the parent frame of current element
+     * @param {boolean} isRequiredLocatorUpdate are we in locator update mode?
+     * @returns 
+     */
+    async checkLocatorBasedOnDefiner(targetLocator, currentLocator, parentIframes, isRequiredLocatorUpdate) {
         //sidebar is the id for the locatorDefinerpug
         let page = this.page
         await this.page.bringToFront()
@@ -100,6 +108,12 @@ class PuppeteerControl {
         let elements = []
         let errorText = ''
 
+        //when isRequiredLocatorUpdate is true, it means we runs the script in the runner and it didn't work
+        //if that is the case, we will just trust whatever things that comes from the user
+        //in this case, we make target equal to current locator
+        if (isRequiredLocatorUpdate) {
+            targetLocator = currentLocator
+        }
         //if target locator is equal to current locator and equals to null, it means we are dealing with parent locator, just return as it is
 
         //navigate through frames and get to current elements
