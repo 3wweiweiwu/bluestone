@@ -299,6 +299,9 @@ async function getElementBasedOnLocatorBackup(page, elementSelector, similarityB
 
     }
     //get score for possible locator
+    if (bestId == null) {
+        return { element: null }
+    }
     let currentSimilarity = elementDict[bestId].count / sum
     if (currentSimilarity > similarityBenchmark) {
         bestElement = elementDict[bestId]
