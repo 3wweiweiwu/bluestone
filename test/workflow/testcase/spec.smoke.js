@@ -106,7 +106,7 @@ describe('Smoke Test - Integration', () => {
         let currentData = res.data
         delete currentData['atomicTree']
         assert.deepStrictEqual(currentData, baseline)
-    }).timeout(10000)
+    }).timeout(15000)
     it('should record click event in steps correct', async () => {
         let happyPathPage = testConfig.testSite.page.happypath
         await bluestoneBackend.startRecording(siteBackend.singlePageHappyPath)
