@@ -20,7 +20,7 @@ class RecordingStep {
         /** @type {Array<Locator>} */
         this.potentialMatch = recordingStep.potentialMatch
         this.framePotentialMatch = recordingStep.framePotentialMatch
-        this.__htmlPath = recordingStep.htmlPath
+        this.htmlPath = recordingStep.htmlPath
         this.targetInnerText = recordingStep.targetInnerText
         this.targetPicPath = recordingStep.targetPicPath
         this.timeoutMs = recordingStep.timeoutMs
@@ -82,7 +82,7 @@ class RecordingStep {
      * @param {HtmlCaptureStatus} htmlCaptureRepo 
      */
     updateHtmlForStep(offSet, htmlCaptureRepo) {
-        this.__htmlPath = htmlCaptureRepo.getHtmlByPath(this.__htmlPath, offSet)
+        this.htmlPath = htmlCaptureRepo.getHtmlByPath(this.htmlPath, offSet)
 
     }
 }

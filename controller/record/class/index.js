@@ -173,7 +173,7 @@ class WorkflowRecord {
         //create index for good/bad index
         for (let i = 0; i < this.steps.length; i++) {
             try {
-                let htmlPath = this.steps[i].__htmlPath
+                let htmlPath = this.steps[i].htmlPath
                 await fs.access(htmlPath)
                 goodPathIndexList.push(i)
             } catch (error) {
@@ -184,7 +184,7 @@ class WorkflowRecord {
         //fix indexes based on its proximity
         badPathIndexList.forEach(i => {
             let closestHtmlRecord = htmlCaptureRepo.getLastCaptureBeforeTimeStamp(this.steps[i].timeStamp)
-            this.steps[i].__htmlPath = closestHtmlRecord.path
+            this.steps[i].htmlPath = closestHtmlRecord.path
         })
     }
     getCurrentOperation() {
@@ -950,7 +950,8 @@ class WorkflowRecord {
         this.steps.splice(0, 1)
         this.testSuiteName = tcLoader.testSuite
         this.testcaseName = tcLoader.testCase
-        await this.updateTestStepBasedOnAutoHealingInfo(abosoluteResultPath, tcLoader)
+        await this.update
+        await this.updateTestStep(abosoluteResultPath, tcLoader)
 
     }
     /**
@@ -958,7 +959,7 @@ class WorkflowRecord {
      * @param {string} testResultPath path to the mocha result file
      * @param {TestcaseLoader} tcLoader name of the testcase
      */
-    async updateTestStepBasedOnAutoHealingInfo(testResultPath, tcLoader) {
+    async updateTestStep(testResultPath, tcLoader) {
         if (testResultPath == null) return
         let tcName = tcLoader.testCase
         try {
@@ -972,6 +973,18 @@ class WorkflowRecord {
             let bluestoneFolder = path.dirname(bluestonePath)
             let bluestoneScriptFolder = path.join(bluestoneFolder, './result/', `./${resultObj.runId}/`)
 
+            //attach the screenshot for current test
+            let currentTestScreenshots = resultObj.screenshotManager.filter(item => item.tcId == tcName)
+            for (let screenshotRecord of currentTestScreenshots) {
+                //copy file to bluestone folder and make it ready for display
+                let newPicPath = this.getPicPath()
+                await fs.copyFile(screenshotRecord.picPath, newPicPath)
+                //assign picture to right step
+                let stepIndex = tcLoader.getStepIndexFromLine(screenshotRecord.lineNumber)
+                this.steps[stepIndex].htmlPath = newPicPath
+            }
+
+
             //identify prescription screenshot and assign it to the step
             let currentTc = resultObj.reviews.find(item => item.title == tcName)
             //current test is passed... no more inforamtion to pass
@@ -981,13 +994,13 @@ class WorkflowRecord {
             for (let prescription of currentTc.prescription) {
                 let newPicPath = this.getPicPath()
                 let sourcePicPath = path.join(bluestoneScriptFolder, prescription.newLocatorSnapshotPath)
-                fs.copyFile(sourcePicPath, newPicPath)
+                await fs.copyFile(sourcePicPath, newPicPath)
 
                 //convert to stepIndex
                 let failedStepIndex = tcLoader.getStepIndexFromLine(prescription.failureStepIndex)
                 this.steps[failedStepIndex].isRequiredReview = true
                 //populate screenshot picture
-                this.steps[failedStepIndex].targetPicPath = newPicPath
+
                 this.steps[failedStepIndex].htmlPath = newPicPath
                 //update locator to proposed value
                 this.steps[failedStepIndex].finalLocator = [prescription.newLocator]

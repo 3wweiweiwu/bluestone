@@ -49,12 +49,15 @@ async function captureSnapshot(pageData) {
             let stepIndex = getErrorStepIndexByStack(varSav.currentFilePath, stack, varSav.tcStepInfo)
             //output html 
             let fileName = `step-${stepIndex.toString()}-${Date.now()}.${extensionName}`
+            //depends on the run sceanrio, output report in different place
             filePath = path.join(varSav.dataOutDir, fileName)
+            await fs.writeFile(filePath, pageData)
+            varSav.ScreenshotReportManager.updateRecord(stepIndex, filePath)
+            varSav.exportVarContextToEnv()
         } catch (error) {
-
+            console.log(error)
         }
 
-        await fs.writeFile(filePath, pageData)
 
         return filePath
     } catch (error) {

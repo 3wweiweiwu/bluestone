@@ -58,8 +58,9 @@ function JSONReporter(runner, options = {}) {
         //update stats information
         let locatorUsage = getLocatorUsageStats()
         self.stats['locatorUsage'] = locatorUsage
-        let runId = VarSaver.parseFromEnvVar().runId
-
+        let varSav = VarSaver.parseFromEnvVar()
+        let runId = varSav.runId
+        let screenshotManager = varSav.ScreenshotReportManager.records
         var obj = {
             stats: self.stats,
             tests: tests.map(clean),
@@ -67,7 +68,8 @@ function JSONReporter(runner, options = {}) {
             failures: failures.map(clean),
             passes: passes.map(clean),
             reviews: [],
-            runId: runId
+            runId: runId,
+            screenshotManager: screenshotManager
         };
         //further analyze passes and divide it into true pass and review categories
 
