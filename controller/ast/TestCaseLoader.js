@@ -1,4 +1,5 @@
 const fs = require('fs').promises
+const fsSync = require('fs')
 const acorn = require("acorn");
 const walk = require('./lib/walk')
 const FunctionAst = require('../ast/class/Function')
@@ -7,6 +8,8 @@ const TestCase = require('../coder/class/Testcase')
 const RecordingStep = require('../record/class/RecordingStep')
 const AstManager = require('../ast/index')
 const { LocatorManager } = require('../locator/index')
+const config = require('../../config');
+const path = require('path');
 class ScriptBreaker {
     constructor(script) {
         this.script = script
@@ -65,7 +68,12 @@ class TestcaseLoader {
         this.scriptBreaker = null
     }
 
-
+    get testCase() {
+        return this.#testCase
+    }
+    get testSuite() {
+        return this.#testSuite
+    }
     async parseTc(isExtractTestInfo = true) {
         let fileInfo = await fs.readFile(this.#filePath)
         let fileStr = fileInfo.toString()
@@ -80,6 +88,51 @@ class TestcaseLoader {
             this.#testCase = this.#extractTestcaseName()
         }
         this.steps = this.#extractTestStep(this.scriptBreaker)
+    }
+
+    /**
+     * copy locator picture to public folder for display
+     * @param {Function} pathGenFunc 
+     */
+    async copyStockLocatorPic(pathGenFunc) {
+
+        for (const step of this.steps) {
+            if (step.targetPicPath == '') continue
+            try {
+                await fs.access(step.targetPicPath)
+            } catch (error) {
+                /**@param {string} */
+                let picPath = pathGenFunc()
+                let sourcePicPath = path.join(config.code.pictureFolder, '..', step.targetPicPath)
+                await fs.copyFile(sourcePicPath, picPath)
+                step.targetPicPath = picPath
+            }
+
+        }
+    }
+    /**
+     * Populate healing inforamtion
+     */
+    async getStepHealingInfo() {
+        for (const step of this.steps) {
+            try {
+                await fs.access(step.healingTree)
+                let healingBinary = await fs.readFile(step.healingTree)
+                step.healingTree = healingBinary.toString()
+            } catch (error) {
+            }
+
+        }
+    }
+    async getIFrameInfo() {
+        let iFrame = []
+        for (const step of this.steps) {
+            step.iframe = iFrame
+            if (step.command == 'gotoFrame') {
+                let elementSelectorParam = step.functionAst.params.find(item => item.type.name == 'ElementSelector')
+                iFrame = [elementSelectorParam.value]
+            }
+        }
     }
     /**
      * Get test suite name from the node
@@ -135,11 +188,39 @@ class TestcaseLoader {
             let ancestorLength = item.ancestors.length
             let command = item.ancestors[ancestorLength - 3].object.property.name
             let args = item.ancestors[ancestorLength - 4].arguments
+            //populate target field
+            let target = 'no target'
             //populate function
             let functionAst
+            let targetPicPath = ''
+            let finalLocatorName = ''
+            let finalLocator = ['']
+            let htmlPath = ''
+            let potentialMatch = []
+            let healingTree = '{}'
+            let locatorSnapshot = []
             try {
                 functionAst = this.#astManager.getFunction(command)
                 functionAst.params = this.#extractFunctionParam(args, functionAst.params)
+                //populate target inforamtion
+                let targetParam = functionAst.params.find(item => item.type.name == 'ElementSelector')
+                if (targetParam != null) {
+                    finalLocatorName = targetParam.value
+                    let locatorObj = this.#locatorManager.locatorLibrary.find(item => item.path == finalLocatorName)
+                    finalLocator = locatorObj.Locator
+                    target = finalLocator[0]
+                    targetPicPath = locatorObj.screenshot
+                    htmlPath = ''
+                    locatorSnapshot = locatorObj.locatorSnapshot
+                }
+                //populate healing information
+                targetParam = functionAst.params.find(item => item.type.name == 'HealingSnapshot')
+                if (targetParam != null) {
+                    let snapshotFolder = path.join(config.code.dataPath, this.testCase, '/snapshot/')
+                    let healingSnapshotFile = targetParam.value + '.json'
+                    healingTree = path.join(snapshotFolder, healingSnapshotFile)
+
+                }
             } catch (error) {
                 //only print out error in the bluestone main console
                 if (process.env.BLUESTONE_VAR_SAVER == null)
@@ -151,7 +232,7 @@ class TestcaseLoader {
             let expressionStatement = item.ancestors[ancestorLength - 6]
             //convert 0 based index to 1 based line number
             let scriptLineNumber = scriptBreaker.getStepLineIndexByEndPoint(expressionStatement.end) + 1
-            let step = new RecordingStep({ command, functionAst, scriptLineNumber })
+            let step = new RecordingStep({ command, functionAst, scriptLineNumber, target, finalLocator, finalLocatorName, targetPicPath, htmlPath, potentialMatch, healingTree })
             allSteps.push(step)
         }
         return allSteps
@@ -170,8 +251,20 @@ class TestcaseLoader {
             if (item.type.name == 'ElementSelector') {
                 item.value = args[index].property.value
             }
+            if (item.type.name == 'HealingSnapshot') {
+                item.value = args[3].arguments[0].value
+            }
         })
         return functionParams
+    }
+    /**
+     * convert line number to step index
+     * @param {number} lineNumber 
+     * @returns {number}
+     */
+    getStepIndexFromLine(lineNumber) {
+        let stepIndex = this.steps.findIndex(item => item.scriptLineNumber == lineNumber)
+        return stepIndex
     }
 }
 

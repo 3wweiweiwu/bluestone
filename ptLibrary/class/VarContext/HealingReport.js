@@ -124,7 +124,7 @@ class HealingInfo {
         }
 
 
-        if (varSav == null || Object.keys(varSav.healingInfo.locatorReport.usage).length == 0) {
+        if (varSav == null || varSav.healingInfo == null || Object.keys(varSav.healingInfo.locatorReport.usage).length == 0) {
             let content = (fs.readFileSync(perscriptionPath)).toString()
             obj = JSON.parse(content)
         }
@@ -166,14 +166,13 @@ class HealingInfo {
      * @param {string} oldLocator 
      * @param {string} newLocator 
      * @param {string} pageData
-     * @param {TestcaseLoader} testcase
      * @param {boolean} isOriginalLocatorWork
      */
-    async createPerscription(locatorName, oldLocator, newLocator, pageData, testcasePath, testcase, isOriginalLocatorWork) {
+    async createPerscription(locatorName, oldLocator, newLocator, pageData, testcasePath, isOriginalLocatorWork) {
         if (this.runId == null || this.runId == '') return
         //get step index information
         let err = new Error()
-        let stepIndex = getErrorStepIndexByErrorStack(testcasePath, err.stack, testcase)
+        let stepIndex = getErrorStepIndexByErrorStack(testcasePath, err.stack)
 
 
         this.locatorReport.addRecord(locatorName, isOriginalLocatorWork)

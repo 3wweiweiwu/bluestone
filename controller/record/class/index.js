@@ -18,7 +18,10 @@ const PicCapture = require('../class/PicCapture')
 const ptConstant = require('../../../ptLibrary/functions/inbuiltFunc').VAR
 const RecordingStep = require('./RecordingStep')
 const MochaDriver = require('../../mocha/index')
+const TestCaseLoader = require("../../ast/TestCaseLoader")
 const os = require('os')
+const TestcaseLoader = require('../../ast/TestCaseLoader')
+const getErrorStepIndexByErrorStack = require('../../../ptLibrary/functions/getErrorStepIndexByStack')
 /**
  * @typedef {string} CommandType
  **/
@@ -55,6 +58,8 @@ class WorkflowRecord {
         //TODO: seperate step into another class
         this.puppeteer = puppeteer
         this.name = ''
+        this.testcaseName = ''
+        this.testSuiteName = ''
         /** 
          * @type {Array<RecordingStep>} 
          */
@@ -113,6 +118,24 @@ class WorkflowRecord {
         await this.astManager.loadFunctions(this.inbuiltFuncPath)
         console.log('Bluestone has started')
     }
+    /**
+     * Based on the path specified, update picture in locator definer
+     * @param {string} picPath 
+     */
+    async updateLocatorDefinerPic(picPath) {
+        let targetPath = path.join(__dirname, '../../../public/temp/componentPic/locatorDefiner.png')
+        try {
+            await fs.unlink(targetPath)
+        } catch (error) {
+
+        }
+        try {
+            await fs.access(picPath)
+            await fs.copyFile(picPath, targetPath)
+        } catch (error) {
+            return
+        }
+    }
     get isNavigationPending() {
         return this.__isNavigationPending
     }
@@ -151,7 +174,7 @@ class WorkflowRecord {
         //create index for good/bad index
         for (let i = 0; i < this.steps.length; i++) {
             try {
-                let htmlPath = this.steps[i].__htmlPath
+                let htmlPath = this.steps[i].htmlPath
                 await fs.access(htmlPath)
                 goodPathIndexList.push(i)
             } catch (error) {
@@ -162,7 +185,7 @@ class WorkflowRecord {
         //fix indexes based on its proximity
         badPathIndexList.forEach(i => {
             let closestHtmlRecord = htmlCaptureRepo.getLastCaptureBeforeTimeStamp(this.steps[i].timeStamp)
-            this.steps[i].__htmlPath = closestHtmlRecord.path
+            this.steps[i].htmlPath = closestHtmlRecord.path
         })
     }
     getCurrentOperation() {
@@ -192,7 +215,11 @@ class WorkflowRecord {
             })
             if (param != null) {
                 param.value = snapshotName
-                await fs.writeFile(snapshotPath, step.healingTree)
+                try {
+                    await fs.writeFile(snapshotPath, step.healingTree)
+                } catch (error) {
+
+                }
 
             }
         }
@@ -203,11 +230,11 @@ class WorkflowRecord {
     }
     /**
      * Write Testcase code into script output folder and update bluestone-locator.js 
-     * @param {string} testSuite 
-     * @param {string} testCase 
      * @returns {string} output path
      */
-    async writeCodeToDisk(testSuite, testCase) {
+    async writeCodeToDisk() {
+        let testSuite = this.testSuiteName
+        let testCase = this.testcaseName
         await this.__updateHealingInfo(testCase)
         //write code to disk
         let functionAstList = this.getAllFunctionAst()
@@ -472,6 +499,22 @@ class WorkflowRecord {
         return stepIndex
     }
     /**
+     * Get index of the step that runs failed or required review
+     * -1 if nothing being found
+     * @returns {number}
+     */
+    getFailedOrReviewRequiredStepIndex() {
+        let stepIndex = -1;
+        //find out selector that is pending correlaton
+        stepIndex = this.steps.findIndex(item => {
+            //will not check final locator for those steps whose function does not use element selector
+            let elementSelectorParam = item.functionAst.params.find(item => item.type.name == 'ElementSelector')
+            if (elementSelectorParam == null) return false
+            return item.isRequiredReview || item.result.isResultPass == false
+        })
+        return stepIndex
+    }
+    /**
      * Return all functionAst object for ast purpose
      * @returns {FunctionAST[]}
      */
@@ -525,28 +568,46 @@ class WorkflowRecord {
     }
     /**
      * Run All steps and assign result to step via bluestone
+     * @param {number} startingIndex
+     * @param {number} endIndex
      * @returns {number} index of the failed step. -1 if everything pass
      */
-    async runAllStepsViaBluestone() {
+    async runAllStepsViaBluestone(startingIndex = 0, endIndex = null) {
         let failedStepIndex = -1
         //check if there is any un-correlated locator in step
-        failedStepIndex = this.findPendingLocatorInStep()
-        if (failedStepIndex != -1) {
-            this.steps[failedStepIndex].result = new StepResult()
-            this.steps[failedStepIndex].result.resultText = 'Locator has not been correleated'
-            return failedStepIndex
+        let pendingLocatorStepIndex = this.findPendingLocatorInStep()
+        let failedOrReviewRequiredStepIndex = this.getFailedOrReviewRequiredStepIndex()
+        //find out smallest non -1 element in between pendingLocatorStepIndex and failedOrReviewRequiredStepIndex
+        // that number will become our end index
+        let sortedList = [pendingLocatorStepIndex, failedOrReviewRequiredStepIndex].filter(item => item != -1).sort((a, b) => a - b)
+        if (sortedList.length == 0) {
+            endIndex = this.steps.length
         }
-
+        else {
+            endIndex = sortedList[0]
+        }
         //run step one by one
-        for (let i = 0; i < this.steps.length; i++) {
+        for (let i = startingIndex; i < endIndex; i++) {
             let step = this.steps[i]
             let elementSelector = new ElementSelector(step.finalLocator, '', step.finalLocatorName)
 
             let result = await this.puppeteer.runCurrentStep(step.functionAst, elementSelector, step.iframe)
+            await this.puppeteer.StepAbortManager.stopStepAbortMonitor()
+            await new Promise(resolve => setTimeout(resolve, 300))
             this.steps[i].result = result
             if (!result.isResultPass) {
                 failedStepIndex = i
                 break
+            }
+
+            let stepSnapshotPath = path.join(os.tmpdir(), 'stepSnapshot.png')
+            let proposedSnapshotPath = this.getPicPath()
+            try {
+                await fs.access(stepSnapshotPath)
+                await fs.copyFile(stepSnapshotPath, proposedSnapshotPath)
+                this.steps[i].htmlPath = proposedSnapshotPath
+            } catch (error) {
+
             }
         }
         await this.puppeteer.openBluestoneTab('workflow')
@@ -856,8 +917,136 @@ class WorkflowRecord {
         return filePath
 
     }
+    /**
+     * @param {string} relativeScriptPath path to the script file
+     * @param {string} abosoluteResultPath path to the test result .json file
+     * @returns {WorkflowRecord}
+     */
+    async loadTestcase(relativeScriptPath, abosoluteResultPath) {
+        //get full script path
+        let bluestonePath = process.env.bluestonePath
+        let bluestoneFolder = path.dirname(bluestonePath)
+        let bluestoneScriptFolder = path.join(bluestoneFolder, 'script')
+        let tcName = relativeScriptPath
+        //apend .js file name if it not included
+        if (!relativeScriptPath.toLowerCase().endsWith('.js')) {
+            relativeScriptPath += '.js'
+        }
+        let scriptPath = path.join(bluestoneScriptFolder, relativeScriptPath)
+
+        //check if file exists
+        try {
+            await fs.access(scriptPath)
+        } catch (error) {
+            throw new Error(`Unable to find file at ${scriptPath}`)
+        }
 
 
+        let tcLoader = new TestcaseLoader(scriptPath, this.locatorManager, this.astManager)
+        await tcLoader.parseTc(true)
+        await tcLoader.copyStockLocatorPic(this.getPicPath)
+        await tcLoader.getStepHealingInfo()
+        await tcLoader.getIFrameInfo()
+        //update test step information based on new files
+        this.steps = tcLoader.steps
+        //remove first initailize step
+        this.steps.splice(0, 1)
+        this.testSuiteName = tcLoader.testSuite
+        this.testcaseName = tcLoader.testCase
+        await this.update
+        await this.updateTestStep(abosoluteResultPath, tcLoader)
+
+    }
+    /**
+     * Based on the test step information, update auto-healing inforamtion
+     * @param {string} testResultPath path to the mocha result file
+     * @param {TestcaseLoader} tcLoader name of the testcase
+     */
+    async updateTestStep(testResultPath, tcLoader) {
+        if (testResultPath == null) return
+        let tcName = tcLoader.testCase
+        try {
+            //load test result file
+            let resultBinary = await fs.readFile(testResultPath)
+            let resultText = resultBinary.toString()
+            let resultObj = JSON.parse(resultText)
+
+            //navigate to the screenshot for the auto-healing steps
+            let bluestonePath = process.env.bluestonePath
+            let bluestoneFolder = path.dirname(bluestonePath)
+            let bluestoneScriptFolder = path.join(bluestoneFolder, './result/', `./${resultObj.runId}/`)
+
+            //attach the screenshot for current test
+            let currentTestScreenshots = resultObj.screenshotManager.filter(item => item.tcId == tcName)
+            for (let screenshotRecord of currentTestScreenshots) {
+                //copy file to bluestone folder and make it ready for display
+                let newPicPath = this.getPicPath()
+                try {
+                    await fs.copyFile(screenshotRecord.picPath, newPicPath)
+                } catch (error) {
+                    console.log(error)
+                }
+
+                //assign picture to right step
+                let stepIndex = tcLoader.getStepIndexFromLine(screenshotRecord.lineNumber)
+                this.steps[stepIndex].htmlPath = newPicPath
+            }
+
+            //if test failed, attach failure information to the step
+            let currentFailureTc = resultObj.failures.find(item => item.title == tcName)
+            let failureStepIndex = 0
+            if (currentFailureTc != null) {
+                let errorMessage = currentFailureTc.err.message
+                let failureLine = getErrorStepIndexByErrorStack(currentFailureTc.file, currentFailureTc.err.stack)
+                failureStepIndex = tcLoader.getStepIndexFromLine(failureLine)
+                if (failureStepIndex == -1) {
+                    failureStepIndex = 0
+                }
+                this.steps[failureStepIndex].result.isResultPass = false
+                this.steps[failureStepIndex].result.resultText = errorMessage
+                this.steps[failureStepIndex].isRequiredLocatorUpdate = true
+            }
+            // Make all steps pass till we hit failure
+            for (let i = 0; i < this.steps.length; i++) {
+                if (i == failureStepIndex) {
+                    break
+                }
+                this.steps[i].result.isResultPass = true
+            }
+
+
+
+            //identify prescription screenshot and assign it to the step
+            let currentTc = resultObj.reviews.find(item => item.title == tcName)
+            //current test is passed... no more inforamtion to pass
+            if (currentTc == null) {
+                return
+            }
+            for (let prescription of currentTc.prescription) {
+                let newPicPath = this.getPicPath()
+                let sourcePicPath = path.join(bluestoneScriptFolder, prescription.newLocatorSnapshotPath)
+                try {
+                    await fs.copyFile(sourcePicPath, newPicPath)
+                } catch (error) {
+                    console.log(error)
+                }
+
+
+                //convert to stepIndex
+                let failedStepIndex = tcLoader.getStepIndexFromLine(prescription.failureStepIndex)
+                this.steps[failedStepIndex].isRequiredReview = true
+                //populate screenshot picture
+
+                this.steps[failedStepIndex].htmlPath = newPicPath
+                //update locator to proposed value
+                this.steps[failedStepIndex].finalLocator = [prescription.newLocator]
+                this.steps[failedStepIndex].target = prescription.newLocator
+            }
+            console.log()
+        } catch (error) {
+            console.log('')
+        }
+    }
 }
 
 module.exports = { WorkflowRecord, RecordingStep, COMMAND_TYPE }

@@ -15,6 +15,7 @@ var EVENT_TEST_PENDING = constants.EVENT_TEST_PENDING;
 var EVENT_TEST_FAIL = constants.EVENT_TEST_FAIL;
 var EVENT_TEST_END = constants.EVENT_TEST_END;
 var EVENT_RUN_END = constants.EVENT_RUN_END;
+const getErrorStepIndexByStack = require('./ptLibrary/functions/getErrorStepIndexByStack')
 const VarSaver = require('./ptLibrary/class/VarSaver')
 /**
  * Expose `JSON`.
@@ -57,15 +58,18 @@ function JSONReporter(runner, options = {}) {
         //update stats information
         let locatorUsage = getLocatorUsageStats()
         self.stats['locatorUsage'] = locatorUsage
-
-
+        let varSav = VarSaver.parseFromEnvVar()
+        let runId = varSav.runId
+        let screenshotManager = varSav.ScreenshotReportManager.records
         var obj = {
             stats: self.stats,
             tests: tests.map(clean),
             pending: pending.map(clean),
             failures: failures.map(clean),
             passes: passes.map(clean),
-            reviews: []
+            reviews: [],
+            runId: runId,
+            screenshotManager: screenshotManager
         };
         //further analyze passes and divide it into true pass and review categories
 

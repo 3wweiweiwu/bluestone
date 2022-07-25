@@ -21,8 +21,9 @@ class LocatorDefiner {
      * @param {number} stepIndex the index of current step. We need this inforamtion so that we can navigate back when we change the inforamtion in the step
      * @param {WorkflowRecord} backend the workflow record backend
      * @param {Array<string>} parentFrame the parent frame hierachy
+     * @param {boolean} isReviewMode if we are in review mode, we will not validate final locator if it match proposed value
      */
-    constructor(defaultSelector, locatorHtmlPath, locatorName, locatorSelector, potentialMatch, stepIndex, backend, parentFrame) {
+    constructor(defaultSelector, locatorHtmlPath, locatorName, locatorSelector, potentialMatch, stepIndex, backend, parentFrame, isReviewMode = false, isRequiredLocatorUpdate = false) {
 
         this.__selectorValidationNote = ''
         this.defaultSelector = defaultSelector
@@ -41,7 +42,8 @@ class LocatorDefiner {
         this.backend = backend
         this.fullLocatorFromPossibleLocator = null
         this.parentFrame = parentFrame
-
+        this.isReviewMode = isReviewMode
+        this.isRequiredLocatorUpdate = isRequiredLocatorUpdate
     }
     get validationText() {
         return this.__validationText
@@ -188,11 +190,16 @@ class LocatorDefiner {
                 await this.backend.puppeteer.openBluestoneTab("locator-definer")
                 break
             case LocatorDefiner.inBuiltQueryKey.btnConfirm:
-                //check locator and confirm locator input
-                let locatorCheckResult = await this.backend.puppeteer.checkLocatorBasedOnDefiner(this.defaultSelector, this.locatorSelector, this.parentFrame)
-                //will not update the locator if current locator is not valid
-                await this.backend.puppeteer.openBluestoneTab("locator-definer")
-
+                let locatorCheckResult = ''
+                if (this.isReviewMode == true && this.defaultSelector == this.locatorSelector) {
+                    console.log('We are in reviwe mode and current locator selection match tested value. We will skip check')
+                }
+                else {
+                    //check locator and confirm locator input
+                    locatorCheckResult = await this.backend.puppeteer.checkLocatorBasedOnDefiner(this.defaultSelector, this.locatorSelector, this.parentFrame, this.isRequiredLocatorUpdate)
+                    //will not update the locator if current locator is not valid
+                    await this.backend.puppeteer.openBluestoneTab("locator-definer")
+                }
 
                 let finalSelection = this.getFinalSelection(locatorCheckResult)
                 if (locatorCheckResult != '') break
@@ -216,6 +223,7 @@ class LocatorDefiner {
                     if (item.target == this.defaultSelector) {
                         this.backend.steps[i].finalLocator = finalSelection.finalLocator
                         this.backend.steps[i].finalLocatorName = finalSelection.finalLocatorName
+                        this.backend.steps[i].isRequiredReview = false
                         //specify the locator name in the param
                         let param = item.functionAst.params.find(item => {
                             return item.type.name == 'ElementSelector'

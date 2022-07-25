@@ -1,6 +1,6 @@
 //- table mixins
 include ../input.pug
-mixin testcase-control(btnResolveLocatorQueryKey,btnCreateTestcaseQueryKey,txtTestSuiteQueryKey,textTestSuiteValue,txtTestCaseQueryKey,textTestCaseValue,txtTestcaseStatus,isValidationPass,btnAbortExecution)
+mixin testcase-control(btnResolveLocatorQueryKey,btnCreateTestcaseQueryKey,txtTestSuiteQueryKey,textTestSuiteValue,txtTestCaseQueryKey,textTestCaseValue,txtTestcaseStatus,isValidationPass,btnAbortExecution,btnFixScreenshotByRunTC)
     script(src="/javascript/redirectInput.js")
     div(class='row')
         div
@@ -15,3 +15,4 @@ mixin testcase-control(btnResolveLocatorQueryKey,btnCreateTestcaseQueryKey,txtTe
             +a-btn-primary("?"+btnResolveLocatorQueryKey)="Resolve Pending Issues"
             +a-btn-info("?"+btnRunWorkflow)="Run Workflow"
             +a-btn-danger("?"+btnAbortExecution)="Abort Execution"
+            +a-btn("?"+btnFixScreenshotByRunTC)="Navigate Browser to Failure Step"

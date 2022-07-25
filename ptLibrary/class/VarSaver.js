@@ -3,12 +3,13 @@ const AlertManager = require('./VarContext/AlertManager')
 const HealingInfo = require('./VarContext/HealingReport')
 const path = require('path')
 const { Page } = require('puppeteer')
+const ScreenshotReportManager = require('./VarContext/ScreenshotReportManager')
 class VarSaver {
     /**
      * @param {Page} page
      * @param {string} currentFilePath The name of the current file
      */
-    constructor(currentFilePath, currentRetryCount) {
+    constructor(currentFilePath, currentRetryCount, isExport = true) {
         this.currentFilePath = currentFilePath
         this.retryCount = currentRetryCount
         this.testcase = (path.basename(currentFilePath).toLowerCase().split('.js'))[0]
@@ -17,10 +18,15 @@ class VarSaver {
         this.dataSnapshotdir = path.join(this.projectRootPath, '/data/', this.testcase, '/snapshot/')
         this.downloadManager = new DownloadManager()
         this.alertManager = new AlertManager()
-        this.healingInfo = new HealingInfo(process.env.BLUESTONE_RUN_ID, this.projectRootPath, this.testcase)
+        this.runId = process.env.BLUESTONE_RUN_ID
+        this.healingInfo = new HealingInfo(this.runId, this.projectRootPath, this.testcase)
         this.isTakeSnapshot = process.env.BLUESTONE_AUTO_SNAPSHOT || true
         this.tcStepInfo = null
-        this.exportVarContextToEnv()
+        this.ScreenshotReportManager = new ScreenshotReportManager(this.runId, this.healingInfo.perscriptionFolder, this.testcase)
+        if (isExport) {
+            this.exportVarContextToEnv()
+        }
+
 
     }
     /**
@@ -47,7 +53,11 @@ class VarSaver {
 
         /**@type {VarSaver} */
         let varSav = JSON.parse(process.env.BLUESTONE_VAR_SAVER)
-        varSav.healingInfo = new HealingInfo(process.env.BLUESTONE_RUN_ID, varSav.projectRootPath, varSav.testcase)
+        varSav.healingInfo = new HealingInfo(varSav.runId, varSav.projectRootPath, varSav.testcase)
+        varSav.ScreenshotReportManager = new ScreenshotReportManager(varSav.runId, varSav.ScreenshotReportManager.prescriptionFolder, varSav.ScreenshotReportManager.tcId, varSav.ScreenshotReportManager.records)
+        //do not export to env variable to avoid pollution
+        let varSavObj = new VarSaver(varSav.currentFilePath, varSav.currentRetryCount, false)
+        varSav['exportVarContextToEnv'] = varSavObj.exportVarContextToEnv
         return varSav
     }
     initializeAutoHealingDir(rootFolder, executionId, HealingReportPath) {

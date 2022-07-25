@@ -30,7 +30,8 @@ class WorkFlowPug {
         txtTestCaseQueryKey: 'WORKFLOW_TEST_CASE',
         btnRunWorkflow: 'WORKFLOW_RUN_ALL',
         updateStepQueryKey: 'WORKFLOW_UPDATE_STEP',
-        btnAbortExecution: 'WORKFLOW_ABORT_EXECUTION'
+        btnAbortExecution: 'WORKFLOW_ABORT_EXECUTION',
+        btnFixScreenshotByRunTC: 'WORKFLOW_FIX_SCREENSHOT_BY_RUN_TESTCASE'
     }
     /**
      * 
@@ -115,16 +116,23 @@ class WorkFlowPug {
 
             case WorkFlowPug.inBuiltQueryKey.txtTestSuiteQueryKey:
                 this.textTestSuiteValue = firstValue
+                this.backend.testSuiteName = firstValue
                 break
             case WorkFlowPug.inBuiltQueryKey.txtTestCaseQueryKey:
                 this.textTestCaseValue = firstValue
+                this.backend.testcaseName = firstValue
                 break
             case WorkFlowPug.inBuiltQueryKey.btnRunWorkflow:
                 this.backend.runAllSteps()
                 this.validateForm()
                 break
+            case WorkFlowPug.inBuiltQueryKey.btnFixScreenshotByRunTC:
+                this.backend.runAllStepsViaBluestone()
+                this.validateForm()
+                break
             case WorkFlowPug.inBuiltQueryKey.btnAbortExecution:
                 try {
+                    this.backend.puppeteer.StepAbortManager.abortStepExecution()
                     this.backend.mochaDriver.abortScript()
                 } catch (error) {
                 }
@@ -161,11 +169,11 @@ class WorkFlowPug {
             this.txtValidationStatus = 'Please wait, execution is going on.'
             return false
         }
-        if (this.textTestSuiteValue == '') {
+        if (this.backend.testSuiteName == '') {
             this.txtValidationStatus = 'Please enter test suite name'
             return false
         }
-        if (this.textTestCaseValue == '') {
+        if (this.backend.testcaseName == '') {
             this.txtValidationStatus = 'Please enter test case name'
             return false
         }
@@ -178,6 +186,10 @@ class WorkFlowPug {
 
             if (stepInfo.finalLocator == '' || stepInfo.finalLocatorName == '') {
                 this.txtValidationStatus = `<a href="#tr-${i}">Locator Missing. Go to step ${i}</a>`
+                return false
+            }
+            if (stepInfo.isRequiredReview) {
+                this.txtValidationStatus = `<a href="#tr-${i}">Bluestone has automatically fix a locator change. Go to step ${i} to review proposal</a>`
                 return false
             }
         }

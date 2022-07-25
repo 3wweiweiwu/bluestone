@@ -34,8 +34,14 @@ module.exports = [
         },
         result: { isResultPass: false, resultText: "" },
         timeStamp: null,
+        isRequiredLocatorUpdate: false,
+        isRequiredNewNameAndLocator: false,
+        isRequiredReview: false
     },
     {
+        isRequiredLocatorUpdate: false,
+        isRequiredNewNameAndLocator: false,
+        isRequiredReview: false,
         command: "waitElementExists",
         target: "#div1",
         iframe: [],
@@ -93,6 +99,9 @@ module.exports = [
         timeStamp: null,
     },
     {
+        isRequiredLocatorUpdate: false,
+        isRequiredNewNameAndLocator: false,
+        isRequiredReview: false,
         command: "click",
         target: "#div1",
         iframe: [],
@@ -129,6 +138,9 @@ module.exports = [
         timeStamp: null,
     },
     {
+        isRequiredLocatorUpdate: false,
+        isRequiredNewNameAndLocator: false,
+        isRequiredReview: false,
         command: "waitElementExists",
         target: "#header",
         iframe: [],
@@ -193,6 +205,9 @@ module.exports = [
         timeStamp: null,
     },
     {
+        isRequiredLocatorUpdate: false,
+        isRequiredNewNameAndLocator: false,
+        isRequiredReview: false,
         command: "click",
         target: "#header",
         iframe: [],
