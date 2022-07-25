@@ -449,3 +449,24 @@ exports.scroll = async function (frame, elementSelector, x, y) {
     await element.evaluate((node, x, y) => { node.scroll(x, y) }, x, y)
     return true
 }
+/**
+* Verify Style attribute value
+* @param {Frame} frame The puppeteer frame object. 
+* @param {ElementSelector} element element this function will interact with. We can only have 1 element as input
+* @param {string} parameter Atributte to verify, backgroundColor, alignItems
+* @param {string} expectedValue Expected Value, rgb(3, 102, 216), normal
+* @returns 
+*/
+exports.getStyleAttribute = async function (frame, element, parameter, expectedValue) {
+try {
+    const atributte = parameter
+    let elementSelected = await bluestoneFunc.waitElementExists.func(frame, element, 6000)
+    let result = await elementSelected.evaluate((node, parameter) => 
+        window.getComputedStyle(node)[parameter]
+        , parameter)
+    assert.deepStrictEqual(result, expectedValue, `Error during Get Style Attribute, In element ¨${element} baseline ${expectedValue} current value ${result} for parameter ${parameter}`)
+    } catch (error) {
+        console.log(error)
+    }
+    return true
+}
