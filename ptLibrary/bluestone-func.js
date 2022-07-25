@@ -80,6 +80,9 @@ module.exports = {
     scroll: class {
         static func = inbuiltFunc.scroll
         static locators = [{ locator: ['invalid_locator'] }]
+    },
+    getStyleAttribute: class {
+        static func = inbuiltFunc.getStyleAttribute
+        static locators = [{ locator: ['invalid_locator'] }]
     }
-
 }

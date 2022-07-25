@@ -279,7 +279,8 @@ class WorkflowRecord {
         clearBrowserCache: 'clearBrowserCache',
         dragstart: 'dragstart',
         drop: 'drop',
-        scroll: 'scroll'
+        scroll: 'scroll',
+        getStyleAttribute: 'getStyleAttribute'
     }
     static inbuiltEvent = {
         refresh: PuppeteerControl.inbuiltEvent.refresh
@@ -325,7 +326,8 @@ class WorkflowRecord {
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.clearBrowserCache),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.dragstart),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.drop),
-                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.scroll)
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.scroll),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.getStyleAttribute)
                 ]
             },
             customizedFunctions: {
