@@ -459,14 +459,14 @@ exports.scroll = async function (frame, elementSelector, x, y) {
 */
 exports.getStyleAttribute = async function (frame, element, parameter, expectedValue) {
 try {
-    const atributte = parameter
-    let elementSelected = await bluestoneFunc.waitElementExists.func(frame, element, 6000)
+    let elementSelected = await findElement(frame, element, 6000)
     let result = await elementSelected.evaluate((node, parameter) => 
         window.getComputedStyle(node)[parameter]
         , parameter)
-    assert.deepStrictEqual(result, expectedValue, `Error during Get Style Attribute, In element ¨${element} baseline ${expectedValue} current value ${result} for parameter ${parameter}`)
+    assert.deepStrictEqual(result, expectedValue, `Error during Get Style Attribute, In element ¨${element.displayName} baseline ${expectedValue} current value ${result} for parameter ${parameter}`)
     } catch (error) {
         console.log(error)
+        return error
     }
     return true
 }
