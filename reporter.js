@@ -39,8 +39,17 @@ function JSONReporter(runner, options = {}) {
     var failures = [];
     var passes = [];
     var output;
-    if (options.reporterOption && options.reporterOption.output) {
-        output = options.reporterOption.output;
+    if (options.reporterOption) {
+        if (options.reporterOption.output) {
+            output = options.reporterOption.output;
+        }
+        if (options.reporterOption.BLUESTONE_RUN_ID) {
+            process.env.BLUESTONE_RUN_ID = options.reporterOption.BLUESTONE_RUN_ID
+        }
+        if (options.reporterOption.BLUESTONE_AUTO_SNAPSHOT) {
+            process.env.BLUESTONE_AUTO_SNAPSHOT = options.reporterOption.BLUESTONE_AUTO_SNAPSHOT
+        }
+
     }
     runner.on(EVENT_TEST_END, function (test) {
         tests.push(test);
