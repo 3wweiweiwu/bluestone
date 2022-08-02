@@ -463,18 +463,16 @@ exports.scroll = async function (frame, elementSelector, x, y) {
 * @returns 
 */
 exports.getStyleAttribute = async function (frame, element, parameter, expectedValue, healingSnapshot) {
-try {
+
 
     //let elementSelected = await findElement(frame, element, 6000)
     let elementSelected = await thisWaitElementExists(frame, element, 6000, healingSnapshot)
-    
 
-    let result = await elementSelected.evaluate((node, parameter) => 
+
+    let result = await elementSelected.evaluate((node, parameter) =>
         window.getComputedStyle(node)[parameter]
         , parameter)
-    assert.deepStrictEqual(result, expectedValue, `Error during Get Style Attribute, In element ¨${element} baseline ${expectedValue} current value ${result} for parameter ${parameter}`)
-    } catch (error) {
-        console.log(error)
-    }
+    assert.deepStrictEqual(result, expectedValue, `Error during Get Style Attribute, In element ¨${element.displayName}¨ baseline ¨${expectedValue}¨ current value: [${result}] for parameter ¨${parameter}¨`)
+
     return true
 }
