@@ -84,11 +84,11 @@
         "--exit",
         "true",
         "--grep",
-        "^st s2$",
+        "^.* s2$",
         "--reporter",
         "${workspaceFolder}\\reporter.js",
         "--reporter-option",
-        "output=testrun.json",
+        "output=testrun.json,BLUESTONE_RUN_ID=testrun123,BLUESTONE_AUTO_SNAPSHOT=1",
         "--timeout",
         "999999"
       ]

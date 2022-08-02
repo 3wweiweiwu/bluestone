@@ -9,6 +9,7 @@ const fsSync = require('fs')
 const axios = require('axios').default
 let config = require('../config')
 const regedit = require('../controller/regedit')
+const process = require('process')
 function getPidPath() {
     return path.join(__dirname, 'bluestone.pid')
 }
@@ -54,6 +55,8 @@ try {
     let runTime = getRuntimeInfo()
     let bluestoneJsonPath = ''
     let port = runTime.port
+    let cwdFolder = process.cwd()
+    let testResultPath = null
     switch (cli.command) {
 
         case 'start':
@@ -103,10 +106,29 @@ try {
             break
         case "edit":
             bluestoneUrl = `http://localhost:${port}`
+
+            //handle result upload mode
+            if (cli.args.tcResult != null && cli.args.tcResult != '') {
+                resultFilePath = path.resolve(cwdFolder, cli.args.tcResult)
+                try {
+
+                    fsSync.accessSync(resultFilePath)
+                }
+                catch
+                {
+                    console.error(`Unable to find path specified under ${resultFilePath}`)
+                    return 1
+                }
+            }
+
             axios.put(`${bluestoneUrl}/api/record`, {
                 relativePath: cli.args.tcId,
-                testResultPath: cli.args.tcResult
+                testResultPath: resultFilePath
             })
+                .then((res) => {
+                    // console.log(res)
+                    return axios.get(`${bluestoneUrl}/workflow?WORKFLOW_RESOLVE`)
+                })
                 .then(() => {
                     console.log('Load script successfully')
                 })
