@@ -953,7 +953,6 @@ class WorkflowRecord {
         this.steps.splice(0, 1)
         this.testSuiteName = tcLoader.testSuite
         this.testcaseName = tcLoader.testCase
-        await this.update
         await this.updateTestStep(abosoluteResultPath, tcLoader)
 
     }
@@ -994,7 +993,7 @@ class WorkflowRecord {
 
             //if test failed, attach failure information to the step
             let currentFailureTc = resultObj.failures.find(item => item.title == tcName)
-            let failureStepIndex = 0
+            let failureStepIndex = -1
             if (currentFailureTc != null) {
                 let errorMessage = currentFailureTc.err.message
                 let failureLine = getErrorStepIndexByErrorStack(currentFailureTc.file, currentFailureTc.err.stack)

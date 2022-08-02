@@ -183,7 +183,10 @@ class WorkFlowPug {
             //skip steps whose function does not need locator
             let elementSelectorParam = stepInfo.functionAst.params.find(item => item.type.name == 'ElementSelector')
             if (elementSelectorParam == null) continue
-
+            if (stepInfo.command != 'goto' && stepInfo.target == 'no target') {
+                this.txtValidationStatus = `<a href="#tr-${i}">Step is invalid. Please delete that and re-record the step. Go to step ${i}</a>`
+                return false
+            }
             if (stepInfo.finalLocator == '' || stepInfo.finalLocatorName == '') {
                 this.txtValidationStatus = `<a href="#tr-${i}">Locator Missing. Go to step ${i}</a>`
                 return false

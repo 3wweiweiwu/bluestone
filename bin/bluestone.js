@@ -125,6 +125,10 @@ try {
                 relativePath: cli.args.tcId,
                 testResultPath: resultFilePath
             })
+                .then((res) => {
+                    // console.log(res)
+                    return axios.get(`${bluestoneUrl}/workflow?WORKFLOW_RESOLVE`)
+                })
                 .then(() => {
                     console.log('Load script successfully')
                 })
