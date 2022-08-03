@@ -127,11 +127,11 @@ Object.keys(EVENTCONST).forEach(item => {
                     default:
                         //if we see combo key ctrl-q, we will call in-browser plugin
                         if ((event.ctrlKey || event.altKey) && event.key === 'q') {
-                            captureScreenshot('alt+q')
                             // captureHtml()
                             command = null
                             parameter = null
                             getActiveLocator()
+                            captureScreenshot('alt+q')
                             isCallBluestoneConsole = true
                             console.log('call in-browser spy' + JSON.stringify(position))
                             break
