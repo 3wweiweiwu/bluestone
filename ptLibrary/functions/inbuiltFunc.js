@@ -143,12 +143,16 @@ exports.waitTillElementVisible = async function (frame, elementSelector, timeout
  * Click UI element
 *  @param {Frame} frame 
  * @param {ElementSelector} elementSelector element selector object
+ * @param {number} x relative coorindation x within element. Use '-1' if you want to click on center
+ * @param {number} y relative coorindation y within element. Use '-1' if you want to click on center
  */
-exports.click = async function (frame, elementSelector) {
+exports.click = async function (frame, elementSelector, x, y) {
     let element = await findElement(frame, elementSelector, 2000)
+    if (x == -1 || x == undefined) x = null
+    if (y == -1 || y == undefined) y = null
     try {
         try {
-            await element.click()
+            await element.click({ offset: { x, y } })
         } catch (error) {
             await element.evaluate(node => {
                 node.dispatchEvent(new Event('click'))
@@ -345,6 +349,7 @@ exports.basicAuthenticate = async function authenticate(page, username, password
 exports.dragstart = async function dragstart(frame, selector) {
     try {
         let element = await findElement(frame, selector, 2000)
+        await element.hover()
         await element.evaluate(node => {
             //declare global data transfer element
             bluestoneDataTransfer = new DataTransfer()
@@ -360,6 +365,7 @@ exports.dragstart = async function dragstart(frame, selector) {
             };
             node.dispatchEvent(new DragEvent('dragstart', dragStartEvent))
         })
+        await element.hover()
 
     } catch (error) {
 
