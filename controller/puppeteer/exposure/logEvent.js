@@ -120,7 +120,7 @@ module.exports = function (recordRepo, browser, page, io) {
             //display mvt console
             await openBluestoneTab(browser, "decide-view")
 
-            //give 500ms delay so that it can capture unfinished events(ex: last change event)
+            //give 500ms delay so that it can capture unfinished events(ex: last change event<-What's the APP? What's the workflow?)
             setTimeout(() => {
                 recordRepo.isRecording = false
                 recordRepo.isCaptureHtml = true

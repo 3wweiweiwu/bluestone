@@ -18,6 +18,7 @@ const checkUrlBlackList = require('./help/checkUrlBlacklist')
 const isHtmlCaptureOngoing = require('./exposure/isHtmlCaptureOngoing')
 const DownloadWatcher = require('./class/DownloadWatcher')
 const AlertWatcher = require('./class/AlertWatcher')
+const stopRecording = require('./exposure/stopRecording')
 /**
  * Create a new puppeteer browser instance
  * @param {import('../record/class/index').WorkflowRecord} record
@@ -82,6 +83,7 @@ async function startRecording(record, io, url = null, isCleanSteps = true) {
 
     await page.exposeFunction('logEvent', logEvent(record, browser, page, io))
     await page.exposeFunction('isRecording', isRecording(record))
+    await page.exposeFunction('stopRecording', stopRecording(record))
     await page.exposeFunction('logCurrentElement', logCurrentElement(record, page))
     await page.exposeFunction('getLocator', getLocator(record))
     await page.exposeFunction('setLocatorStatus', setLocatorStatus(record))

@@ -130,6 +130,7 @@ Object.keys(EVENTCONST).forEach(item => {
                             // captureHtml()
                             command = null
                             parameter = null
+                            window.stopRecording()
                             getActiveLocator()
                             captureScreenshot('alt+q')
                             isCallBluestoneConsole = true
