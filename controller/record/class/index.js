@@ -308,7 +308,8 @@ class WorkflowRecord {
         drop: 'drop',
         scroll: 'scroll',
         getStyleAttribute: 'getStyleAttribute',
-        mouseDown: 'mouseDown'
+        mouseDown: 'mouseDown',
+        mouseUp: 'mouseUp'
     }
     static inbuiltEvent = {
         refresh: PuppeteerControl.inbuiltEvent.refresh
@@ -356,7 +357,8 @@ class WorkflowRecord {
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.drop),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.scroll),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.getStyleAttribute),
-                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.mouseDown)
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.mouseDown),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.mouseUp)
                 ]
             },
             customizedFunctions: {
@@ -708,7 +710,7 @@ class WorkflowRecord {
         this.__handleFileUpload(event)
         this.__handleFileDownloadProgressUpdate(event)
         this.__handleScroll(event)
-        this.__handleMouseDownNClick(event)
+        this.__handleMouseUpDownNClick(event)
         this.__handleMouseDownNDrag(event)
         this.setLastOperationTime()
         await this.refreshActiveFunc()
@@ -809,18 +811,25 @@ class WorkflowRecord {
     * @param {RecordingStep} step 
     * @returns 
      */
-    async __handleMouseDownNClick(step) {
+    async __handleMouseUpDownNClick(step) {
         if (this.steps.length < 3 || step.command != 'click') {
             return
         }
         let allSteps = this.steps
-
-        for (let i = 0; this.steps.length - 1; i++) {
+        let newSteps
+        for (let i = 0; i < this.steps.length - 2; i++) {
             let priorOperation = this.steps[i]
-            if (priorOperation.command == 'mousedown' && priorOperation.target == step.target && step.timeStamp - priorOperation.timeStamp < 300) {
-                allSteps.splice(i - 1, 2)
+            try {
+                if ((priorOperation.command == 'mousedown' || priorOperation.command == 'mouseup') && priorOperation.target == step.target && step.timeStamp - priorOperation.timeStamp < 300) {
+                    allSteps[i - 1]['deleted'] = true
+                    allSteps[i]['deleted'] = true
+                }
+            } catch (error) {
+                console.log(error)
             }
+
         }
+        this.steps = this.steps.filter(item => item.deleted != true)
 
 
 

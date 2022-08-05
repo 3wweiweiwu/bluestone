@@ -26,7 +26,8 @@ const EVENTCONST = {
     dragstart: 'dragstart',
     drop: 'drop',
     scroll: 'scroll',
-    mousedown: 'mousedown'
+    mousedown: 'mousedown',
+    mouseup: 'mouseup'
 
 }
 const BLUESTONE = {
@@ -117,6 +118,14 @@ Object.keys(EVENTCONST).forEach(item => {
                     x: event.clientX - position.x,
                     y: event.clientY - position.y
                 })
+                break
+            case EVENTCONST.mouseup:
+                parameter = JSON.stringify({
+                    x: event.clientX - position.x,
+                    y: event.clientY - position.y
+                })
+                // console.log(selector)
+                // console.log(event.target)
                 break
             case EVENTCONST.change:
                 //still use original target because the new target may not have value

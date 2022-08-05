@@ -88,5 +88,9 @@ module.exports = {
     mouseDown: class {
         static func = inbuiltFunc.mouseDown
         static locators = [{ locator: ['invalid_locator'] }]
+    },
+    mouseUp: class {
+        static func = inbuiltFunc.mouseUp
+        static locators = [{ locator: ['invalid_locator'] }]
     }
 }

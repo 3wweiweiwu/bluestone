@@ -212,7 +212,47 @@ exports.mouseDown = async function (frame, elementSelector, x, y) {
 
     return `Click success!`
 }
+/**
+ * Mouse Up on UI element
+*  @param {Frame} frame 
+ * @param {ElementSelector} elementSelector element selector object
+ * @param {number} x relative coorindation x within element. Use '-1' if you want to click on center
+ * @param {number} y relative coorindation y within element. Use '-1' if you want to click on center
+ */
+exports.mouseUp = async function (frame, elementSelector, x, y) {
+    let element = await findElement(frame, elementSelector, 2000)
+    //handle default value
+    if (x == -1 || x == undefined) x = null
+    if (y == -1 || y == undefined) y = null
 
+    //if x and y offset is bigger than element itself, we will click on midle point
+    //otherwise, it will go beyond the scope
+    let elementPos = await element.boundingBox()
+    if (elementPos.width <= x || elementPos.height <= y) {
+        x = elementPos.x + elementPos.width / 2
+        y = elementPos.y + elementPos.height / 2
+    }
+    else {
+        x = elementPos.x + x
+        y = elementPos.y + y
+    }
+
+    try {
+        try {
+            await element.hover()
+            await frame.mouse.move(x, y, { steps: 3 })
+            await frame.mouse.up(x, y)
+        } catch (error) {
+            await element.evaluate(node => {
+                node.dispatchEvent(new Event('up'))
+            })
+        }
+    } catch (error) {
+        assert.fail(`Unable to do mouse down on "${elementSelector.displayName}"`)
+    }
+
+    return `Click success!`
+}
 /**
  * Hover Mouse on Element
 *  @param {Frame} frame 
