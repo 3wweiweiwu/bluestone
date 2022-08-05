@@ -94,11 +94,12 @@ module.exports = async function (browser, targetLocator, currentLocator, parentI
         }
 
         //check if current element and target element has same inner text. This is important becasue we might use current value for text validation
-        let targetText = await targetElement.evaluate(el => el.textContent);
-        let currentText = await elements[0].evaluate(el => el.textContent);
-        if (errorText == '' && targetText != currentText) {
-            errorText = `Inner Text is different. The target locator has inner text "${targetText}" while the current locator has inner text "${currentText}"`
-        }
+        //comment this out because it is not very useful. How often does text even matter?
+        // let targetText = await targetElement.evaluate(el => el.textContent);
+        // let currentText = await elements[0].evaluate(el => el.textContent);
+        // if (errorText == '' && targetText != currentText) {
+        //     errorText = `Inner Text is different. The target locator has inner text "${targetText}" while the current locator has inner text "${currentText}"`
+        // }
     }
     return errorText
 
