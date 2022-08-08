@@ -820,9 +820,18 @@ class WorkflowRecord {
         for (let i = 0; i < this.steps.length - 2; i++) {
             let priorOperation = this.steps[i]
             try {
-                if ((priorOperation.command == 'mousedown' || priorOperation.command == 'mouseup') && priorOperation.target == step.target && step.timeStamp - priorOperation.timeStamp < 300) {
-                    allSteps[i - 1]['deleted'] = true
-                    allSteps[i]['deleted'] = true
+                if ((priorOperation.command == 'mousedown' || priorOperation.command == 'mouseup') && priorOperation.target == step.target) {
+                    //check element based on x,y coorindation. If nothing change, most likely, they are subsequent operation
+                    let priorX = priorOperation.functionAst.params.find(item => item.name == 'x')
+                    let priorY = priorOperation.functionAst.params.find(item => item.name == 'y')
+                    let currentX = step.functionAst.params.find(item => item.name == 'x')
+                    let currentY = step.functionAst.params.find(item => item.name == 'y')
+
+                    if (priorX.value == currentX.value && priorY.value == currentY.value) {
+                        allSteps[i - 1]['deleted'] = true
+                        allSteps[i]['deleted'] = true
+                    }
+
                 }
             } catch (error) {
                 console.log(error)
