@@ -9,6 +9,9 @@ module.exports = [
         targetPicPath: null,
         timeoutMs: null,
         meta: {},
+        isRequiredReview: false,
+        isRequiredLocatorUpdate: false,
+        isRequiredNewNameAndLocator: false,
         finalLocatorName: "FAKE locator name to avoid check",
         finalLocator: "FAKE locator to avoid check",
         functionAst: {
@@ -34,14 +37,8 @@ module.exports = [
         },
         result: { isResultPass: false, resultText: "" },
         timeStamp: null,
-        isRequiredLocatorUpdate: false,
-        isRequiredNewNameAndLocator: false,
-        isRequiredReview: false
     },
     {
-        isRequiredLocatorUpdate: false,
-        isRequiredNewNameAndLocator: false,
-        isRequiredReview: false,
         command: "waitElementExists",
         target: "#div1",
         iframe: [],
@@ -52,6 +49,9 @@ module.exports = [
         targetPicPath: null,
         timeoutMs: null,
         meta: {},
+        isRequiredReview: false,
+        isRequiredLocatorUpdate: false,
+        isRequiredNewNameAndLocator: false,
         finalLocatorName: "",
         finalLocator: [""],
         functionAst: {
@@ -99,9 +99,6 @@ module.exports = [
         timeStamp: null,
     },
     {
-        isRequiredLocatorUpdate: false,
-        isRequiredNewNameAndLocator: false,
-        isRequiredReview: false,
         command: "click",
         target: "#div1",
         iframe: [],
@@ -112,6 +109,9 @@ module.exports = [
         targetPicPath: null,
         timeoutMs: null,
         meta: {},
+        isRequiredReview: false,
+        isRequiredLocatorUpdate: false,
+        isRequiredNewNameAndLocator: false,
         finalLocatorName: "",
         finalLocator: [""],
         functionAst: {
@@ -131,6 +131,22 @@ module.exports = [
                     type: { type: "NameExpression", name: "ElementSelector" },
                     name: "elementSelector",
                 },
+                {
+                    title: "param",
+                    description:
+                        "percentage of coorindation x within element. Use '0.5' if you want to click on center",
+                    type: { type: "NameExpression", name: "number" },
+                    name: "x",
+                    value: null,
+                },
+                {
+                    title: "param",
+                    description:
+                        "percentage of coorindation y within element. Use '0.5' if you want to click on center",
+                    type: { type: "NameExpression", name: "number" },
+                    name: "y",
+                    value: null,
+                },
             ],
             locators: [{ locator: ["invalid_locator"] }],
         },
@@ -138,9 +154,6 @@ module.exports = [
         timeStamp: null,
     },
     {
-        isRequiredLocatorUpdate: false,
-        isRequiredNewNameAndLocator: false,
-        isRequiredReview: false,
         command: "waitElementExists",
         target: "#header",
         iframe: [],
@@ -158,6 +171,9 @@ module.exports = [
         targetPicPath: null,
         timeoutMs: null,
         meta: {},
+        isRequiredReview: false,
+        isRequiredLocatorUpdate: false,
+        isRequiredNewNameAndLocator: false,
         finalLocatorName: "",
         finalLocator: [""],
         functionAst: {
@@ -205,9 +221,6 @@ module.exports = [
         timeStamp: null,
     },
     {
-        isRequiredLocatorUpdate: false,
-        isRequiredNewNameAndLocator: false,
-        isRequiredReview: false,
         command: "click",
         target: "#header",
         iframe: [],
@@ -225,6 +238,9 @@ module.exports = [
         targetPicPath: null,
         timeoutMs: null,
         meta: {},
+        isRequiredReview: false,
+        isRequiredLocatorUpdate: false,
+        isRequiredNewNameAndLocator: false,
         finalLocatorName: "",
         finalLocator: [""],
         functionAst: {
@@ -243,6 +259,22 @@ module.exports = [
                     description: "element selector object",
                     type: { type: "NameExpression", name: "ElementSelector" },
                     name: "elementSelector",
+                },
+                {
+                    title: "param",
+                    description:
+                        "percentage of coorindation x within element. Use '0.5' if you want to click on center",
+                    type: { type: "NameExpression", name: "number" },
+                    name: "x",
+                    value: null,
+                },
+                {
+                    title: "param",
+                    description:
+                        "percentage of coorindation y within element. Use '0.5' if you want to click on center",
+                    type: { type: "NameExpression", name: "number" },
+                    name: "y",
+                    value: null,
                 },
             ],
             locators: [{ locator: ["invalid_locator"] }],
