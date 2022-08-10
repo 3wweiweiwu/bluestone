@@ -307,7 +307,9 @@ class WorkflowRecord {
         dragstart: 'dragstart',
         drop: 'drop',
         scroll: 'scroll',
-        getStyleAttribute: 'getStyleAttribute'
+        getStyleAttribute: 'getStyleAttribute',
+        mouseDown: 'mouseDown',
+        mouseUp: 'mouseUp'
     }
     static inbuiltEvent = {
         refresh: PuppeteerControl.inbuiltEvent.refresh
@@ -354,7 +356,9 @@ class WorkflowRecord {
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.dragstart),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.drop),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.scroll),
-                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.getStyleAttribute)
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.getStyleAttribute),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.mouseDown),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.mouseUp)
                 ]
             },
             customizedFunctions: {
@@ -706,6 +710,8 @@ class WorkflowRecord {
         this.__handleFileUpload(event)
         this.__handleFileDownloadProgressUpdate(event)
         this.__handleScroll(event)
+        this.__handleMouseUpDownNClick(event)
+        this.__handleMouseDownNDrag(event)
         this.setLastOperationTime()
         await this.refreshActiveFunc()
     }
@@ -752,6 +758,91 @@ class WorkflowRecord {
 
     }
 
+    /**
+     * In a graphic drawing application(PA), we run into a situation
+     * As they implement drag and drop element operation, no drag/drop evens is fired
+     * The application use mouse down event to decide the starting target
+     * And use click event to decide destination. In this case, we need to support mousedown.
+     * And there is no click on the starting target even though we drag it within the element
+     * With this challenge, I propose to check if mousedown and click.
+     * Mouse down event will always comes first and click event will follow
+     * In this case, we should check click event and its prior mousedown event and see if they are against
+     * same element. If so, we should get rid of the mousedown event to keep the code clean.
+     * If mousedown event and click event are agaisnt two different element, we should keep both 
+     * Also, if mousedown and click event happen within 100ms, we should get rid of mousedown
+     * most likely, it is part of click lifecycle
+     * @param {RecordingStep} step 
+     * @returns 
+     */
+    async __handleMouseDownNDrag(step) {
+        if (this.steps.length < 3 || step.command != 'dragstart') {
+            return
+        }
+        let allSteps = this.steps
+        let lastStepIndex = allSteps.length - 1
+
+        let i = lastStepIndex - 2
+        let priorOperation = this.steps[i]
+        if (priorOperation.command == 'mousedown' && priorOperation.target == step.target) {
+            allSteps.splice(i - 1, 2)
+        }
+
+
+
+    }
+    /**
+     * In a workflow, we run into issue where mousedown and click event are scatter all over the place
+     * workflow:
+     * click username input box
+     * update a username
+     * click password input box
+     * 
+     * Challenge:
+     * Event sequence will look like this:
+     * click(username)
+     * mousedown(password)
+     * change value(username)
+     * click(password)
+     * 
+     * Proposed solution
+     * the mouse down will happen as part of click lifecycle, its time stamp difference is very small(<300ms)
+     * Therefore, when click happen, we will search all prior mousedown whose timestamp difference is small enough
+     * And get rid of those mousedown steps to avoid problem
+    * @param {RecordingStep} step 
+    * @returns 
+     */
+    async __handleMouseUpDownNClick(step) {
+        if (this.steps.length < 3 || step.command != 'click') {
+            return
+        }
+        let allSteps = this.steps
+        let newSteps
+        for (let i = 0; i < this.steps.length - 2; i++) {
+            let priorOperation = this.steps[i]
+            try {
+                if ((priorOperation.command == 'mousedown' || priorOperation.command == 'mouseup') && priorOperation.target == step.target && Math.abs(priorOperation.timeStamp - step.timeStamp) < 1000) {
+                    //check element based on x,y coorindation. If nothing change, most likely, they are subsequent operation
+                    let priorX = priorOperation.functionAst.params.find(item => item.name == 'x')
+                    let priorY = priorOperation.functionAst.params.find(item => item.name == 'y')
+                    let currentX = step.functionAst.params.find(item => item.name == 'x')
+                    let currentY = step.functionAst.params.find(item => item.name == 'y')
+
+                    if (priorX.value == currentX.value && priorY.value == currentY.value) {
+                        allSteps[i - 1]['deleted'] = true
+                        allSteps[i]['deleted'] = true
+                    }
+
+                }
+            } catch (error) {
+                console.log(error)
+            }
+
+        }
+        this.steps = this.steps.filter(item => item.deleted != true)
+
+
+
+    }
     /**
      * delete action before upload
      * In recording mode, we will always do some action to trigger file upload

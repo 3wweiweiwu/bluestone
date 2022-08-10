@@ -84,5 +84,13 @@ module.exports = {
     getStyleAttribute: class {
         static func = inbuiltFunc.getStyleAttribute
         static locators = [{ locator: ['invalid_locator'] }]
+    },
+    mouseDown: class {
+        static func = inbuiltFunc.mouseDown
+        static locators = [{ locator: ['invalid_locator'] }]
+    },
+    mouseUp: class {
+        static func = inbuiltFunc.mouseUp
+        static locators = [{ locator: ['invalid_locator'] }]
     }
 }

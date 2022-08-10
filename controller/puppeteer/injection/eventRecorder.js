@@ -25,7 +25,9 @@ const EVENTCONST = {
     keydown: 'keydown',
     dragstart: 'dragstart',
     drop: 'drop',
-    scroll: 'scroll'
+    scroll: 'scroll',
+    mousedown: 'mousedown',
+    mouseup: 'mouseup'
 
 }
 const BLUESTONE = {
@@ -65,6 +67,7 @@ function getElementAttribute(element, attributeName) {
 
 Object.keys(EVENTCONST).forEach(item => {
     document.addEventListener(item, event => {
+        let timeStamp = Date.now()
         let selector = ''
         try {
             selector = finder(event.target)
@@ -104,6 +107,26 @@ Object.keys(EVENTCONST).forEach(item => {
         let fileNames = []
         let isCallBluestoneConsole = false
         switch (item) {
+            case EVENTCONST.click:
+                parameter = JSON.stringify({
+                    x: Math.round(((event.clientX - position.x) / position.width) * 100) / 100,
+                    y: Math.round((event.clientY - position.y) / position.height * 100) / 100
+                })
+                break
+            case EVENTCONST.mousedown:
+                parameter = JSON.stringify({
+                    x: Math.round(((event.clientX - position.x) / position.width) * 100) / 100,
+                    y: Math.round((event.clientY - position.y) / position.height * 100) / 100
+                })
+                break
+            case EVENTCONST.mouseup:
+                parameter = JSON.stringify({
+                    x: Math.round(((event.clientX - position.x) / position.width) * 100) / 100,
+                    y: Math.round((event.clientY - position.y) / position.height * 100) / 100
+                })
+                // console.log(selector)
+                // console.log(event.target)
+                break
             case EVENTCONST.change:
                 //still use original target because the new target may not have value
                 parameter = event.target.value
@@ -203,7 +226,7 @@ Object.keys(EVENTCONST).forEach(item => {
                 height: position.height,
                 width: position.width
             },
-            timestamp: Date.now(),
+            timestamp: timeStamp,
             healingTree: atomicTreeStr
         }
         //will not record any event that is marked as ignore.

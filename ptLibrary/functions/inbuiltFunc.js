@@ -143,12 +143,31 @@ exports.waitTillElementVisible = async function (frame, elementSelector, timeout
  * Click UI element
 *  @param {Frame} frame 
  * @param {ElementSelector} elementSelector element selector object
+ * @param {number} x percentage of coorindation x within element. Use '0.5' if you want to click on center
+ * @param {number} y percentage of coorindation y within element. Use '0.5' if you want to click on center
  */
-exports.click = async function (frame, elementSelector) {
+exports.click = async function (frame, elementSelector, x, y) {
     let element = await findElement(frame, elementSelector, 2000)
+    //handle default value
+    if (x < 0 || x == undefined || x > 1) x = null
+    if (y < 0 || y == undefined || y > 1) y = null
+
+    //if x and y offset is bigger than element itself, we will click on midle point
+    //otherwise, it will go beyond the scope
+    let elementPos = await element.boundingBox()
+
+    let offsetX = null
+    let offsetY = null
+    if (x != null) {
+        offsetX = elementPos.width * x
+    }
+    if (y != null) {
+        offsetY = elementPos.height * y
+    }
     try {
         try {
-            await element.click()
+            await element.hover()
+            await element.click({ offset: { x: offsetX, y: offsetY } })
         } catch (error) {
             await element.evaluate(node => {
                 node.dispatchEvent(new Event('click'))
@@ -161,6 +180,75 @@ exports.click = async function (frame, elementSelector) {
     return `Click success!`
 }
 
+/**
+ * Mouse down on UI element
+*  @param {Frame} frame 
+ * @param {ElementSelector} elementSelector element selector object
+ * @param {number} x percentage coorindation x within element. Use '0.5' if you want to click on center
+ * @param {number} y percentage coorindation y within element. Use '0.5' if you want to click on center
+ */
+exports.mouseDown = async function (frame, elementSelector, x, y) {
+    let element = await findElement(frame, elementSelector, 2000)
+    //handle default value
+    if (x < 0 || x == undefined || x > 1) x = 0.5
+    if (y < 0 || y == undefined || y > 1) y = 0.5
+
+    //if x and y offset is bigger than element itself, we will click on midle point
+    //otherwise, it will go beyond the scope
+    let elementPos = await element.boundingBox()
+    let absoluteX = elementPos.width * x + elementPos.x
+    let absoluteY = elementPos.height * y + elementPos.y
+    try {
+        try {
+            await element.hover()
+            await frame.mouse.move(absoluteX, absoluteY)
+            await frame.mouse.down(absoluteX, absoluteY)
+        } catch (error) {
+            await element.evaluate(node => {
+                node.dispatchEvent(new Event('mousedown'))
+            })
+        }
+    } catch (error) {
+        assert.fail(`Unable to do mouse down on "${elementSelector.displayName}"`)
+    }
+
+    return `Click success!`
+}
+/**
+ * Mouse Up on UI element
+*  @param {Frame} frame 
+ * @param {ElementSelector} elementSelector element selector object
+ * @param {number} x percentage coorindation x within element. Use '0.5' if you want to click on center
+ * @param {number} y percentage coorindation y within element. Use '0.5' if you want to click on center
+ */
+exports.mouseUp = async function (frame, elementSelector, x, y) {
+    let element = await findElement(frame, elementSelector, 2000)
+    //handle default value
+    //handle default value
+    if (x < 0 || x == undefined || x > 1) x = 0.5
+    if (y < 0 || y == undefined || y > 1) y = 0.5
+
+    //if x and y offset is bigger than element itself, we will click on midle point
+    //otherwise, it will go beyond the scope
+    let elementPos = await element.boundingBox()
+    let absoluteX = elementPos.width * x + elementPos.x
+    let absoluteY = elementPos.height * y + elementPos.y
+
+    try {
+        try {
+            await frame.mouse.move(absoluteX, absoluteY, { steps: 3 })
+            await frame.mouse.up(absoluteX, absoluteY)
+        } catch (error) {
+            await element.evaluate(node => {
+                node.dispatchEvent(new Event('up'))
+            })
+        }
+    } catch (error) {
+        assert.fail(`Unable to do mouse down on "${elementSelector.displayName}"`)
+    }
+
+    return `Click success!`
+}
 /**
  * Hover Mouse on Element
 *  @param {Frame} frame 
@@ -345,6 +433,7 @@ exports.basicAuthenticate = async function authenticate(page, username, password
 exports.dragstart = async function dragstart(frame, selector) {
     try {
         let element = await findElement(frame, selector, 2000)
+        await element.hover()
         await element.evaluate(node => {
             //declare global data transfer element
             bluestoneDataTransfer = new DataTransfer()
@@ -360,6 +449,7 @@ exports.dragstart = async function dragstart(frame, selector) {
             };
             node.dispatchEvent(new DragEvent('dragstart', dragStartEvent))
         })
+        await element.hover()
 
     } catch (error) {
 
