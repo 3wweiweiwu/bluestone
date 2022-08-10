@@ -109,20 +109,20 @@ Object.keys(EVENTCONST).forEach(item => {
         switch (item) {
             case EVENTCONST.click:
                 parameter = JSON.stringify({
-                    x: event.clientX - position.x,
-                    y: event.clientY - position.y
+                    x: Math.round(((event.clientX - position.x) / position.width) * 100) / 100,
+                    y: Math.round((event.clientY - position.y) / position.height * 100) / 100
                 })
                 break
             case EVENTCONST.mousedown:
                 parameter = JSON.stringify({
-                    x: event.clientX - position.x,
-                    y: event.clientY - position.y
+                    x: Math.round(((event.clientX - position.x) / position.width) * 100) / 100,
+                    y: Math.round((event.clientY - position.y) / position.height * 100) / 100
                 })
                 break
             case EVENTCONST.mouseup:
                 parameter = JSON.stringify({
-                    x: event.clientX - position.x,
-                    y: event.clientY - position.y
+                    x: Math.round(((event.clientX - position.x) / position.width) * 100) / 100,
+                    y: Math.round((event.clientY - position.y) / position.height * 100) / 100
                 })
                 // console.log(selector)
                 // console.log(event.target)

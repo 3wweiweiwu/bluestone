@@ -143,27 +143,31 @@ exports.waitTillElementVisible = async function (frame, elementSelector, timeout
  * Click UI element
 *  @param {Frame} frame 
  * @param {ElementSelector} elementSelector element selector object
- * @param {number} x relative coorindation x within element. Use '-1' if you want to click on center
- * @param {number} y relative coorindation y within element. Use '-1' if you want to click on center
+ * @param {number} x percentage of coorindation x within element. Use '0.5' if you want to click on center
+ * @param {number} y percentage of coorindation y within element. Use '0.5' if you want to click on center
  */
 exports.click = async function (frame, elementSelector, x, y) {
     let element = await findElement(frame, elementSelector, 2000)
     //handle default value
-    if (x == -1 || x == undefined) x = null
-    if (y == -1 || y == undefined) y = null
+    if (x < 0 || x == undefined || x > 1) x = null
+    if (y < 0 || y == undefined || y > 1) y = null
 
     //if x and y offset is bigger than element itself, we will click on midle point
     //otherwise, it will go beyond the scope
     let elementPos = await element.boundingBox()
-    if (elementPos.width <= x || elementPos.height <= y) {
-        x = null
-        y = null
-    }
 
+    let offsetX = null
+    let offsetY = null
+    if (x != null) {
+        offsetX = elementPos.width * x
+    }
+    if (y != null) {
+        offsetY = elementPos.height * y
+    }
     try {
         try {
             await element.hover()
-            await element.click({ offset: { x, y } })
+            await element.click({ offset: { x: offsetX, y: offsetY } })
         } catch (error) {
             await element.evaluate(node => {
                 node.dispatchEvent(new Event('click'))
@@ -180,27 +184,25 @@ exports.click = async function (frame, elementSelector, x, y) {
  * Mouse down on UI element
 *  @param {Frame} frame 
  * @param {ElementSelector} elementSelector element selector object
- * @param {number} x relative coorindation x within element. Use '-1' if you want to click on center
- * @param {number} y relative coorindation y within element. Use '-1' if you want to click on center
+ * @param {number} x percentage coorindation x within element. Use '0.5' if you want to click on center
+ * @param {number} y percentage coorindation y within element. Use '0.5' if you want to click on center
  */
 exports.mouseDown = async function (frame, elementSelector, x, y) {
     let element = await findElement(frame, elementSelector, 2000)
     //handle default value
-    if (x == -1 || x == undefined) x = null
-    if (y == -1 || y == undefined) y = null
+    if (x < 0 || x == undefined || x > 1) x = 0.5
+    if (y < 0 || y == undefined || y > 1) y = 0.5
 
     //if x and y offset is bigger than element itself, we will click on midle point
     //otherwise, it will go beyond the scope
     let elementPos = await element.boundingBox()
-    if (elementPos.width <= x || elementPos.height <= y) {
-        x = elementPos.x + elementPos.width / 2
-        y = elementPos.y + elementPos.height / 2
-    }
-
+    let absoluteX = elementPos.width * x + elementPos.x
+    let absoluteY = elementPos.height * y + elementPos.y
     try {
         try {
             await element.hover()
-            await frame.mouse.down(x, y)
+            await frame.mouse.move(absoluteX, absoluteY)
+            await frame.mouse.down(absoluteX, absoluteY)
         } catch (error) {
             await element.evaluate(node => {
                 node.dispatchEvent(new Event('mousedown'))
@@ -216,32 +218,26 @@ exports.mouseDown = async function (frame, elementSelector, x, y) {
  * Mouse Up on UI element
 *  @param {Frame} frame 
  * @param {ElementSelector} elementSelector element selector object
- * @param {number} x relative coorindation x within element. Use '-1' if you want to click on center
- * @param {number} y relative coorindation y within element. Use '-1' if you want to click on center
+ * @param {number} x percentage coorindation x within element. Use '0.5' if you want to click on center
+ * @param {number} y percentage coorindation y within element. Use '0.5' if you want to click on center
  */
 exports.mouseUp = async function (frame, elementSelector, x, y) {
     let element = await findElement(frame, elementSelector, 2000)
     //handle default value
-    if (x == -1 || x == undefined) x = null
-    if (y == -1 || y == undefined) y = null
+    //handle default value
+    if (x < 0 || x == undefined || x > 1) x = 0.5
+    if (y < 0 || y == undefined || y > 1) y = 0.5
 
     //if x and y offset is bigger than element itself, we will click on midle point
     //otherwise, it will go beyond the scope
     let elementPos = await element.boundingBox()
-    if (elementPos.width <= x || elementPos.height <= y) {
-        x = elementPos.x + elementPos.width / 2
-        y = elementPos.y + elementPos.height / 2
-    }
-    else {
-        x = elementPos.x + x
-        y = elementPos.y + y
-    }
+    let absoluteX = elementPos.width * x + elementPos.x
+    let absoluteY = elementPos.height * y + elementPos.y
 
     try {
         try {
-            await element.hover()
-            await frame.mouse.move(x, y, { steps: 3 })
-            await frame.mouse.up(x, y)
+            await frame.mouse.move(absoluteX, absoluteY, { steps: 3 })
+            await frame.mouse.up(absoluteX, absoluteY)
         } catch (error) {
             await element.evaluate(node => {
                 node.dispatchEvent(new Event('up'))
