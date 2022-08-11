@@ -138,7 +138,7 @@ class LocatorManager {
         if (targetLocator == null) {
             //if we do not specify new locator snapshot, we will use existing locator snapshot
             if (locatorSnapshot == null) {
-                locatorSnapshot = targetLocator.locatorSnapshot
+                locatorSnapshot = []
             }
             targetLocator = new Locator(locatorValue, relativePicPath, locatorName, locatorSnapshot)
             this.locatorLibrary.push(targetLocator)

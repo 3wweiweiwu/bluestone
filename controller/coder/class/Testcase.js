@@ -118,8 +118,8 @@ class Coder {
         //let element,variable
         ast = AstGenerator.getVariableDeclaration(this.inbuiltVarName.body.variableDeclaration)
         this.testcaseCodeBody.push(ast)
-        //const browser = await puppeteer.launch(config.puppeteer)
-        ast = AstGenerator.getBrowserStatement(this.inbuiltVarName.body.browserVarName, this.inbuiltVarName.library.puppeteerLibrary, this.inbuiltVarName.library.configLibrary, 'puppeteer')
+        //const browser = await bluestoneFunc.launchBrowser.func(config.puppeteer)
+        ast = AstGenerator.getBrowserStatementWithBluestone(this.inbuiltVarName.body.browserVarName, this.inbuiltVarName.library.configLibrary, 'puppeteer')
         this.testcaseCodeBody.push(ast)
         //const page = await browser.newPage();
         ast = AstGenerator.getPageInitializationStatement(this.inbuiltVarName.body.pageVarName, this.inbuiltVarName.body.browserVarName)

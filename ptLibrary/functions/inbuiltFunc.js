@@ -3,6 +3,7 @@ const HealingSnapshot = require('../class/HealingSnapshot')
 const ElementSelector = require('../class/ElementSelector')
 const VarSaver = require('../class/VarSaver')
 const findElement = require('./findElement')
+const puppeteer = require('puppeteer')
 const initailizeDownload = require('./initialization/initiailzeDownload')
 const initailizeAlertHandle = require('./initialization/initializeAlertHandle')
 const initializeFolder = require('./initialization/initializeFolder')
@@ -18,6 +19,20 @@ const ConstantVar = {
 
 exports.VAR = ConstantVar
 
+exports.launchBrowser = class extends BluestoneFunc {
+    /**
+     * Launch Browser
+     * @param {Object} puppeteerCofnig puppeteer Config
+     */
+    async func(config) {
+
+        let browser = await puppeteer.launch(config);
+        return browser
+    }
+    constructor() {
+        super()
+    }
+}
 exports.clearBrowserCache = class extends BluestoneFunc {
     /**
      * Clear browser cache

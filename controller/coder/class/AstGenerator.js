@@ -378,6 +378,72 @@ class AstGenerator {
         return ast
     }
     /**
+     * const browser = await bluestoneFunc.launchBrowser.func(config.puppeteer)
+     * @param {*} browserVarName 
+     * @param {*} configVarname 
+     * @param {*} puppeteerConfigPath 
+     */
+    static getBrowserStatementWithBluestone(browserVarName, configVarname, puppeteerConfigPath) {
+        let ast = {
+            "type": "VariableDeclaration",
+            "declarations": [
+                {
+                    "type": "VariableDeclarator",
+                    "id": {
+                        "type": "Identifier",
+                        "name": browserVarName
+                    },
+                    "init": {
+                        "type": "AwaitExpression",
+                        "argument": {
+                            "type": "CallExpression",
+                            "callee": {
+                                "type": "MemberExpression",
+                                "object": {
+                                    "type": "MemberExpression",
+                                    "object": {
+                                        "type": "Identifier",
+                                        "name": "bluestoneFunc"
+                                    },
+                                    "property": {
+                                        "type": "Identifier",
+                                        "name": "launchBrowser"
+                                    },
+                                    "computed": false,
+                                    "optional": false
+                                },
+                                "property": {
+                                    "type": "Identifier",
+                                    "name": "func"
+                                },
+                                "computed": false,
+                                "optional": false
+                            },
+                            "arguments": [
+                                {
+                                    "type": "MemberExpression",
+                                    "object": {
+                                        "type": "Identifier",
+                                        "name": configVarname
+                                    },
+                                    "property": {
+                                        "type": "Identifier",
+                                        "name": puppeteerConfigPath
+                                    },
+                                    "computed": false,
+                                    "optional": false
+                                }
+                            ],
+                            "optional": false
+                        }
+                    }
+                }
+            ],
+            "kind": "const"
+        }
+        return ast
+    }
+    /**
      * const browser = await puppeteer.launch(config.puppeteer)
      * @param {string} browserVarName browser
      * @param {string} puppeteerVarName puppeteer
