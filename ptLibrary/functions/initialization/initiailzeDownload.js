@@ -17,7 +17,8 @@ module.exports = async function initializeDownload(vars, page) {
     //create download folder
     initializeFolder(vars.downloadManager.downloadFolder)
     //set download path
-    await page.client().send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: vars.downloadManager.downloadFolder });
+    let client = await page.target().createCDPSession()
+    await client.send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: vars.downloadManager.downloadFolder });
 
     //populate download task queue
     var watcher = chokidar.watch(vars.downloadManager.downloadFolder, { ignored: /\.crdownload$/, persistent: true });
