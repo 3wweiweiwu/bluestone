@@ -247,7 +247,7 @@ class WorkflowRecord {
         for (let i = 0; i < this.steps.length; i++) {
             let step = this.steps[i]
             //ignore locator for goto functon
-            if (step.command == WorkflowRecord.inBuiltFunc.goto) continue
+            if (step.command == WorkflowRecord.inBuiltFunc.goto || step.finalLocatorName == '') continue
 
             //update step information accordingly
             let newLocator = await this.locatorManager.updateLocator(step.finalLocatorName, step.finalLocator, step.targetPicPath)

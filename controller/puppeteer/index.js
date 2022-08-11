@@ -96,7 +96,8 @@ async function startRecording(record, io, url = null, isCleanSteps = true) {
     await page.exposeFunction('isHtmlCaptureOngoing', isHtmlCaptureOngoing(record))
 
     await page.setBypassCSP(true)
-    await page.client().send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: download.downloadFolder });
+    let client = await page.target().createCDPSession()
+    await client.send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: download.downloadFolder });
 
 
     if (url != null) {
