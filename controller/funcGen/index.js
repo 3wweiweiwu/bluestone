@@ -35,7 +35,7 @@ module.exports = async function generateFunction(relativeFuncFolder, funcName) {
     let bluestoneJsonPath = path.resolve(path.join(bluestoneFolder, 'bluestone-func.js'))
     let bluestoneJsonBin = await fs.promises.readFile(bluestoneJsonPath)
     let bluestoneJsonStr = bluestoneJsonBin.toString()
-    let ast = acorn.parse(bluestoneJsonStr)
+    let ast = acorn.parse(bluestoneJsonStr, { ecmaVersion: 2022 })
     //create require statement
     let newFuncRelativePath = path.relative(path.dirname(bluestoneJsonPath), newFuncPath)
     //convert windows-liked path to linux based path
