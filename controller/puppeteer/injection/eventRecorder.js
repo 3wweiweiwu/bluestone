@@ -16,7 +16,8 @@ try {
 
 let globalVar = {
     isFreezeMode: false,
-    isRecordScroll: false
+    isRecordScroll: false,
+    scanLocatorQueue: []
 }
 const EVENTCONST = {
     click: 'click',
@@ -415,6 +416,17 @@ function getElementsByLocator(currentLocator) {
     return currentElementList
 
 }
+/**
+ * Scan Through all locators in the web page and mark potential match element to its index
+ * At a given point of time, there will be 1 instance of scanLocator function running.
+ * If there is 0 instance in the queue, then start function and add element to the queue, 
+ * If there are 1 instance in the queue, quit current loop and push task into queue
+ * If there are 2 instance in the queue alreayd, quit current function
+ * we will pop the task toward the end. 
+ * After poping queue, if there are still task remains, run it right away.
+
+ * @returns 
+ */
 async function scanLocator() {
     function resetBsLocatorAttribute() {
         //clearly all bluestone-locator properties from the elements in current frame to reset to clean state
@@ -468,6 +480,17 @@ async function scanLocator() {
             return xCheck && yCheck
         }
 
+    }
+
+    if (globalVar.scanLocatorQueue.length >= 2) {
+        return
+    }
+    if (globalVar.scanLocatorQueue.length == 1) {
+        globalVar.scanLocatorQueue.push('')
+        return
+    }
+    if (globalVar.scanLocatorQueue.length == 0) {
+        globalVar.scanLocatorQueue.push('')
     }
     /**@type {Array<ElementMidPosition>} */
     let elementMidPintDict = {}
@@ -539,7 +562,10 @@ async function scanLocator() {
             ele.setAttribute(Helper.potentialLocatorMatchIndexes, JSON.stringify(uniqueArr))
         }
     })
-
+    globalVar.scanLocatorQueue.pop()
+    if (globalVar.scanLocatorQueue.length > 0) {
+        scanLocator()
+    }
 
 }
 
