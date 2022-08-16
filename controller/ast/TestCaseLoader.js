@@ -246,7 +246,9 @@ class TestcaseLoader {
     #extractFunctionParam(args, functionParams) {
         functionParams.forEach((item, index) => {
             if (item.type.name == 'string' || item.type.name == 'number') {
-                item.value = args[index].value
+                item.value = null
+                if (args[index] != null)
+                    item.value = args[index].value
             }
             if (item.type.name == 'ElementSelector') {
                 item.value = args[index].property.value
