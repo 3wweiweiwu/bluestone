@@ -171,6 +171,8 @@ class Operation {
 
 
                     await this.backend.addStep(step)
+                    //refresh active function so that we can point the functionASt to new isntances
+                    await this.backend.refreshActiveFunc()
                     this.backend.operation.browserSelection.lastOperationTimeoutMs = 0
                     console.log(this.backend.steps)
                 }

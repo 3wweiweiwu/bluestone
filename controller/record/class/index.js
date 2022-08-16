@@ -713,7 +713,7 @@ class WorkflowRecord {
         this.__handleMouseUpDownNClick(event)
         this.__handleMouseDownNDrag(event)
         this.setLastOperationTime()
-        await this.refreshActiveFunc()
+        await this.astManager.refreshFunction(event.command)
     }
     /**
      * As we receiving update from file download, try to combine the progress together

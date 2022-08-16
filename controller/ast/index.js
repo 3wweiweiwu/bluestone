@@ -35,6 +35,15 @@ class AST {
     get funcRepo() {
         return this.__funcRepo
     }
+    /**
+     * After function is being used, re-instanize the object to avoid duplication
+     * @param {string} name 
+     */
+    refreshFunction(name) {
+        let funcAst = this.getFunction(name)
+        this.__funcRepo = this.__funcRepo.filter(item => item.name != name)
+        this.__funcRepo.push(funcAst)
+    }
     getFunction(name) {
         let func = this.__funcRepo.find(item => {
             return item.name.toUpperCase() == name.toUpperCase()
