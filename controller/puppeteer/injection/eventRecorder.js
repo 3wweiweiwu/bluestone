@@ -424,10 +424,14 @@ function getElementsByLocator(currentLocator) {
  * If there are 2 instance in the queue alreayd, quit current function
  * we will pop the task toward the end. 
  * After poping queue, if there are still task remains, run it right away.
-
+ * isMainThread switch is used to ensure the main thread will be executed regardless the # of elements in queue
+ * in case there are 2 tasks in queue, without this switch, the scan locator will be stuck and never
+ * get the chance to execute the subsequent tasks to clear the queue. As a result, the scan locator function
+ * will fail
+ * @param {boolean} isMainThread if it is main thread, we will execute regardless number of task in queue
  * @returns 
  */
-async function scanLocator() {
+async function scanLocator(isMainThread = false) {
     function resetBsLocatorAttribute() {
         //clearly all bluestone-locator properties from the elements in current frame to reset to clean state
 
@@ -481,11 +485,10 @@ async function scanLocator() {
         }
 
     }
-
-    if (globalVar.scanLocatorQueue.length >= 2) {
+    if (globalVar.scanLocatorQueue.length >= 2 && isMainThread == false) {
         return
     }
-    if (globalVar.scanLocatorQueue.length == 1) {
+    if (globalVar.scanLocatorQueue.length == 1 && isMainThread == false) {
         globalVar.scanLocatorQueue.push('')
         return
     }
@@ -564,7 +567,7 @@ async function scanLocator() {
     })
     globalVar.scanLocatorQueue.pop()
     if (globalVar.scanLocatorQueue.length > 0) {
-        scanLocator()
+        scanLocator(true)
     }
 
 }
@@ -648,6 +651,7 @@ const mutationObserverCallback = function (mutationsList, observer) {
     if (window.isRecording() == false) {
         return
     }
+    // console.log(mutationsList)
     captureScreenshot('dom tree change')
     //only proceed change that is introduced by RPA engine or code change
     // captureHtml()
