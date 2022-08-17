@@ -56,7 +56,7 @@ try {
     let bluestoneJsonPath = ''
     let port = runTime.port
     let cwdFolder = process.cwd()
-    let testResultPath = null
+    let resultFilePath = null
     switch (cli.command) {
 
         case 'start':
@@ -108,8 +108,8 @@ try {
             bluestoneUrl = `http://localhost:${port}`
 
             //handle result upload mode
-            if (cli.args.tcResult != null && cli.args.tcResult != '') {
-                resultFilePath = path.resolve(cwdFolder, cli.args.tcResult)
+            if (cli.args.result != null && cli.args.result != '') {
+                resultFilePath = path.resolve(cwdFolder, cli.args.result)
                 try {
 
                     fsSync.accessSync(resultFilePath)
@@ -125,10 +125,10 @@ try {
                 relativePath: cli.args.tcId,
                 testResultPath: resultFilePath
             })
-                .then((res) => {
-                    // console.log(res)
-                    return axios.get(`${bluestoneUrl}/workflow?WORKFLOW_RESOLVE`)
-                })
+                            .then((res) => {
+                // console.log(res)
+                return axios.get(`${bluestoneUrl}/workflow?WORKFLOW_RESOLVE`)
+            })
                 .then(() => {
                     console.log('Load script successfully')
                 })

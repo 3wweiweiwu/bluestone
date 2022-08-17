@@ -164,19 +164,21 @@ class TestcaseLoader {
      */
     #extractTestStep(scriptBreaker) {
         // let startTime = Date.now()
-        //narrow down the scope
+        //narrow down the scope to function level
         let result = walk(this.#ast, (node, ancestor) => {
             if (ancestor.length < 2) return false
-            let ancestorCheck = ancestor[ancestor.length - 2].type == 'MemberExpression'
+            let ancestorCheck = ancestor[ancestor.length - 2].type == 'MemberExpression' && (['launchBrowser','initialize'].includes(ancestor[ancestor.length - 2].property.name) == false)
             let nodeCheck = node.type == "Identifier" && (node.name == TestCase.ConstVar.library.projectFuncLibrary || node.name == TestCase.ConstVar.library.bluestoneFuncLibrary)
             return nodeCheck && ancestorCheck
         }, (node, ancestor, result) => {
             return ancestor.length > 16 || result.length > 0
         })
+        //identify steps based on bluestone function
         let newRange = result[0].ancestors[result[0].ancestors.length - 7]
+        //will take care of initialize later
         result = walk(newRange, (node, ancestor) => {
             if (ancestor.length < 2) return false
-            let ancestorCheck = ancestor[ancestor.length - 2].type == 'MemberExpression'
+            let ancestorCheck = ancestor[ancestor.length - 2].type == 'MemberExpression' && (['launchBrowser','initialize'].includes(ancestor[ancestor.length - 2].property.name) == false)
             let nodeCheck = node.type == "Identifier" && (node.name == TestCase.ConstVar.library.projectFuncLibrary || node.name == TestCase.ConstVar.library.bluestoneFuncLibrary)
             return nodeCheck && ancestorCheck
         })

@@ -1040,8 +1040,6 @@ class WorkflowRecord {
         await tcLoader.getIFrameInfo()
         //update test step information based on new files
         this.steps = tcLoader.steps
-        //remove first initailize step
-        this.steps.splice(0, 1)
         this.testSuiteName = tcLoader.testSuite
         this.testcaseName = tcLoader.testCase
         await this.updateTestStep(abosoluteResultPath, tcLoader)
