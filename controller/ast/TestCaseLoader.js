@@ -167,7 +167,7 @@ class TestcaseLoader {
         //narrow down the scope to function level
         let result = walk(this.#ast, (node, ancestor) => {
             if (ancestor.length < 2) return false
-            let ancestorCheck = ancestor[ancestor.length - 2].type == 'MemberExpression' && (['launchBrowser','initialize'].includes(ancestor[ancestor.length - 2].property.name) == false)
+            let ancestorCheck = ancestor[ancestor.length - 2].type == 'MemberExpression' && (['launchBrowser', 'initialize'].includes(ancestor[ancestor.length - 2].property.name) == false)
             let nodeCheck = node.type == "Identifier" && (node.name == TestCase.ConstVar.library.projectFuncLibrary || node.name == TestCase.ConstVar.library.bluestoneFuncLibrary)
             return nodeCheck && ancestorCheck
         }, (node, ancestor, result) => {
@@ -178,7 +178,7 @@ class TestcaseLoader {
         //will take care of initialize later
         result = walk(newRange, (node, ancestor) => {
             if (ancestor.length < 2) return false
-            let ancestorCheck = ancestor[ancestor.length - 2].type == 'MemberExpression' && (['launchBrowser','initialize'].includes(ancestor[ancestor.length - 2].property.name) == false)
+            let ancestorCheck = ancestor[ancestor.length - 2].type == 'MemberExpression' && (['launchBrowser', 'initialize'].includes(ancestor[ancestor.length - 2].property.name) == false)
             let nodeCheck = node.type == "Identifier" && (node.name == TestCase.ConstVar.library.projectFuncLibrary || node.name == TestCase.ConstVar.library.bluestoneFuncLibrary)
             return nodeCheck && ancestorCheck
         })
