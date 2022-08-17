@@ -114,12 +114,16 @@ exports.change = async function (frame, elementSelector, text) {
     let currentValue = await element.evaluate(el => el.value);
 
     //if current value cannot be changed via typing text, set value directly
+    let startTime = Date.now()
     while (currentValue != text) {
         await element.evaluate((el, text) => el.value = text, text);
         await element.evaluate(node => node.dispatchEvent(new Event('change', { bubbles: true })));
         //wait for 500ms and confirm if change went through
         await new Promise(resolve => setTimeout(resolve, 500))
         currentValue = await element.evaluate(el => el.value);
+        if (Date.now() - startTime > 10000) {
+            assert.fail(`Unable to change "${elementSelector.displayName}" to value "${text}" in 10s`)
+        }
     }
 
     return `Type value ${text} success!`
