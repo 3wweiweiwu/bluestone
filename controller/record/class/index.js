@@ -820,7 +820,7 @@ class WorkflowRecord {
         for (let i = 0; i < this.steps.length - 2; i++) {
             let priorOperation = this.steps[i]
             try {
-                if ((priorOperation.command == 'mousedown' || priorOperation.command == 'mouseup') && priorOperation.target == step.target && Math.abs(priorOperation.timeStamp - step.timeStamp) < 1000) {
+                if ((priorOperation.command == 'mousedown' || priorOperation.command == 'mouseup') && priorOperation.target == step.target && Math.abs(priorOperation.timeStamp - step.timeStamp) < 3000) {
                     //check element based on x,y coorindation. If nothing change, most likely, they are subsequent operation
                     let priorX = priorOperation.functionAst.params.find(item => item.name == 'x')
                     let priorY = priorOperation.functionAst.params.find(item => item.name == 'y')
