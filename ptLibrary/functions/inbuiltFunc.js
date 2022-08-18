@@ -116,6 +116,7 @@ exports.change = async function (frame, elementSelector, text) {
     //if current value cannot be changed via typing text, set value directly
     let startTime = Date.now()
     while (currentValue != text) {
+        await element.evaluate(el => el.blur());
         await element.evaluate((el, text) => el.value = text, text);
         await element.evaluate(node => node.dispatchEvent(new Event('change', { bubbles: true })));
         //wait for 500ms and confirm if change went through
