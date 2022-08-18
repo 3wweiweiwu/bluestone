@@ -100,6 +100,9 @@ class TestcaseLoader {
             if (step.targetPicPath == '') continue
             try {
                 await fs.access(step.targetPicPath)
+                if(!step.targetPicPath.includes('public')){
+                    throw 'We expect the target picture should be under /public/temp folder so that we can access it from website'
+                }
             } catch (error) {
                 /**@param {string} */
                 let picPath = pathGenFunc()
