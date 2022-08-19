@@ -68,6 +68,27 @@ function getElementAttribute(element, attributeName) {
 
 Object.keys(EVENTCONST).forEach(item => {
     document.addEventListener(item, event => {
+        function getRelativeXYCoordination(event) {
+            let target = event.target
+            let framePosition = target.getBoundingClientRect() //this is position in regards to curent frame
+            let relativeMouseX = Math.round(((event.clientX - framePosition.x) / framePosition.width) * 100) / 100
+            let relativeMouseY = Math.round((event.clientY - framePosition.y) / framePosition.height * 100) / 100
+
+            //1st realtive x cannot be less than 0
+            //2nd somehow, escodegen does not support negative number output
+            if (relativeMouseX < 0 || relativeMouseX > 1) {
+                relativeMouseX = 0.5
+            }
+            if (relativeMouseY < 0 || relativeMouseY > 1) {
+                relativeMouseY = 0.5
+            }
+            let jsonStr = JSON.stringify({
+                x: relativeMouseX,
+                y: relativeMouseY
+            })
+            return jsonStr
+
+        }
         let timeStamp = Date.now()
         let selector = ''
         try {
@@ -100,7 +121,7 @@ Object.keys(EVENTCONST).forEach(item => {
         let currentSelectedIndex = target.getAttribute(BLUESTONE.bluestoneSelectedLocatorIndex)
 
 
-        let position = getElementPos(target)
+        let position = getElementPos(target) // this is position in regards to the screen
         let targetInnerText = target.innerText
         let parameter = null
         let command = item
@@ -109,22 +130,14 @@ Object.keys(EVENTCONST).forEach(item => {
         let isCallBluestoneConsole = false
         switch (item) {
             case EVENTCONST.click:
-                parameter = JSON.stringify({
-                    x: Math.round(((event.clientX - position.x) / position.width) * 100) / 100,
-                    y: Math.round((event.clientY - position.y) / position.height * 100) / 100
-                })
+                // console.log(`frame Position: ${JSON.stringify(framePosition)} absolute position: ${JSON.stringify(position)}, clientX,y: ${event.clientX},${event.clientY}`)
+                parameter = getRelativeXYCoordination(event)
                 break
             case EVENTCONST.mousedown:
-                parameter = JSON.stringify({
-                    x: Math.round(((event.clientX - position.x) / position.width) * 100) / 100,
-                    y: Math.round((event.clientY - position.y) / position.height * 100) / 100
-                })
+                parameter = getRelativeXYCoordination(event)
                 break
             case EVENTCONST.mouseup:
-                parameter = JSON.stringify({
-                    x: Math.round(((event.clientX - position.x) / position.width) * 100) / 100,
-                    y: Math.round((event.clientY - position.y) / position.height * 100) / 100
-                })
+                parameter = getRelativeXYCoordination(event)
                 // console.log(selector)
                 // console.log(event.target)
                 break
