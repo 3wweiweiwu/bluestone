@@ -176,14 +176,14 @@ exports.click = async function (frame, elementSelector, x, y) {
     //otherwise, it will go beyond the scope
     let elementPos = await element.boundingBox()
 
-    let offsetX = null
-    let offsetY = null
-    if (x != null) {
-        offsetX = elementPos.width * x
+    if (x == null) {
+        x = 0.5
     }
-    if (y != null) {
-        offsetY = elementPos.height * y
+    if (y == null) {
+        y = 0.5
     }
+    let offsetX = elementPos.width * x
+    let offsetY = elementPos.height * y
     try {
         try {
             await element.hover()
