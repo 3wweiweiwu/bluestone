@@ -817,18 +817,21 @@ class WorkflowRecord {
         }
         let allSteps = this.steps
         let newSteps
+        //this function is used in case there is event in between mouseup/mousedown and click combo. That's why we set the time limit.
         for (let i = 0; i < this.steps.length - 2; i++) {
             let priorOperation = this.steps[i]
             try {
-                if ((priorOperation.command == 'mousedown' || priorOperation.command == 'mouseup') && priorOperation.target == step.target && Math.abs(priorOperation.timeStamp - step.timeStamp) < 3000) {
+                if ((priorOperation.command == 'mousedown' || priorOperation.command == 'mouseup')) {
                     //check element based on x,y coorindation. If nothing change, most likely, they are subsequent operation
                     let priorX = priorOperation.functionAst.params.find(item => item.name == 'x')
                     let priorY = priorOperation.functionAst.params.find(item => item.name == 'y')
                     let currentX = step.functionAst.params.find(item => item.name == 'x')
                     let currentY = step.functionAst.params.find(item => item.name == 'y')
-
+                    //check if mousedown/up event is in the exact same position of click
                     if (priorX.value == currentX.value && priorY.value == currentY.value) {
-                        allSteps[i - 1]['deleted'] = true
+                        //if they are close by inde xor time, we can ignore them for sure
+                        if (priorOperation.target == step.target && Math.abs(priorOperation.timeStamp - step.timeStamp) < 3000 || i == this.steps.length - 3 || i == this.steps.length - 5)
+                            allSteps[i - 1]['deleted'] = true
                         allSteps[i]['deleted'] = true
                     }
 
