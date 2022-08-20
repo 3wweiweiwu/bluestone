@@ -22,8 +22,8 @@ class UI {
         if (queryKeys.length == 0) {
             return
         }
-        //decode uri component for the query
-        queryKeys.forEach(key => { query[key] = decodeURIComponent(query[key]) })
+        //uri component has been decoded already. 2nd decoding will mess up the foramt
+        // queryKeys.forEach(key => { query[key] = decodeURIComponent(query[key]) })
         await this.operation.update(query)
         await this.workflow.update(query)
         await this.locatorDefiner.update(query)
