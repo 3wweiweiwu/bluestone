@@ -110,6 +110,9 @@ async function startRecording(record, io, url = null, isCleanSteps = true) {
             }
         }
     }
+    //automatically focus main frame body as we perform initial navigation
+    // do this in avoid click on the screen at first before you can call ctrl+q
+    await page.focus('body')
     let eventStep = new RecordingStep({ command: 'goto', target: url, iframe: '[]' })
     eventStep.parameter = url
     eventStep.finalLocator = 'FAKE locator to avoid check'
