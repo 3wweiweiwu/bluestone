@@ -1,6 +1,6 @@
 {
   "name": "bluestone",
-  "version": "0.4.86",
+  "version": "0.4.87",
   "private": false,
   "scripts": {
     "start": "babel-node ./bin/www",
