@@ -44,7 +44,7 @@ router.get('/workflow', async function (req, res) {
   }
   if (req.query[PugWorkflow.inBuiltQueryKey.btnEditWorkflow]) {
     //if we are editing current workflow, we will `redirect` back to spy page
-    res.redirect('/spy')
+    res.redirect('/edit-step')
   }
   else if (req.query[PugWorkflow.inBuiltQueryKey.btnLocatorWorkflow]) {
     res.redirect('/locator-definer')
@@ -153,6 +153,45 @@ router.get('/spy', async function (req, res, next) {
   }
 
   res.render('spy.pug', variables);
+});
+router.get('/edit-step', async function (req, res, next) {
+  /**
+   * @type {import('../controller/record/class/index.js').WorkflowRecord}
+   */
+  let workflow = req.app.locals.workflow
+
+  /**@type {UI} */
+  let ui = req.app.locals.ui
+
+
+  await ui.updateUserInputForSpy(req.query)
+  if (req.app.locals.puppeteerControl.page) {
+    hideSpy(req.app.locals.puppeteerControl, workflow.spyVisible, req.app.locals.puppeteerControl.io)
+  }
+
+  let variables = {
+    title: `Bluestone Recording: ${workflow.isRecording}`,
+    groups: ui.operation.getSpyGroupsInfoForPug(),
+    operations: ui.operation.getOperationInfoForPug(),
+    argumentList: ui.operation.getArgumentsInfoForPug(),
+    currentSelector: ui.operation.browserSelection.currentSelector,
+    currentSelectorPic: ui.operation.getSpySelectorPictureForPug(),
+    currentGroup: ui.operation.getCurrentGroupText(),
+    currentOperation: ui.operation.getCurrentOperationText(),
+    argumentsQueryKey: Operation.inbuiltQueryKey.currentArgument,
+    argumentsQueryIndex: Operation.inbuiltQueryKey.currentArgumentIndex,
+    btnAddStepValidation: ui.operation.spy.validation.btnAddStep,
+    modifyStepQueryKey: Operation.inbuiltQueryKey.btnModifyStep,
+    cancelQueryKey: Operation.inbuiltQueryKey.btnCancel,
+    runQueryKey: Operation.inbuiltQueryKey.btnRun,
+    result: ui.operation.operationResult,
+    txtSelector: Operation.inbuiltQueryKey.txtSelector
+  }
+  if (Object.keys(req.query).includes('modifyStep')) {
+    res.redirect('/workflow')
+    return
+  }
+  res.render('editOperation.pug', variables);
 });
 router.get('/pending-capture', async function (req, res, next) {
   /**

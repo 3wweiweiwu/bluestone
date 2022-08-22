@@ -692,6 +692,14 @@ class WorkflowRecord {
         this.mapOperationToGroups(activeFuncs)
     }
     /**
+     * Modify step in the library based on index
+     * @param {number} stepIndex 
+     * @param {RecordingStep} step 
+     */
+    async modifyStep(stepIndex, step) {
+        this.steps.splice(stepIndex, 1, step)
+    }
+    /**
      * add current event to the list
      * @param {RecordingStep} event 
      */

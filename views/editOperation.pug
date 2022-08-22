@@ -1,0 +1,29 @@
+extends ./component/navigationHeader.pug
+include ./component/input.pug
+include ./component/refresh.pug
+include ./component/resultPanel.pug
+block content
+
+    script(src="/javascript/redirectInput.js")
+    h1='Blue stone Agent'
+    +input-arguments(txtSelector,[{description:'Selector:',pugType:"input",value:currentSelector}],'index')
+    h2='Picture'
+    +img-responsive("temp/componentPic/"+currentSelectorPic,"Responsive Image")
+
+
+    +dropdown(currentGroup,groups)
+
+    +dropdown(currentOperation,operations)='' 
+
+    +input-arguments(argumentsQueryKey,argumentList,argumentsQueryIndex)='' 
+
+    +result-panel(result.isPass,'Result',result.text)
+
+    if btnAddStepValidation!=null && btnAddStepValidation!=''
+        +alert-danger(btnAddStepValidation)
+
+
+    +a-btn-primary('?'+runQueryKey)='Run Step'
+    +a-btn-success('?'+modifyStepQueryKey)='Modify Step'
+    +a-btn-danger('?'+cancelQueryKey)='Resume'
+    +refresh()

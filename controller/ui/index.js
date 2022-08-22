@@ -33,7 +33,7 @@ class UI {
         switch (firstKey) {
             case Workflow.inBuiltQueryKey.btnEditWorkflow:
                 targetStep = this.backend.steps[firstValue]
-                this.__repopulateOperationUI(targetStep)
+                this.__repopulateOperationUI(targetStep, firstValue)
                 break
             case Workflow.inBuiltQueryKey.btnResolveLocatorQueryKey:
 
@@ -94,10 +94,12 @@ class UI {
     /**
      * Based on the current step in the workflow, repopulate operation view
      * @param {RecordingStep} step 
+     * @param {number} stepIndex
      */
-    __repopulateOperationUI(step) {
+    __repopulateOperationUI(step, stepIndex) {
 
         let currentGroupKeys = Object.keys(this.backend.operationGroup)
+        this.operation.spy.userSelection.stepIndex = stepIndex
         let findOperation = false
         for (let i = 0; i < currentGroupKeys.length; i++) {
             let groupKey = currentGroupKeys[i]

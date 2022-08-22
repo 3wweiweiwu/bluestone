@@ -31,7 +31,8 @@ class Operation {
                 currentLocatorIndex: -1,
                 currentLocatorPath: '',
                 currentLocatorName: '',
-                currentLocatorSelector: ''
+                currentLocatorSelector: '',
+                stepIndex: -1
             },
             validation: {
                 btnAddStep: ''
@@ -55,6 +56,7 @@ class Operation {
         currentArgument: 'currentArgument',
         currentArgumentIndex: 'currentArgumentIndex',
         btnAddStep: 'btnAddStep',
+        btnModifyStep: 'modifyStep',
         btnCancel: 'btnCancel',
         btnRun: 'btnRun',
         txtSelector: 'txtSelector'
@@ -123,9 +125,49 @@ class Operation {
             return (item.type.name == 'string' || item.type.name == 'number') && (item.value == null || item.value == '')
         })
             .forEach(item => item.value = '')
+    }
+    /**
+     * add or modify the step based on stepIndex
+     * @param {number} stepIndex add or modify steps if stepIndex is null, it means add the step to the end
+     */
+    async __addOrModifyStep(stepIndex) {
+        this.__validateOverallFormForSpy()
+        //if validation is done correctly, add current operation
+        if (this.spy.validation.btnAddStep == '') {
+            let currentOperation = this.getCurrentOperation()
+            let command = currentOperation.name
+
+            let target = this.backend.operation.browserSelection.currentSelector
+
+            let targetInnerText = this.backend.operation.browserSelection.currentInnerText
+            let targetPicPath = this.backend.operation.browserSelection.selectorPicture
+            let timeoutMs = this.backend.operation.browserSelection.lastOperationTimeoutMs
+            let htmlPath = this.backend.operation.browserSelection.selectorHtmlPath
+            let parentFrame = this.backend.operation.browserSelection.parentIframe
+            let potentialMatch = this.backend.operation.browserSelection.potentialMatch
+            let atomicTree = this.backend.operation.browserSelection.atomicTree
+
+            //construct operation step
+            let step = new RecordingStep({ command, target, timeoutMs: timeoutMs, targetPicPath, targetInnerText, functionAst: currentOperation, htmlPath: htmlPath, iframe: parentFrame, potentialMatch: potentialMatch, healingTree: atomicTree })
+
+            //update step if currentLocatorIndex has been specified
+            let currentLocatorIndex = this.backend.operation.browserSelection.currentSelectedIndex
+            if (currentLocatorIndex) {
+                let locator = this.backend.locatorManager.locatorLibrary[currentLocatorIndex]
+                step.finalLocatorName = locator.path
+                step.finalLocator = locator.Locator
+            }
 
 
-
+            if (stepIndex == null)
+                await this.backend.addStep(step)
+            else
+                this.backend.modifyStep(stepIndex, step)
+            //refresh active function so that we can point the functionASt to new isntances
+            await this.backend.refreshActiveFunc()
+            this.backend.operation.browserSelection.lastOperationTimeoutMs = 0
+            console.log(this.backend.steps)
+        }
     }
     async update(query) {
         let queryKeys = Object.keys(query)
@@ -142,40 +184,10 @@ class Operation {
                 })
                 break;
             case Operation.inbuiltQueryKey.btnAddStep:
-                this.__validateOverallFormForSpy()
-                //if validation is done correctly, add current operation
-                if (this.spy.validation.btnAddStep == '') {
-                    let currentOperation = this.getCurrentOperation()
-                    let command = currentOperation.name
-
-                    let target = this.backend.operation.browserSelection.currentSelector
-
-                    let targetInnerText = this.backend.operation.browserSelection.currentInnerText
-                    let targetPicPath = this.backend.operation.browserSelection.selectorPicture
-                    let timeoutMs = this.backend.operation.browserSelection.lastOperationTimeoutMs
-                    let htmlPath = this.backend.operation.browserSelection.selectorHtmlPath
-                    let parentFrame = this.backend.operation.browserSelection.parentIframe
-                    let potentialMatch = this.backend.operation.browserSelection.potentialMatch
-                    let atomicTree = this.backend.operation.browserSelection.atomicTree
-
-                    //construct operation step
-                    let step = new RecordingStep({ command, target, timeoutMs: timeoutMs, targetPicPath, targetInnerText, functionAst: currentOperation, htmlPath: htmlPath, iframe: parentFrame, potentialMatch: potentialMatch, healingTree: atomicTree })
-
-                    //update step if currentLocatorIndex has been specified
-                    let currentLocatorIndex = this.backend.operation.browserSelection.currentSelectedIndex
-                    if (currentLocatorIndex) {
-                        let locator = this.backend.locatorManager.locatorLibrary[currentLocatorIndex]
-                        step.finalLocatorName = locator.path
-                        step.finalLocator = locator.Locator
-                    }
-
-
-                    await this.backend.addStep(step)
-                    //refresh active function so that we can point the functionASt to new isntances
-                    await this.backend.refreshActiveFunc()
-                    this.backend.operation.browserSelection.lastOperationTimeoutMs = 0
-                    console.log(this.backend.steps)
-                }
+                this.__addOrModifyStep(null)
+                break;
+            case Operation.inbuiltQueryKey.btnModifyStep:
+                this.__addOrModifyStep(this.spy.userSelection.stepIndex)
                 break;
             case Operation.inbuiltQueryKey.btnCancel:
                 this.backend.isRecording = true
@@ -192,7 +204,7 @@ class Operation {
                 this.backend.operation.spy.result.isPass = result.isResultPass
                 this.backend.operation.spy.result.text = result.resultText
                 // this.backend.puppeteer.refreshSpy()
-                await this.backend.puppeteer.openBluestoneTab("spy")
+                await this.backend.puppeteer.openBluestoneTab("refresh")
                 break;
             case Operation.inbuiltQueryKey.currentArgument:
                 //update ui value

@@ -59,7 +59,7 @@ class PuppeteerControl {
     }
     /**
      * launch bluestone page and go to specified bluestone path     
-     * @param {'spy'|'workflow'} bluestonePath 
+     * @param {'spy'|'workflow'|'refresh'} bluestonePath refresh means refresh current page
      */
     async openBluestoneTab(bluestonePath) {
         let result = await openBluestoneTab(this.browser, bluestonePath)

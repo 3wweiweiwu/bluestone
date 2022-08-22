@@ -4,15 +4,18 @@ const config = require('../../../config')
 /**
  * launch bluestone page and go to specified bluestone path
  * @param {Browser} browser 
- * @param {'spy'|'workflow'} bluestonePath 
+ * @param {'spy'|'workflow'|'refresh'} bluestonePath refresh means refresh current page
  */
 module.exports = async function (browser, bluestonePath) {
     let targetPage = await getBluestonePage(browser)
-    let bluestonePageUrl = `http://localhost:${config.app.port}`
 
 
-    //navigate to bluestone url
-    await targetPage.goto(`${bluestonePageUrl}/${bluestonePath}`)
+
+    //navigate to bluestone url if we are not in the refresh mode
+    if (bluestonePath != 'refresh') {
+        let bluestonePageUrl = `http://localhost:${config.app.port}`
+        await targetPage.goto(`${bluestonePageUrl}/${bluestonePath}`)
+    }
     await targetPage.bringToFront()
     await targetPage.evaluate(() => {
         location.reload(true)
