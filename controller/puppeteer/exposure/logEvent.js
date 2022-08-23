@@ -120,7 +120,12 @@ module.exports = function (recordRepo, browser, page, io) {
             //display mvt console
             await openBluestoneTab(browser, "decide-view")
 
-            //give 500ms delay so that it can capture unfinished events(ex: last change event<-What's the APP? What's the workflow?)
+            //give 500ms delay so that it can capture unfinished events
+            //use case:
+            //In a login page, change the username and password
+            //Right after password is changed, use ctrl+q to call out bluestone agent
+            //In this case, the last password change event will be neglected. 
+            //With this challenge, that's why we need to wait for 500ms
             setTimeout(() => {
                 recordRepo.isRecording = false
                 recordRepo.isCaptureHtml = true
