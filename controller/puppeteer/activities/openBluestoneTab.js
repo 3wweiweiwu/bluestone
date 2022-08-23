@@ -12,10 +12,16 @@ module.exports = async function (browser, bluestonePath) {
 
 
     //navigate to bluestone url if we are not in the refresh mode
-    if (bluestonePath != 'refresh') {
+    if (bluestonePath == 'refresh') {
+
+        let url = targetPage.url().split('?')[0]
+        await targetPage.goto(url)
+    }
+    else {
         let bluestonePageUrl = `http://localhost:${config.app.port}`
         await targetPage.goto(`${bluestonePageUrl}/${bluestonePath}`)
     }
+
     await targetPage.bringToFront()
     await targetPage.evaluate(() => {
         location.reload(true)
