@@ -17,7 +17,8 @@ try {
 let globalVar = {
     isFreezeMode: false,
     isRecordScroll: false,
-    scanLocatorQueue: []
+    scanLocatorQueue: [],
+    capturePicQueue: []
 }
 const EVENTCONST = {
     click: 'click',
@@ -598,12 +599,26 @@ async function captureHtml() {
 }
 
 
-async function captureScreenshot(reason) {
+async function captureScreenshot(reason, isMainThread) {
+    if (globalVar.capturePicQueue.length >= 2 && isMainThread == false) {
+        return
+    }
+    if (globalVar.capturePicQueue.length == 1 && isMainThread == false) {
+        globalVar.capturePicQueue.push(reason)
+        return
+    }
+    if (globalVar.capturePicQueue.length == 0) {
+        globalVar.capturePicQueue.push(reason)
+    }
     try {
         if (!globalVar.isFreezeMode)
             await window.captureScreenshot(reason)
     } catch (error) {
 
+    }
+    globalVar.capturePicQueue.shift()
+    if (globalVar.capturePicQueue.length > 0) {
+        scanLocator(globalVar.capturePicQueue[0], true)
     }
 
 
