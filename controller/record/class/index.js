@@ -825,6 +825,7 @@ class WorkflowRecord {
         }
         let allSteps = this.steps
         let newSteps
+        let iTotalWaitTime = 0
         //this function is used in case there is event in between mouseup/mousedown and click combo. That's why we set the time limit.
         for (let i = 0; i < this.steps.length - 2; i++) {
             let priorOperation = this.steps[i]
@@ -838,9 +839,16 @@ class WorkflowRecord {
                     //check if mousedown/up event is in the exact same position of click
                     if (priorX.value == currentX.value && priorY.value == currentY.value) {
                         //if they are close by inde xor time, we can ignore them for sure
-                        if (priorOperation.target == step.target && Math.abs(priorOperation.timeStamp - step.timeStamp) < 3000 || i == this.steps.length - 3 || i == this.steps.length - 5)
-                            allSteps[i - 1]['deleted'] = true
-                        allSteps[i]['deleted'] = true
+                        if (priorOperation.target == step.target && Math.abs(priorOperation.timeStamp - step.timeStamp) < 3000 || i == this.steps.length - 3 || i == this.steps.length - 5) {
+                            allSteps[i]['deleted'] = true
+                            //accumulate wait time toward the end
+                            if (allSteps[i - 1].command == 'waitElementExists') {
+                                allSteps[i - 1]['deleted'] = true
+                                iTotalWaitTime += allSteps[i - 1].functionAst.params[2].value
+                            }
+
+                        }
+
                     }
 
                 }
@@ -849,7 +857,12 @@ class WorkflowRecord {
             }
 
         }
+        //add accumulated wait time toward the wait in the click
+        if (allSteps[allSteps.length - 2].command == 'waitElementExists') {
+            allSteps[allSteps.length - 2].functionAst.params[2].value = iTotalWaitTime
+        }
         this.steps = this.steps.filter(item => item.deleted != true)
+
 
 
 
