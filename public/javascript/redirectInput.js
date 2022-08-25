@@ -10,6 +10,9 @@ function redirectInputOnChange(event) {
 
 function ajaxInputOnChange(event) {
     let value = event.target.value
+    if (value == null) {
+        value = event.target.getAttribute('value')
+    }
     let queryKey = event.target.getAttribute('querykey')
     let index = event.target.getAttribute('index')
     let queryindex = event.target.getAttribute('queryIndex')

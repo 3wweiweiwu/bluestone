@@ -1,0 +1,13 @@
+//- checkbox toggle group
+mixin customized-checkbox-toggle(items,queryKey)
+    script(src="/javascript/redirectInput.js")
+    .btn-group(data-toggle="buttons")
+        each item,index in items
+            if item.isMuted === 'false'
+                label.btn.active(class="btn-default" value=item.caption onClick="ajaxInputOnChange(event)" queryKey=queryKey)
+                    input(type="checkbox" autocomplete="off",checked) 
+                    |  #{item.caption}
+            else
+                label.btn(class="btn-default" value=item.caption onClick="ajaxInputOnChange(event)" queryKey=queryKey)
+                    input(type="checkbox" autocomplete="off") 
+                    |  #{item.caption}
