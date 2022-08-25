@@ -117,19 +117,23 @@ module.exports = function (recordRepo, browser, page, io) {
             let task1 = recordRepo.getRecommendedLocatorFromDefiner(recordRepo.operation.browserSelection.currentSelector, eventDetail.iframe)
             //display pending work progress
             await drawPendingWorkProgress(page, recordRepo.picCapture, recordRepo.htmlCaptureStatus, task1)
+
+
             //display mvt console
+            recordRepo.isCaptureHtml = false
             await openBluestoneTab(browser, "decide-view")
 
-            //give 500ms delay so that it can capture unfinished events
+            //give 5000ms delay so that it can capture unfinished events
             //use case:
             //In a login page, change the username and password
             //Right after password is changed, use ctrl+q to call out bluestone agent
             //In this case, the last password change event will be neglected. 
-            //With this challenge, that's why we need to wait for 500ms
+            //With this challenge, that's why we need to wait for 5000ms
+            //or in brm, some of the change event will be triggered after 5s?!
+
             setTimeout(() => {
-                // recordRepo.isRecording = false
-                recordRepo.isCaptureHtml = true
-            }, 500)
+                recordRepo.isRecording = false
+            }, 5000)
 
 
         }

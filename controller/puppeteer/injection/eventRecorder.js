@@ -220,8 +220,8 @@ Object.keys(EVENTCONST).forEach(item => {
             //it will significantly slow down the user experience
             // will collect auto-healing when call bluestone console
             // this will create noticible user experience slow down
-            atomicTree = new AtomicElementTree(target)
-            atomicTreeStr = atomicTree.stringify(atomicTree)
+            // atomicTree = new AtomicElementTree(target)
+            // atomicTreeStr = atomicTree.stringify(atomicTree)
         }
         const eventDetail = {
             command: command,

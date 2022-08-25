@@ -193,6 +193,7 @@ class Operation {
             case Operation.inbuiltQueryKey.btnCancel:
                 this.backend.isRecording = true
                 this.backend.spyVisible = false
+                this.backend.isCaptureHtml = true
                 break;
             case Operation.inbuiltQueryKey.txtSelector:
                 this.backend.operation.browserSelection.currentSelector = firstValue
