@@ -22,8 +22,14 @@ block content
 	if btnAddStepValidation!=null && btnAddStepValidation!=''
 		+alert-danger(btnAddStepValidation)
 
-
-	+a-btn-primary('?'+runQueryKey)='Run Step'
-	+a-btn-success('?'+addStepQueryKey)='Add Step'
-	+a-btn-danger('?'+cancelQueryKey)='Resume'
+	+accordion("Recording Setting")
+		+accordion-item-primary("Operation","sample","true")
+			+a-btn-primary('?'+runQueryKey)='Run Step'
+			+a-btn-success('?'+addStepQueryKey)='Add Step'
+			+a-btn-danger('?'+cancelQueryKey)='Resume'
+		+accordion-item-default("Recording Settings","sample")
+			if isRecording
+				+a-btn-danger('?'+isRecordingQueryKey)='Stop Recording'
+			else 
+				+a-btn-success('?'+isRecordingQueryKey)='Start Recording'
 	+refresh()

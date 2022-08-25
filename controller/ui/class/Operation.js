@@ -59,7 +59,8 @@ class Operation {
         btnModifyStep: 'modifyStep',
         btnCancel: 'btnCancel',
         btnRun: 'btnRun',
-        txtSelector: 'txtSelector'
+        txtSelector: 'txtSelector',
+        btnUpdateRecording: 'btnUpdateRecording'
     }
     static inbuiltOperation = {
         textEqual: 'testTextEqual',
@@ -218,6 +219,9 @@ class Operation {
                 //update user selection value
                 this.spy.userSelection.currentArgument[currentArgumentIndex] = currentQueryKeyForValue
                 break
+            case Operation.inbuiltQueryKey.btnUpdateRecording:
+                this.backend.isRecording = !this.backend.isRecording
+                break;
             default:
                 break;
         }

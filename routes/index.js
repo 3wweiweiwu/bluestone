@@ -149,7 +149,9 @@ router.get('/spy', async function (req, res, next) {
     cancelQueryKey: Operation.inbuiltQueryKey.btnCancel,
     runQueryKey: Operation.inbuiltQueryKey.btnRun,
     result: ui.operation.operationResult,
-    txtSelector: Operation.inbuiltQueryKey.txtSelector
+    txtSelector: Operation.inbuiltQueryKey.txtSelector,
+    isRecording: ui.backend.isRecording,
+    isRecordingQueryKey: Operation.inbuiltQueryKey.btnUpdateRecording
   }
 
   res.render('spy.pug', variables);

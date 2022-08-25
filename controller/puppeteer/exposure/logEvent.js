@@ -127,7 +127,7 @@ module.exports = function (recordRepo, browser, page, io) {
             //In this case, the last password change event will be neglected. 
             //With this challenge, that's why we need to wait for 500ms
             setTimeout(() => {
-                recordRepo.isRecording = false
+                // recordRepo.isRecording = false
                 recordRepo.isCaptureHtml = true
             }, 500)
 
