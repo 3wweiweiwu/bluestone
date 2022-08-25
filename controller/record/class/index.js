@@ -396,6 +396,13 @@ class WorkflowRecord {
             }
             switchFrameStep.iframe = parentIframe
             switchFrameStep.potentialMatch = step.framePotentialMatch || []
+            //if this frame step comes from recently defined locator,
+            //its final locator property will be set as a locator
+            //bluestoen use finalLocator to decide what locator to use
+            //in order to avoid this problem, we should clen up final locator name/locator
+            //and let bluestone to handle locator assignment based on frame
+            switchFrameStep.finalLocator = ['']
+            switchFrameStep.finalLocatorName = ''
             let waitTime = step.timeoutMs
             if (waitTime < 3000)
                 waitTime = 3000
