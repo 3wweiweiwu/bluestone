@@ -111,6 +111,26 @@ class WorkflowRecord {
         this.initializeFunctions()
         /**@type {MochaDriver} */
         this.mochaDriver = null
+        /** @type {Array<string>} */
+        this.__mutedFunctionForRecording = [] //muted funciton for recoridng. if function name is here, we will not record operation
+    }
+    get mutedFunctionForRecording() {
+        return this.__mutedFunctionForRecording
+    }
+    set mutedFunctionForRecording(item) {
+        this.__mutedFunctionForRecording = item
+    }
+    /**
+     * Depends on the function name, update mute list. For those function in mute list, we will not record workflows for them
+     * @param {string} funcName 
+     */
+    updateMutedFunctionForRecording(funcName) {
+        if (this.mutedFunctionForRecording.includes(funcName)) {
+            this.mutedFunctionForRecording = this.mutedFunctionForRecording.filter(item => item != funcName)
+        }
+        else {
+            this.mutedFunctionForRecording.push(funcName)
+        }
     }
     async initializeFunctions() {
         console.log('Initializing Bluestone...')

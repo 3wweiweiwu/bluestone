@@ -2,6 +2,7 @@ extends ./component/navigationHeader.pug
 include ./component/input.pug
 include ./component/refresh.pug
 include ./component/resultPanel.pug
+include ./component/checkboxGroup.pug
 block content
 
 	script(src="/javascript/redirectInput.js")
@@ -28,8 +29,17 @@ block content
 			+a-btn-success('?'+addStepQueryKey)='Add Step'
 			+a-btn-danger('?'+cancelQueryKey)='Resume'
 		+accordion-item-default("Recording Settings","sample")
-			if isRecording
-				+a-btn-danger('?'+isRecordingQueryKey)='Stop Recording'
-			else 
-				+a-btn-success('?'+isRecordingQueryKey)='Start Recording'
+			div(class="container-fluid")
+				h4="Start/Stop Recording"
+				if isRecording
+					+a-btn-danger('?'+isRecordingQueryKey)='Stop Recording'
+				else 
+					+a-btn-success('?'+isRecordingQueryKey)='Start Recording'
+
+			div(class="container-fluid")
+				h4="Operation Capture Setting: Grey-Capture; White-Not Capture"
+				+customized-checkbox-toggle(functionMuteStatus,getFunctionMuteStatQueryKey)
+
+
+
 	+refresh()

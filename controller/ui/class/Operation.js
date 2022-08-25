@@ -60,7 +60,8 @@ class Operation {
         btnCancel: 'btnCancel',
         btnRun: 'btnRun',
         txtSelector: 'txtSelector',
-        btnUpdateRecording: 'btnUpdateRecording'
+        btnUpdateRecording: 'btnUpdateRecording',
+        btnMuteFuncQueryKey: 'btnMuteFuncQueryKey'
     }
     static inbuiltOperation = {
         textEqual: 'testTextEqual',
@@ -221,6 +222,9 @@ class Operation {
                 //update user selection value
                 this.spy.userSelection.currentArgument[currentArgumentIndex] = currentQueryKeyForValue
                 break
+            case Operation.inbuiltQueryKey.btnMuteFuncQueryKey:
+                this.backend.updateMutedFunctionForRecording(firstValue)
+                break;
             case Operation.inbuiltQueryKey.btnUpdateRecording:
                 this.backend.isRecording = !this.backend.isRecording
                 break;
@@ -247,6 +251,16 @@ class Operation {
             }
         }
         return convertedIndex
+
+    }
+    getFunctionMuteState() {
+        let functionList = this.backend.astManager.funcRepo.map(item => {
+            return {
+                caption: item.name,
+                isMuted: this.backend.mutedFunctionForRecording.includes(item.name).toString()
+            }
+        })
+        return functionList
 
     }
     /**

@@ -22,6 +22,10 @@ module.exports = function (recordRepo, browser, page, io) {
      */
     async function logEvent(eventDetail) {
 
+        //skip steps that is in the mute list
+        if (recordRepo.mutedFunctionForRecording.includes(eventDetail.command)) {
+            return
+        }
         //goto command does not generate a locator, we w
 
         //handle locator potential match

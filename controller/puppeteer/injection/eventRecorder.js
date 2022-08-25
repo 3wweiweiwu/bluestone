@@ -16,7 +16,7 @@ try {
 
 let globalVar = {
     isFreezeMode: false,
-    isRecordScroll: false,
+    isRecordScroll: true,
     scanLocatorQueue: [],
     capturePicQueue: []
 }
@@ -194,7 +194,6 @@ Object.keys(EVENTCONST).forEach(item => {
                 }
                 break;
             case EVENTCONST.scroll:
-                if (!globalVar.isRecordScroll) return
                 parameter = JSON.stringify({
                     y: event.target.scrollTop,
                     x: event.target.scrollLeft
