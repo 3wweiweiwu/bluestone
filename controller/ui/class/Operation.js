@@ -254,9 +254,9 @@ class Operation {
 
     }
     getFunctionMuteState() {
-        let functionList = this.backend.astManager.funcRepo.map(item => {
+        let functionList = this.backend.operationGroup.inbuiltFunction.operations.map(item => {
             return {
-                caption: item.name,
+                caption: item.name.toLowerCase(),
                 isMuted: this.backend.mutedFunctionForRecording.includes(item.name).toString()
             }
         })
