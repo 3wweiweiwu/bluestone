@@ -271,7 +271,7 @@ class Operation {
         let allOperationGroup = this.backend.operationGroup
         let groupId = Object.keys(allOperationGroup)
         let groupInfo = groupId.map(id => {
-            return new PugDropDownInfo(id, allOperationGroup[id].text, `spy?${Operation.inbuiltQueryKey.currentGroup}=${id}`)
+            return new PugDropDownInfo(id, allOperationGroup[id].text, `?${Operation.inbuiltQueryKey.currentGroup}=${id}`)
         })
         return groupInfo
     }
@@ -287,7 +287,7 @@ class Operation {
         }
         let operationGroup = this.backend.operationGroup
         let operationInfo = operationGroup[currentGroup].operations.map(item => {
-            return new PugDropDownInfo(item.name, item.description, `spy?${Operation.inbuiltQueryKey.currentOperation}=${item.name}`)
+            return new PugDropDownInfo(item.name, item.description, `?${Operation.inbuiltQueryKey.currentOperation}=${item.name}`)
         })
 
         return operationInfo
