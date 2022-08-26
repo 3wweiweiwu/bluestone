@@ -126,6 +126,19 @@ async function waitForElement(page, elementSelector, timeout, option = new Optio
 
     }
 
+    // wait for a global timeout before we proceed
+    // some app, it will render ui at first, after ui is renderded, it will start to load context
+    // The challenge is that it takes 2-3s to load context after ui is rendered.
+    // if we extract value at that time, it will give us wrong value
+    // as a workaround, we will wait for a timeout before we interact with it
+    // so that the information could be loaded
+    if (process.env.BLUESTONE_EXECUTION_OPERATION_TIMEOUT_MS != null) {
+        try {
+            await page.waitForTimeout(process.env.BLUESTONE_EXECUTION_OPERATION_TIMEOUT_MS)
+        } catch (error) {
+            console.log(error)
+        }
+    }
     return element
 
 }
