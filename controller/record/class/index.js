@@ -112,7 +112,7 @@ class WorkflowRecord {
         /**@type {MochaDriver} */
         this.mochaDriver = null
         /** @type {Array<string>} */
-        this.__mutedFunctionForRecording = [] //muted funciton for recoridng. if function name is here, we will not record operation
+        this.__mutedFunctionForRecording = ['scroll'] //muted funciton for recoridng. if function name is here, we will not record operation
     }
     get mutedFunctionForRecording() {
         return this.__mutedFunctionForRecording

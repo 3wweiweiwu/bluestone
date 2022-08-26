@@ -29,6 +29,14 @@
       "args": ["start", "../bluestone-batch-release-manager", "--port", "3601"]
     },
     {
+      "name": "Launch Command line for procedural-automation-bluestone",
+      "program": "${workspaceFolder}/bin/bluestone.js",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node",
+      "args": ["start", "../Procedure-Automation-Bluestone", "--port", "3601"]
+    },
+    {
       "name": "Launch Command line for apm-insight-bluestone",
       "program": "${workspaceFolder}/bin/bluestone.js",
       "request": "launch",
