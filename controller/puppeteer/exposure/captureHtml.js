@@ -8,82 +8,47 @@ const fs = require('fs').promises
  * @param {WorkflowRecord} recordRepo
  */
 module.exports = function (page, recordRepo) {
-
-    return async function () {
+    let session = null
+    let taskQueue = []
+    let lastRunTime = Date.now()
+    const minimumCaptureIntervalMs = 100
+    let main = async function (isMainThread = false) {
+        if (taskQueue.length >= 2 && isMainThread == false) {
+            return
+        }
+        if (taskQueue.length == 1 && isMainThread == false) {
+            taskQueue.push(reason)
+            return
+        }
+        if (taskQueue.length == 0) {
+            taskQueue.push(reason)
+        }
         if (page != null && recordRepo.isRecording && recordRepo.isCaptureHtml) {
             let htmlPath = recordRepo.getHtmlPath()
-            let htmlIndex = null
-            //Use queue to avoid repeated capture for a short period of time to enhance performance
-            //when there is more than 1 item, add a waiting queue, if there are more action being taken while we are waiting,
-            //the subsequent action will be cancelled because it is waiting for the same thing
-            //taking multiple same picture will not help
-            //the html will be captured while the queue is empty
-
-            //# of simoutaneous html capture session
-            const maxConcurrentWorker = 1
-            const maxWaitingWorker = 1
             try {
-                if (recordRepo.htmlCaptureStatus.getPendingItems().length < maxConcurrentWorker + maxWaitingWorker) {
-                    htmlIndex = recordRepo.htmlCaptureStatus.pushOperation('', htmlPath)
-                    let currentPendingQueue = recordRepo.htmlCaptureStatus.__queue
-                    do {
-                        try {
-                            currentPendingQueue = recordRepo.htmlCaptureStatus.getPendingItemBeforeIndex(htmlIndex)
-                        } catch (error) {
-                            console.log(error)
-                        }
-                        //will not wait if I am first item
-                        if (currentPendingQueue.length < maxConcurrentWorker) {
-                            break
-                        }
-                        await new Promise(resolve => setTimeout(resolve, 100))
-                    }
-                    while (currentPendingQueue.length >= maxConcurrentWorker)
+                if (session == null) {
+
                 }
-                else {
-                    return
+                let mHtmlData = null
+                try {
+                    const { data } = await session.send('Page.captureSnapshot');
+                    mHtmlData = data
+                } catch (error) {
+                    session = await page.target().createCDPSession();
+                    await session.send('Page.enable');
                 }
-            } catch (error) {
-                console.log(error)
-            }
-
-
-
-            try {
-                htmlPath = recordRepo.htmlCaptureStatus.markWriteStarted(htmlIndex)
-                //If recording is in paused state, we will just pop current operation
-                if (recordRepo.isRecording != true || recordRepo.isCaptureHtml != true) {
-                    recordRepo.htmlCaptureStatus.popOperation(htmlIndex)
-                    return
-                }
-                let pageData = await page.evaluate(async (DEFAULT_OPTIONS) => {
-                    const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
-                    return pageData;
-                }, config.singlefile)
-
-                recordRepo.operation.browserSelection.selectorHtmlPath = htmlPath
-                if (recordRepo.htmlCaptureStatus.lastHtml == pageData.content) {
-                    recordRepo.htmlCaptureStatus.updateHtmlPath(htmlIndex, recordRepo.htmlCaptureStatus.lastFilePath)
-                    recordRepo.htmlCaptureStatus.markWriteDone(htmlIndex)
-                }
-                else {
-                    recordRepo.htmlCaptureStatus.lastHtml = pageData.content
-                    recordRepo.htmlCaptureStatus.lastFilePath = htmlPath
-                    recordRepo.htmlCaptureStatus.markWriteDone(htmlIndex)
-
-                    fs.writeFile(htmlPath, pageData.content)
-                        .then(() => {
-
-                        })
-                }
+                fs.writeFile(htmlPath, mHtmlData)
+                recordRepo.htmlCaptureStatus.pushOperation()
 
             } catch (error) {
-                console.log(error)
-                recordRepo.htmlCaptureStatus.popOperation(htmlIndex)
+
             }
-
-
+        }
+        taskQueue.shift()
+        if (taskQueue.length > 0) {
+            main(taskQueue[0], true)
         }
 
     }
+    return main
 }

@@ -1041,7 +1041,7 @@ class WorkflowRecord {
      */
     getHtmlPath(fileName = null) {
         if (fileName == null) {
-            fileName = Date.now().toString() + ".html"
+            fileName = Date.now().toString() + ".mhtml"
         }
         let filePath = path.join(__dirname, '../../../public/temp/componentPic', fileName)
         return filePath

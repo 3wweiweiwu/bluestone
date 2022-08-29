@@ -617,7 +617,7 @@ async function captureScreenshot(reason, isMainThread) {
     }
     globalVar.capturePicQueue.shift()
     if (globalVar.capturePicQueue.length > 0) {
-        scanLocator(globalVar.capturePicQueue[0], true)
+        captureScreenshot(globalVar.capturePicQueue[0], true)
     }
 
 

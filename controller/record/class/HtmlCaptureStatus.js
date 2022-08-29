@@ -126,8 +126,8 @@ class HtmlCaptureStatus {
     }
     pushOperation(selector = 'unknown', path = '') {
         let htmlCaptureEntry = new HtmlCaptureEntry(selector, path)
-        this.__queue.push(htmlCaptureEntry)
-        return this.__queue.length - 1
+        let index = this.__queue.push(htmlCaptureEntry)
+        this.markWriteDone(index - 1)
     }
     popOperation(htmlIndex) {
         this.__queue[htmlIndex].path = this.lastFilePath
