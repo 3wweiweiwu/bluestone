@@ -312,10 +312,6 @@ class Operation {
             if (standardizedCurrentType == 'string') {
                 currentValue['pugType'] = 'text'
                 previousValue.push(currentValue)
-                //if this is string for text equal, automatically populate value
-                if (operation.name == Operation.inbuiltOperation.textEqual) {
-                    operation.params[currentIndex].value = this.backend.operation.browserSelection.currentInnerText
-                }
                 uiIndex++
             }
             else if (standardizedCurrentType == 'number') {
