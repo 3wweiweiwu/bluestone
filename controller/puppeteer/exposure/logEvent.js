@@ -26,6 +26,10 @@ module.exports = function (recordRepo, browser, page, io) {
         if (recordRepo.mutedFunctionForRecording.includes(eventDetail.command)) {
             return
         }
+        //stop recording right away when we press ctrl+q
+        if (eventDetail.command == null) {
+            recordRepo.isRecording = false
+        }
         //goto command does not generate a locator, we w
 
         //handle locator potential match
@@ -137,7 +141,6 @@ module.exports = function (recordRepo, browser, page, io) {
             //or in brm, some of the change event will be triggered after 5s?!
 
 
-            recordRepo.isRecording = false
 
 
         }
