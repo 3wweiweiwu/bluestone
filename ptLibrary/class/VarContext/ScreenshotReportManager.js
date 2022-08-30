@@ -2,10 +2,11 @@ let fs = require('fs')
 let path = require('path')
 
 class ScreenshotRecord {
-    constructor(tcId, lineNumber, picPath) {
+    constructor(tcId, lineNumber, picPath, mhtmlPath) {
         this.tcId = tcId
         this.lineNumber = lineNumber
         this.picPath = picPath
+        this.mhtmlPath = mhtmlPath
     }
 }
 class ScreenshotReportManager {
@@ -26,14 +27,18 @@ class ScreenshotReportManager {
         this.records = records
         this.tcId = tcId
     }
-    updateRecord(lineNumber, picPath) {
+    updateRecord(lineNumber, picPath, mhtmlPath) {
         let tcId = this.tcId
         if (this.prescriptionFolder != '' && this.prescriptionFolder != null) {
             let filePath = path.join(this.prescriptionFolder, `${tcId}-${lineNumber}.png`)
             fs.copyFileSync(picPath, filePath)
             picPath = filePath
+
+            filePath = path.join(this.prescriptionFolder, `${tcId}-${lineNumber}.mhtml`)
+            fs.copyFileSync(mhtmlPath, filePath)
+            mhtmlPath = filePath
         }
-        let newRecord = new ScreenshotRecord(tcId, lineNumber, picPath)
+        let newRecord = new ScreenshotRecord(tcId, lineNumber, picPath, mhtmlPath)
         //remove existing picture if there is any
         let existingRecord = this.records.find(item => item.lineNumber == lineNumber && this.tcId == item.tcId)
         //add new entry

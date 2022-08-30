@@ -22,6 +22,8 @@ const TestCaseLoader = require("../../ast/TestCaseLoader")
 const os = require('os')
 const TestcaseLoader = require('../../ast/TestCaseLoader')
 const getErrorStepIndexByErrorStack = require('../../../ptLibrary/functions/getErrorStepIndexByStack')
+const mhtml2html = require('mhtml2html/dist/mhtml2html')
+const { JSDOM } = require('jsdom');
 /**
  * @typedef {string} CommandType
  **/
@@ -631,11 +633,21 @@ class WorkflowRecord {
                 break
             }
 
-            let stepSnapshotPath = path.join(os.tmpdir(), 'stepSnapshot.png')
-            let proposedSnapshotPath = this.getPicPath()
+            let stepSnapshotPath = path.join(os.tmpdir(), 'stepSnapshot.mhtml')
+            let proposedSnapshotPath = this.getHtmlPath()
             try {
                 await fs.access(stepSnapshotPath)
-                await fs.copyFile(stepSnapshotPath, proposedSnapshotPath)
+                let mhtmlData = await fs.readFile(stepSnapshotPath)
+
+                try {
+                    let doc = mhtml2html.convert(mhtmlData.toString(), { convertIframes: true, parseDOM: (html) => new JSDOM(html) });
+                    await fs.writeFile(proposedSnapshotPath, doc.serialize())
+                } catch (error) {
+                    stepSnapshotPath = path.join(os.tmpdir(), 'stepSnapshot.png')
+                    proposedSnapshotPath = this.getPicPath()
+                    await fs.copyFile(stepSnapshotPath, proposedSnapshotPath)
+                }
+
                 this.steps[i].htmlPath = proposedSnapshotPath
             } catch (error) {
 
@@ -1063,6 +1075,18 @@ class WorkflowRecord {
     getPicPath(fileName = null) {
         if (fileName == null) {
             fileName = Date.now().toString() + ".png"
+        }
+
+        let filePath = path.join(__dirname, '../../../public/temp/componentPic', fileName)
+        return filePath
+
+    }
+    /**
+     * returns the picture path for current step
+     */
+    getHtmlPath(fileName = null) {
+        if (fileName == null) {
+            fileName = Date.now().toString() + ".html"
         }
 
         let filePath = path.join(__dirname, '../../../public/temp/componentPic', fileName)

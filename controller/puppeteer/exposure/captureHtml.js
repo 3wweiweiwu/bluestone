@@ -2,8 +2,7 @@ const { WorkflowRecord } = require('../../record/class/index')
 const { Page, Browser } = require('puppeteer-core')
 const config = require('../../../config')
 const fs = require('fs').promises
-const { mhtml2html } = require('mhtml2html')
-const { JSDOM } = require('jsdom');
+
 /**
  * Continuously capture html snapshot and save it to the disk
  * @param {Page} page 
