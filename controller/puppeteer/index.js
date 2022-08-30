@@ -51,7 +51,7 @@ async function startRecording(record, io, url = null, isCleanSteps = true) {
     if (isCleanSteps) {
         record.steps = []
         record.isRecording = true
-        record.isCaptureHtml = false
+        record.isCaptureHtml = config.recording.captureHtml
     }
     else {
         //will not record steps by default
