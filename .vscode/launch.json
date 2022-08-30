@@ -88,11 +88,11 @@
       "type": "node",
       "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
       "args": [
-        "C:\\Users\\3wwei\\sample-bluestone-project\\script\\",
+        "C:\\Users\\wuwei\\Procedure-Automation-Bluestone\\script",
         "--exit",
         "true",
         "--grep",
-        "^.* s2$",
+        "^.* s3$",
         "--reporter",
         "${workspaceFolder}\\reporter.js",
         "--reporter-option",

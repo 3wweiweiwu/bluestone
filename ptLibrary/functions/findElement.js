@@ -341,11 +341,13 @@ async function highlightProposedElement(page, element) {
         node.style.border = "thick solid #0000FF"
         return borderStyle
     })
+
     let pngData = await page.screenshot({ type: 'png' })
 
     let session = await page.target().createCDPSession();
     await session.send('Page.enable');
     let sessionResult = await session.send('Page.captureSnapshot');
+
 
 
     await element.evaluate((node, prevBorderStyle) => {

@@ -60,7 +60,7 @@ async function captureSnapshot(pageData) {
             pngFilePath = path.join(varSav.dataOutDir, fileName)
             await fs.writeFile(pngFilePath, pageData.pngData)
             await fs.writeFile(mhtmlFilePath, pageData.mhtmlData)
-            varSav.ScreenshotReportManager.updateRecord(stepIndex, pngFilePath)
+            varSav.ScreenshotReportManager.updateRecord(stepIndex, pngFilePath, mhtmlFilePath)
             varSav.exportVarContextToEnv()
         } catch (error) {
             console.log(error)

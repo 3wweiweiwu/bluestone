@@ -1152,13 +1152,22 @@ class WorkflowRecord {
             //attach the screenshot for current test
             let currentTestScreenshots = resultObj.screenshotManager.filter(item => item.tcId == tcName)
             for (let screenshotRecord of currentTestScreenshots) {
-                //copy file to bluestone folder and make it ready for display
-                let newPicPath = this.getPicPath()
+                //use html snapshot if possible
+                let newPicPath = this.getHtmlPath()
                 try {
-                    await fs.copyFile(screenshotRecord.picPath, newPicPath)
+                    let mhtmlData = await fs.readFile(screenshotRecord.mhtmlPath)
+                    let doc = mhtml2html.convert(mhtmlData.toString(), { convertIframes: true, parseDOM: (html) => new JSDOM(html) });
+                    await fs.writeFile(newPicPath, doc.serialize())
                 } catch (error) {
-                    console.log(error)
+                    //copy file to bluestone folder and make it ready for display
+                    let newPicPath = this.getPicPath()
+                    try {
+                        await fs.copyFile(screenshotRecord.picPath, newPicPath)
+                    } catch (error) {
+                        console.log(error)
+                    }
                 }
+
 
                 //assign picture to right step
                 let stepIndex = tcLoader.getStepIndexFromLine(screenshotRecord.lineNumber)
