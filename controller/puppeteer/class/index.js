@@ -27,6 +27,7 @@ const _eval = require('eval')
 const ptInbuiltFunc = require('../../../ptLibrary/functions/inbuiltFunc')
 const takeScreenshotForLocatorDefiner = require('../activities/takeScreenshotForLocatorDefiner')
 const StepAbortManager = require('../help/StepAbortManager')
+const getBluestonePage = require('../activities/help/getBluestonePage')
 class PuppeteerControl {
     constructor() {
         /** @type {Page}*/
@@ -95,14 +96,35 @@ class PuppeteerControl {
      * 
      * @param {string} targetLocator the locator for target element
      * @param {string} currentLocator current locator user provided
-     * @param {string} parentIframes the parent frame of current element
+     * @param {Array<string>} parentIframes the parent frame of current element
      * @param {boolean} isRequiredLocatorUpdate are we in locator update mode?
      * @returns 
      */
     async checkLocatorBasedOnDefiner(targetLocator, currentLocator, parentIframes, isRequiredLocatorUpdate) {
+        let errNote = ''
+        //check locator from stock html page
+        let bluestonePage = await getBluestonePage(this.browser)
+
+        errNote = await this.checkLocatorFromPage(bluestonePage, targetLocator, currentLocator, ["//iframe[contains(@src,'html') and @id='viewer']", ...parentIframes], isRequiredLocatorUpdate)
+
+        //if stock html page cannot find locator, use current web page
+        if (errNote != '') {
+            errNote = await this.checkLocatorFromPage(this.page, targetLocator, currentLocator, parentIframes, isRequiredLocatorUpdate)
+        }
+        return errNote
+    }
+    /**
+     * @param {Page} page 
+     * @param {string} targetLocator the locator for target element
+     * @param {string} currentLocator current locator user provided
+     * @param {Array<string>} parentIframes the parent frame of current element
+     * @param {boolean} isRequiredLocatorUpdate are we in locator update mode?
+     * @returns 
+     */
+    async checkLocatorFromPage(page, targetLocator, currentLocator, parentIframes, isRequiredLocatorUpdate) {
         //sidebar is the id for the locatorDefinerpug
-        let page = this.page
-        await this.page.bringToFront()
+
+        await page.bringToFront()
 
         /** @type {Array<ElementHandle>} */
         let elements = []
@@ -117,7 +139,7 @@ class PuppeteerControl {
         //if target locator is equal to current locator and equals to null, it means we are dealing with parent locator, just return as it is
 
         //navigate through frames and get to current elements
-        let frame = await getFrame(this.page, parentIframes)
+        let frame = await getFrame(page, parentIframes)
         if (frame == null) {
             return `Unable to navigate to iframe ${JSON.stringify(parentIframes)}`
         }
@@ -151,7 +173,7 @@ class PuppeteerControl {
             //draw rectangle
             node.style.border = "thick solid #0000FF"
         })
-        await takeScreenshotForLocatorDefiner(this.page)
+        await takeScreenshotForLocatorDefiner(page)
         targetElement.evaluate(node => {
             //remove rectangle
             let prevBorder = node.getAttribute('bluestone-previous-border')
