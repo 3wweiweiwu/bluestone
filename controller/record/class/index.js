@@ -66,7 +66,7 @@ class WorkflowRecord {
         this.steps = []
         this.lastOperationTimestamp = Date.now()
         this.__isRecording = true
-        this.__isCaptureHtml = true
+        this.__isCaptureHtml = false
         this.astManager = new AstManager(config.code.locatorPath)
         this.__isNavigationPending = false
         this.__codePath = ''
@@ -1035,13 +1035,23 @@ class WorkflowRecord {
         arr.splice(toIndex, 0, element);
         this.steps = arr
     }
+    /**
+     * returns the path for current mhtml
+     */
+    getMhtmlPath(fileName = null) {
+        if (fileName == null) {
+            fileName = Date.now().toString() + ".mhtml"
+        }
+        let filePath = path.join(__dirname, '../../../public/temp/componentPic', fileName)
+        return filePath
 
+    }
     /**
      * returns the picture path for current step
      */
     getHtmlPath(fileName = null) {
         if (fileName == null) {
-            fileName = Date.now().toString() + ".mhtml"
+            fileName = Date.now().toString() + ".html"
         }
         let filePath = path.join(__dirname, '../../../public/temp/componentPic', fileName)
         return filePath

@@ -61,7 +61,8 @@ class Operation {
         btnRun: 'btnRun',
         txtSelector: 'txtSelector',
         btnUpdateRecording: 'btnUpdateRecording',
-        btnMuteFuncQueryKey: 'btnMuteFuncQueryKey'
+        btnMuteFuncQueryKey: 'btnMuteFuncQueryKey',
+        btnIsRecordingHtml: 'btnIsRecordingHtml'
     }
     static inbuiltOperation = {
         textEqual: 'testTextEqual',
@@ -195,7 +196,7 @@ class Operation {
             case Operation.inbuiltQueryKey.btnCancel:
                 this.backend.isRecording = true
                 this.backend.spyVisible = false
-                this.backend.isCaptureHtml = true
+                // this.backend.isCaptureHtml = true
                 break;
             case Operation.inbuiltQueryKey.txtSelector:
                 this.backend.operation.browserSelection.currentSelector = firstValue
@@ -228,6 +229,9 @@ class Operation {
             case Operation.inbuiltQueryKey.btnUpdateRecording:
                 this.backend.isRecording = !this.backend.isRecording
                 break;
+            case Operation.inbuiltQueryKey.btnIsRecordingHtml:
+                this.backend.isCaptureHtml = !this.backend.isCaptureHtml
+                break
             default:
                 break;
         }

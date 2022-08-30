@@ -2,6 +2,8 @@ const { WorkflowRecord } = require('../../record/class/index')
 const { Page, Browser } = require('puppeteer-core')
 const config = require('../../../config')
 const fs = require('fs').promises
+const { mhtml2html } = require('mhtml2html')
+const { JSDOM } = require('jsdom');
 /**
  * Continuously capture html snapshot and save it to the disk
  * @param {Page} page 
@@ -11,23 +13,24 @@ module.exports = function (page, recordRepo) {
     let session = null
     let taskQueue = []
     let lastRunTime = Date.now()
-    const minimumCaptureIntervalMs = 100
-    let main = async function (isMainThread = false) {
-        if (taskQueue.length >= 2 && isMainThread == false) {
-            return
-        }
-        if (taskQueue.length == 1 && isMainThread == false) {
-            taskQueue.push(reason)
-            return
-        }
-        if (taskQueue.length == 0) {
-            taskQueue.push(reason)
-        }
+    const minimumCaptureIntervalMs = 50
+    let main = async function (reason, isMainThread = false) {
         if (page != null && recordRepo.isRecording && recordRepo.isCaptureHtml) {
-            let htmlPath = recordRepo.getHtmlPath()
+            if (taskQueue.length >= 2 && isMainThread == false) {
+                return
+            }
+            if (taskQueue.length == 1 && isMainThread == false) {
+                taskQueue.push(reason)
+                return
+            }
+            if (taskQueue.length == 0) {
+                taskQueue.push(reason)
+            }
+            let mHtmlPath = recordRepo.getMhtmlPath()
             try {
                 if (session == null) {
-
+                    session = await page.target().createCDPSession();
+                    await session.send('Page.enable');
                 }
                 let mHtmlData = null
                 try {
@@ -37,8 +40,8 @@ module.exports = function (page, recordRepo) {
                     session = await page.target().createCDPSession();
                     await session.send('Page.enable');
                 }
-                fs.writeFile(htmlPath, mHtmlData)
-                recordRepo.htmlCaptureStatus.pushOperation()
+                fs.writeFile(mHtmlPath, mHtmlData)
+                recordRepo.htmlCaptureStatus.pushOperation(null, mHtmlPath)
 
             } catch (error) {
 
@@ -46,6 +49,7 @@ module.exports = function (page, recordRepo) {
         }
         taskQueue.shift()
         if (taskQueue.length > 0) {
+            await new Promise(resolve => setTimeout(resolve, minimumCaptureIntervalMs))
             main(taskQueue[0], true)
         }
 

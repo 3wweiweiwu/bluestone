@@ -165,7 +165,7 @@ Object.keys(EVENTCONST).forEach(item => {
                     default:
                         //if we see combo key ctrl-q, we will call in-browser plugin
                         if ((event.ctrlKey || event.altKey) && event.key === 'q') {
-                            // captureHtml()
+                            // captureHtml('alt+q')
                             command = null
                             parameter = null
                             // window.stopRecording()
@@ -560,7 +560,7 @@ async function scanLocator(isMainThread = false) {
 
     //add potential match to elments who's region contains other element's mid point.
     //We do this because we might use other element to identify current element
-    let elements = getElementByXpath(`//*[@${Helper.potentialLocatorMatchIndexes}]`)
+    let elements = Array.from(document.getElementsByTagName('*'))
     elements.forEach(ele => {
         for (const midPointElementKey of Object.keys(elementMidPintDict)) {
             let midPointElement = elementMidPintDict[midPointElementKey]
@@ -571,6 +571,9 @@ async function scanLocator(isMainThread = false) {
 
             //if passed mid point test, we will add potential match to current element
             let potentialMatchStr = ele.getAttribute(Helper.potentialLocatorMatchIndexes)
+            if (potentialMatchStr == null) {
+                potentialMatchStr = '[]'
+            }
             let potentialMatch = JSON.parse(potentialMatchStr)
             let uniqueSet = new Set([...potentialMatch, ...midPointElement.potentialMatch])
             let uniqueArr = [...uniqueSet]
@@ -587,9 +590,9 @@ async function scanLocator(isMainThread = false) {
 
 
 
-async function captureHtml() {
+async function captureHtml(reason) {
     try {
-        // await window.captureHtml()
+        await window.captureHtml(reason)
     } catch (error) {
 
     }
@@ -681,7 +684,7 @@ const mutationObserverCallback = function (mutationsList, observer) {
     // console.log(mutationsList)
     captureScreenshot('dom tree change')
     //only proceed change that is introduced by RPA engine or code change
-    // captureHtml()
+    captureHtml('dom tree change')
     getFrameLocator()
     scanLocator()
     // console.log(mutationsList)
@@ -707,9 +710,9 @@ observer.observe(document, config);
 document.addEventListener('scroll', captureScreenshot)
 document.addEventListener('animationstart', () => {
     console.log('Animation started');
-    captureHtml()
-    setTimeout(captureHtml, 1000)
-    setTimeout(captureHtml, 2000)
+    // captureHtml()
+    // setTimeout(captureHtml, 1000)
+    // setTimeout(captureHtml, 2000)
 }, { capture: true });
 document.addEventListener('animationend', () => {
     console.log('Animation ended');
@@ -718,7 +721,7 @@ document.addEventListener('animationend', () => {
     // captureScreenshot('animation ended')
 
 }, { capture: true });
-// captureHtml()
+captureHtml('page initialization')
 // setInterval(captureHtml, 800)
 captureScreenshot('initial capture')
 getFrameLocator()
