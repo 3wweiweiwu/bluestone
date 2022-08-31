@@ -1160,7 +1160,7 @@ class WorkflowRecord {
                     await fs.writeFile(newPicPath, doc.serialize())
                 } catch (error) {
                     //copy file to bluestone folder and make it ready for display
-                    let newPicPath = this.getPicPath()
+                    newPicPath = this.getPicPath()
                     try {
                         await fs.copyFile(screenshotRecord.picPath, newPicPath)
                     } catch (error) {
@@ -1199,6 +1199,8 @@ class WorkflowRecord {
 
 
             //identify prescription screenshot and assign it to the step
+            //we do this because prescription screenshot contains hint to potential match
+            //it will provide more information
             let currentTc = resultObj.reviews.find(item => item.title == tcName)
             //current test is passed... no more inforamtion to pass
             if (currentTc == null) {

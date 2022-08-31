@@ -100,6 +100,25 @@
         "--timeout",
         "999999"
       ]
+    },
+    {
+      "name": "Debug Mocha No1",
+      "request": "launch",
+      "type": "node",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "args": [
+        "../sample-bluestone-project/script",
+        "--exit",
+        "true",
+        "--grep",
+        "^.* s3$",
+        "--reporter",
+        "${workspaceFolder}\\reporter.js",
+        "--reporter-option",
+        "output=testrun.json,BLUESTONE_RUN_ID=testrun123,BLUESTONE_AUTO_SNAPSHOT=1",
+        "--timeout",
+        "999999"
+      ]
     }
   ]
 }

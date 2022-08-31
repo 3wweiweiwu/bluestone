@@ -334,13 +334,16 @@ async function getElementBasedOnLocatorBackup(page, elementSelector, similarityB
  * @returns {SnapshotData}
  */
 async function highlightProposedElement(page, element) {
-    let borderStyle = await element.evaluate(node => {
-        //record previous border info
-        let borderStyle = node.style.border
-        //draw rectangle
-        node.style.border = "thick solid #0000FF"
-        return borderStyle
-    })
+    let borderStyle = ''
+    if (element != null) {
+        borderStyle = await element.evaluate(node => {
+            //record previous border info
+            let borderStyle = node.style.border
+            //draw rectangle
+            node.style.border = "thick solid #0000FF"
+            return borderStyle
+        })
+    }
 
     let pngData = await page.screenshot({ type: 'png' })
 
@@ -349,10 +352,11 @@ async function highlightProposedElement(page, element) {
     let sessionResult = await session.send('Page.captureSnapshot');
 
 
-
-    await element.evaluate((node, prevBorderStyle) => {
-        node.style.border = prevBorderStyle
-    }, borderStyle)
+    if (element != null) {
+        await element.evaluate((node, prevBorderStyle) => {
+            node.style.border = prevBorderStyle
+        }, borderStyle)
+    }
     let snapshotData = new SnapshotData(pngData, sessionResult.data)
     return snapshotData
 
