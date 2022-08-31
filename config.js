@@ -66,6 +66,9 @@ let config = {
         insertMetaCSP: false,
         insertMetaNoIndex: false,
         insertSingleFileComment: false
+    },
+    recording: {
+        captureHtml: false
     }
 
 }
@@ -93,6 +96,9 @@ function configFunc() {
         config.code.customLocatorEnginePath = path.join(projectFolder, projectObj.customLocatorEnginePath)
     }
 
+    if (projectObj.captureHtmlOnRecording == true) {
+        config.recording.captureHtml = true
+    }
     config.code.dataPath = path.join(projectFolder, 'data')
     return config
 }

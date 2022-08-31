@@ -2,88 +2,56 @@ const { WorkflowRecord } = require('../../record/class/index')
 const { Page, Browser } = require('puppeteer-core')
 const config = require('../../../config')
 const fs = require('fs').promises
+
 /**
  * Continuously capture html snapshot and save it to the disk
  * @param {Page} page 
  * @param {WorkflowRecord} recordRepo
  */
 module.exports = function (page, recordRepo) {
-
-    return async function () {
+    let session = null
+    let taskQueue = []
+    let lastRunTime = Date.now()
+    const minimumCaptureIntervalMs = 50
+    let main = async function (reason, isMainThread = false) {
         if (page != null && recordRepo.isRecording && recordRepo.isCaptureHtml) {
-            let htmlPath = recordRepo.getHtmlPath()
-            let htmlIndex = null
-            //Use queue to avoid repeated capture for a short period of time to enhance performance
-            //when there is more than 1 item, add a waiting queue, if there are more action being taken while we are waiting,
-            //the subsequent action will be cancelled because it is waiting for the same thing
-            //taking multiple same picture will not help
-            //the html will be captured while the queue is empty
-
-            //# of simoutaneous html capture session
-            const maxConcurrentWorker = 1
-            const maxWaitingWorker = 1
-            try {
-                if (recordRepo.htmlCaptureStatus.getPendingItems().length < maxConcurrentWorker + maxWaitingWorker) {
-                    htmlIndex = recordRepo.htmlCaptureStatus.pushOperation('', htmlPath)
-                    let currentPendingQueue = recordRepo.htmlCaptureStatus.__queue
-                    do {
-                        try {
-                            currentPendingQueue = recordRepo.htmlCaptureStatus.getPendingItemBeforeIndex(htmlIndex)
-                        } catch (error) {
-                            console.log(error)
-                        }
-                        //will not wait if I am first item
-                        if (currentPendingQueue.length < maxConcurrentWorker) {
-                            break
-                        }
-                        await new Promise(resolve => setTimeout(resolve, 100))
-                    }
-                    while (currentPendingQueue.length >= maxConcurrentWorker)
-                }
-                else {
-                    return
-                }
-            } catch (error) {
-                console.log(error)
+            if (taskQueue.length >= 2 && isMainThread == false) {
+                return
             }
-
-
-
+            if (taskQueue.length == 1 && isMainThread == false) {
+                taskQueue.push(reason)
+                return
+            }
+            if (taskQueue.length == 0) {
+                taskQueue.push(reason)
+            }
+            let mHtmlPath = recordRepo.getMhtmlPath()
             try {
-                htmlPath = recordRepo.htmlCaptureStatus.markWriteStarted(htmlIndex)
-                //If recording is in paused state, we will just pop current operation
-                if (recordRepo.isRecording != true || recordRepo.isCaptureHtml != true) {
-                    recordRepo.htmlCaptureStatus.popOperation(htmlIndex)
-                    return
+                if (session == null) {
+                    session = await page.target().createCDPSession();
+                    await session.send('Page.enable');
                 }
-                let pageData = await page.evaluate(async (DEFAULT_OPTIONS) => {
-                    const pageData = await singlefile.getPageData(DEFAULT_OPTIONS);
-                    return pageData;
-                }, config.singlefile)
-
-                recordRepo.operation.browserSelection.selectorHtmlPath = htmlPath
-                if (recordRepo.htmlCaptureStatus.lastHtml == pageData.content) {
-                    recordRepo.htmlCaptureStatus.updateHtmlPath(htmlIndex, recordRepo.htmlCaptureStatus.lastFilePath)
-                    recordRepo.htmlCaptureStatus.markWriteDone(htmlIndex)
+                let mHtmlData = null
+                try {
+                    const { data } = await session.send('Page.captureSnapshot');
+                    mHtmlData = data
+                } catch (error) {
+                    session = await page.target().createCDPSession();
+                    await session.send('Page.enable');
                 }
-                else {
-                    recordRepo.htmlCaptureStatus.lastHtml = pageData.content
-                    recordRepo.htmlCaptureStatus.lastFilePath = htmlPath
-                    recordRepo.htmlCaptureStatus.markWriteDone(htmlIndex)
-
-                    fs.writeFile(htmlPath, pageData.content)
-                        .then(() => {
-
-                        })
-                }
+                fs.writeFile(mHtmlPath, mHtmlData)
+                recordRepo.htmlCaptureStatus.pushOperation(null, mHtmlPath)
 
             } catch (error) {
-                console.log(error)
-                recordRepo.htmlCaptureStatus.popOperation(htmlIndex)
+
             }
-
-
+        }
+        taskQueue.shift()
+        if (taskQueue.length > 0) {
+            await new Promise(resolve => setTimeout(resolve, minimumCaptureIntervalMs))
+            main(taskQueue[0], true)
         }
 
     }
+    return main
 }

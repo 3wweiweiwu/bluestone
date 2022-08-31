@@ -93,6 +93,7 @@ class HealingInfo {
         this.perscriptionFolder = path.join(projectRootPath, 'result', runId, '/')
         this.prescriptionPath = path.join(this.perscriptionFolder, 'report.json')
         this.picPath = path.join(this.perscriptionFolder, `${testcaseName}-${Date.now().toString()}.png`)
+        this.mhtmlPath = path.join(this.perscriptionFolder, `${testcaseName}-${Date.now().toString()}.mhtml`)
         this.testcasName = testcaseName
         this.initialize(this.perscriptionFolder, this.prescriptionPath, this.runId)
     }
@@ -165,7 +166,7 @@ class HealingInfo {
     * @param {string} locatorName 
      * @param {string} oldLocator 
      * @param {string} newLocator 
-     * @param {string} pageData
+     * @param {import('../../functions/snapshotCapture').SnapshotData} pageData
      * @param {boolean} isOriginalLocatorWork
      */
     async createPerscription(locatorName, oldLocator, newLocator, pageData, testcasePath, isOriginalLocatorWork) {
@@ -177,7 +178,8 @@ class HealingInfo {
 
         this.locatorReport.addRecord(locatorName, isOriginalLocatorWork)
         if (pageData != null) {
-            fs.writeFileSync(this.picPath, pageData)
+            fs.writeFileSync(this.picPath, pageData.pngData)
+            fs.writeFileSync(this.mhtmlPath, pageData.mhtmlData)
         }
 
         let picPathBaseName = path.basename(this.picPath)

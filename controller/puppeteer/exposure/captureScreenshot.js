@@ -9,7 +9,7 @@ const config = require('../../../config')
 module.exports = function (page, recordRepo) {
 
     return async function (reason) {
-        if (page != null && recordRepo.isRecording && recordRepo.picCapture.getPendingItems() < 1 && recordRepo.isCaptureHtml) {
+        if (page != null && recordRepo.isRecording && recordRepo.picCapture.getPendingItems() < 1) {
             //capture html
 
             let picPath = recordRepo.getPicPath()

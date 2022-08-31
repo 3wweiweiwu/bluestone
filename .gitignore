@@ -10,3 +10,4 @@ public/temp/**/*.snapshot.json
 *.pid
 testrun.json
 result/testrun/report.json
+*.mhtml

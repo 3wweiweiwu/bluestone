@@ -1,5 +1,7 @@
 extends ../../node_modules/pug-bootstrap/_bootstrap.pug
+include ./refresh.pug
 block body
+    +refresh()
     div(id='topNav')
         +navbar("Bluestone","dropdown_menu")
             +nav_item("/spy")="Operation"

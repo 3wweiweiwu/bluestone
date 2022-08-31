@@ -1,6 +1,6 @@
 const ElementSelector = require('../class/ElementSelector')
 const HealingSnapshot = require('../class/HealingSnapshot')
-const { captureSnapshot } = require('./snapshotCapture')
+const { captureSnapshot, SnapshotData } = require('./snapshotCapture')
 const { Browser, Page, ElementHandle } = require('puppeteer-core')
 const assert = require('assert')
 class Options {
@@ -14,7 +14,6 @@ class Options {
 
 }
 const VarSaver = require('../class/VarSaver')
-
 module.exports = waitForElement
 /**
  * Find a element within timeout period. If no element is found, a error will be thrown
@@ -94,7 +93,8 @@ async function waitForElement(page, elementSelector, timeout, option = new Optio
                 try {
                     pageData = await highlightProposedElement(page, element)
                 } catch (error) {
-                    pageData = await page.screenshot({ type: 'png' })
+                    let pngData = await page.screenshot({ type: 'png' })
+                    pageData = new SnapshotData(pngData, null)
                 }
 
             }
@@ -331,6 +331,7 @@ async function getElementBasedOnLocatorBackup(page, elementSelector, similarityB
  * 
  * @param {Page} page 
  * @param {ElementHandle} element 
+ * @returns {SnapshotData}
  */
 async function highlightProposedElement(page, element) {
     let borderStyle = await element.evaluate(node => {
@@ -340,10 +341,19 @@ async function highlightProposedElement(page, element) {
         node.style.border = "thick solid #0000FF"
         return borderStyle
     })
-    let pageData = await page.screenshot({ type: 'png' })
+
+    let pngData = await page.screenshot({ type: 'png' })
+
+    let session = await page.target().createCDPSession();
+    await session.send('Page.enable');
+    let sessionResult = await session.send('Page.captureSnapshot');
+
+
+
     await element.evaluate((node, prevBorderStyle) => {
         node.style.border = prevBorderStyle
     }, borderStyle)
-    return pageData
+    let snapshotData = new SnapshotData(pngData, sessionResult.data)
+    return snapshotData
 
 }

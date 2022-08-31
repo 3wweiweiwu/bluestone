@@ -22,6 +22,8 @@ const TestCaseLoader = require("../../ast/TestCaseLoader")
 const os = require('os')
 const TestcaseLoader = require('../../ast/TestCaseLoader')
 const getErrorStepIndexByErrorStack = require('../../../ptLibrary/functions/getErrorStepIndexByStack')
+const mhtml2html = require('mhtml2html/dist/mhtml2html')
+const { JSDOM } = require('jsdom');
 /**
  * @typedef {string} CommandType
  **/
@@ -66,7 +68,7 @@ class WorkflowRecord {
         this.steps = []
         this.lastOperationTimestamp = Date.now()
         this.__isRecording = true
-        this.__isCaptureHtml = true
+        this.__isCaptureHtml = config.recording.captureHtml
         this.astManager = new AstManager(config.code.locatorPath)
         this.__isNavigationPending = false
         this.__codePath = ''
@@ -631,11 +633,21 @@ class WorkflowRecord {
                 break
             }
 
-            let stepSnapshotPath = path.join(os.tmpdir(), 'stepSnapshot.png')
-            let proposedSnapshotPath = this.getPicPath()
+            let stepSnapshotPath = path.join(os.tmpdir(), 'stepSnapshot.mhtml')
+            let proposedSnapshotPath = this.getHtmlPath()
             try {
                 await fs.access(stepSnapshotPath)
-                await fs.copyFile(stepSnapshotPath, proposedSnapshotPath)
+                let mhtmlData = await fs.readFile(stepSnapshotPath)
+
+                try {
+                    let doc = mhtml2html.convert(mhtmlData.toString(), { convertIframes: true, parseDOM: (html) => new JSDOM(html) });
+                    await fs.writeFile(proposedSnapshotPath, doc.serialize())
+                } catch (error) {
+                    stepSnapshotPath = path.join(os.tmpdir(), 'stepSnapshot.png')
+                    proposedSnapshotPath = this.getPicPath()
+                    await fs.copyFile(stepSnapshotPath, proposedSnapshotPath)
+                }
+
                 this.steps[i].htmlPath = proposedSnapshotPath
             } catch (error) {
 
@@ -1035,7 +1047,17 @@ class WorkflowRecord {
         arr.splice(toIndex, 0, element);
         this.steps = arr
     }
+    /**
+     * returns the path for current mhtml
+     */
+    getMhtmlPath(fileName = null) {
+        if (fileName == null) {
+            fileName = Date.now().toString() + ".mhtml"
+        }
+        let filePath = path.join(__dirname, '../../../public/temp/componentPic', fileName)
+        return filePath
 
+    }
     /**
      * returns the picture path for current step
      */
@@ -1053,6 +1075,18 @@ class WorkflowRecord {
     getPicPath(fileName = null) {
         if (fileName == null) {
             fileName = Date.now().toString() + ".png"
+        }
+
+        let filePath = path.join(__dirname, '../../../public/temp/componentPic', fileName)
+        return filePath
+
+    }
+    /**
+     * returns the picture path for current step
+     */
+    getHtmlPath(fileName = null) {
+        if (fileName == null) {
+            fileName = Date.now().toString() + ".html"
         }
 
         let filePath = path.join(__dirname, '../../../public/temp/componentPic', fileName)
@@ -1118,13 +1152,22 @@ class WorkflowRecord {
             //attach the screenshot for current test
             let currentTestScreenshots = resultObj.screenshotManager.filter(item => item.tcId == tcName)
             for (let screenshotRecord of currentTestScreenshots) {
-                //copy file to bluestone folder and make it ready for display
-                let newPicPath = this.getPicPath()
+                //use html snapshot if possible
+                let newPicPath = this.getHtmlPath()
                 try {
-                    await fs.copyFile(screenshotRecord.picPath, newPicPath)
+                    let mhtmlData = await fs.readFile(screenshotRecord.mhtmlPath)
+                    let doc = mhtml2html.convert(mhtmlData.toString(), { convertIframes: true, parseDOM: (html) => new JSDOM(html) });
+                    await fs.writeFile(newPicPath, doc.serialize())
                 } catch (error) {
-                    console.log(error)
+                    //copy file to bluestone folder and make it ready for display
+                    let newPicPath = this.getPicPath()
+                    try {
+                        await fs.copyFile(screenshotRecord.picPath, newPicPath)
+                    } catch (error) {
+                        console.log(error)
+                    }
                 }
+
 
                 //assign picture to right step
                 let stepIndex = tcLoader.getStepIndexFromLine(screenshotRecord.lineNumber)

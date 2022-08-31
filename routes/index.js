@@ -71,7 +71,7 @@ router.get('/locator-definer', async function (req, res) {
 
   let variables = {
     title: `Bluestone Recording: ${workflow.isRecording}`,
-    locatorHtml: ui.locatorDefiner.locatorHtml,
+    locatorHtml: ui.locatorDefiner.getSrcToDisplayInSideBar(),
     btnNextHtmlQueryKey: PugLocatorDefiner.inBuiltQueryKey.btnNextHtml,
     btnPrevHtmlQueryKey: PugLocatorDefiner.inBuiltQueryKey.btnPrevHtml,
   }
@@ -153,7 +153,9 @@ router.get('/spy', async function (req, res, next) {
     isRecording: ui.backend.isRecording,
     isRecordingQueryKey: Operation.inbuiltQueryKey.btnUpdateRecording,
     functionMuteStatus: ui.operation.getFunctionMuteState(),
-    getFunctionMuteStatQueryKey: Operation.inbuiltQueryKey.btnMuteFuncQueryKey
+    getFunctionMuteStatQueryKey: Operation.inbuiltQueryKey.btnMuteFuncQueryKey,
+    isRecordingHtmlQueryKey: Operation.inbuiltQueryKey.btnIsRecordingHtml,
+    isRecordingHtml: ui.backend.isCaptureHtml
   }
 
   res.render('spy.pug', variables);

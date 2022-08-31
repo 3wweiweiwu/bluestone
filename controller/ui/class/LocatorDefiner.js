@@ -3,6 +3,8 @@ const Locator = require('../../locator/class/Locator')
 const { WorkflowRecord } = require('../../record/class/index')
 const checkLocatorInDefiner = require('../../puppeteer/activities/checkLocatorInDefiner')
 const ElementSelector = require('../../../ptLibrary/class/ElementSelector')
+const fs = require('fs')
+const path = require('path')
 class FinalLocatorSelection {
     constructor() {
         this.finalLocatorName = ''
@@ -29,6 +31,7 @@ class LocatorDefiner {
         this.defaultSelector = defaultSelector
         this.__locatorName = locatorName
         this.__locatorSelector = locatorSelector
+        this.__locatorHtml = ''
         this.locatorHtml = locatorHtmlPath
         this.__validationText = 'Please click Confirm button to validate your input'
         this.__possibleLocators = potentialMatch.map(item => {
@@ -44,6 +47,12 @@ class LocatorDefiner {
         this.parentFrame = parentFrame
         this.isReviewMode = isReviewMode
         this.isRequiredLocatorUpdate = isRequiredLocatorUpdate
+    }
+    get locatorHtml() {
+        return this.__locatorHtml
+    }
+    set locatorHtml(value) {
+        this.__locatorHtml = value
     }
     get validationText() {
         return this.__validationText
@@ -62,6 +71,28 @@ class LocatorDefiner {
         btnPrevHtml: 'LOCATOR_PREVIOUS_HTML',
         btnOverrideLocator: 'LOCATOR_OVERRIDE_SELECTOR',
         recommendationDropDown: 'LOCATOR_RECOMMENDATION_DROPDOWN'
+    }
+    /**
+     * Depends on current file, display image or html on the right side of locator definer
+     * so that user can visualize what is the current operation
+     * @returns 
+     */
+    getSrcToDisplayInSideBar() {
+        let locatorHtml = '/temp/componentPic/locatorDefiner.png'
+        try {
+            //the default value for locator html is empty string.
+            //it doesn't make sense to do it
+            let locatorHtmlFullPath = path.join(__dirname, '../../../public', this.locatorHtml)
+            if (this.locatorHtml != '') {
+                fs.accessSync(locatorHtmlFullPath)
+                locatorHtml = this.locatorHtml
+            }
+
+        }
+        catch (error) {
+            // console.log(error)
+        }
+        return locatorHtml
     }
     get locatorName() {
         return this.__locatorName

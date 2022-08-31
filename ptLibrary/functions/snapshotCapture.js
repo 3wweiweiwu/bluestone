@@ -6,6 +6,12 @@ const fs = require('fs').promises
 const os = require('os')
 const path = require('path')
 const getErrorStepIndexByStack = require('./getErrorStepIndexByStack')
+class SnapshotData {
+    constructor(pngData, mhtmlData) {
+        this.pngData = pngData
+        this.mhtmlData = mhtmlData
+    }
+}
 /**
  * inject single page engine into the page in order to capture real-time web page interaction
  * @param {Page} page 
@@ -28,7 +34,7 @@ async function initializePageCapture(page) {
 }
 /**
  * capture html and save result in the designated step folder
- * @param {string} pageData
+ * @param {SnapshotData} pageData
  * @returns {string} //file path
  */
 async function captureSnapshot(pageData) {
@@ -43,23 +49,25 @@ async function captureSnapshot(pageData) {
         //Based on call stack, get curret step's info
         let err = new Error()
         let stack = err.stack
-        let filePath = path.join(os.tmpdir(), 'stepSnapshot.png')
+        let pngFilePath = path.join(os.tmpdir(), 'stepSnapshot.png')
+        let mhtmlFilePath = path.join(os.tmpdir(), 'stepSnapshot.mhtml')
         try {
             //if we are in execution mode, we will output file to desinated folder
             let stepIndex = getErrorStepIndexByStack(varSav.currentFilePath, stack, varSav.tcStepInfo)
             //output html 
             let fileName = `step-${stepIndex.toString()}-${Date.now()}.${extensionName}`
             //depends on the run sceanrio, output report in different place
-            filePath = path.join(varSav.dataOutDir, fileName)
-            await fs.writeFile(filePath, pageData)
-            varSav.ScreenshotReportManager.updateRecord(stepIndex, filePath)
+            pngFilePath = path.join(varSav.dataOutDir, fileName)
+            await fs.writeFile(pngFilePath, pageData.pngData)
+            await fs.writeFile(mhtmlFilePath, pageData.mhtmlData)
+            varSav.ScreenshotReportManager.updateRecord(stepIndex, pngFilePath, mhtmlFilePath)
             varSav.exportVarContextToEnv()
         } catch (error) {
             console.log(error)
         }
 
 
-        return filePath
+        return pngFilePath
     } catch (error) {
         console.log('Unable to capture current HTML snapshot. Error:' + error.toString())
     }
@@ -78,4 +86,4 @@ async function captureHtmlSnapshot(page) {
     // }, pageCaptureConfig)
     // return pageData
 }
-module.exports = { initializePageCapture, captureSnapshot }
+module.exports = { initializePageCapture, captureSnapshot, SnapshotData }

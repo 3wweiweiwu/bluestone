@@ -35,6 +35,12 @@ block content
 					+a-btn-danger('?'+isRecordingQueryKey)='Stop Recording'
 				else 
 					+a-btn-success('?'+isRecordingQueryKey)='Start Recording'
+			div(class="container-fluid")
+				h4="Start/Stop HTML Capture"
+				if isRecordingHtml
+					+a-btn-danger('?'+isRecordingHtmlQueryKey)='Stop HTML Capture'
+				else 
+					+a-btn-success('?'+isRecordingHtmlQueryKey)='Start HTML Capture'
 
 			div(class="container-fluid")
 				h4="Operation Capture Setting: Grey-Capture; White-Not Capture"
@@ -42,4 +48,3 @@ block content
 
 
 
-	+refresh()

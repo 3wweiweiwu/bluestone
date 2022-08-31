@@ -1,6 +1,8 @@
 const fs = require('fs').promises
 const { constants } = require('fs')
 const path = require('path')
+const mhtml2html = require('mhtml2html/dist/mhtml2html')
+const { JSDOM } = require('jsdom');
 class HtmlCaptureEntry {
     /**
      * 
@@ -24,6 +26,9 @@ class HtmlCaptureStatus {
         this.__lastHtml = ''
         this.__lastFilePath = ''
         this.__timestamp = Date.now()
+    }
+    get queue() {
+        return this.__queue
     }
 
     /**
@@ -126,8 +131,8 @@ class HtmlCaptureStatus {
     }
     pushOperation(selector = 'unknown', path = '') {
         let htmlCaptureEntry = new HtmlCaptureEntry(selector, path)
-        this.__queue.push(htmlCaptureEntry)
-        return this.__queue.length - 1
+        let index = this.__queue.push(htmlCaptureEntry)
+        this.markWriteDone(index - 1)
     }
     popOperation(htmlIndex) {
         this.__queue[htmlIndex].path = this.lastFilePath
@@ -163,45 +168,11 @@ class HtmlCaptureStatus {
         return this.__queue[workerIndex].path
     }
     async outputHtml(newPath) {
-        let timeStamp = Date.now()
-
-        let htmlFound = false
-        //get current html capture
-        let i = this.__queue.length - 1;
-        // if (i >= 0) {
-        //     htmlFound = true
-        // }
-
-        for (i = this.__queue.length - 1; i >= 0; i--) {
-            //find last element that is either in complete or capturing state
-            if (this.__queue[i].writeReady != null) {
-                htmlFound = true
-                break
-            }
-        }
-
-        //if no picture found, just return
-        if (!htmlFound) {
-            return
-        }
-        let writeComplete = false
-        do {
-
-            try {
-                writeComplete = this.__queue[i].writeReady
-                await new Promise(resolve => { setTimeout(resolve, 500) })
-            } catch (error) {
-                i = i - 1
-            }
-        } while (writeComplete != true)
-        let filePath = this.__queue[i].path
-        this.__queue[i].outputPath.push(newPath)
+        let mhtmlData = await fs.readFile(this.queue[this.queue.length - 1].path)
+        let doc = mhtml2html.convert(mhtmlData.toString(), { convertIframes: true, parseDOM: (html) => new JSDOM(html) });
 
         try {
-            await fs.copyFile(filePath, newPath)
-
-            // await fs.unlink(filePath)
-            // this.__queue[i].path = newPath
+            await fs.writeFile(newPath, doc.serialize())
         } catch (error) {
             console.log(error)
         }

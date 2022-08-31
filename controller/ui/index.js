@@ -176,7 +176,13 @@ class UI {
             locatorName = locator.path
             locatorSelector = locator.Locator[0]
         }
-        let htmlUrl = this.backend.convertLocalPath2RelativeLink(this.backend.htmlCaptureStatus.lastFilePath)
+        let htmlUrl = ''
+        if (this.backend.isCaptureHtml) {
+            let htmlPath = this.backend.getHtmlPath()
+            await this.backend.htmlCaptureStatus.outputHtml(htmlPath)
+            htmlUrl = this.backend.convertLocalPath2RelativeLink(htmlPath)
+        }
+
 
 
         this.locatorDefiner = new LocatorDefiner(browserSelection.currentSelector, htmlUrl, locatorName, locatorSelector, newPotentialMatch, -1, this.backend, browserSelection.parentIframe)

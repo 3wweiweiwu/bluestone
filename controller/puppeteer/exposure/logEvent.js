@@ -26,6 +26,10 @@ module.exports = function (recordRepo, browser, page, io) {
         if (recordRepo.mutedFunctionForRecording.includes(eventDetail.command)) {
             return
         }
+        //stop recording right away when we press ctrl+q
+        if (eventDetail.command == null) {
+            recordRepo.isRecording = false
+        }
         //goto command does not generate a locator, we w
 
         //handle locator potential match
@@ -61,10 +65,11 @@ module.exports = function (recordRepo, browser, page, io) {
         //handle page capture
 
         let htmlPath = ''
-        // if (page != null) {
-        // htmlPath = recordRepo.getHtmlPath()
-        // recordRepo.htmlCaptureStatus.outputHtml(htmlPath)
-        // }
+        if (page != null && recordRepo.isCaptureHtml) {
+            htmlPath = recordRepo.getHtmlPath()
+            recordRepo.htmlCaptureStatus.outputHtml(htmlPath)
+
+        }
         //handle screenshot
 
         let picturePath = ''
@@ -102,7 +107,7 @@ module.exports = function (recordRepo, browser, page, io) {
         //if event command is null, call the in-browser console
         if (eventDetail.command == null) {
             await takeScreenshotForLocatorDefiner(page)
-            recordRepo.isCaptureHtml = false
+            // recordRepo.isCaptureHtml = false
 
             recordRepo.spyBrowserSelectionPicPath = picturePath
             // recordRepo.spyBrowserSelectionHtmlPath = htmlPath
@@ -124,7 +129,7 @@ module.exports = function (recordRepo, browser, page, io) {
 
 
             //display mvt console
-            recordRepo.isCaptureHtml = false
+            // recordRepo.isCaptureHtml = false
             await openBluestoneTab(browser, "decide-view")
 
             //give 5000ms delay so that it can capture unfinished events
@@ -135,13 +140,14 @@ module.exports = function (recordRepo, browser, page, io) {
             //With this challenge, that's why we need to wait for 5000ms
             //or in brm, some of the change event will be triggered after 5s?!
 
-            setTimeout(() => {
-                recordRepo.isRecording = false
-            }, 5000)
+
 
 
         }
-        if (recordRepo.isRecording && eventDetail.command != null) {
+        //delayed record. 
+        //normally, if we are in recording state, we will log step anyway
+        //if we are not in recording state, we will still log steps for 5s to avoid missing delayed events
+        if ((recordRepo.isRecording || (Date.now() - eventDetail.timeStamp < 5000)) && eventDetail.command != null) {
             //If we don't have page element, this indicates that it is a non-UI operation,
             //we will not calculate timeout
             let timeoutMs = null
@@ -193,6 +199,13 @@ module.exports = function (recordRepo, browser, page, io) {
 
 
             await recordRepo.addStep(event)
+            //bring up notification on bluestone if there is more than 1 potential match
+            //or the final element has not been set
+            let isElementDefined = event.potentialMatch.length == 1 || event.finalLocatorName != ''
+            if (!isElementDefined) {
+                recordRepo.puppeteer.sendUndefinedLocatorNotification()
+            }
+
             // console.log(JSON.stringify(recordRepo.steps))
             //update last operation time
         }
