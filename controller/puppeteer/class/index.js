@@ -48,7 +48,9 @@ class PuppeteerControl {
         refresh: 'refresh',
         scanLocator: 'scan-locator',
         markSelectorIndex: 'mark-selector-index',
-        undefinedLocator: 'undefined-locator'
+        undefinedLocator: 'undefined-locator',
+        capturingHtml: 'capturing-html',
+        captureHtmlComplete: 'capturing-html-complete'
     }
     setPage(page) {
         this.page = page
@@ -94,6 +96,20 @@ class PuppeteerControl {
     setSelectorIndexForLocator(locator, index) {
         if (this.io) {
             this.io.emit(PuppeteerControl.inbuiltEvent.markSelectorIndex, {
+                locator, index
+            })
+        }
+    }
+    sendCaptureHtmlComplete(locator, index) {
+        if (this.io) {
+            this.io.emit(PuppeteerControl.inbuiltEvent.captureHtmlComplete, {
+                locator, index
+            })
+        }
+    }
+    sendCapturingHtml(locator, index) {
+        if (this.io) {
+            this.io.emit(PuppeteerControl.inbuiltEvent.capturingHtml, {
                 locator, index
             })
         }
@@ -161,7 +177,7 @@ class PuppeteerControl {
         }
         //check if we are at the right html page
         /** @type {Array<ElementHandle>} */
-        let targetElementList = await getLocator(frame, targetLocator, 10000)
+        let targetElementList = await getLocator(frame, targetLocator, 1500)
         if (targetElementList.length == 0) {
             errorText = 'Original Selector cannot be found in current html snapshot. Please click <Previous Html> button and find right snapshot'
             return errorText
