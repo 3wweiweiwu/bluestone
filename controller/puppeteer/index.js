@@ -119,7 +119,9 @@ async function startRecording(record, io, url = null, isCleanSteps = true) {
     eventStep.finalLocatorName = 'FAKE locator name to avoid check'
     logEvent(record)(eventStep)
 
-
+    //launch bluestone console
+    await record.puppeteer.openBluestoneTab('workflow')
+    await page.bringToFront()
     return { browser, page }
 }
 /**

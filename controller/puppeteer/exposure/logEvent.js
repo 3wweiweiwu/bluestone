@@ -199,6 +199,13 @@ module.exports = function (recordRepo, browser, page, io) {
 
 
             await recordRepo.addStep(event)
+            //bring up notification on bluestone if there is more than 1 potential match
+            //or the final element has not been set
+            let isElementDefined = event.potentialMatch.length == 1 || event.finalLocatorName != ''
+            if (!isElementDefined) {
+                recordRepo.puppeteer.sendUndefinedLocatorNotification()
+            }
+
             // console.log(JSON.stringify(recordRepo.steps))
             //update last operation time
         }

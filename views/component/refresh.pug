@@ -7,3 +7,15 @@ mixin refresh()
             console.log('refresh!')
             window.location.replace(`/spy`)
         });
+
+        socket.on('undefined-locator',async function(){
+            while(true){
+
+                document.title='Undefined Element'
+                await new Promise(resolve=>setTimeout(resolve,1500))
+                document.title='Resolve Problem'
+                await new Promise(resolve=>setTimeout(resolve,1500))
+                document.title='by using Ctrl+Q'
+                await new Promise(resolve=>setTimeout(resolve,1500))
+            }
+        })

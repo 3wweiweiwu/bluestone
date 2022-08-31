@@ -47,7 +47,8 @@ class PuppeteerControl {
     static inbuiltEvent = {
         refresh: 'refresh',
         scanLocator: 'scan-locator',
-        markSelectorIndex: 'mark-selector-index'
+        markSelectorIndex: 'mark-selector-index',
+        undefinedLocator: 'undefined-locator'
     }
     setPage(page) {
         this.page = page
@@ -83,6 +84,11 @@ class PuppeteerControl {
     scanLocatorInBrowser() {
         if (this.io) {
             this.io.emit(PuppeteerControl.inbuiltEvent.scanLocator)
+        }
+    }
+    sendUndefinedLocatorNotification() {
+        if (this.io) {
+            this.io.emit(PuppeteerControl.inbuiltEvent.undefinedLocator)
         }
     }
     setSelectorIndexForLocator(locator, index) {
