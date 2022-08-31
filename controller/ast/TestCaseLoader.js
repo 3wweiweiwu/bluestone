@@ -100,7 +100,7 @@ class TestcaseLoader {
             if (step.targetPicPath == '') continue
             try {
                 await fs.access(step.targetPicPath)
-                if(!step.targetPicPath.includes('public')){
+                if (!step.targetPicPath.includes('public')) {
                     throw 'We expect the target picture should be under /public/temp folder so that we can access it from website'
                 }
             } catch (error) {
@@ -123,6 +123,7 @@ class TestcaseLoader {
                 let healingBinary = await fs.readFile(step.healingTree)
                 step.healingTree = healingBinary.toString()
             } catch (error) {
+                step.healingTree = '[]'
             }
 
         }
@@ -220,7 +221,7 @@ class TestcaseLoader {
                 }
                 //populate healing information
                 targetParam = functionAst.params.find(item => item.type.name == 'HealingSnapshot')
-                if (targetParam != null) {
+                if (targetParam != null && targetParam.value != null) {
                     let snapshotFolder = path.join(config.code.dataPath, this.testCase, '/snapshot/')
                     let healingSnapshotFile = targetParam.value + '.json'
                     healingTree = path.join(snapshotFolder, healingSnapshotFile)
@@ -259,7 +260,11 @@ class TestcaseLoader {
                 item.value = args[index].property.value
             }
             if (item.type.name == 'HealingSnapshot') {
-                item.value = args[3].arguments[0].value
+                try {
+                    item.value = args[3].arguments[0].value
+                } catch (error) {
+                    item.value = null
+                }
             }
         })
         return functionParams
