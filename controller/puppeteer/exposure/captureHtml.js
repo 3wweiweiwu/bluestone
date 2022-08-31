@@ -26,6 +26,7 @@ module.exports = function (page, recordRepo) {
                 taskQueue.push(reason)
             }
             let mHtmlPath = recordRepo.getMhtmlPath()
+            recordRepo.puppeteer.sendCapturingHtml()
             try {
                 if (session == null) {
                     session = await page.target().createCDPSession();
@@ -46,6 +47,7 @@ module.exports = function (page, recordRepo) {
 
             }
         }
+        recordRepo.puppeteer.sendCaptureHtmlComplete()
         taskQueue.shift()
         if (taskQueue.length > 0) {
             await new Promise(resolve => setTimeout(resolve, minimumCaptureIntervalMs))

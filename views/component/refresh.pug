@@ -1,21 +1,40 @@
 mixin refresh()
     script(src="/javascript/socket.io.js")
     script.
-        const  socket = io();
-
+        const socket = io();
+        let currentNotification=''
         socket.on('refresh', function(data) {
             console.log('refresh!')
             window.location.replace(`/spy`)
         });
 
         socket.on('undefined-locator',async function(){
+            currentNotification='undefined-locator'
             while(true){
-
+                if(currentNotification!='undefined-locator') break
                 document.title='Undefined Element'
                 await new Promise(resolve=>setTimeout(resolve,1500))
                 document.title='Resolve Problem'
                 await new Promise(resolve=>setTimeout(resolve,1500))
                 document.title='by using Ctrl+Q'
                 await new Promise(resolve=>setTimeout(resolve,1500))
+                document.title='Undefined Element'
+            }
+        })
+
+        socket.on('capturing-html',async function(){
+            currentNotification='capturing-html'            
+            while(true){
+                if(currentNotification!='capturing-html') break
+                document.title='capturing html right now...'  
+                await new Promise(resolve=>setTimeout(resolve,1500))          
+            }
+        })
+        socket.on('capturing-html-complete',async function(){
+            currentNotification='capturing-html-complete'            
+            while(true){
+                if(currentNotification!='capturing-html-complete') break
+                document.title='html capture complete'  
+                await new Promise(resolve=>setTimeout(resolve,1500))          
             }
         })
