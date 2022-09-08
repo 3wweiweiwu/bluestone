@@ -331,7 +331,8 @@ class WorkflowRecord {
         scroll: 'scroll',
         getStyleAttribute: 'getStyleAttribute',
         mouseDown: 'mouseDown',
-        mouseUp: 'mouseUp'
+        mouseUp: 'mouseUp',
+        switchTab: 'switchTab'
     }
     static inbuiltEvent = {
         refresh: PuppeteerControl.inbuiltEvent.refresh
@@ -380,7 +381,8 @@ class WorkflowRecord {
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.scroll),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.getStyleAttribute),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.mouseDown),
-                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.mouseUp)
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.mouseUp),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.switchTab),
                 ]
             },
             customizedFunctions: {

@@ -288,24 +288,43 @@ exports.hover = async function (frame, elementSelector) {
  * Navigate browser to he url
  * @param {Frame} page 
  * @param {string} url 
+ * @param {Browser} browser
  * @returns 
  */
-exports.goto = async function (page, url) {
+exports.goto = async function (page, url, browser) {
     let iRetryCount = 0
-    for (iRetryCount = 0; iRetryCount < 5; iRetryCount++) {
-        try {
-            url = getCurrentUrl(url)
-            await page.goto(url)
-            break
-        } catch (error) {
-            console.log('Unable to go to ' + url)
-            await new Promise(resolve => setTimeout(resolve, 500))
+    //override existing url with env vaiable
+    url = getCurrentUrl(url)
+
+    let individualUrlList = url.split(',')
+
+    for (let i = 0; i < individualUrlList.length; i++) {
+        let link = individualUrlList[i]
+        if (browser != null) {
+            let pageList = await browser.pages()
+            if (pageList.length < i + 2) {
+                page = await browser.newPage();
+            }
+            else {
+                page = pageList[i + 1]
+            }
+
+            await page.bringToFront()
+        }
+        for (iRetryCount = 0; iRetryCount < 5; iRetryCount++) {
+            try {
+
+                await page.goto(link)
+                break
+            } catch (error) {
+                console.log('Unable to go to ' + link)
+                await new Promise(resolve => setTimeout(resolve, 500))
+            }
+        }
+        if (iRetryCount == 5) {
+            assert.fail('Unable to go to ' + link)
         }
     }
-    if (iRetryCount == 5) {
-        assert.fail('Unable to go to ' + url)
-    }
-
     return `Goto ${url} success!`
 
 }
@@ -585,4 +604,20 @@ exports.getStyleAttribute = async function (frame, element, parameter, expectedV
     assert.deepStrictEqual(result, expectedValue, `Error during Get Style Attribute, In element ¨${element.displayName}¨ baseline ¨${expectedValue}¨ current value: [${result}] for parameter ¨${parameter}¨`)
 
     return true
+}
+
+/**
+ * Switch to tab by index
+ * @param {Browser} browser 
+ * @param {number} tabIndex tab index
+ * @returns 
+ */
+exports.switchTab = async function (browser, tabIndex) {
+    let pageList = await browser.pages()
+    if (pageList.length <= tabIndex) {
+        assert.fail(`Incorrect tabIndex. Total tab count: ${pageList.length}, desired tabIndex: ${tabIndex}`)
+    }
+    let page = pageList[tabIndex]
+    await page.bringToFront()
+    return { page, frame: page }
 }

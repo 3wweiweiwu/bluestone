@@ -106,6 +106,10 @@ module.exports = function (recordRepo, browser, page, io) {
 
         //if event command is null, call the in-browser console
         if (eventDetail.command == null) {
+            //cache the page inforamtion. After we finish agent page
+            //it will go back to the orginal page
+            recordRepo.puppeteer.setPage(page)
+
             await takeScreenshotForLocatorDefiner(page)
             // recordRepo.isCaptureHtml = false
 

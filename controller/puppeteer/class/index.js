@@ -37,6 +37,8 @@ class PuppeteerControl {
         this.io = null
         this.__isExecutionOngoing = false //execution status has 3 status. true-> ongoing false-> completed null=>aborted
         this.StepAbortManager = StepAbortManager
+        /** @type {Page[]} */
+        this.pageList = []
     }
     get isExecutionOngoing() {
         return this.__isExecutionOngoing
@@ -51,6 +53,12 @@ class PuppeteerControl {
         undefinedLocator: 'undefined-locator',
         capturingHtml: 'capturing-html',
         captureHtmlComplete: 'capturing-html-complete'
+    }
+    addPageToPageList(page) {
+        this.pageList.push(page)
+    }
+    getPageByIndex(index) {
+        this.setPage(this.pageList[index])
     }
     setPage(page) {
         this.page = page

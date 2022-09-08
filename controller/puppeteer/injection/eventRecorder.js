@@ -18,7 +18,8 @@ let globalVar = {
     isFreezeMode: false,
     isRecordScroll: true,
     scanLocatorQueue: [],
-    capturePicQueue: []
+    capturePicQueue: [],
+    tabIndex: 1
 }
 const EVENTCONST = {
     click: 'click',
@@ -29,7 +30,8 @@ const EVENTCONST = {
     drop: 'drop',
     scroll: 'scroll',
     mousedown: 'mousedown',
-    mouseup: 'mouseup'
+    mouseup: 'mouseup',
+    visibilitychange: 'visibilitychange'
 
 }
 const BLUESTONE = {
@@ -90,19 +92,25 @@ Object.keys(EVENTCONST).forEach(item => {
             return jsonStr
 
         }
+        //if the target is whole document, we will redirect it to body because document does not have
+        //.getAttribute function. It will cause problem
+        let targetElement = event.target
+        if (event.target == document) {
+            targetElement = document.body
+        }
         let timeStamp = Date.now()
         let selector = ''
         try {
-            selector = finder(event.target)
+            selector = finder(targetElement)
         } catch (error) {
-            selector = getXPath(event.target)
+            selector = getXPath(targetElement)
         }
 
         let customLocator = {
-            target: event.target
+            target: targetElement
         }
         try {
-            customLocator = getLocator(event.target, selector)
+            customLocator = getLocator(targetElement, selector)
         } catch (error) {
 
         }
@@ -112,7 +120,7 @@ Object.keys(EVENTCONST).forEach(item => {
         //use new target to generate selector
         if (customLocator.selector)
             selector = customLocator.selector
-        else if (customLocator.target != event.target)
+        else if (customLocator.target != targetElement)
             selector = finder(customLocator.target)
         let target = customLocator.target
         if (selector == null) return
@@ -130,6 +138,13 @@ Object.keys(EVENTCONST).forEach(item => {
         let fileNames = []
         let isCallBluestoneConsole = false
         switch (item) {
+            case EVENTCONST.visibilitychange:
+                if (document.visibilityState == 'hidden') return
+                parameter = JSON.stringify({
+                    tabIndex: globalVar.tabIndex
+                })
+                command = 'switchTab'
+                break
             case EVENTCONST.click:
                 // console.log(`frame Position: ${JSON.stringify(framePosition)} absolute position: ${JSON.stringify(position)}, clientX,y: ${event.clientX},${event.clientY}`)
                 parameter = getRelativeXYCoordination(event)
@@ -139,12 +154,10 @@ Object.keys(EVENTCONST).forEach(item => {
                 break
             case EVENTCONST.mouseup:
                 parameter = getRelativeXYCoordination(event)
-                // console.log(selector)
-                // console.log(event.target)
                 break
             case EVENTCONST.change:
                 //still use original target because the new target may not have value
-                parameter = event.target.value
+                parameter = targetElement.value
                 //handle file upload through input
                 fileNames = fileUpload(event)
                 if (fileNames.length != 0) {
@@ -195,8 +208,8 @@ Object.keys(EVENTCONST).forEach(item => {
                 break;
             case EVENTCONST.scroll:
                 parameter = JSON.stringify({
-                    y: event.target.scrollTop,
-                    x: event.target.scrollLeft
+                    y: targetElement.scrollTop,
+                    x: targetElement.scrollLeft
                 })
                 break;
             default:
