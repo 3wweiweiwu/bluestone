@@ -503,7 +503,7 @@ class AstGenerator {
         return ast
     }
     /**
-     * const page = await browser.newPage();
+     * let page = await browser.newPage();
      * @param {string} pageVarName page
      * @param {string} browserVarName browser
      * @returns 
@@ -541,7 +541,7 @@ class AstGenerator {
                     }
                 }
             ],
-            "kind": "const"
+            "kind": "let"
         }
         return ast
     }
@@ -752,6 +752,46 @@ class AstGenerator {
                 }
             }
         }
+    }
+    /**
+     * ({ page, frame } = await bluestoneFunc.switchTab.func(browser, 2));
+     * @param {Array<Array<string>>} stringPair
+     * @param {string} pageVarName
+     * @param {} commandAst
+     */
+    static getDestructuringAssignment(stringPair, commandAst) {
+        let statement = {
+            "type": "ExpressionStatement",
+            "expression": {
+                "type": "AssignmentExpression",
+                "operator": "=",
+                "left": {
+                    "type": "ObjectPattern",
+                    "properties": [
+                    ]
+                },
+                "right": commandAst
+            }
+        }
+        for (let varPair of stringPair) {
+            let varPairAst = {
+                "type": "Property",
+                "method": false,
+                "shorthand": false,
+                "computed": false,
+                "key": {
+                    "type": "Identifier",
+                    "name": varPair[0]
+                },
+                "kind": "init",
+                "value": {
+                    "type": "Identifier",
+                    "name": varPair[1]
+                }
+            }
+            statement.expression.left.properties.push(varPairAst)
+        }
+        return statement
     }
 }
 module.exports = AstGenerator

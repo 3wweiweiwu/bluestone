@@ -194,7 +194,12 @@ class Operation {
                 this.__addOrModifyStep(this.spy.userSelection.stepIndex)
                 break;
             case Operation.inbuiltQueryKey.btnCancel:
-                this.backend.isRecording = true
+                //if we switch it back right away, it will recod the switch tab event
+                //it will be confusing to see so many switch tab events
+                setTimeout(() => {
+                    this.backend.isRecording = true
+                }, 800);
+
                 this.backend.spyVisible = false
                 // this.backend.isCaptureHtml = true
                 break;

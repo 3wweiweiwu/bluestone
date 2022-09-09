@@ -246,6 +246,9 @@ class Coder {
         if (functionAst.name == 'gotoFrame') {
             astJson = AstGenerator.getAssignFunctionResultToVarOperation(this.inbuiltVarName.body.frameVarName, astJson)
         }
+        else if (functionAst.name == 'switchTab') {
+            astJson = AstGenerator.getDestructuringAssignment([[this.inbuiltVarName.body.pageVarName, this.inbuiltVarName.body.pageVarName], [this.inbuiltVarName.body.frameVarName, this.inbuiltVarName.body.frameVarName]], astJson.expression)
+        }
         return astJson
 
     }

@@ -331,7 +331,8 @@ class WorkflowRecord {
         scroll: 'scroll',
         getStyleAttribute: 'getStyleAttribute',
         mouseDown: 'mouseDown',
-        mouseUp: 'mouseUp'
+        mouseUp: 'mouseUp',
+        switchTab: 'switchTab'
     }
     static inbuiltEvent = {
         refresh: PuppeteerControl.inbuiltEvent.refresh
@@ -380,7 +381,8 @@ class WorkflowRecord {
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.scroll),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.getStyleAttribute),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.mouseDown),
-                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.mouseUp)
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.mouseUp),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.switchTab),
                 ]
             },
             customizedFunctions: {
@@ -625,12 +627,19 @@ class WorkflowRecord {
             let elementSelector = new ElementSelector(step.finalLocator, '', step.finalLocatorName)
 
             let result = await this.puppeteer.runCurrentStep(step.functionAst, elementSelector, step.iframe)
+
             await this.puppeteer.StepAbortManager.stopStepAbortMonitor()
             await new Promise(resolve => setTimeout(resolve, 300))
             this.steps[i].result = result
             if (!result.isResultPass) {
                 failedStepIndex = i
                 break
+            }
+
+            //update current page information if we switch the tab.
+            if (step.functionAst.name == 'switchTab') {
+                let { page, frame } = await step.functionAst.mainFunc(this.puppeteer.browser, step.functionAst.params[1].value)
+                this.puppeteer.setPage(page)
             }
 
             let stepSnapshotPath = path.join(os.tmpdir(), 'stepSnapshot.mhtml')

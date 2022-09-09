@@ -38,14 +38,11 @@ const ConstStr = {
  */
 async function startRecording(record, io, url = null, isCleanSteps = true) {
     const browser = await puppeteer.launch(config.puppeteer)
-    const page = await browser.newPage();
+    let page = null
     //start to watch the download event
     const download = new DownloadWatcher((record))
     await download.startWatching()
 
-    //initialize alert watcher
-    const alert = new AlertWatcher(record, page, logEvent)
-    await alert.startWatching()
 
     //initialize recording object
     if (isCleanSteps) {
@@ -58,58 +55,69 @@ async function startRecording(record, io, url = null, isCleanSteps = true) {
         record.isRecording = false
         record.isCaptureHtml = false
     }
-
-
     //update io for record
     record.puppeteer.setIO(io)
     record.puppeteer.setBrowser(browser)
-    record.puppeteer.setPage(page)
-    //inject event watcher and expose supporting function
-    let eventRecorderPath = path.join(__dirname, './injection/eventRecorder.js')
-    await injectModuleScriptBlock(page, eventRecorderPath)
 
-    //inject singlepage
-    // const injectedScript = await singlefileScript.get(config.puppeteer);
-    // await page.evaluateOnNewDocument(injectedScript)
-
-    //inject robust Locator Generator
-    let robustLocatorPath = path.join(__dirname, '../../public/javascript/robustLocatorGen.js')
-    let robustLocatorGenScript = await fs.readFile(robustLocatorPath)
-    await page.evaluateOnNewDocument(robustLocatorGenScript.toString())
-
-    //inject getEventListener
-    // const eventListener = await fs.readFile(path.join(__dirname, '../../public/javascript/getEventListner.js'))
-    // await page.evaluateOnNewDocument(eventListener)
-
-    await page.exposeFunction('logEvent', logEvent(record, browser, page, io))
-    await page.exposeFunction('isRecording', isRecording(record))
-    await page.exposeFunction('stopRecording', stopRecording(record))
-    await page.exposeFunction('logCurrentElement', logCurrentElement(record, page))
-    await page.exposeFunction('getLocator', getLocator(record))
-    await page.exposeFunction('setLocatorStatus', setLocatorStatus(record))
-    await page.exposeFunction('isSpyVisible', isSpyVisible(record))
-    await page.exposeFunction('setSpyVisible', setSpyVisible(record))
-    await page.exposeFunction('captureHtml', captureHtml(page, record))
-    await page.exposeFunction('captureScreenshot', captureScreenshot(page, record))
-    await page.exposeFunction('saveUploadedFile', saveUploadedFile(record))
-    await page.exposeFunction('getUploadFilePath', getUploadFilePath)
-    await page.exposeFunction('isHtmlCaptureOngoing', isHtmlCaptureOngoing(record))
-
-    await page.setBypassCSP(true)
-    let client = await page.target().createCDPSession()
-    await client.send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: download.downloadFolder });
+    for (let i = 0; i < url.split(',').length; i++) {
+        let link = url.split(',')[i]
+        page = await browser.newPage();
+        record.puppeteer.setPage(page)
+        record.puppeteer.addPageToPageList(page)
+        //initialize alert watcher
+        const alert = new AlertWatcher(record, page, logEvent)
+        await alert.startWatching()
 
 
-    if (url != null) {
-        for (let i = 0; i < 5; i++) {
-            try {
-                await page.goto(url)
-                break
-            } catch (error) {
-                console.log('Unable to go to ' + url)
+        //inject event watcher and expose supporting function
+        let eventRecorderPath = path.join(__dirname, './injection/eventRecorder.js')
+        await injectModuleScriptBlock(page, eventRecorderPath, i + 1)
+
+        //inject singlepage
+        // const injectedScript = await singlefileScript.get(config.puppeteer);
+        // await page.evaluateOnNewDocument(injectedScript)
+
+        //inject robust Locator Generator
+        let robustLocatorPath = path.join(__dirname, '../../public/javascript/robustLocatorGen.js')
+        let robustLocatorGenScript = await fs.readFile(robustLocatorPath)
+        await page.evaluateOnNewDocument(robustLocatorGenScript.toString())
+
+        //inject getEventListener
+        // const eventListener = await fs.readFile(path.join(__dirname, '../../public/javascript/getEventListner.js'))
+        // await page.evaluateOnNewDocument(eventListener)
+
+        await page.exposeFunction('logEvent', logEvent(record, browser, page, io))
+        await page.exposeFunction('isRecording', isRecording(record))
+        await page.exposeFunction('stopRecording', stopRecording(record))
+        await page.exposeFunction('logCurrentElement', logCurrentElement(record, page))
+        await page.exposeFunction('getLocator', getLocator(record))
+        await page.exposeFunction('setLocatorStatus', setLocatorStatus(record))
+        await page.exposeFunction('isSpyVisible', isSpyVisible(record))
+        await page.exposeFunction('setSpyVisible', setSpyVisible(record))
+        await page.exposeFunction('captureHtml', captureHtml(page, record))
+        await page.exposeFunction('captureScreenshot', captureScreenshot(page, record))
+        await page.exposeFunction('saveUploadedFile', saveUploadedFile(record))
+        await page.exposeFunction('getUploadFilePath', getUploadFilePath)
+        await page.exposeFunction('isHtmlCaptureOngoing', isHtmlCaptureOngoing(record))
+
+        await page.setBypassCSP(true)
+        let client = await page.target().createCDPSession()
+        await client.send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: download.downloadFolder });
+
+
+        if (url != null) {
+            for (let i = 0; i < 5; i++) {
+                try {
+                    await page.goto(link)
+                    break
+                } catch (error) {
+                    console.log('Unable to go to ' + link)
+                }
             }
         }
     }
+
+
     //automatically focus main frame body as we perform initial navigation
     // do this in avoid click on the screen at first before you can call ctrl+q
     await page.focus('body')
