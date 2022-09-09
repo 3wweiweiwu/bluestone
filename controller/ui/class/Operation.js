@@ -198,7 +198,7 @@ class Operation {
                 //it will be confusing to see so many switch tab events
                 setTimeout(() => {
                     this.backend.isRecording = true
-                }, 500);
+                }, 800);
 
                 this.backend.spyVisible = false
                 // this.backend.isCaptureHtml = true
