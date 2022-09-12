@@ -187,7 +187,11 @@ exports.click = async function (frame, elementSelector, x, y) {
     try {
         try {
             await element.hover()
-            await element.click({ offset: { x: offsetX, y: offsetY } })
+            try {
+                await frame.mouse.click(elementPos.x + offsetX, elementPos.y + offsetY)
+            } catch (error) {
+                await element.click({ offset: { x: offsetX, y: offsetY } })
+            }
         } catch (error) {
             await element.evaluate(node => {
                 node.dispatchEvent(new Event('click'))
