@@ -1159,7 +1159,7 @@ class WorkflowRecord {
             let bluestoneScriptFolder = path.join(bluestoneFolder, './result/', `./${resultObj.runId}/`)
 
             //attach the screenshot for current test
-            let currentTestScreenshots = resultObj.screenshotManager.filter(item => item.tcId == tcName)
+            let currentTestScreenshots = resultObj.screenshotManager.filter(item => item.tcId.toLowerCase() == tcName.toLowerCase())
             for (let screenshotRecord of currentTestScreenshots) {
                 //use html snapshot if possible
                 let newPicPath = this.getHtmlPath()
