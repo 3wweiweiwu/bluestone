@@ -172,19 +172,20 @@ exports.click = async function (frame, elementSelector, x, y) {
     if (x < 0 || x == undefined || x > 1) x = null
     if (y < 0 || y == undefined || y > 1) y = null
 
-    //if x and y offset is bigger than element itself, we will click on midle point
-    //otherwise, it will go beyond the scope
-    let elementPos = await element.boundingBox()
 
-    if (x == null) {
-        x = 0.5
-    }
-    if (y == null) {
-        y = 0.5
-    }
-    let offsetX = elementPos.width * x
-    let offsetY = elementPos.height * y
     try {
+        //if x and y offset is bigger than element itself, we will click on midle point
+        //otherwise, it will go beyond the scope
+        let elementPos = await element.boundingBox()
+
+        if (x == null) {
+            x = 0.5
+        }
+        if (y == null) {
+            y = 0.5
+        }
+        let offsetX = elementPos.width * x
+        let offsetY = elementPos.height * y
         try {
             await element.hover()
             try {
@@ -217,12 +218,13 @@ exports.mouseDown = async function (frame, elementSelector, x, y) {
     if (x < 0 || x == undefined || x > 1) x = 0.5
     if (y < 0 || y == undefined || y > 1) y = 0.5
 
-    //if x and y offset is bigger than element itself, we will click on midle point
-    //otherwise, it will go beyond the scope
-    let elementPos = await element.boundingBox()
-    let absoluteX = elementPos.width * x + elementPos.x
-    let absoluteY = elementPos.height * y + elementPos.y
+
     try {
+        //if x and y offset is bigger than element itself, we will click on midle point
+        //otherwise, it will go beyond the scope
+        let elementPos = await element.boundingBox()
+        let absoluteX = elementPos.width * x + elementPos.x
+        let absoluteY = elementPos.height * y + elementPos.y
         try {
             await element.hover()
             await frame.mouse.move(absoluteX, absoluteY)
@@ -252,13 +254,14 @@ exports.mouseUp = async function (frame, elementSelector, x, y) {
     if (x < 0 || x == undefined || x > 1) x = 0.5
     if (y < 0 || y == undefined || y > 1) y = 0.5
 
-    //if x and y offset is bigger than element itself, we will click on midle point
-    //otherwise, it will go beyond the scope
-    let elementPos = await element.boundingBox()
-    let absoluteX = elementPos.width * x + elementPos.x
-    let absoluteY = elementPos.height * y + elementPos.y
+
 
     try {
+        //if x and y offset is bigger than element itself, we will click on midle point
+        //otherwise, it will go beyond the scope
+        let elementPos = await element.boundingBox()
+        let absoluteX = elementPos.width * x + elementPos.x
+        let absoluteY = elementPos.height * y + elementPos.y
         try {
             await frame.mouse.move(absoluteX, absoluteY, { steps: 3 })
             await frame.mouse.up(absoluteX, absoluteY)
