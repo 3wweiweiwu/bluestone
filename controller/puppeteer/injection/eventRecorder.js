@@ -19,7 +19,13 @@ let globalVar = {
     isRecordScroll: true,
     scanLocatorQueue: [],
     capturePicQueue: [],
-    tabIndex: 1
+    tabIndex: 1,
+    scanLocator: {
+        bluestoneRegisteredLocator: [],
+        lastLocatorScanTime: Date.now(),
+        bluestoneLocator: []
+    }
+
 }
 const EVENTCONST = {
     click: 'click',
@@ -442,6 +448,13 @@ function getElementsByLocator(currentLocator) {
     return currentElementList
 
 }
+class LocatorEntry {
+    constructor() {
+        this.potentialMatchIndex = []
+        this.currentPotentialMatch = []
+    }
+    updatePotentialMatch
+}
 /**
  * Scan Through all locators in the web page and mark potential match element to its index
  * At a given point of time, there will be 1 instance of scanLocator function running.
@@ -461,21 +474,15 @@ async function scanLocator(isMainThread = false) {
     function resetBsLocatorAttribute() {
         //clearly all bluestone-locator properties from the elements in current frame to reset to clean state
 
-
-        while (true) {
-            let bsLocators = document.evaluate(`//*[@${BLUESTONE.bluestonePotentialMatchIndexes}]`, document)
+        for (let element of globalVar.scanLocator.bluestoneRegisteredLocator) {
             try {
-                let element = bsLocators.iterateNext()
-                //stop iteration when 
-                if (element == null) {
-                    break
-                }
                 element.removeAttribute(BLUESTONE.bluestonePotentialMatchIndexes)
             } catch (error) {
                 console.log(error)
             }
-
         }
+        globalVar.scanLocator.bluestoneRegisteredLocator = []
+
     }
     class ElementMidPosition {
         /**
@@ -511,6 +518,7 @@ async function scanLocator(isMainThread = false) {
         }
 
     }
+
     if (globalVar.scanLocatorQueue.length >= 2 && isMainThread == false) {
         return
     }
@@ -521,13 +529,21 @@ async function scanLocator(isMainThread = false) {
     if (globalVar.scanLocatorQueue.length == 0) {
         globalVar.scanLocatorQueue.push('')
     }
+    let currentTimeStamp = Date.now()
+    if ((currentTimeStamp - globalVar.scanLocator.lastLocatorScanTime) < 1000) {
+        await new Promise(resolve => setTimeout(resolve, 1000))
+    }
     /**@type {Array<ElementMidPosition>} */
     let elementMidPintDict = {}
     /** @type {Array<import('../../locator/index').Locator>} */
-    let currentLocatorList = await window.getLocator()
     let startTime = Date.now()
+
+    let currentLocatorList = globalVar.scanLocator.bluestoneRegisteredLocator
+    let getLocatorTime = Date.now()
+
     //clean up all 
     resetBsLocatorAttribute()
+    let resetLocatorTime = Date.now()
     for (let i = 0; i < currentLocatorList.length; i++) {
         currentLocatorList[i].selector = ''
         let locator = currentLocatorList[i]
@@ -570,7 +586,7 @@ async function scanLocator(isMainThread = false) {
         }
 
     }
-
+    let scanLocatorStartTime = Date.now()
     //add potential match to elments who's region contains other element's mid point.
     //We do this because we might use other element to identify current element
     let elements = Array.from(document.getElementsByTagName('*'))
@@ -594,9 +610,21 @@ async function scanLocator(isMainThread = false) {
             ele.setAttribute(Helper.potentialLocatorMatchIndexes, JSON.stringify(uniqueArr))
         }
     })
+    let midPointTestCompleteTime = Date.now()
     globalVar.scanLocatorQueue.pop()
+    globalVar.scanLocator.lastLocatorScanTime = Date.now()
+    console.log(`
+        get locator:${getLocatorTime - startTime}
+        reset locator:${resetLocatorTime - getLocatorTime}, 
+        scan locator:${scanLocatorStartTime - resetLocatorTime},
+        mid point test: ${midPointTestCompleteTime - scanLocatorStartTime}
+        total locator length: ${currentLocatorList.length},
+        scanLocatorTaskQeueu: ${globalVar.scanLocatorQueue.length},
+        isMainThread: ${isMainThread}
+    `)
     if (globalVar.scanLocatorQueue.length > 0) {
-        scanLocator(true)
+        setTimeout(scanLocator(true), 1000)
+
     }
 
 }
@@ -739,6 +767,7 @@ captureHtml('page initialization')
 captureScreenshot('initial capture')
 getFrameLocator()
 scanLocator()
+globalVar.scanLocator.bluestoneRegisteredLocator = await window.getLocator()
 const socket = io("http://localhost:3600");
 socket.on(BLUESTONE.scanLocator, async function (data) {
     console.log('locator refreshing!')
