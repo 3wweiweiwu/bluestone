@@ -1,6 +1,6 @@
 var socket = io();
 socket.on("www", (obj) => {
-    console.log(`Message Received: ${JSON.stringify(obj)}`);
+    console.log(`www - Message Received: ${JSON.stringify(obj)}`);
     let targetId = obj.target;
     let eventName = obj.event;
 
@@ -57,3 +57,12 @@ socket.on("www", (obj) => {
     console.log(target);
     console.log(event);
 });
+socket.on("change-property", obj => {
+    console.log(`change-property - Message Received: ${JSON.stringify(obj)}`);
+    let targetId = obj.target;
+    let attribute = obj.attribute;
+    let value = obj.value;
+    let target = document.getElementById(targetId);
+    target.setAttribute(attribute, value)
+
+})
