@@ -16,5 +16,13 @@ router.post('/operation', function (req, res) {
   res.io.emit("www", eventObj);
   res.send()
 })
-
+router.post('/change-property', function (req, res) {
+  let eventObj = {
+    event: req.body.event,
+    attribute: req.body.attribute,
+    value: req.body.value
+  }
+  res.io.emit("change-property", eventObj);
+  res.send()
+})
 module.exports = router;
