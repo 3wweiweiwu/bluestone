@@ -167,8 +167,24 @@ exports.waitTillElementVisible = async function (frame, elementSelector, timeout
  * @param {number} y percentage of coorindation y within element. Use '0.5' if you want to click on center
  */
 exports.click = async function (frame, elementSelector, x, y) {
+    /** There is a problems with the coordinates when element that you try to click on it's no visible
+     *  For some reason that I don't know the definition of the elemnt whent it's not visible on screen it's differetn with 
+     * the same element that it's visible on sceen. When this function do the scroll to display the element (this
+     * is made in the element.hover() method) the definition of the elemnt change and Bluestone cannot click on the
+     * element.
+     * The proposal it's add 2 lines of code, 
+     * 1st Define the element
+     * 2nd Scroll to see the element
+     * 3rd Define the element (now that we are sure that the element it's visible and we can click on it)
+     * continue with the workflow
+     * 
+     * _scrollIntoViewIfNeeded() method do the scroll to find the elemnt, the problem it's that it's a hidden function
+     * so it could change in any moment. 
+     * hover() method has an _scrollIntoViewIfNeeded() inside.
+     */
     let element = await findElement(frame, elementSelector, 2000)
-    await element._scrollIntoViewIfNeeded() 
+    // await element._scrollIntoViewIfNeeded() 
+    await element.hover() 
     element = await findElement(frame, elementSelector, 1000)
     //handle default value
     if (x < 0 || x == undefined || x > 1) x = null
