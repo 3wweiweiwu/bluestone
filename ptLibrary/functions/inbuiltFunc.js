@@ -168,6 +168,8 @@ exports.waitTillElementVisible = async function (frame, elementSelector, timeout
  */
 exports.click = async function (frame, elementSelector, x, y) {
     let element = await findElement(frame, elementSelector, 2000)
+    await element._scrollIntoViewIfNeeded()
+    element = await findElement(frame, elementSelector, 1000)
     //handle default value
     if (x < 0 || x == undefined || x > 1) x = null
     if (y < 0 || y == undefined || y > 1) y = null
