@@ -78,7 +78,7 @@ module.exports = async function getRecommendedLocator(browser, page, targetLocat
         let bluestoneAttributes = []
         for (let i = 0; i < element.attributes.length; i++) {
             let attr = element.attributes[i].name
-            if (attr.toLowerCase().includes('bluestone')) {
+            if (attr.toLowerCase().includes('bluestone') && !attr.toLowerCase().includes('bluestone-potential-match-indexes')) {
                 bluestoneAttributes.push(attr)
             }
             //correct background color
