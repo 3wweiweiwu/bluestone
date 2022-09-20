@@ -184,7 +184,7 @@ exports.click = async function (frame, elementSelector, x, y) {
      */
     let element = await findElement(frame, elementSelector, 2000)
     // await element._scrollIntoViewIfNeeded() 
-    await element.hover() 
+    await element.hover()
     element = await findElement(frame, elementSelector, 1000)
     //handle default value
     if (x < 0 || x == undefined || x > 1) x = null
@@ -614,7 +614,7 @@ exports.scroll = async function (frame, elementSelector, x, y) {
 * @param {string} parameter Atributte to verify, backgroundColor, alignItems
 * @param {string} expectedValue Expected Value, rgb(3, 102, 216), normal
 * @param {HealingSnapshot} healingSnapshot healing snapshot file
-* @returns 
+* @returns {string}
 */
 exports.getStyleAttribute = async function (frame, element, parameter, expectedValue, healingSnapshot) {
 
@@ -628,7 +628,7 @@ exports.getStyleAttribute = async function (frame, element, parameter, expectedV
         , parameter)
     assert.deepStrictEqual(result, expectedValue, `Error during Get Style Attribute, In element ¨${element.displayName}¨ baseline ¨${expectedValue}¨ current value: [${result}] for parameter ¨${parameter}¨`)
 
-    return true
+    return result
 }
 
 /**

@@ -111,7 +111,7 @@ class AST {
 
 
 
-            let functionAst = new FunctionAST(funcPath, funcName, methodDetail.methodDescription, methodDetail.jsDocTag, locators, mainFunc)
+            let functionAst = new FunctionAST(funcPath, funcName, methodDetail.methodDescription, methodDetail.jsDocTag, locators, mainFunc, methodDetail.returnJsDoc)
             this.__addFuncAstToRepo(functionAst)
 
 
@@ -171,7 +171,7 @@ class AST {
 
                 let methodDescription = commentAST.description
 
-                let jsDocEntry = new JsDocEntry(filePath, libraryName, methodName, methodDescription, commentAST.tags)
+                let jsDocEntry = new JsDocEntry(filePath, libraryName, methodName, methodDescription, commentAST.tags, commentAST['returns'])
                 jsDocSummary.add(jsDocEntry)
 
             })
@@ -272,7 +272,8 @@ class AST {
             reArrangedTag.push(tag)
         })
 
-
+        //extract returns type
+        commentAST['returns'] = commentAST.tags.find(item => item.title == 'returns')
 
         commentAST.tags = reArrangedTag
         return commentAST

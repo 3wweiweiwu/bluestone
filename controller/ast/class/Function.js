@@ -24,14 +24,16 @@ class FunctionAST {
      * @param {Array<import('./JsDocTag')>} params 
      * @param {Function} mainFunc the main function to call during actual execution
      * @param {Array<Locator>} locator locator to sync-up from
+     * @param {import('./JsDocTag')} returnJsDoc
      */
-    constructor(path, name, description, params, locator, mainFunc) {
+    constructor(path, name, description, params, locator, mainFunc, returnJsDoc) {
         this.path = path
         this.name = name
         this.description = description
         this.params = params
         this.locators = locator
         this.mainFunc = mainFunc
+        this.returnJsDoc = returnJsDoc
     }
 
     /**

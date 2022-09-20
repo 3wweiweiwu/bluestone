@@ -6,13 +6,15 @@ class JsDocEntry {
      * @param {string} methodName 
      * @param {string} methodDescription 
      * @param {import('./JsDocTag')} jsDocTag 
+     * @param {import('./JsDocTag')} returnJsDoc
      */
-    constructor(filePath, libraryName, methodName, methodDescription, jsDocTag) {
+    constructor(filePath, libraryName, methodName, methodDescription, jsDocTag, returnJsDoc) {
         this.filePath = filePath
         this.libraryName = libraryName
         this.methodName = methodName
         this.methodDescription = methodDescription
         this.jsDocTag = jsDocTag
+        this.returnJsDoc = returnJsDoc
     }
 }
 
