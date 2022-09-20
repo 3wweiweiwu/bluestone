@@ -15,7 +15,7 @@ const Operation = require('../../puppeteer/class/index')
  * @param {import('socket.io').Server} io
  */
 module.exports = function (recordRepo, browser, page, io) {
-
+    let recordStopTimeStamp = Date.now()
     /**
      * Log browser event to the cache
      * @param {import('../../record/class').RecordingStep} eventDetail 
@@ -29,6 +29,7 @@ module.exports = function (recordRepo, browser, page, io) {
         //stop recording right away when we press ctrl+q
         if (eventDetail.command == null) {
             recordRepo.isRecording = false
+            recordStopTimeStamp = Date.now()
         }
         //goto command does not generate a locator, we w
 
@@ -151,7 +152,7 @@ module.exports = function (recordRepo, browser, page, io) {
         //delayed record. 
         //normally, if we are in recording state, we will log step anyway
         //if we are not in recording state, we will still log steps for 5s to avoid missing delayed events
-        if ((recordRepo.isRecording || (Date.now() - eventDetail.timeStamp < 5000)) && eventDetail.command != null) {
+        if ((recordRepo.isRecording || (Math.abs(recordStopTimeStamp - eventDetail.timestamp) < 5000)) && eventDetail.command != null) {
             //If we don't have page element, this indicates that it is a non-UI operation,
             //we will not calculate timeout
             let timeoutMs = null
