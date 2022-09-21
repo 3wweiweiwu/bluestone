@@ -62,7 +62,8 @@ class Operation {
         txtSelector: 'txtSelector',
         btnUpdateRecording: 'btnUpdateRecording',
         btnMuteFuncQueryKey: 'btnMuteFuncQueryKey',
-        btnIsRecordingHtml: 'btnIsRecordingHtml'
+        btnIsRecordingHtml: 'btnIsRecordingHtml',
+        returnQueryKey: 'returnQueryKey'
     }
     static inbuiltOperation = {
         textEqual: 'testTextEqual',
@@ -178,6 +179,11 @@ class Operation {
         let firstKey = queryKeys[0]
         let firstValue = query[firstKey]
         switch (firstKey) {
+            case Operation.inbuiltQueryKey.returnQueryKey:
+                //update ui value
+                let currentFunction1 = this.getCurrentOperation()
+                currentFunction1.returnJsDoc.value = firstValue
+                break
             case Operation.inbuiltQueryKey.currentGroup:
                 this.spy.userSelection.currentGroup = firstValue
                 break;
@@ -218,7 +224,6 @@ class Operation {
                 break;
             case Operation.inbuiltQueryKey.currentArgument:
                 //update ui value
-                //TODO: allow url like https://todomvc.com/examples/angularjs/#/ to work
                 let currentArgumentIndex = query[Operation.inbuiltQueryKey.currentArgumentIndex]
                 let currentQueryKeyForValue = query[Operation.inbuiltQueryKey.currentArgument]
                 let currentFunction = this.getCurrentOperation()
@@ -300,9 +305,24 @@ class Operation {
         let operationInfo = operationGroup[currentGroup].operations.map(item => {
             return new PugDropDownInfo(item.name, item.description, `?${Operation.inbuiltQueryKey.currentOperation}=${item.name}`)
         })
-
         return operationInfo
 
+    }
+    getReturnInfoForPug() {
+        let operation = this.getCurrentOperation()
+        if (operation == null) return []
+        if (operation.returnJsDoc == null) {
+            return []
+        }
+        let description = operation.returnJsDoc.description
+        let type = operation.returnJsDoc.type.name
+        description = `Please Enter Variable Name to store result. Return Type:${type} - Description: ${description}`
+        let result = [{
+            pugType: 'text',
+            description: description,
+            value: operation.returnJsDoc.value
+        }]
+        return result
     }
     /**
      * Get argument information for pug

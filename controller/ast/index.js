@@ -62,7 +62,9 @@ class AST {
         if (func.params) {
             newFunc.params = JSON.parse(JSON.stringify(func.params))
         }
-
+        if (func.returnJsDoc) {
+            newFunc.returnJsDoc = JSON.parse(JSON.stringify(func.returnJsDoc))
+        }
         return newFunc
     }
     /**
