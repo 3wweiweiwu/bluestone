@@ -261,8 +261,9 @@ class PuppeteerControl {
      * @param {import('../../ast/class/Function')} functionAst
      * @param {ElementSelector} elementSelector
      * @param {Array<string>} parentFrame
+     * @param {*} runtimeVar
      */
-    async runCurrentStep(functionAst, elementSelector, parentFrame) {
+    async runCurrentStep(functionAst, elementSelector, parentFrame, runtimeVar = {}) {
 
         let isResultPass = true
         let resultNote = ''
@@ -279,6 +280,7 @@ class PuppeteerControl {
             let currentScope = argumentNContext.currentScope
             currentScope['mainFunc'] = functionAst.mainFunc
             currentScope['StepAbortManager'] = this.StepAbortManager
+            currentScope['variable'] = runtimeVar
             let res = null
             this.isExecutionOngoing = true
             res = _eval(`

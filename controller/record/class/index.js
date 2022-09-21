@@ -626,8 +626,11 @@ class WorkflowRecord {
             let step = this.steps[i]
             let elementSelector = new ElementSelector(step.finalLocator, '', step.finalLocatorName)
 
-            let result = await this.puppeteer.runCurrentStep(step.functionAst, elementSelector, step.iframe)
-
+            let result = await this.puppeteer.runCurrentStep(step.functionAst, elementSelector, step.iframe, this.astManager.runtimeVariable)
+            //if current value pass and it comes with return, assign value to the return
+            if (result.isResultPass && step.functionAst.returnJsDoc && step.functionAst.returnJsDoc.value) {
+                this.astManager.setRuntimeVariable(step.functionAst.returnJsDoc.value, result.resultText)
+            }
             await this.puppeteer.StepAbortManager.stopStepAbortMonitor()
             await new Promise(resolve => setTimeout(resolve, 300))
             this.steps[i].result = result
