@@ -28,11 +28,12 @@ class Coder {
             require: {},
             library: Coder.ConstVar.library,
             body: {
-                variableDeclaration: ['element', 'vars', 'frame'],
+                variableDeclaration: ['element', 'vars', 'frame', 'variable'],
                 browserVarName: 'browser',
                 pageVarName: 'page',
                 frameVarName: 'frame',
-                varsVarName: 'vars'
+                varsVarName: 'vars',
+                VariableStorageVarName: 'variable'
             },
             variableIndicator: 'vars:'
         }
@@ -116,9 +117,13 @@ class Coder {
         let ast
         this.__testCaseAst = AstGenerator.getDescribeItWrapper(this.__testSuite, this.__testCase)
 
-        //let element,variable
+        //let element, vars, frame, variable
         ast = AstGenerator.getVariableDeclaration(this.inbuiltVarName.body.variableDeclaration)
         this.testcaseCodeBody.push(ast)
+        // variable = {}
+        ast = AstGenerator.getSingleVariableInitialization()
+        this.testcaseCodeBody.push(ast)
+
         //const browser = await bluestoneFunc.launchBrowser.func(config.puppeteer)
         ast = AstGenerator.getBrowserStatementWithBluestone(this.inbuiltVarName.body.browserVarName, this.inbuiltVarName.library.configLibrary, 'puppeteer')
         this.testcaseCodeBody.push(ast)
@@ -209,7 +214,7 @@ class Coder {
             // in this case, we will just push in variable and skip switch
             if (param.value && param.value.toString().toLowerCase().includes(this.inbuiltVarName.variableIndicator)) {
                 let identifierName = param.value.split(this.inbuiltVarName.variableIndicator)[1]
-                let memberExpressionAst = AstGenerator.getSimpleMemberExpression(this.inbuiltVarName.body.varsVarName, identifierName)
+                let memberExpressionAst = AstGenerator.getSimpleMemberExpression(this.inbuiltVarName.body.VariableStorageVarName, identifierName)
                 astJson.expression.argument.arguments.push(memberExpressionAst)
                 continue
             }
@@ -259,7 +264,7 @@ class Coder {
             astJson = AstGenerator.getDestructuringAssignment([[this.inbuiltVarName.body.pageVarName, this.inbuiltVarName.body.pageVarName], [this.inbuiltVarName.body.frameVarName, this.inbuiltVarName.body.frameVarName]], astJson.expression)
         }
         else if (functionAst.returnJsDoc && functionAst.returnJsDoc.value) {
-            astJson = AstGenerator.getAssignmentFunctionResultToVarsDictOperation(functionAst.returnJsDoc.value, astJson)
+            astJson = AstGenerator.getAssignmentFunctionResultToVarsDictOperation(this.inbuiltVarName.body.VariableStorageVarName, functionAst.returnJsDoc.value, astJson)
         }
         return astJson
 
