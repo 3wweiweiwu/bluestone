@@ -216,7 +216,11 @@ class Operation {
                 let currentOperation = this.backend.getCurrentOperation()
 
                 let elementSelector = new ElementSelector([this.backend.operation.browserSelection.currentSelector], '', 'Current Selector')
-                let result = await this.backend.puppeteer.runCurrentStep(currentOperation, elementSelector, this.backend.operation.browserSelection.parentIframe)
+                let result = await this.backend.puppeteer.runCurrentStep(currentOperation, elementSelector, this.backend.operation.browserSelection.parentIframe, this.backend.astManager.runtimeVariable)
+                //if current value pass and it comes with return, assign value to the return
+                if (result.isResultPass && currentOperation.returnJsDoc && currentOperation.returnJsDoc.value) {
+                    this.backend.astManager.setRuntimeVariable(currentOperation.returnJsDoc.value, result.resultText)
+                }
                 this.backend.operation.spy.result.isPass = result.isResultPass
                 this.backend.operation.spy.result.text = result.resultText
                 // this.backend.puppeteer.refreshSpy()

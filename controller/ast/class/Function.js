@@ -85,6 +85,9 @@ class FunctionAST {
                 default:
                     break;
             }
+            if (param.value && param.value.toLowerCase && param.value.toLowerCase().startsWith('vars:')) {
+                currentParam[currentParam.length - 1] = param.value.replace('vars:', 'variable[\'') + '\']'
+            }
             argDic[param.description] = param.value
         }
 

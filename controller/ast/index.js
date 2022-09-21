@@ -20,6 +20,13 @@ class AST {
         this.__locatorPath = locatorPath
         /** @type {Array<FunctionAST>} */
         this.__funcRepo = []
+        this.__runtimeVariable = {} //this function is used to store runtime variable
+    }
+    get runtimeVariable() {
+        return this.__runtimeVariable
+    }
+    setRuntimeVariable(name, value) {
+        this.__runtimeVariable[name] = value
     }
     /**
      * Push current func ast to the repo
