@@ -244,10 +244,13 @@ class Coder {
         }
         //for gotoFrame function, will assign the returned variable to frame variable so that we can switch context
         if (functionAst.name == 'gotoFrame') {
-            astJson = AstGenerator.getAssignFunctionResultToVarOperation(this.inbuiltVarName.body.frameVarName, astJson)
+            astJson = AstGenerator.getAssignFunctionResultToNormalVarOperation(this.inbuiltVarName.body.frameVarName, astJson)
         }
         else if (functionAst.name == 'switchTab') {
             astJson = AstGenerator.getDestructuringAssignment([[this.inbuiltVarName.body.pageVarName, this.inbuiltVarName.body.pageVarName], [this.inbuiltVarName.body.frameVarName, this.inbuiltVarName.body.frameVarName]], astJson.expression)
+        }
+        else if (functionAst.returnJsDoc && functionAst.returnJsDoc.value) {
+            astJson = AstGenerator.getAssignmentFunctionResultToVarsDictOperation(functionAst.returnJsDoc.value, astJson)
         }
         return astJson
 

@@ -316,7 +316,7 @@ class Operation {
         }
         let description = operation.returnJsDoc.description
         let type = operation.returnJsDoc.type.name
-        description = `Please Enter Variable Name to store result. Return Type:${type} - Description: ${description}`
+        description = `Please Enter Variable Name to store result. To use it in other place, you can use: vars:${operation.returnJsDoc.value} - Description: ${description}`
         let result = [{
             pugType: 'text',
             description: description,

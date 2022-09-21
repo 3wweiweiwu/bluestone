@@ -123,7 +123,7 @@ class AstGenerator {
      * @param {*} operationAst ast for await function()
      * @returns 
      */
-    static getAssignFunctionResultToVarOperation(variableName, operationAst) {
+    static getAssignFunctionResultToNormalVarOperation(variableName, operationAst) {
         return {
             "type": "ExpressionStatement",
             "expression": {
@@ -137,6 +137,35 @@ class AstGenerator {
             }
         }
 
+    }
+    /**
+     * Create opeartion such as vars["s123"]=await funcName()
+     * @param {string} variableName s123
+     * @param {*} operationAst ast for await funcName()
+     * @returns 
+     */
+    static getAssignmentFunctionResultToVarsDictOperation(variableName, operationAst) {
+        return {
+            "type": "ExpressionStatement",
+            "expression": {
+                "type": "AssignmentExpression",
+                "operator": "=",
+                "left": {
+                    "type": "MemberExpression",
+                    "object": {
+                        "type": "Identifier",
+                        "name": "vars"
+                    },
+                    "property": {
+                        "type": "Literal",
+                        "value": variableName,
+                    },
+                    "computed": true,
+                    "optional": false
+                },
+                "right": operationAst
+            }
+        }
     }
     /**
      * assign variable based on other variable value s1=s2

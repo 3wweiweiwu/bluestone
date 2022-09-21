@@ -121,6 +121,9 @@ class UI {
                 for (let i = 0; i < currentOperation.params.length; i++) {
                     currentOperation.params[i].value = step.functionAst.params[i].value
                 }
+                if (step.functionAst.returnJsDoc) {
+                    currentOperation.returnJsDoc.value = step.functionAst.returnJsDoc.value
+                }
                 findOperation = true
                 break
             }
