@@ -1,10 +1,16 @@
 const path = require("path")
 const { WorkflowRecord, RecordingStep } = require('../../record/class')
 class WorkflowStepForPug {
-    constructor(command, target, argDic) {
+    constructor(command, target, argDic, output) {
         this.command = command
         this.target = target
         this.argument = JSON.stringify(argDic)
+        if (output == '') {
+            this.output = ''
+        } else {
+            this.output = `vars:${output}`
+        }
+
     }
     /**
      * Generate Pug-compatible array format
@@ -12,7 +18,7 @@ class WorkflowStepForPug {
      */
 
     generatePugOutput() {
-        return [this.command, this.target, this.argument]
+        return [this.command, this.target, this.output, this.argument]
     }
 }
 
@@ -39,7 +45,7 @@ class WorkFlowPug {
      * @param {WorkflowRecord} backend
      */
     constructor(steps, backend) {
-        this.workflowHeader = ['Operation', 'Target', 'Arguments', 'Actions']
+        this.workflowHeader = ['Operation', 'Target', 'Variable Declaration', 'Arguments', 'Actions']
         /** @type {List<WorkflowStepForPug>} */
         this.workflowSteps = null
         this.refreshWorkflowForPug(steps)
@@ -82,7 +88,11 @@ class WorkFlowPug {
             if (step.functionAst && step.functionAst.description && step.functionAst.description != '') {
                 description = step.functionAst.description
             }
-            let workflowPug = new WorkflowStepForPug(step.command, target, argStr)
+            let output = ''
+            if (step.functionAst.returnJsDoc && step.functionAst.returnJsDoc.value) {
+                output = step.functionAst.returnJsDoc.value
+            }
+            let workflowPug = new WorkflowStepForPug(step.command, target, argStr, output)
             let workflowPugArray = workflowPug.generatePugOutput()
             return workflowPugArray
         })

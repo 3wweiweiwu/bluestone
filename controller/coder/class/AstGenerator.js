@@ -148,11 +148,12 @@ class AstGenerator {
     }
     /**
      * Create opeartion such as vars["s123"]=await funcName()
+     * @param {string} variableStorageVarName vars
      * @param {string} variableName s123
      * @param {*} operationAst ast for await funcName()
      * @returns 
      */
-    static getAssignmentFunctionResultToVarsDictOperation(variableName, operationAst) {
+    static getAssignmentFunctionResultToVarsDictOperation(variableStorageVarName, variableName, operationAst) {
         return {
             "type": "ExpressionStatement",
             "expression": {
@@ -162,7 +163,7 @@ class AstGenerator {
                     "type": "MemberExpression",
                     "object": {
                         "type": "Identifier",
-                        "name": "vars"
+                        "name": variableStorageVarName
                     },
                     "property": {
                         "type": "Literal",
@@ -326,6 +327,27 @@ class AstGenerator {
             "kind": 'const'
         }
         return ast
+    }
+    /**
+     * variable={}
+     * @returns 
+     */
+    static getSingleVariableInitialization() {
+        return {
+            "type": "ExpressionStatement",
+            "expression": {
+                "type": "AssignmentExpression",
+                "operator": "=",
+                "left": {
+                    "type": "Identifier",
+                    "name": "variable"
+                },
+                "right": {
+                    "type": "ObjectExpression",
+                    "properties": []
+                }
+            }
+        }
     }
     /**
      * let element,s1
