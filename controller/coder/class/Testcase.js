@@ -33,7 +33,8 @@ class Coder {
                 pageVarName: 'page',
                 frameVarName: 'frame',
                 varsVarName: 'vars'
-            }
+            },
+            variableIndicator: 'vars:'
         }
 
 
@@ -204,6 +205,14 @@ class Coder {
         let astJson = AstGenerator.getAwaitCommandWrapper(libraryName, functionAst.name)
         for (let i = 0; i < functionAst.params.length; i++) {
             let param = functionAst.params[i]
+            //if current value match variable pattern, we will treat it as variable
+            // in this case, we will just push in variable and skip switch
+            if (param.value && param.value.toString().toLowerCase().includes(this.inbuiltVarName.variableIndicator)) {
+                let identifierName = param.value.split(this.inbuiltVarName.variableIndicator)[1]
+                let memberExpressionAst = AstGenerator.getSimpleMemberExpression(this.inbuiltVarName.body.varsVarName, identifierName)
+                astJson.expression.argument.arguments.push(memberExpressionAst)
+                continue
+            }
             //construct scope
             switch (param.type.name) {
                 case "Frame":

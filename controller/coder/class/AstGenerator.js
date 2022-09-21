@@ -1,5 +1,13 @@
 class AstGenerator {
-
+    /**
+     * Create simple member expression. Sample: vars['123']
+     * @param {string} identifierName vars
+     * @param {string} literalName 123
+     * @returns 
+     */
+    static getSimpleMemberExpression(identifierName, literalName) {
+        return AstGenerator.getDictionaryVariableAst(identifierName, literalName)
+    }
     /**
      * Create simple ast for variable. sample var1
      * @param {string} varName name of the var in this case, it will be'var1'
