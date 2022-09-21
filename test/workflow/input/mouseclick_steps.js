@@ -127,6 +127,11 @@ module.exports = [
                 },
             ],
             locators: [{ locator: ["invalid_locator"] }],
+            returnJsDoc: {
+                title: "returns",
+                description: null,
+                type: { type: "NameExpression", name: "ElementHandle" },
+            },
         },
         parameter: [
             {
@@ -249,6 +254,11 @@ module.exports = [
                 },
             ],
             locators: [{ locator: ["invalid_locator"] }],
+            returnJsDoc: {
+                title: "returns",
+                description: null,
+                type: { type: "NameExpression", name: "ElementHandle" },
+            },
         },
         parameter: [
             {

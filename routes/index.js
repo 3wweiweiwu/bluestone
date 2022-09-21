@@ -155,7 +155,9 @@ router.get('/spy', async function (req, res, next) {
     functionMuteStatus: ui.operation.getFunctionMuteState(),
     getFunctionMuteStatQueryKey: Operation.inbuiltQueryKey.btnMuteFuncQueryKey,
     isRecordingHtmlQueryKey: Operation.inbuiltQueryKey.btnIsRecordingHtml,
-    isRecordingHtml: ui.backend.isCaptureHtml
+    isRecordingHtml: ui.backend.isCaptureHtml,
+    returnList: ui.operation.getReturnInfoForPug(),
+    returnQueryKey: Operation.inbuiltQueryKey.returnQueryKey
   }
 
   res.render('spy.pug', variables);
@@ -191,7 +193,9 @@ router.get('/edit-step', async function (req, res, next) {
     cancelQueryKey: Operation.inbuiltQueryKey.btnCancel,
     runQueryKey: Operation.inbuiltQueryKey.btnRun,
     result: ui.operation.operationResult,
-    txtSelector: Operation.inbuiltQueryKey.txtSelector
+    txtSelector: Operation.inbuiltQueryKey.txtSelector,
+    returnList: ui.operation.getReturnInfoForPug(),
+    returnQueryKey: Operation.inbuiltQueryKey.returnQueryKey
   }
   if (Object.keys(req.query).includes('modifyStep')) {
     res.redirect('/workflow')

@@ -33,7 +33,8 @@ class Coder {
                 pageVarName: 'page',
                 frameVarName: 'frame',
                 varsVarName: 'vars'
-            }
+            },
+            variableIndicator: 'vars:'
         }
 
 
@@ -204,6 +205,14 @@ class Coder {
         let astJson = AstGenerator.getAwaitCommandWrapper(libraryName, functionAst.name)
         for (let i = 0; i < functionAst.params.length; i++) {
             let param = functionAst.params[i]
+            //if current value match variable pattern, we will treat it as variable
+            // in this case, we will just push in variable and skip switch
+            if (param.value && param.value.toString().toLowerCase().includes(this.inbuiltVarName.variableIndicator)) {
+                let identifierName = param.value.split(this.inbuiltVarName.variableIndicator)[1]
+                let memberExpressionAst = AstGenerator.getSimpleMemberExpression(this.inbuiltVarName.body.varsVarName, identifierName)
+                astJson.expression.argument.arguments.push(memberExpressionAst)
+                continue
+            }
             //construct scope
             switch (param.type.name) {
                 case "Frame":
@@ -244,10 +253,13 @@ class Coder {
         }
         //for gotoFrame function, will assign the returned variable to frame variable so that we can switch context
         if (functionAst.name == 'gotoFrame') {
-            astJson = AstGenerator.getAssignFunctionResultToVarOperation(this.inbuiltVarName.body.frameVarName, astJson)
+            astJson = AstGenerator.getAssignFunctionResultToNormalVarOperation(this.inbuiltVarName.body.frameVarName, astJson)
         }
         else if (functionAst.name == 'switchTab') {
             astJson = AstGenerator.getDestructuringAssignment([[this.inbuiltVarName.body.pageVarName, this.inbuiltVarName.body.pageVarName], [this.inbuiltVarName.body.frameVarName, this.inbuiltVarName.body.frameVarName]], astJson.expression)
+        }
+        else if (functionAst.returnJsDoc && functionAst.returnJsDoc.value) {
+            astJson = AstGenerator.getAssignmentFunctionResultToVarsDictOperation(functionAst.returnJsDoc.value, astJson)
         }
         return astJson
 
