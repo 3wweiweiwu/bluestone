@@ -192,6 +192,7 @@ exports.click = async function (frame, elementSelector, x, y) {
 
 
     try {
+        await element.hover()
         //if x and y offset is bigger than element itself, we will click on midle point
         //otherwise, it will go beyond the scope
         let elementPos = await element.boundingBox()
@@ -205,7 +206,6 @@ exports.click = async function (frame, elementSelector, x, y) {
         let offsetX = elementPos.width * x
         let offsetY = elementPos.height * y
         try {
-            await element.hover()
             try {
                 await frame.mouse.click(elementPos.x + offsetX, elementPos.y + offsetY)
             } catch (error) {
