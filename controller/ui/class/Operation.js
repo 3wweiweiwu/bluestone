@@ -15,6 +15,19 @@ class PugDropDownInfo {
         this.url = url
     }
 }
+class PugVariableTableEntry {
+    /**
+     * Return variable info for pug
+     * @param {string} name 
+     * @param {string} value 
+     * @param {string} type 
+     */
+    constructor(name, value, type) {
+        this.name = name
+        this.value = value
+        this.type = type
+    }
+}
 class Operation {
     /**
      * 
@@ -294,6 +307,40 @@ class Operation {
             return new PugDropDownInfo(id, allOperationGroup[id].text, `?${Operation.inbuiltQueryKey.currentGroup}=${id}`)
         })
         return groupInfo
+    }
+    /**
+     * return list of varaible info
+     * @return {Array<PugVariableTableEntry>}
+     */
+    getVariableInfoForPug() {
+
+        let result = []
+        let runTimeVar = this.backend.astManager.runtimeVariable
+        let stepsWithVarAssignment = this.backend.steps.filter(item => item.functionAst.returnJsDoc && item.functionAst.returnJsDoc.value)
+        result = stepsWithVarAssignment.map(step => {
+            let varName = step.functionAst.returnJsDoc.value
+            let varValue = runTimeVar[varName]
+            let varType = typeof (runTimeVar[varName])
+            let variableTableEntry = new PugVariableTableEntry(
+                varName,
+                varValue,
+                varType
+            )
+            return variableTableEntry
+        })
+
+        // result = Object.keys(runTimeVar).map(varName => {
+
+        //     let varValue = runTimeVar[varName]
+        //     let varType = typeof (runTimeVar[varName])
+        //     let variableTableEntry = new PugVariableTableEntry(
+        //         varName,
+        //         varValue,
+        //         varType
+        //     )
+        //     return variableTableEntry
+        // })
+        return result
     }
     /**
      * return a list of operation based on curent group
