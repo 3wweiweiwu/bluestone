@@ -19,8 +19,6 @@ block content
 
 	+input-arguments(argumentsQueryKey,argumentList,argumentsQueryIndex)='' 
 
-	+input-arguments(returnQueryKey,returnList,'index')
-
 	+result-panel(result.isPass,'Result',result.text)
 
 	if btnAddStepValidation!=null && btnAddStepValidation!=''
@@ -32,6 +30,7 @@ block content
 			+a-btn-success('?'+addStepQueryKey)='Add Step'
 			+a-btn-danger('?'+cancelQueryKey)='Resume'
 		+accordion-item-default("Variable Information","sample")
+			+input-arguments(returnQueryKey,returnList,'index')
 			+variable-table(variableInfo)
 		+accordion-item-default("Recording Settings","sample")
 			div(class="container-fluid")

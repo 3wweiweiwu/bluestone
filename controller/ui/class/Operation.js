@@ -367,7 +367,7 @@ class Operation {
         }
         let description = operation.returnJsDoc.description
         let type = operation.returnJsDoc.type.name
-        description = `Please Enter Variable Name to store result. To use it in other place, you can use: vars:${operation.returnJsDoc.value} - Description: ${description}`
+        description = `Variable Name for Result Assignment. Description: ${description}`
         let result = [{
             pugType: 'text',
             description: description,
@@ -397,7 +397,7 @@ class Operation {
                 uiIndex++
             }
             else if (standardizedCurrentType == 'number') {
-                currentValue['pugType'] = 'number'
+                currentValue['pugType'] = 'text'
                 previousValue.push(currentValue)
                 uiIndex++
             }
