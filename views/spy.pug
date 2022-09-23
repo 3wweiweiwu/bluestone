@@ -3,6 +3,7 @@ include ./component/input.pug
 include ./component/refresh.pug
 include ./component/resultPanel.pug
 include ./component/checkboxGroup.pug
+include ./component/operation/variableTable.pug
 block content
 
 	script(src="/javascript/redirectInput.js")
@@ -30,6 +31,8 @@ block content
 			+a-btn-primary('?'+runQueryKey)='Run Step'
 			+a-btn-success('?'+addStepQueryKey)='Add Step'
 			+a-btn-danger('?'+cancelQueryKey)='Resume'
+		+accordion-item-default("Variable Information","sample")
+			+variable-table(variableInfo)
 		+accordion-item-default("Recording Settings","sample")
 			div(class="container-fluid")
 				h4="Start/Stop Recording"

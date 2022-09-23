@@ -157,7 +157,8 @@ router.get('/spy', async function (req, res, next) {
     isRecordingHtmlQueryKey: Operation.inbuiltQueryKey.btnIsRecordingHtml,
     isRecordingHtml: ui.backend.isCaptureHtml,
     returnList: ui.operation.getReturnInfoForPug(),
-    returnQueryKey: Operation.inbuiltQueryKey.returnQueryKey
+    returnQueryKey: Operation.inbuiltQueryKey.returnQueryKey,
+    variableInfo: ui.operation.getVariableInfoForPug()
   }
 
   res.render('spy.pug', variables);
