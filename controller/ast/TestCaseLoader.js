@@ -227,6 +227,16 @@ class TestcaseLoader {
                     healingTree = path.join(snapshotFolder, healingSnapshotFile)
 
                 }
+                //populate variable assignment information
+                //test if variable has return
+                if (functionAst.returnJsDoc) {
+                    //test if current user perform assignment operamation
+                    let assignmentAncestor = item.ancestors.find(item => item.type == 'AssignmentExpression')
+                    if (assignmentAncestor) {
+                        functionAst.returnJsDoc.value = assignmentAncestor.left.property.value
+                    }
+                }
+
             } catch (error) {
                 //only print out error in the bluestone main console
                 if (process.env.BLUESTONE_VAR_SAVER == null)
@@ -253,8 +263,15 @@ class TestcaseLoader {
         functionParams.forEach((item, index) => {
             if (item.type.name == 'string' || item.type.name == 'number') {
                 item.value = null
-                if (args[index] != null)
-                    item.value = args[index].value
+                if (args[index] != null) {
+                    //this is variable
+                    if (args[index].type == 'MemberExpression')
+                        item.value = `vars:${args[index].property.value}`
+                    else
+                        //this is literal value
+                        item.value = args[index].value
+                }
+
             }
             if (item.type.name == 'ElementSelector') {
                 item.value = args[index].property.value
