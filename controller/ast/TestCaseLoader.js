@@ -148,7 +148,7 @@ class TestcaseLoader {
             let ancestorCheck = ancestor[ancestor.length - 2].type == 'CallExpression' && ancestor[ancestor.length - 2].callee.name == 'describe'
             let nodeCheck = node.type == 'Literal'
             return ancestorCheck && nodeCheck
-        })
+        }, (node, ancestor, result) => result.length > 0)
         return result[0].node.value
     }
 
@@ -158,7 +158,7 @@ class TestcaseLoader {
             let ancestorCheck = ancestor[ancestor.length - 2].type == 'CallExpression' && ancestor[ancestor.length - 2].callee.name == 'it'
             let nodeCheck = node.type == 'Literal'
             return ancestorCheck && nodeCheck
-        })
+        }, (node, ancestor, result) => result.length > 0)
         return result[0].node.value
     }
     /**
