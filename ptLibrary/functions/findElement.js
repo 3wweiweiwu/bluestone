@@ -345,7 +345,9 @@ async function highlightProposedElement(page, element) {
             return borderStyle
         })
     }
-
+    if(page.constructor.name != 'CDPPage'){
+        page=page.page()
+    }
     let pngData = await page.screenshot({ type: 'png' })
 
     let session = await page.target().createCDPSession();
