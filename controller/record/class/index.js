@@ -1187,7 +1187,7 @@ class WorkflowRecord {
             }
 
             //if test failed, attach failure information to the step
-            let currentFailureTc = resultObj.failures.find(item => item.title == tcName)
+            let currentFailureTc = resultObj.failures.find(item => item.title.toLowerCase() == tcName.toLowerCase())
             let failureStepIndex = -1
             if (currentFailureTc != null) {
                 let errorMessage = currentFailureTc.err.message
@@ -1213,7 +1213,7 @@ class WorkflowRecord {
             //identify prescription screenshot and assign it to the step
             //we do this because prescription screenshot contains hint to potential match
             //it will provide more information
-            let currentTc = resultObj.reviews.find(item => item.title == tcName)
+            let currentTc = resultObj.reviews.find(item => item.title.toLowerCase() == tcName.toLowerCase())
             //current test is passed... no more inforamtion to pass
             if (currentTc == null) {
                 return
