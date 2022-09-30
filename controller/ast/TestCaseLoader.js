@@ -134,7 +134,8 @@ class TestcaseLoader {
             step.iframe = iFrame
             if (step.command == 'gotoFrame') {
                 let elementSelectorParam = step.functionAst.params.find(item => item.type.name == 'ElementSelector')
-                iFrame = [elementSelectorParam.value]
+                let frameLocator = this.#locatorManager.locatorLibrary.find(item => item.path == elementSelectorParam.value)
+                iFrame = frameLocator.Locator
             }
         }
     }
