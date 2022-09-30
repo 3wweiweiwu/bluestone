@@ -284,7 +284,7 @@ async function getElementBasedOnLocatorBackup(page, elementSelector, similarityB
     let elementDict = {}
     let sum = 0
     /**@type {string} */
-    let bestId = null
+    let bestCandidate = null
     let bestElement = new ElementInfo(null, '')
     if (elementSelector.snapshot == null) {
         return bestElement
@@ -358,16 +358,33 @@ async function getElementBasedOnLocatorBackup(page, elementSelector, similarityB
         }
         return getBestMatch(locators)
     }), elementSelector.snapshot)
+    if (potentialMatchList == null && potentialMatchList.result == null) {
+        return bestElement
+    }
 
+    //get most possible locator and its score
+    for (let match of potentialMatchList.result) {
+        sum += match.count
+        //if best candidate is not defined, use current element
+        if (bestCandidate == null) {
+            bestCandidate = match
+        }
+        else if(bestCandidate.count < match.count)
+        {
+            //if best canddidate is defined yet it is not as good as what we have, use what we have
+            bestCandidate = match
+        }
+    }
 
 
     //get score for possible locator
-    if (bestId == null) {
+    if (bestCandidate == null) {
         return { element: null }
     }
-    let currentSimilarity = elementDict[bestId].count / sum
+    let currentSimilarity = bestCandidate.count / sum
     if (currentSimilarity > similarityBenchmark) {
-        bestElement = elementDict[bestId]
+        let elements = await page.$x(bestCandidate.locator)
+        bestElement = new ElementInfo(elements[0], bestCandidate.locator)
     }
 
     return bestElement
