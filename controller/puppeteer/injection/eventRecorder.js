@@ -143,6 +143,12 @@ Object.keys(EVENTCONST).forEach(item => {
         switch (item) {
             case EVENTCONST.visibilitychange:
                 if (document.visibilityState == 'hidden') return
+                //in edit mode, we saw an situation where a swap tab operation is added at the end
+                // we will normally land in about:blank page when we are coming from edit mode
+                //As we switch to page, it will triger an go to tab action
+                //in this case, we will not record any switch page action from about:blank
+                //to avoid adding unnecessary steps toward the end of the script
+                if (window.location.href == 'about:blank') return
                 parameter = JSON.stringify({
                     tabIndex: globalVar.tabIndex
                 })
