@@ -1143,7 +1143,7 @@ class WorkflowRecord {
 
     }
     /**
-     * Based on the test step information, update auto-healing inforamtion
+     * Based on the test step information, update screenshot/auto-healing info
      * @param {string} testResultPath path to the mocha result file
      * @param {TestcaseLoader} tcLoader name of the testcase
      */

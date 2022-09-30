@@ -88,11 +88,11 @@
       "type": "node",
       "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
       "args": [
-        "C:\\Users\\wuwei\\Procedure-Automation-Bluestone\\script",
+        "C:\\Users\\wuwei\\bluestone-batch-release-manager\\script",
         "--exit",
         "true",
         "--grep",
-        "^.* s3$",
+        "^.* TC_779479$",
         "--reporter",
         "${workspaceFolder}\\reporter.js",
         "--reporter-option",
