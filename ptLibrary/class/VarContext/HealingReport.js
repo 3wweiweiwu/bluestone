@@ -182,7 +182,7 @@ class HealingInfo {
             fs.writeFileSync(this.mhtmlPath, pageData.mhtmlData)
         }
 
-        let picPathBaseName = path.basename(this.picPath)
+        let picPathBaseName = path.basename(this.mhtmlPath)
         this.prescriptionReport.addRecord(this.testcasName, locatorName, newLocator, oldLocator, picPathBaseName, stepIndex, isOriginalLocatorWork)
 
         this.export(this.runId, this.prescriptionPath)
