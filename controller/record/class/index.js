@@ -1155,7 +1155,7 @@ class WorkflowRecord {
             let resultBinary = await fs.readFile(testResultPath)
             let resultText = resultBinary.toString()
             let resultObj = JSON.parse(resultText)
-
+            let testResultFolder = path.dirname(testResultPath)
             //navigate to the screenshot for the auto-healing steps
             let bluestonePath = process.env.bluestonePath
             let bluestoneFolder = path.dirname(bluestonePath)
@@ -1167,7 +1167,17 @@ class WorkflowRecord {
                 //use html snapshot if possible
                 let newPicPath = this.getHtmlPath()
                 try {
-                    let mhtmlData = await fs.readFile(screenshotRecord.mhtmlPath)
+                    let mhtmlData = null
+                    try {
+                        mhtmlData = await fs.readFile(screenshotRecord.mhtmlPath)
+                    } catch (error) {
+                        //in case we cannot find the file in the same folder, try to load it from same folder
+                        let mhtmlFileName = path.basename(screenshotRecord.mhtmlPath)
+                        screenshotRecord.mhtmlPath = path.join(testResultFolder, mhtmlFileName)
+                        mhtmlData = await fs.readFile(screenshotRecord.mhtmlPath)
+
+                    }
+
                     let doc = mhtml2html.convert(mhtmlData.toString(), { convertIframes: true, parseDOM: (html) => new JSDOM(html) });
                     await fs.writeFile(newPicPath, doc.serialize())
                 } catch (error) {
@@ -1219,21 +1229,31 @@ class WorkflowRecord {
                 return
             }
             for (let prescription of currentTc.prescription) {
-                let newPicPath = this.getPicPath()
+                let newHtmlPath = this.getHtmlPath()
                 let sourcePicPath = path.join(bluestoneScriptFolder, prescription.newLocatorSnapshotPath)
+
+                let mhtmlData = null
+
                 try {
-                    await fs.copyFile(sourcePicPath, newPicPath)
+                    try {
+                        mhtmlData = await fs.readFile(sourcePicPath)
+                    } catch (error) {
+                        sourcePicPath = path.join(testResultFolder, prescription.newLocatorSnapshotPath)
+                        mhtmlData = await fs.readFile(sourcePicPath)
+                    }
                 } catch (error) {
                     console.log(error)
                 }
 
+                let doc = mhtml2html.convert(mhtmlData.toString(), { convertIframes: true, parseDOM: (html) => new JSDOM(html) });
+                await fs.writeFile(newHtmlPath, doc.serialize())
 
                 //convert to stepIndex
                 let failedStepIndex = tcLoader.getStepIndexFromLine(prescription.failureStepIndex)
                 this.steps[failedStepIndex].isRequiredReview = true
                 //populate screenshot picture
 
-                this.steps[failedStepIndex].htmlPath = newPicPath
+                this.steps[failedStepIndex].htmlPath = newHtmlPath
                 //update locator to proposed value
                 this.steps[failedStepIndex].finalLocator = [prescription.newLocator]
                 this.steps[failedStepIndex].target = prescription.newLocator
