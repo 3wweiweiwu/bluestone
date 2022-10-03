@@ -93,6 +93,7 @@ function JSONReporter(runner, options = {}) {
         runner.testResults = obj;
         var json = JSON.stringify(obj, null, 2);
         if (output) {
+            //output file into folder user specified
             try {
                 fs.mkdirSync(path.dirname(output), { recursive: true });
                 fs.writeFileSync(output, json);
@@ -102,6 +103,21 @@ function JSONReporter(runner, options = {}) {
                 );
                 process.stdout.write(json);
             }
+
+            //output file into prescription folder
+            try {
+                let fileName = path.basename(output)
+                let filePathInPrescriptionFolder = path.join(varSav.ScreenshotReportManager.prescriptionFolder, fileName)
+                fs.writeFileSync(filePathInPrescriptionFolder, json);
+            } catch (err) {
+                console.error(
+                    `${Base.symbols.err} [mocha] writing output to "${filePathInPrescriptionFolder}" failed: ${err.message}\n`
+                );
+                process.stdout.write(json);
+            }
+
+
+
         } else {
             process.stdout.write(json);
         }
