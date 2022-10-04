@@ -1165,7 +1165,7 @@ class WorkflowRecord {
 
             //attach the screenshot for current test
             //setup thread pool for upcoming mhtml conversion as it is resource intense
-            const pool = Pool(() => spawn(new Worker("./MhtmlConversion.js")), 4)
+            const pool = Pool(() => spawn(new Worker("./MhtmlConversion.js"), { timeout: 30000 }))
 
 
             let currentTestScreenshots = resultObj.screenshotManager.filter(item => item.tcId.toLowerCase() == tcName.toLowerCase())
@@ -1178,7 +1178,7 @@ class WorkflowRecord {
                 })
                 //assign picture to right step
                 let stepIndex = tcLoader.getStepIndexFromLine(screenshotRecord.lineNumber)
-                this.steps[stepIndex].htmlPath = newPicPath
+                this.steps[stepIndex].htmlPath = newHtmlPath
             }
             await pool.completed()
             await pool.terminate()
