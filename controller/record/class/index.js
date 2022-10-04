@@ -24,6 +24,8 @@ const TestcaseLoader = require('../../ast/TestCaseLoader')
 const getErrorStepIndexByErrorStack = require('../../../ptLibrary/functions/getErrorStepIndexByStack')
 const mhtml2html = require('mhtml2html/dist/mhtml2html')
 const { JSDOM } = require('jsdom');
+const { spawn, Pool, Worker } = require("threads")
+
 /**
  * @typedef {string} CommandType
  **/
@@ -1162,39 +1164,25 @@ class WorkflowRecord {
             let bluestoneScriptFolder = path.join(bluestoneFolder, './result/', `./${resultObj.runId}/`)
 
             //attach the screenshot for current test
+            //setup thread pool for upcoming mhtml conversion as it is resource intense
+            const pool = Pool(() => spawn(new Worker("./MhtmlConversion.js"), { timeout: 30000 }))
+
+
             let currentTestScreenshots = resultObj.screenshotManager.filter(item => item.tcId.toLowerCase() == tcName.toLowerCase())
             for (let screenshotRecord of currentTestScreenshots) {
                 //use html snapshot if possible
-                let newPicPath = this.getHtmlPath()
-                try {
-                    let mhtmlData = null
-                    try {
-                        mhtmlData = await fs.readFile(screenshotRecord.mhtmlPath)
-                    } catch (error) {
-                        //in case we cannot find the file in the same folder, try to load it from same folder
-                        let mhtmlFileName = path.basename(screenshotRecord.mhtmlPath)
-                        screenshotRecord.mhtmlPath = path.join(testResultFolder, mhtmlFileName)
-                        mhtmlData = await fs.readFile(screenshotRecord.mhtmlPath)
-
-                    }
-
-                    let doc = mhtml2html.convert(mhtmlData.toString(), { convertIframes: true, parseDOM: (html) => new JSDOM(html) });
-                    await fs.writeFile(newPicPath, doc.serialize())
-                } catch (error) {
-                    //copy file to bluestone folder and make it ready for display
-                    newPicPath = this.getPicPath()
-                    try {
-                        await fs.copyFile(screenshotRecord.picPath, newPicPath)
-                    } catch (error) {
-                        console.log(error)
-                    }
-                }
-
-
+                let newHtmlPath = this.getHtmlPath()
+                let newPicPath = this.getPicPath()
+                pool.queue(async convert => {
+                    await convert.convertMHtml(screenshotRecord, newHtmlPath, newPicPath, testResultFolder)
+                })
                 //assign picture to right step
                 let stepIndex = tcLoader.getStepIndexFromLine(screenshotRecord.lineNumber)
-                this.steps[stepIndex].htmlPath = newPicPath
+                this.steps[stepIndex].htmlPath = newHtmlPath
             }
+            await pool.completed()
+            await pool.terminate()
+
 
             //if test failed, attach failure information to the step
             let currentFailureTc = resultObj.failures.find(item => item.title.toLowerCase() == tcName.toLowerCase())
