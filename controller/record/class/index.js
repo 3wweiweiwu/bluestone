@@ -575,6 +575,17 @@ class WorkflowRecord {
             this.steps[failedStepIndex].result.resultText = 'Locator has not been correleated'
             return failedStepIndex
         }
+        //update auto screenshot setting to mimic real-world environment
+        switch (config.projectEnvVar.isAutoSnapshot) {
+            case false:
+                process.env.BLUESTONE_AUTO_SNAPSHOT = 0
+                break;
+            default:
+                process.env.BLUESTONE_AUTO_SNAPSHOT = 1
+                break;
+        }
+
+
 
         this.mochaDriver = new MochaDriver(this.codePath, this.locatorManager, this.astManager, 999999)
         let result = await this.mochaDriver.runScript()
@@ -623,6 +634,10 @@ class WorkflowRecord {
         else {
             endIndex = sortedList[0]
         }
+
+        //disable auto snapshot to avoid memory issue
+        process.env.BLUESTONE_AUTO_SNAPSHOT = 0
+
         //run step one by one
         for (let i = startingIndex; i < endIndex; i++) {
             let step = this.steps[i]
