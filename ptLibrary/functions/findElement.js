@@ -358,7 +358,7 @@ async function getElementBasedOnLocatorBackup(page, elementSelector, similarityB
         }
         return getBestMatch(locators)
     }), elementSelector.snapshot)
-    if (potentialMatchList == null && potentialMatchList.result == null) {
+    if (potentialMatchList == null || potentialMatchList.result == null) {
         return bestElement
     }
 
@@ -369,8 +369,7 @@ async function getElementBasedOnLocatorBackup(page, elementSelector, similarityB
         if (bestCandidate == null) {
             bestCandidate = match
         }
-        else if(bestCandidate.count < match.count)
-        {
+        else if (bestCandidate.count < match.count) {
             //if best canddidate is defined yet it is not as good as what we have, use what we have
             bestCandidate = match
         }
