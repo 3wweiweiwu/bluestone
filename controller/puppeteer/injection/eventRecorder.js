@@ -285,9 +285,10 @@ Object.keys(EVENTCONST).forEach(item => {
 document.addEventListener('mouseover', async event => {
     let selector = null
     try {
-        selector = finder(event.target)
-    } catch (error) {
         selector = getXPath(event.target)
+    } catch (error) {
+        selector = finder(event.target)
+
     }
 
 
