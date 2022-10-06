@@ -236,16 +236,16 @@ export class PotentialMatchManager {
         let applyChangeCompleteTime = Date.now()
         this.scanLocatorQueue.pop()
         this.lastLocatorScanTime = Date.now()
-        console.log(`
-            get locator:${getLocatorTime - startTime}
-            scan locator:${scanLocatorStartTime - scanLocatorCompleteTime},
-            apply change: ${applyChangeCompleteTime - scanLocatorCompleteTime}
-            total locator length: ${currentLocatorList.length},
-            scanLocatorTaskQeueu: ${this.scanLocatorQueue.length},
-            proposed potential match list: ${this.currentPotentialMatchList.length}
-            isMainThread: ${isMainThread}
-        `)
-        console.log(this.currentPotentialMatchList)
+        // console.log(`
+        //     get locator:${getLocatorTime - startTime}
+        //     scan locator:${scanLocatorStartTime - scanLocatorCompleteTime},
+        //     apply change: ${applyChangeCompleteTime - scanLocatorCompleteTime}
+        //     total locator length: ${currentLocatorList.length},
+        //     scanLocatorTaskQeueu: ${this.scanLocatorQueue.length},
+        //     proposed potential match list: ${this.currentPotentialMatchList.length}
+        //     isMainThread: ${isMainThread}
+        // `)
+        // console.log(this.currentPotentialMatchList)
         this.waitTime = scanLocatorCompleteTime - scanLocatorStartTime
         if (this.scanLocatorQueue.length > 0) {
             this.scanLocator(true)

@@ -285,9 +285,10 @@ Object.keys(EVENTCONST).forEach(item => {
 document.addEventListener('mouseover', async event => {
     let selector = null
     try {
-        selector = finder(event.target)
-    } catch (error) {
         selector = getXPath(event.target)
+    } catch (error) {
+        selector = finder(event.target)
+
     }
 
 
@@ -560,10 +561,7 @@ const mutationObserverCallback = function (mutationsList, observer) {
         || checkAttributeNameExists(BLUESTONE.bluestoneIframePath)) {
         return
     }
-    //will not proceed to record if recording is set to false
-    if (window.isRecording() == false) {
-        return
-    }
+
     // console.log(mutationsList)
     captureScreenshot('dom tree change')
     //only proceed change that is introduced by RPA engine or code change
