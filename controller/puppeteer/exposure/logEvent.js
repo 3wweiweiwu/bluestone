@@ -175,7 +175,7 @@ module.exports = function (recordRepo, browser, page, io) {
                 let commandFuncAst = recordRepo.astManager.getFunction(event.command)
                 event.functionAst = commandFuncAst
                 //parse in argument into parameter
-                if (eventDetail.parameter && eventDetail.parameter != '') {
+                if (eventDetail.parameter != null) {
                     let paramIndex = event.functionAst.params.findIndex(item => { return item.type.name == 'Number' || item.type.name == 'string' || item.type.name == 'number' || item.type.name == 'Number' })
                     event.functionAst.params[paramIndex].value = eventDetail.parameter
 
