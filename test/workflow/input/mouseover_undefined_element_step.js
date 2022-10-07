@@ -1,5 +1,6 @@
 module.exports = {
-    currentSelector: "#div1",
+    currentSelectedIndex: null,
+    currentSelector: '//*[@id="div1"]',
     selectorPicture: "",
     selectorHtmlPath: "",
     currentInnerText: "This is a paragrah",
@@ -11,9 +12,8 @@ module.exports = {
     lastOperationTime: null,
     lastOperationTimeoutMs: null,
     currentOpeartion: null,
-    currentSelectedIndex: null,
     __htmlCaptureInProcess: [],
-    recommendedLocator: [],
     potentialMatch: [],
     framePotentialMatch: [],
+    recommendedLocator: [],
 };
