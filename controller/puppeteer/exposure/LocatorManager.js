@@ -12,7 +12,15 @@ function getLocator(recordRepo) {
      * @param {import('../../record/class').RecordingStep} eventDetail 
      */
     async function getLocatorsFromBluestone() {
-        return recordRepo.locatorManager.locatorLibrary
+        let cleanedLocatorLibrary = []
+        recordRepo.locatorManager.locatorLibrary.forEach(item => {
+            cleanedLocatorLibrary.push({
+                Locator: item.Locator,
+                path: item.path,
+                selector: item.selector
+            })
+        })
+        return cleanedLocatorLibrary
     }
     return getLocatorsFromBluestone
 }
