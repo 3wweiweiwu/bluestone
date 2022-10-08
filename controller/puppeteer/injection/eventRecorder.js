@@ -7,7 +7,8 @@ import { io } from "http://localhost:3600/javascript/socket.io.esm.js";
 import { getElementPos } from "http://localhost:3600/javascript/getElementPosition.js";
 import { PotentialMatchManager } from "http://localhost:3600/javascript/LocatorScanner.js";
 import { setStateToAllEvents } from "http://localhost:3600/javascript/blockElementInteraction.js";
-import getXPath from 'https://unpkg.com/get-xpath/index.esm.js';
+import { getXPath } from 'http://localhost:3600/javascript/getXPath.js';
+window.getXPath = getXPath
 import AtomicElementTree from "http://localhost:3600/javascript/AtomicElementTree.js"
 try {
 
@@ -104,9 +105,9 @@ Object.keys(EVENTCONST).forEach(item => {
         let timeStamp = Date.now()
         let selector = ''
         try {
-            selector = finder(targetElement)
-        } catch (error) {
             selector = getXPath(targetElement)
+        } catch (error) {
+            selector = finder(targetElement)
         }
 
         let customLocator = {

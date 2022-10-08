@@ -1,5 +1,5 @@
 module.exports = {
-    currentSelector: '//*[@id="header"]',
+    currentSelector: "//*[@id='header']",
     selectorPicture: "",
     selectorHtmlPath: "",
     currentInnerText: "This is header",

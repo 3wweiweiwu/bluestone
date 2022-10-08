@@ -1,6 +1,6 @@
 module.exports = {
     currentSelectedIndex: null,
-    currentSelector: '//*[@id="div1"]',
+    currentSelector: "//*[@id='div1']",
     selectorPicture: "",
     selectorHtmlPath: "",
     currentInnerText: "This is a paragrah",

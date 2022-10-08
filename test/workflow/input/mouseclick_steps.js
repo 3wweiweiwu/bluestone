@@ -46,7 +46,7 @@ module.exports = [
     },
     {
         command: "switchTab",
-        target: "body",
+        target: "/*[local-name()='html'][1]/*[local-name()='body'][1]",
         iframe: [],
         potentialMatch: [],
         framePotentialMatch: [],
@@ -87,7 +87,7 @@ module.exports = [
     },
     {
         command: "waitElementExists",
-        target: "#div1",
+        target: "//*[@id='div1']",
         iframe: [],
         potentialMatch: [],
         framePotentialMatch: [],
@@ -152,7 +152,7 @@ module.exports = [
     },
     {
         command: "click",
-        target: "#div1",
+        target: "//*[@id='div1']",
         iframe: [],
         potentialMatch: [],
         framePotentialMatch: [],
@@ -207,7 +207,7 @@ module.exports = [
     },
     {
         command: "waitElementExists",
-        target: "#header",
+        target: "//*[@id='header']",
         iframe: [],
         potentialMatch: [
             {
@@ -279,7 +279,7 @@ module.exports = [
     },
     {
         command: "click",
-        target: "#header",
+        target: "//*[@id='header']",
         iframe: [],
         potentialMatch: [
             {
