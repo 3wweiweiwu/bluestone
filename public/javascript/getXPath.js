@@ -1,3 +1,14 @@
+function getElementByXpath(xpath, source = document) {
+    let result = []
+    let elements = document.evaluate(xpath, source)
+    while (true) {
+        let node = elements.iterateNext()
+        if (node == null) break
+        result.push(node)
+    }
+    return result
+
+}
 export function getXPath(elm) {
     let target = elm
     var allNodes = document.getElementsByTagName('*');
