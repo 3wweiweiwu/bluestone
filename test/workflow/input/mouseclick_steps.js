@@ -46,7 +46,7 @@ module.exports = [
     },
     {
         command: "switchTab",
-        target: "/*[local-name()='html'][1]/*[local-name()='body'][1]",
+        target: "//*[local-name()='html'][1]/*[local-name()='body'][1]",
         iframe: [],
         potentialMatch: [],
         framePotentialMatch: [],
