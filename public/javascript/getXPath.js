@@ -44,7 +44,7 @@ export function getXPath(elm) {
     if (results.length == 1) return xpath
     for (let i = 0; i < results.length; i++) {
         if (results[i] == target) {
-            return `(${xpath})[${i}]`
+            return `(${xpath})[${i + 1}]`
         }
     }
 
