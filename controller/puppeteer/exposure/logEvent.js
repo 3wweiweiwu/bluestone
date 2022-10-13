@@ -79,6 +79,11 @@ module.exports = function (recordRepo, browser, page, io) {
 
         if (page != null) {
             picturePath = recordRepo.getPicPath()
+            //avoid tab switch if we are dealing with the same page
+            if (page == recordRepo.puppeteer.page && eventDetail.command == 'switchTab') {
+                return
+            }
+            recordRepo.puppeteer.setPage(page)
 
 
             if (eventDetail.target == '') {
@@ -109,7 +114,6 @@ module.exports = function (recordRepo, browser, page, io) {
         if (eventDetail.command == null) {
             //cache the page inforamtion. After we finish agent page
             //it will go back to the orginal page
-            recordRepo.puppeteer.setPage(page)
 
             await takeScreenshotForLocatorDefiner(page)
             // recordRepo.isCaptureHtml = false
