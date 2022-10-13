@@ -774,7 +774,10 @@ class WorkflowRecord {
     async addStep(event) {
         //handle change in iframe
         let lastStep = this.steps[this.steps.length - 1]
-        if (lastStep != null && JSON.stringify(event.iframe) != JSON.stringify(lastStep.iframe)) {
+        //add switch frame operation whenever we switch tab
+        if (lastStep != null &&
+            (JSON.stringify(event.iframe) != JSON.stringify(lastStep.iframe) || lastStep.command == 'switchTab')
+        ) {
             // this.__addWaitForSteps(event, true)
             this.__addSwitchIframeForStep(event)
         }

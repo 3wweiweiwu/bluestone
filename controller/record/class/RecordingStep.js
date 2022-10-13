@@ -88,7 +88,7 @@ class RecordingStep {
 }
 /**
  * @typedef step
- * @property {'click'|'change'|'dblclick'|'keydown'|'goto'|'upload'|'waitForDownloadComplete'|'waitAndHandleForAlert'|'scroll'|'gotoFrame'|'mousedown'|'dragstart'|'mouseup'|'waitElementExists'} command
+ * @property {'click'|'change'|'dblclick'|'keydown'|'goto'|'upload'|'waitForDownloadComplete'|'waitAndHandleForAlert'|'scroll'|'gotoFrame'|'mousedown'|'dragstart'|'mouseup'|'waitElementExists'|'switchTab'} command
  * @property {string} target
  * @property {Array<ExistingSelector>} matchedSelector
  * @property {number} timeoutMs
