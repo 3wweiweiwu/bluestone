@@ -1,6 +1,6 @@
 let inbuiltFunc = require('./functions/inbuiltFunc')
 let BluestoneFunc = require('./class/BluestoneFunc')
-
+let WaitForElementUnblocked = require('./functions/waitElementUnblocked')
 
 
 module.exports = {
@@ -98,4 +98,6 @@ module.exports = {
         static func = inbuiltFunc.switchTab
         static locators = [{ locator: ['invalid_locator'] }]
     },
+    scrollElementToMidview: new inbuiltFunc.scrollElementToMidview(),
+    waitElementUnblocked: new WaitForElementUnblocked.funcClass(),
 }
