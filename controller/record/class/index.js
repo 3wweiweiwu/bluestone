@@ -334,7 +334,9 @@ class WorkflowRecord {
         getStyleAttribute: 'getStyleAttribute',
         mouseDown: 'mouseDown',
         mouseUp: 'mouseUp',
-        switchTab: 'switchTab'
+        switchTab: 'switchTab',
+        scrollElementToMidview: 'scrollElementToMidview',
+        waitElementUnblocked: 'waitElementUnblocked'
     }
     static inbuiltEvent = {
         refresh: PuppeteerControl.inbuiltEvent.refresh
@@ -362,7 +364,8 @@ class WorkflowRecord {
             waitTill: {
                 text: 'Wait Till',
                 operations: [
-                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.waitElementVisible)
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.waitElementVisible),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.waitElementUnblocked)
                 ]
             },
             inbuiltFunction: {
@@ -385,6 +388,7 @@ class WorkflowRecord {
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.mouseDown),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.mouseUp),
                     this.astManager.getFunction(WorkflowRecord.inBuiltFunc.switchTab),
+                    this.astManager.getFunction(WorkflowRecord.inBuiltFunc.scrollElementToMidview),
                 ]
             },
             customizedFunctions: {
@@ -1137,6 +1141,7 @@ class WorkflowRecord {
      * @returns {WorkflowRecord}
      */
     async loadTestcase(relativeScriptPath, abosoluteResultPath) {
+        await this.refreshActiveFunc()
         //get full script path
         let bluestonePath = process.env.bluestonePath
         let bluestoneFolder = path.dirname(bluestonePath)
