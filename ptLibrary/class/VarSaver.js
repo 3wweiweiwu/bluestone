@@ -54,7 +54,7 @@ class VarSaver {
         /**@type {VarSaver} */
         let varSav = JSON.parse(process.env.BLUESTONE_VAR_SAVER)
         varSav.healingInfo = new HealingInfo(varSav.runId, varSav.projectRootPath, varSav.testcase)
-        varSav.ScreenshotReportManager = new ScreenshotReportManager(varSav.runId, varSav.ScreenshotReportManager.prescriptionFolder, varSav.ScreenshotReportManager.tcId, varSav.ScreenshotReportManager.records)
+        varSav.ScreenshotReportManager = new ScreenshotReportManager(varSav.runId, varSav.ScreenshotReportManager.prescriptionFolder, varSav.ScreenshotReportManager.tcId, varSav.ScreenshotReportManager.records, varSav.ScreenshotReportManager.currentLineNumber, varSav.ScreenshotReportManager.currentRecordIndex)
         //do not export to env variable to avoid pollution
         let varSavObj = new VarSaver(varSav.currentFilePath, varSav.currentRetryCount, false)
         varSav['exportVarContextToEnv'] = varSavObj.exportVarContextToEnv

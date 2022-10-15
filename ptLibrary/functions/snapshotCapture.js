@@ -68,7 +68,7 @@ async function captureSnapshot(pageData) {
             } catch (error) {
                 mhtmlFilePath = null
             }
-            varSav.ScreenshotReportManager.updateRecord(stepIndex, pngFilePath, mhtmlFilePath)
+            varSav.ScreenshotReportManager.updateRecord(stepIndex, pngFilePath, mhtmlFilePath, varSav.retryCount)
             varSav.exportVarContextToEnv()
         } catch (error) {
             console.log(error)
