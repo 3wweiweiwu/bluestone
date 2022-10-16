@@ -170,7 +170,7 @@ module.exports = function (recordRepo, browser, page, io) {
             //calculate timeout by subtracting current time to the time from previous step
 
             eventDetail.targetPicPath = picturePath
-            eventDetail.htmlPath = htmlPath
+            eventDetail.htmlPath = [htmlPath]
             eventDetail.potentialMatch = locatorPotentialMatch
             eventDetail.framePotentialMatch = framePotentialMatch
             //construct operation event

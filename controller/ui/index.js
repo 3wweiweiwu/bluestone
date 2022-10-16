@@ -74,7 +74,7 @@ class UI {
     /**
      * Initialize Locator Definer page based on information from current locator information from workflow page
      * @param {string} defaultSelector 
-     * @param {string} locatorHtmlPath 
+     * @param {string[]} locatorHtmlPath 
      * @param {string} locatorName 
      * @param {Array<string>} locatorSelector 
      * @param {Array<Locator>} potentialMatch 
@@ -84,11 +84,11 @@ class UI {
      */
     async refreshLocatorDefiner(defaultSelector, locatorHtmlPath, locatorName, locatorSelector, potentialMatch, stepIndex, parentFrame, isReviewMode = false, isRequiredLocatorUpdate = false) {
         //convert html path from local file to relative url
-        let htmlUrl = this.backend.convertLocalPath2RelativeLink(locatorHtmlPath)
+        let htmlUrl = locatorHtmlPath.map(item => { return this.backend.convertLocalPath2RelativeLink(item) })
 
         //create a new object because we are going to modify screenshot key direclty
         let newPotentialMatch = await this.__updatePotentialMatchStockPic(potentialMatch)
-        await this.backend.updateLocatorDefinerPic(locatorHtmlPath)
+        await this.backend.updateLocatorDefinerPic(locatorHtmlPath[0])
         this.locatorDefiner = new LocatorDefiner(defaultSelector, htmlUrl, locatorName, locatorSelector[0], newPotentialMatch, stepIndex, this.backend, parentFrame, isReviewMode, isRequiredLocatorUpdate)
     }
     /**
@@ -188,7 +188,7 @@ class UI {
 
 
 
-        this.locatorDefiner = new LocatorDefiner(browserSelection.currentSelector, htmlUrl, locatorName, locatorSelector, newPotentialMatch, -1, this.backend, browserSelection.parentIframe)
+        this.locatorDefiner = new LocatorDefiner(browserSelection.currentSelector, [htmlUrl], locatorName, locatorSelector, newPotentialMatch, -1, this.backend, browserSelection.parentIframe)
 
     }
 }

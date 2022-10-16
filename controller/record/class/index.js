@@ -681,7 +681,7 @@ class WorkflowRecord {
                     await fs.copyFile(stepSnapshotPath, proposedSnapshotPath)
                 }
 
-                this.steps[i].htmlPath = proposedSnapshotPath
+                this.steps[i].htmlPath = [proposedSnapshotPath]
             } catch (error) {
 
             }
@@ -1207,7 +1207,7 @@ class WorkflowRecord {
                 })
                 //assign picture to right step
                 let stepIndex = tcLoader.getStepIndexFromLine(screenshotRecord.lineNumber)
-                this.steps[stepIndex].htmlPath = newHtmlPath
+                this.steps[stepIndex].htmlPath.push(newHtmlPath)
             }
             await pool.completed()
             await pool.terminate()
@@ -1270,7 +1270,7 @@ class WorkflowRecord {
                 this.steps[failedStepIndex].isRequiredReview = true
                 //populate screenshot picture
 
-                this.steps[failedStepIndex].htmlPath = newHtmlPath
+                this.steps[failedStepIndex].htmlPath.push(newHtmlPath)
                 //update locator to proposed value
                 this.steps[failedStepIndex].finalLocator = [prescription.newLocator]
                 this.steps[failedStepIndex].target = prescription.newLocator
