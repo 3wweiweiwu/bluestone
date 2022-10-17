@@ -23,10 +23,21 @@ class VarSaver {
         this.isTakeSnapshot = process.env.BLUESTONE_AUTO_SNAPSHOT || true
         this.tcStepInfo = null
         this.ScreenshotReportManager = new ScreenshotReportManager(this.runId, this.healingInfo.perscriptionFolder, this.testcase)
+        this.parseEnvVar()
         if (isExport) {
             this.exportVarContextToEnv()
         }
 
+    }
+    parseEnvVar() {
+        if (process.env.BLUESTONE_VAR_SAVER == null) return
+        /**@type {VarSaver} */
+        let json = JSON.parse(process.env.BLUESTONE_VAR_SAVER)
+
+        //parse screenshot information from env variable if it is empty
+        if (this.ScreenshotReportManager.records.length == 0) {
+            this.ScreenshotReportManager.records = json.ScreenshotReportManager.records
+        }
 
     }
     /**

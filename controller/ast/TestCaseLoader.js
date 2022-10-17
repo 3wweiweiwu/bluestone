@@ -202,7 +202,7 @@ class TestcaseLoader {
             let targetPicPath = ''
             let finalLocatorName = ''
             let finalLocator = ['']
-            let htmlPath = ''
+            let htmlPath = []
             let potentialMatch = []
             let healingTree = '{}'
             let locatorSnapshot = []
@@ -217,7 +217,7 @@ class TestcaseLoader {
                     finalLocator = locatorObj.Locator
                     target = finalLocator[0]
                     targetPicPath = locatorObj.screenshot
-                    htmlPath = ''
+                    htmlPath = []
                     locatorSnapshot = locatorObj.locatorSnapshot
                 }
                 //populate healing information

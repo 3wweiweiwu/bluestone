@@ -20,7 +20,8 @@ class RecordingStep {
         /** @type {Array<Locator>} */
         this.potentialMatch = recordingStep.potentialMatch
         this.framePotentialMatch = recordingStep.framePotentialMatch
-        this.htmlPath = recordingStep.htmlPath
+        /**@type {Array<string>} path of the html pathes */
+        this.__htmlPath = recordingStep.htmlPath
         this.targetInnerText = recordingStep.targetInnerText
         this.targetPicPath = recordingStep.targetPicPath
         this.timeoutMs = recordingStep.timeoutMs

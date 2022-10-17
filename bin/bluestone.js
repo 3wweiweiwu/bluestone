@@ -123,12 +123,13 @@ try {
 
             axios.put(`${bluestoneUrl}/api/record`, {
                 relativePath: cli.args.tcId,
-                testResultPath: resultFilePath
+                testResultPath: resultFilePath,
+                iteration: cli.args.iteration
             })
-                            .then((res) => {
-                // console.log(res)
-                return axios.get(`${bluestoneUrl}/workflow?WORKFLOW_RESOLVE`)
-            })
+                .then((res) => {
+                    // console.log(res)
+                    return axios.get(`${bluestoneUrl}/workflow?WORKFLOW_RESOLVE`)
+                })
                 .then(() => {
                     console.log('Load script successfully')
                 })

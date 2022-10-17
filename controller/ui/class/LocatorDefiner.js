@@ -5,6 +5,7 @@ const checkLocatorInDefiner = require('../../puppeteer/activities/checkLocatorIn
 const ElementSelector = require('../../../ptLibrary/class/ElementSelector')
 const fs = require('fs')
 const path = require('path')
+const { ThisExpression } = require('ts-morph')
 class FinalLocatorSelection {
     constructor() {
         this.finalLocatorName = ''
@@ -16,7 +17,7 @@ class LocatorDefiner {
     /**
      * 
      * @param {string} defaultSelector the default selector from locator generation library
-     * @param {string} locatorHtmlPath the html path of current locator
+     * @param {string} locatorHtmlPathList the html path of current locator
      * @param {string} locatorName the name of current locator. If it is a new locator, you shold provide ''
      * @param {string} locatorSelector the selector info. If '' is provided, it means that there is no potential match
      * @param {Array<Locator>} potentialMatch the potential match info coming from the recording step
@@ -25,14 +26,18 @@ class LocatorDefiner {
      * @param {Array<string>} parentFrame the parent frame hierachy
      * @param {boolean} isReviewMode if we are in review mode, we will not validate final locator if it match proposed value
      */
-    constructor(defaultSelector, locatorHtmlPath, locatorName, locatorSelector, potentialMatch, stepIndex, backend, parentFrame, isReviewMode = false, isRequiredLocatorUpdate = false) {
+    constructor(defaultSelector, locatorHtmlPathList, locatorName, locatorSelector, potentialMatch, stepIndex, backend, parentFrame, isReviewMode = false, isRequiredLocatorUpdate = false) {
 
         this.__selectorValidationNote = ''
         this.defaultSelector = defaultSelector
         this.__locatorName = locatorName
         this.__locatorSelector = locatorSelector
+        this.__locatorHtmlIndex = 0
+        this.locatorHtmlPathList = locatorHtmlPathList
         this.__locatorHtml = ''
-        this.locatorHtml = locatorHtmlPath
+        if (this.locatorHtmlPathList && this.locatorHtmlPathList.length >= 1) {
+            this.__locatorHtml = this.locatorHtmlPathList[0]
+        }
         this.__validationText = 'Please click Confirm button to validate your input'
         this.__possibleLocators = potentialMatch.map(item => {
             return {
@@ -47,6 +52,12 @@ class LocatorDefiner {
         this.parentFrame = parentFrame
         this.isReviewMode = isReviewMode
         this.isRequiredLocatorUpdate = isRequiredLocatorUpdate
+    }
+    get locatorHtmlIndex() {
+        return this.__locatorHtmlIndex
+    }
+    set locatorHtmlIndex(index) {
+        this.__locatorHtmlIndex = index
     }
     get locatorHtml() {
         return this.__locatorHtml
@@ -269,14 +280,12 @@ class LocatorDefiner {
 
                 break
             case LocatorDefiner.inBuiltQueryKey.btnNextHtml:
-                if (this.stepIndex != -1)
-                    this.backend.steps[this.stepIndex].updateHtmlForStep(1, this.backend.htmlCaptureStatus)
-                this.locatorHtml = this.backend.convertLocalPath2RelativeLink(this.backend.htmlCaptureStatus.getHtmlByPath(this.locatorHtml, 1))
+                this.locatorHtmlIndex = Math.abs(this.locatorHtmlIndex + 1) % this.locatorHtmlPathList.length
+                this.locatorHtml = this.locatorHtmlPathList[this.locatorHtmlIndex]
                 break
             case LocatorDefiner.inBuiltQueryKey.btnPrevHtml:
-                if (this.stepIndex != -1)
-                    this.backend.steps[this.stepIndex].updateHtmlForStep(-1, this.backend.htmlCaptureStatus)
-                this.locatorHtml = this.backend.convertLocalPath2RelativeLink(this.backend.htmlCaptureStatus.getHtmlByPath(this.locatorHtml, -1))
+                this.locatorHtmlIndex = Math.abs(this.locatorHtmlIndex - 1) % this.locatorHtmlPathList.length
+                this.locatorHtml = this.locatorHtmlPathList[this.locatorHtmlIndex]
                 break
             default:
                 break;
