@@ -57,7 +57,7 @@ class LocatorDefiner {
         return this.__locatorHtmlIndex
     }
     set locatorHtmlIndex(index) {
-        locatorHtmlIndex = index
+        this.__locatorHtmlIndex = index
     }
     get locatorHtml() {
         return this.__locatorHtml

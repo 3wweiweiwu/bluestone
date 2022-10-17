@@ -1105,7 +1105,7 @@ class WorkflowRecord {
      */
     getHtmlPath(fileName = null) {
         if (fileName == null) {
-            fileName = Date.now().toString() + ".html"
+            fileName = Date.now().toString() + (Math.random() + 1).toString(36).substring(7) + ".html"
         }
         let filePath = path.join(__dirname, '../../../public/temp/componentPic', fileName)
         return filePath
@@ -1128,7 +1128,7 @@ class WorkflowRecord {
      */
     getHtmlPath(fileName = null) {
         if (fileName == null) {
-            fileName = Date.now().toString() + ".html"
+            fileName = Date.now().toString() + (Math.random() + 1).toString(36).substring(7) + ".html"
         }
 
         let filePath = path.join(__dirname, '../../../public/temp/componentPic', fileName)
@@ -1197,7 +1197,7 @@ class WorkflowRecord {
             const pool = Pool(() => spawn(new Worker("./MhtmlConversion.js"), { timeout: 30000 }))
 
 
-            let currentTestScreenshots = resultObj.screenshotManager.filter(item => item.tcId.toLowerCase() == tcName.toLowerCase())
+            let currentTestScreenshots = resultObj.screenshotManager.filter(item => item.tcId.toLowerCase() == tcName.toLowerCase() && item.retryCount == 0)
             for (let screenshotRecord of currentTestScreenshots) {
                 //use html snapshot if possible
                 let newHtmlPath = this.getHtmlPath()
