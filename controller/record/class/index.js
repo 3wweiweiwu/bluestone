@@ -1138,9 +1138,10 @@ class WorkflowRecord {
     /**
      * @param {string} relativeScriptPath path to the script file
      * @param {string} abosoluteResultPath path to the test result .json file
+     * @param {number} iteration iteration information
      * @returns {WorkflowRecord}
      */
-    async loadTestcase(relativeScriptPath, abosoluteResultPath) {
+    async loadTestcase(relativeScriptPath, abosoluteResultPath, iteration = 0) {
         await this.refreshActiveFunc()
         //get full script path
         let bluestonePath = process.env.bluestonePath
@@ -1170,15 +1171,16 @@ class WorkflowRecord {
         this.steps = tcLoader.steps
         this.testSuiteName = tcLoader.testSuite
         this.testcaseName = tcLoader.testCase
-        await this.updateTestStep(abosoluteResultPath, tcLoader)
+        await this.updateTestStep(abosoluteResultPath, tcLoader, iteration)
 
     }
     /**
      * Based on the test step information, update screenshot/auto-healing info
      * @param {string} testResultPath path to the mocha result file
      * @param {TestcaseLoader} tcLoader name of the testcase
+     * @param {number} iteration iteration information
      */
-    async updateTestStep(testResultPath, tcLoader) {
+    async updateTestStep(testResultPath, tcLoader, iteration) {
         if (testResultPath == null) return
         let tcName = tcLoader.testCase
         try {
@@ -1197,7 +1199,7 @@ class WorkflowRecord {
             const pool = Pool(() => spawn(new Worker("./MhtmlConversion.js"), { timeout: 30000 }))
 
 
-            let currentTestScreenshots = resultObj.screenshotManager.filter(item => item.tcId.toLowerCase() == tcName.toLowerCase() && item.retryCount == 0)
+            let currentTestScreenshots = resultObj.screenshotManager.filter(item => item.tcId.toLowerCase() == tcName.toLowerCase() && item.retryCount == iteration)
             for (let screenshotRecord of currentTestScreenshots) {
                 //use html snapshot if possible
                 let newHtmlPath = this.getHtmlPath()
