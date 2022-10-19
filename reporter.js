@@ -15,6 +15,7 @@ var EVENT_TEST_PENDING = constants.EVENT_TEST_PENDING;
 var EVENT_TEST_FAIL = constants.EVENT_TEST_FAIL;
 var EVENT_TEST_END = constants.EVENT_TEST_END;
 var EVENT_RUN_END = constants.EVENT_RUN_END;
+var EVENT_TEST_RETRY = constants.EVENT_TEST_RETRY
 const getErrorStepIndexByStack = require('./ptLibrary/functions/getErrorStepIndexByStack')
 const VarSaver = require('./ptLibrary/class/VarSaver')
 /**
@@ -51,13 +52,23 @@ function JSONReporter(runner, options = {}) {
         }
 
     }
+    runner.on(EVENT_TEST_RETRY, function (test, error) {
+        let varSav = VarSaver.parseFromEnvVar()
+        varSav.errorManager.addInfo(error)
+        varSav.exportVarContextToEnv()
+
+
+    })
     runner.on(EVENT_TEST_END, function (test) {
         tests.push(test);
     });
     runner.on(EVENT_TEST_PASS, function (test) {
         passes.push(test);
     });
-    runner.on(EVENT_TEST_FAIL, function (test) {
+    runner.on(EVENT_TEST_FAIL, function (test, error) {
+        let varSav = VarSaver.parseFromEnvVar()
+        varSav.errorManager.addInfo(error)
+        varSav.exportVarContextToEnv()
         failures.push(test);
     });
     runner.on(EVENT_TEST_PENDING, function (test) {
@@ -85,6 +96,9 @@ function JSONReporter(runner, options = {}) {
         let truePasses = getTruePassAndReviews(obj.passes)
         obj.passes = truePasses.passes
         obj.reviews = truePasses.reviews
+
+        //add last failure to retry 
+        obj.errorManager = varSav.errorManager
 
         //update info in the stats field
         obj.stats.passes = obj.passes.length
