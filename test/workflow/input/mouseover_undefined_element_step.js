@@ -2,7 +2,7 @@ module.exports = {
     currentSelectedIndex: null,
     currentSelector: "//*[@id='div1']",
     selectorPicture: "",
-    selectorHtmlPath: "",
+    selectorHtmlPath: [],
     currentInnerText: "This is a paragrah",
     parentIframe: [],
     x: null,

@@ -86,7 +86,7 @@ class TestSite {
             let currentData = res.data
             Object.assign(currentData, {
                 selectorPicture: "",
-                selectorHtmlPath: "",
+                selectorHtmlPath: [],
                 x: null,
                 y: null,
                 width: null,

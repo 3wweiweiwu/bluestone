@@ -91,7 +91,7 @@ class WorkflowRecord {
                 currentSelectedIndex: null,
                 currentSelector: '',
                 selectorPicture: '',
-                selectorHtmlPath: '',
+                selectorHtmlPath: [],
                 currentInnerText: 'default',
                 parentIframe: [],
                 x: 0,
@@ -721,7 +721,7 @@ class WorkflowRecord {
     set spyBrowserSelectionPicPath(picturePath = '') {
         this.operation.browserSelection.selectorPicture = picturePath
     }
-    set spyBrowserSelectionHtmlPath(htmlPath = '') {
+    set spyBrowserSelectionHtmlPath(htmlPath = []) {
         this.operation.browserSelection.selectorHtmlPath = htmlPath
     }
 
