@@ -107,8 +107,13 @@ class TestcaseLoader {
                 /**@param {string} */
                 let picPath = pathGenFunc()
                 let sourcePicPath = path.join(config.code.pictureFolder, '..', step.targetPicPath)
-                await fs.copyFile(sourcePicPath, picPath)
-                step.targetPicPath = picPath
+                try {
+                    await fs.copyFile(sourcePicPath, picPath)
+                    step.targetPicPath = picPath
+                } catch (error) {
+                    console.info(`Unable to copy stock picture for ${step.finalLocatorName} from ${sourcePicPath} to ${picPath}. Please consider update locator picture when time permit.`)
+                }
+
             }
 
         }
