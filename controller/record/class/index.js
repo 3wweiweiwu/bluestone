@@ -1211,7 +1211,9 @@ class WorkflowRecord {
                 let stepIndex = tcLoader.getStepIndexFromLine(screenshotRecord.lineNumber)
                 this.steps[stepIndex].htmlPath.push(newHtmlPath)
             }
-            await pool.completed()
+            if (pool.taskQueue.length != 0) {
+                await pool.completed()
+            }
             await pool.terminate()
 
 
@@ -1229,6 +1231,8 @@ class WorkflowRecord {
                 this.steps[failureStepIndex].result.resultText = errorMessage
                 this.steps[failureStepIndex].isRequiredLocatorUpdate = true
             }
+            //if current step does not pass
+
             // Make all steps pass till we hit failure
             for (let i = 0; i < this.steps.length; i++) {
                 if (i == failureStepIndex) {
