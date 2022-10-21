@@ -54,7 +54,7 @@ function JSONReporter(runner, options = {}) {
     }
     runner.on(EVENT_TEST_RETRY, function (test, error) {
         let varSav = VarSaver.parseFromEnvVar()
-        varSav.errorManager.addInfo(error)
+        varSav.errorManager.addInfo(error, test.ctx.test.title, test.ctx.test.fullTitle())
         varSav.exportVarContextToEnv()
 
 
@@ -67,7 +67,7 @@ function JSONReporter(runner, options = {}) {
     });
     runner.on(EVENT_TEST_FAIL, function (test, error) {
         let varSav = VarSaver.parseFromEnvVar()
-        varSav.errorManager.addInfo(error)
+        varSav.errorManager.addInfo(error, test.ctx.test.title, test.ctx.test.fullTitle())
         varSav.exportVarContextToEnv()
         failures.push(test);
     });
