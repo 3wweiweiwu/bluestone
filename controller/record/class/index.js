@@ -1272,7 +1272,7 @@ class WorkflowRecord {
                 this.steps[failedStepIndex].isRequiredReview = true
                 //populate screenshot picture
 
-                this.steps[failedStepIndex].htmlPath.push(newHtmlPath)
+                this.steps[failedStepIndex].htmlPath.unshift(newHtmlPath)
                 //update locator to proposed value
                 this.steps[failedStepIndex].finalLocator = [prescription.newLocator]
                 this.steps[failedStepIndex].target = prescription.newLocator
