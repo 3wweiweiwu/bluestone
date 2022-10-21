@@ -1216,11 +1216,11 @@ class WorkflowRecord {
 
 
             //if test failed, attach failure information to the step
-            let currentFailureTc = resultObj.failures.find(item => item.title.toLowerCase() == tcName.toLowerCase())
+            let currentFailureTc = resultObj.errorManager.ErrorList.find(item => item.title.toLowerCase() == tcName.toLowerCase() && item.retryCount == iteration)
             let failureStepIndex = -1
             if (currentFailureTc != null) {
-                let errorMessage = currentFailureTc.err.message
-                let failureLine = getErrorStepIndexByErrorStack(currentFailureTc.file, currentFailureTc.err.stack)
+                let errorMessage = currentFailureTc.message
+                let failureLine = getErrorStepIndexByErrorStack(currentFailureTc.file, currentFailureTc.stack)
                 failureStepIndex = tcLoader.getStepIndexFromLine(failureLine)
                 if (failureStepIndex == -1) {
                     failureStepIndex = 0
