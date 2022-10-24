@@ -10,6 +10,7 @@ const axios = require('axios').default
 let config = require('../config')
 const regedit = require('../controller/regedit')
 const process = require('process')
+const initAutomation = require('../controller/initAutomation')
 function getPidPath() {
     return path.join(__dirname, 'bluestone.pid')
 }
@@ -103,6 +104,11 @@ try {
                 .then(() => {
                     console.log('hot reload complete!')
                 })
+            break
+        case "init":
+            bluestoneUrl = `http://localhost:${port}`
+            let initAutomationPath = path.resolve(cwdFolder, cli.args.path)
+            initAutomation(initAutomationPath)
             break
         case "edit":
             bluestoneUrl = `http://localhost:${port}`
