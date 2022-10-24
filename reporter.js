@@ -7,6 +7,7 @@
  */
 var Mocha = require("mocha");
 var Base = Mocha.reporters.Base
+const Spec = Mocha.reporters.Spec;
 var fs = require("fs");
 var path = require("path");
 var constants = Mocha.Runner.constants;
@@ -34,6 +35,7 @@ exports = module.exports = JSONReporter;
  */
 function JSONReporter(runner, options = {}) {
     Base.call(this, runner, options);
+    this._specReporter = new Spec(runner, options);
     var self = this;
     var tests = [];
     var pending = [];
