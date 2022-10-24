@@ -6,6 +6,10 @@ const options = {
         description: 'The path to the folder where we can find bluestone.json',
         type: 'string'
     },
+    initPath: {
+        description: 'The path to the folder where we can initialize Bluestone automation project',
+        type: 'string'
+    },
     url: {
         description: 'The url of your website',
         type: 'string'
@@ -67,6 +71,15 @@ let argv = yargs
             .options({ 'iteration': options['edit iteration'] })
             .wrap(null)
             .example('bluestone edit testcaseName --result ./result.json', 'Edit testcaseName based on result from ./result.json')
+    })
+    .command('init <path>', 'Initialize Bluestone Automation Project', recordYargs => {
+        recordYargs
+            .usage('Usage: bluestone init')
+            .help('help')
+            .positional('path', options.initPath)
+            .wrap(null)
+            .example('bluestone init .', 'Create a Bluestone Autoamtion Project in current folder')
+
     })
     .command('record <url>', 'Record new workflow', recordYargs => {
         recordYargs
