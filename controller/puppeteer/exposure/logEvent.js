@@ -79,6 +79,11 @@ module.exports = function (recordRepo, browser, page, io) {
 
         if (page != null) {
             picturePath = recordRepo.getPicPath()
+            //avoid tab switch if we are dealing with the same page
+            if (page == recordRepo.puppeteer.page && eventDetail.command == 'switchTab') {
+                return
+            }
+            recordRepo.puppeteer.setPage(page)
 
 
             if (eventDetail.target == '') {
@@ -109,7 +114,6 @@ module.exports = function (recordRepo, browser, page, io) {
         if (eventDetail.command == null) {
             //cache the page inforamtion. After we finish agent page
             //it will go back to the orginal page
-            recordRepo.puppeteer.setPage(page)
 
             await takeScreenshotForLocatorDefiner(page)
             // recordRepo.isCaptureHtml = false
@@ -166,7 +170,7 @@ module.exports = function (recordRepo, browser, page, io) {
             //calculate timeout by subtracting current time to the time from previous step
 
             eventDetail.targetPicPath = picturePath
-            eventDetail.htmlPath = htmlPath
+            eventDetail.htmlPath = [htmlPath]
             eventDetail.potentialMatch = locatorPotentialMatch
             eventDetail.framePotentialMatch = framePotentialMatch
             //construct operation event
@@ -175,7 +179,7 @@ module.exports = function (recordRepo, browser, page, io) {
                 let commandFuncAst = recordRepo.astManager.getFunction(event.command)
                 event.functionAst = commandFuncAst
                 //parse in argument into parameter
-                if (eventDetail.parameter && eventDetail.parameter != '') {
+                if (eventDetail.parameter != null) {
                     let paramIndex = event.functionAst.params.findIndex(item => { return item.type.name == 'Number' || item.type.name == 'string' || item.type.name == 'number' || item.type.name == 'Number' })
                     event.functionAst.params[paramIndex].value = eventDetail.parameter
 

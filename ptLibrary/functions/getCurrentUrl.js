@@ -5,7 +5,7 @@
  */
 module.exports = function (baseUrl) {
     let url = baseUrl
-    if (process.env.BLUESTONE_URL != null) {
+    if (process.env.BLUESTONE_URL != null && process.env.BLUESTONE_URL != '') {
         let originalUrlComponent = new URL(url)
         let newUrlHost = new URL(process.env.BLUESTONE_URL)
         originalUrlComponent.username = newUrlHost.username

@@ -1,0 +1,13 @@
+mixin variable-table(data)
+    table.table(class='table-hover')
+        thead
+            tr
+                th='Name (Click to copy Var Name)'
+                th='Type'
+                th='Value'
+        tbody
+            each row,j in data
+                tr(id='value-table-'+j)
+                    td(onclick=`navigator.clipboard.writeText("vars:${row.name}")`)='vars:'+row.name
+                    td=row.type
+                    td=row.value

@@ -69,6 +69,11 @@ let config = {
     },
     recording: {
         captureHtml: false
+    },
+    projectEnvVar: {
+        executionOperationTimeout: 0,
+        isAutoSnapshot: true
+
     }
 
 }
@@ -89,6 +94,9 @@ function configFunc() {
     if (projectObj.config) {
         let puppeteerConfigPath = path.join(projectFolder, projectObj.config)
         config.puppeteer = require(puppeteerConfigPath).puppeteer
+        //force headless mode to be false because bluestone need to display browser
+        if (config.puppeteer && config.puppeteer.headless == true)
+            config.puppeteer.headless = false
     }
 
     //load locator generator engine
@@ -100,8 +108,16 @@ function configFunc() {
         config.recording.captureHtml = true
     }
     config.code.dataPath = path.join(projectFolder, 'data')
+
+    //popoulate enviornment variable for project
+    initProjectEnv()
+
     return config
 }
 
+function initProjectEnv() {
+    config.projectEnvVar.executionOperationTimeout = process.env.BLUESTONE_EXECUTION_OPERATION_TIMEOUT_MS
+    config.projectEnvVar.isAutoSnapshot = process.env.BLUESTONE_AUTO_SNAPSHOT
 
+}
 module.exports = configFunc()

@@ -6,6 +6,10 @@ const options = {
         description: 'The path to the folder where we can find bluestone.json',
         type: 'string'
     },
+    initPath: {
+        description: 'The path to the folder where we can initialize Bluestone automation project',
+        type: 'string'
+    },
     url: {
         description: 'The url of your website',
         type: 'string'
@@ -36,6 +40,10 @@ const options = {
         description: 'The path to the result file. This result file will help with auto-healing',
         type: 'string',
     },
+    'edit iteration': {
+        description: 'The iteration result you would like to see. Default value:0, which is first iteration',
+        type: 'number'
+    },
     'tcId': {
         description: 'The name of test case. The testcase need to under ./script folder',
         type: 'string',
@@ -59,9 +67,19 @@ let argv = yargs
             .usage('Usage: Edit Testcase specified <tcId>. If you parse in execution report through <result> arg, auto-healing may save you maintenance time')
             .help('help')
             .positional('tcId', options.tcId)
-            .options({ tcResult: options['test result'] })
+            .options({ 'result': options['test result'] })
+            .options({ 'iteration': options['edit iteration'] })
             .wrap(null)
             .example('bluestone edit testcaseName --result ./result.json', 'Edit testcaseName based on result from ./result.json')
+    })
+    .command('init <path>', 'Initialize Bluestone Automation Project', recordYargs => {
+        recordYargs
+            .usage('Usage: bluestone init')
+            .help('help')
+            .positional('path', options.initPath)
+            .wrap(null)
+            .example('bluestone init .', 'Create a Bluestone Autoamtion Project in current folder')
+
     })
     .command('record <url>', 'Record new workflow', recordYargs => {
         recordYargs

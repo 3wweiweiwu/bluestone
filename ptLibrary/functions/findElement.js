@@ -284,46 +284,106 @@ async function getElementBasedOnLocatorBackup(page, elementSelector, similarityB
     let elementDict = {}
     let sum = 0
     /**@type {string} */
-    let bestId = null
+    let bestCandidate = null
     let bestElement = new ElementInfo(null, '')
     if (elementSelector.snapshot == null) {
         return bestElement
     }
     //get existing elements
-    for (const locator of elementSelector.snapshot) {
-        let newElementSelector = new ElementSelector([locator], null, `Locator-based Auto-healing - ${elementSelector.displayName} - ${locator}`)
-        let element = await waitForElement(page, newElementSelector, 1, { takeSnapshot: false, throwError: false, isHealingByLocatorBackup: false })
-        if (element != null) {
-            let id = await element.boundingBox()
-            id = JSON.stringify(id)
-            sum += 1
-            if (elementDict[id] == null) {
-                elementDict[id] = new ElementInfo(element, locator)
+    let potentialMatchList = await page.evaluate((locators => {
+        console.log(locators)
+        function getElementByXpath(xpath, source = document) {
+            let result = []
+            let elements = document.evaluate(xpath, source)
+            while (true) {
+                let node = elements.iterateNext()
+                if (node == null) break
+                result.push(node)
             }
+            return result
 
-            elementDict[id].addCount()
-
-
-
-            //get best element
-            if (bestId == null) {
-                bestId = id
-            }
-            else {
-                if (elementDict[bestId] < elementDict[id]) {
-                    bestId = id
-                }
-            }
         }
 
+        class ElementInfo {
+            constructor(element, locator) {
+                this.element = element
+                this.locator = locator
+                this.count = 1
+            }
+            addCount() {
+                this.count += 1
+            }
+        }
+        class ElementInfoList {
+            constructor() {
+                this.result = []
+            }
+            addCount(element, xpath) {
+                let entry = this.result.find(item => item.element == element)
+                if (entry == null) {
+                    //element not defined, create a new one
+                    entry = new ElementInfo(element, xpath)
+                    this.result.push(entry)
+                }
+                else {
+                    entry.addCount()
+                }
+            }
+
+        }
+
+        function getBestMatch(potentialLocatorList) {
+            let scoreBoard = new ElementInfoList()
+            for (let locator of potentialLocatorList) {
+                let locatorResults = null
+                try {
+                    locatorResults = getElementByXpath(locator)
+                } catch (error) {
+                    console.log(error)
+                    continue
+                }
+
+
+                //skip invalid locators
+                if (locatorResults.length == 0 || locatorResults.length > 1) {
+                    continue
+                }
+
+                let element = locatorResults[0]
+                scoreBoard.addCount(element, locator)
+
+            }
+
+            return scoreBoard
+        }
+        return getBestMatch(locators)
+    }), elementSelector.snapshot)
+    if (potentialMatchList == null || potentialMatchList.result == null) {
+        return bestElement
     }
+
+    //get most possible locator and its score
+    for (let match of potentialMatchList.result) {
+        sum += match.count
+        //if best candidate is not defined, use current element
+        if (bestCandidate == null) {
+            bestCandidate = match
+        }
+        else if (bestCandidate.count < match.count) {
+            //if best canddidate is defined yet it is not as good as what we have, use what we have
+            bestCandidate = match
+        }
+    }
+
+
     //get score for possible locator
-    if (bestId == null) {
+    if (bestCandidate == null) {
         return { element: null }
     }
-    let currentSimilarity = elementDict[bestId].count / sum
+    let currentSimilarity = bestCandidate.count / sum
     if (currentSimilarity > similarityBenchmark) {
-        bestElement = elementDict[bestId]
+        let elements = await page.$x(bestCandidate.locator)
+        bestElement = new ElementInfo(elements[0], bestCandidate.locator)
     }
 
     return bestElement
@@ -345,7 +405,13 @@ async function highlightProposedElement(page, element) {
             return borderStyle
         })
     }
-
+    if (page.constructor.name != 'CDPPage' && page.constructor.name != 'Page') {
+        try {
+            page = page.page()
+        } catch (error) {
+            page = page._frameManager.page()
+        }
+    }
     let pngData = await page.screenshot({ type: 'png' })
 
     let session = await page.target().createCDPSession();

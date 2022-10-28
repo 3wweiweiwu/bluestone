@@ -15,6 +15,19 @@ class PugDropDownInfo {
         this.url = url
     }
 }
+class PugVariableTableEntry {
+    /**
+     * Return variable info for pug
+     * @param {string} name 
+     * @param {string} value 
+     * @param {string} type 
+     */
+    constructor(name, value, type) {
+        this.name = name
+        this.value = value
+        this.type = type
+    }
+}
 class Operation {
     /**
      * 
@@ -216,7 +229,11 @@ class Operation {
                 let currentOperation = this.backend.getCurrentOperation()
 
                 let elementSelector = new ElementSelector([this.backend.operation.browserSelection.currentSelector], '', 'Current Selector')
-                let result = await this.backend.puppeteer.runCurrentStep(currentOperation, elementSelector, this.backend.operation.browserSelection.parentIframe)
+                let result = await this.backend.puppeteer.runCurrentStep(currentOperation, elementSelector, this.backend.operation.browserSelection.parentIframe, this.backend.astManager.runtimeVariable)
+                //if current value pass and it comes with return, assign value to the return
+                if (result.isResultPass && currentOperation.returnJsDoc && currentOperation.returnJsDoc.value) {
+                    this.backend.astManager.setRuntimeVariable(currentOperation.returnJsDoc.value, result.resultText)
+                }
                 this.backend.operation.spy.result.isPass = result.isResultPass
                 this.backend.operation.spy.result.text = result.resultText
                 // this.backend.puppeteer.refreshSpy()
@@ -292,6 +309,40 @@ class Operation {
         return groupInfo
     }
     /**
+     * return list of varaible info
+     * @return {Array<PugVariableTableEntry>}
+     */
+    getVariableInfoForPug() {
+
+        let result = []
+        let runTimeVar = this.backend.astManager.runtimeVariable
+        let stepsWithVarAssignment = this.backend.steps.filter(item => item.functionAst.returnJsDoc && item.functionAst.returnJsDoc.value)
+        result = stepsWithVarAssignment.map(step => {
+            let varName = step.functionAst.returnJsDoc.value
+            let varValue = runTimeVar[varName]
+            let varType = typeof (runTimeVar[varName])
+            let variableTableEntry = new PugVariableTableEntry(
+                varName,
+                varValue,
+                varType
+            )
+            return variableTableEntry
+        })
+
+        // result = Object.keys(runTimeVar).map(varName => {
+
+        //     let varValue = runTimeVar[varName]
+        //     let varType = typeof (runTimeVar[varName])
+        //     let variableTableEntry = new PugVariableTableEntry(
+        //         varName,
+        //         varValue,
+        //         varType
+        //     )
+        //     return variableTableEntry
+        // })
+        return result
+    }
+    /**
      * return a list of operation based on curent group
      * @returns {Array<PugDropDownInfo>}
      */
@@ -316,7 +367,7 @@ class Operation {
         }
         let description = operation.returnJsDoc.description
         let type = operation.returnJsDoc.type.name
-        description = `Please Enter Variable Name to store result. To use it in other place, you can use: vars:${operation.returnJsDoc.value} - Description: ${description}`
+        description = `Variable Name for Result Assignment. Description: ${description}`
         let result = [{
             pugType: 'text',
             description: description,
@@ -346,7 +397,7 @@ class Operation {
                 uiIndex++
             }
             else if (standardizedCurrentType == 'number') {
-                currentValue['pugType'] = 'number'
+                currentValue['pugType'] = 'text'
                 previousValue.push(currentValue)
                 uiIndex++
             }

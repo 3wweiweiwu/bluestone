@@ -23,7 +23,7 @@ router.put('/record', async function (req, res) {
     /**@type {import('../controller/record/class/index').WorkflowRecord} */
     let workflow = req.app.locals.workflow
     try {
-        await workflow.loadTestcase(req.body.relativePath, req.body.testResultPath)
+        await workflow.loadTestcase(req.body.relativePath, req.body.testResultPath, req.body.iteration)
         //get first url within the website
         let gotoStep = workflow.steps.find(element => element.command == 'goto')
 

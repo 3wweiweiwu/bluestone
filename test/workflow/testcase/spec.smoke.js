@@ -82,7 +82,7 @@ describe('Smoke Test - Integration', () => {
         assert.strictEqual(res.data.value, 3)
         // await new Promise(resolve => setTimeout(resolve, 500000))
 
-    }).timeout(15000)
+    }).timeout(20000)
     it('should correlate existing locator when hovering defined element', async () => {
         let happyPathPage = testConfig.testSite.page.happypath
         await bluestoneBackend.startRecording(siteBackend.singlePageHappyPath)

@@ -88,11 +88,11 @@
       "type": "node",
       "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
       "args": [
-        "C:\\Users\\wuwei\\Procedure-Automation-Bluestone\\script",
+        "C:\\Users\\wuwei\\bluestone-batch-release-manager\\script",
         "--exit",
         "true",
         "--grep",
-        "^.* s3$",
+        "^.* TC_779479$",
         "--reporter",
         "${workspaceFolder}\\reporter.js",
         "--reporter-option",
@@ -117,7 +117,9 @@
         "--reporter-option",
         "output=testrun.json,BLUESTONE_RUN_ID=testrun123,BLUESTONE_AUTO_SNAPSHOT=1",
         "--timeout",
-        "999999"
+        "999999",
+        "--retries",
+        "2"
       ]
     }
   ]

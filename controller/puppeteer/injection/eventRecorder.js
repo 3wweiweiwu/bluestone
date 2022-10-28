@@ -7,7 +7,8 @@ import { io } from "http://localhost:3600/javascript/socket.io.esm.js";
 import { getElementPos } from "http://localhost:3600/javascript/getElementPosition.js";
 import { PotentialMatchManager } from "http://localhost:3600/javascript/LocatorScanner.js";
 import { setStateToAllEvents } from "http://localhost:3600/javascript/blockElementInteraction.js";
-import getXPath from 'https://unpkg.com/get-xpath/index.esm.js';
+import { getXPath } from 'http://localhost:3600/javascript/getXPath.js';
+window.getXPath = getXPath
 import AtomicElementTree from "http://localhost:3600/javascript/AtomicElementTree.js"
 try {
 
@@ -104,9 +105,9 @@ Object.keys(EVENTCONST).forEach(item => {
         let timeStamp = Date.now()
         let selector = ''
         try {
-            selector = finder(targetElement)
-        } catch (error) {
             selector = getXPath(targetElement)
+        } catch (error) {
+            selector = finder(targetElement)
         }
 
         let customLocator = {
@@ -143,6 +144,12 @@ Object.keys(EVENTCONST).forEach(item => {
         switch (item) {
             case EVENTCONST.visibilitychange:
                 if (document.visibilityState == 'hidden') return
+                //in edit mode, we saw an situation where a swap tab operation is added at the end
+                // we will normally land in about:blank page when we are coming from edit mode
+                //As we switch to page, it will triger an go to tab action
+                //in this case, we will not record any switch page action from about:blank
+                //to avoid adding unnecessary steps toward the end of the script
+                if (window.location.href == 'about:blank') return
                 parameter = JSON.stringify({
                     tabIndex: globalVar.tabIndex
                 })
@@ -279,9 +286,10 @@ Object.keys(EVENTCONST).forEach(item => {
 document.addEventListener('mouseover', async event => {
     let selector = null
     try {
-        selector = finder(event.target)
-    } catch (error) {
         selector = getXPath(event.target)
+    } catch (error) {
+        selector = finder(event.target)
+
     }
 
 
@@ -554,10 +562,7 @@ const mutationObserverCallback = function (mutationsList, observer) {
         || checkAttributeNameExists(BLUESTONE.bluestoneIframePath)) {
         return
     }
-    //will not proceed to record if recording is set to false
-    if (window.isRecording() == false) {
-        return
-    }
+
     // console.log(mutationsList)
     captureScreenshot('dom tree change')
     //only proceed change that is introduced by RPA engine or code change

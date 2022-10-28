@@ -10,6 +10,9 @@ async function getFrame(page, parentIframes) {
     let frame = page
     //navigate through frames and get to current elements
     for (const frameLocator of parentIframes) {
+        if (frameLocator == 'TOP IFRAME') {
+            return page
+        }
         let frameElements = await getLocator(frame, frameLocator)
         if (frameElements.length != 1) {
             return null

@@ -11,6 +11,7 @@ const { initializePageCapture } = require('./snapshotCapture')
 const assert = require('assert')
 const path = require('path')
 const BluestoneFunc = require('../class/BluestoneFunc')
+const BluestoneType = require('../class/index')
 const TestcaseLoader = require('../../controller/ast/TestCaseLoader')
 const getCurrentUrl = require('./getCurrentUrl')
 const ConstantVar = {
@@ -139,17 +140,15 @@ exports.change = async function (frame, elementSelector, text) {
 exports.waitTillElementVisible = async function (frame, elementSelector, timeout) {
     let itemVisible = false
     let startTime = Date.now()
-    let timeSpan = 0
-    do {
+    while ((Date.now() - startTime) < timeout) {
         let element = await findElement(frame, elementSelector, timeout)
-        let rect = await element.evaluate(node => node.getBoundingClientRect())
+        let rect = await element.boundingBox()
         if (rect.width > 0 && rect.height > 0) {
             itemVisible = true
             break
         }
-        timespan = Date.now() - startTime
     }
-    while (timeSpan < timeout)
+
     if (itemVisible) {
         return 'Element is visible'
     }
@@ -192,6 +191,7 @@ exports.click = async function (frame, elementSelector, x, y) {
 
 
     try {
+        await element.hover()
         //if x and y offset is bigger than element itself, we will click on midle point
         //otherwise, it will go beyond the scope
         let elementPos = await element.boundingBox()
@@ -205,7 +205,6 @@ exports.click = async function (frame, elementSelector, x, y) {
         let offsetX = elementPos.width * x
         let offsetY = elementPos.height * y
         try {
-            await element.hover()
             try {
                 await frame.mouse.click(elementPos.x + offsetX, elementPos.y + offsetY)
             } catch (error) {
@@ -645,4 +644,30 @@ exports.switchTab = async function (browser, tabIndex) {
     let page = pageList[tabIndex]
     await page.bringToFront()
     return { page, frame: page }
+}
+
+
+exports.scrollElementToMidview = class extends BluestoneType.BluestoneFunc {
+    constructor() {
+        super()
+        this.locators = [{ locator: ['invalid_locator'] }]
+    }
+    /**
+     * Scroll element to the middle of the screen
+     * @param {Frame} frame frame. 
+     * @param {ElementSelector} element element
+     */
+    async func(frame, element) {
+        try {
+            let elementSelected = await thisWaitElementExists(frame, element, 6000)
+            elementSelected.evaluate(item => {
+                item.scrollIntoView({ block: 'center', inline: 'center' })
+            })
+        } catch (error) {
+            return Promise.reject(`Unable to scroll element into view:${element.displayName}    Error: ${error}`)
+        }
+
+        return true
+    }
+
 }

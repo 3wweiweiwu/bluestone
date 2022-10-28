@@ -7,6 +7,7 @@
  */
 var Mocha = require("mocha");
 var Base = Mocha.reporters.Base
+const Spec = Mocha.reporters.Spec;
 var fs = require("fs");
 var path = require("path");
 var constants = Mocha.Runner.constants;
@@ -15,6 +16,7 @@ var EVENT_TEST_PENDING = constants.EVENT_TEST_PENDING;
 var EVENT_TEST_FAIL = constants.EVENT_TEST_FAIL;
 var EVENT_TEST_END = constants.EVENT_TEST_END;
 var EVENT_RUN_END = constants.EVENT_RUN_END;
+var EVENT_TEST_RETRY = constants.EVENT_TEST_RETRY
 const getErrorStepIndexByStack = require('./ptLibrary/functions/getErrorStepIndexByStack')
 const VarSaver = require('./ptLibrary/class/VarSaver')
 /**
@@ -33,6 +35,7 @@ exports = module.exports = JSONReporter;
  */
 function JSONReporter(runner, options = {}) {
     Base.call(this, runner, options);
+    this._specReporter = new Spec(runner, options);
     var self = this;
     var tests = [];
     var pending = [];
@@ -51,13 +54,23 @@ function JSONReporter(runner, options = {}) {
         }
 
     }
+    runner.on(EVENT_TEST_RETRY, function (test, error) {
+        let varSav = VarSaver.parseFromEnvVar()
+        varSav.errorManager.addInfo(error, test.ctx.test.title, test.ctx.test.fullTitle(), test.ctx.test.file)
+        varSav.exportVarContextToEnv()
+
+
+    })
     runner.on(EVENT_TEST_END, function (test) {
         tests.push(test);
     });
     runner.on(EVENT_TEST_PASS, function (test) {
         passes.push(test);
     });
-    runner.on(EVENT_TEST_FAIL, function (test) {
+    runner.on(EVENT_TEST_FAIL, function (test, error) {
+        let varSav = VarSaver.parseFromEnvVar()
+        varSav.errorManager.addInfo(error, test.ctx.test.title, test.ctx.test.fullTitle(), test.ctx.test.file)
+        varSav.exportVarContextToEnv()
         failures.push(test);
     });
     runner.on(EVENT_TEST_PENDING, function (test) {
@@ -86,6 +99,9 @@ function JSONReporter(runner, options = {}) {
         obj.passes = truePasses.passes
         obj.reviews = truePasses.reviews
 
+        //add last failure to retry 
+        obj.errorManager = varSav.errorManager
+
         //update info in the stats field
         obj.stats.passes = obj.passes.length
         obj.stats['reviews'] = obj.reviews.length
@@ -93,6 +109,7 @@ function JSONReporter(runner, options = {}) {
         runner.testResults = obj;
         var json = JSON.stringify(obj, null, 2);
         if (output) {
+            //output file into folder user specified
             try {
                 fs.mkdirSync(path.dirname(output), { recursive: true });
                 fs.writeFileSync(output, json);
@@ -102,6 +119,21 @@ function JSONReporter(runner, options = {}) {
                 );
                 process.stdout.write(json);
             }
+
+            //output file into prescription folder
+            try {
+                let fileName = path.basename(output)
+                let filePathInPrescriptionFolder = path.join(varSav.ScreenshotReportManager.prescriptionFolder, fileName)
+                fs.writeFileSync(filePathInPrescriptionFolder, json);
+            } catch (err) {
+                console.error(
+                    `${Base.symbols.err} [mocha] writing output to "${filePathInPrescriptionFolder}" failed: ${err.message}\n`
+                );
+                process.stdout.write(json);
+            }
+
+
+
         } else {
             process.stdout.write(json);
         }

@@ -107,8 +107,13 @@ class TestcaseLoader {
                 /**@param {string} */
                 let picPath = pathGenFunc()
                 let sourcePicPath = path.join(config.code.pictureFolder, '..', step.targetPicPath)
-                await fs.copyFile(sourcePicPath, picPath)
-                step.targetPicPath = picPath
+                try {
+                    await fs.copyFile(sourcePicPath, picPath)
+                    step.targetPicPath = picPath
+                } catch (error) {
+                    console.info(`Unable to copy stock picture for ${step.finalLocatorName} from ${sourcePicPath} to ${picPath}. Please consider update locator picture when time permit.`)
+                }
+
             }
 
         }
@@ -134,7 +139,8 @@ class TestcaseLoader {
             step.iframe = iFrame
             if (step.command == 'gotoFrame') {
                 let elementSelectorParam = step.functionAst.params.find(item => item.type.name == 'ElementSelector')
-                iFrame = [elementSelectorParam.value]
+                let frameLocator = this.#locatorManager.locatorLibrary.find(item => item.path == elementSelectorParam.value)
+                iFrame = frameLocator.Locator
             }
         }
     }
@@ -148,7 +154,7 @@ class TestcaseLoader {
             let ancestorCheck = ancestor[ancestor.length - 2].type == 'CallExpression' && ancestor[ancestor.length - 2].callee.name == 'describe'
             let nodeCheck = node.type == 'Literal'
             return ancestorCheck && nodeCheck
-        })
+        }, (node, ancestor, result) => result.length > 0)
         return result[0].node.value
     }
 
@@ -158,7 +164,7 @@ class TestcaseLoader {
             let ancestorCheck = ancestor[ancestor.length - 2].type == 'CallExpression' && ancestor[ancestor.length - 2].callee.name == 'it'
             let nodeCheck = node.type == 'Literal'
             return ancestorCheck && nodeCheck
-        })
+        }, (node, ancestor, result) => result.length > 0)
         return result[0].node.value
     }
     /**
@@ -201,7 +207,7 @@ class TestcaseLoader {
             let targetPicPath = ''
             let finalLocatorName = ''
             let finalLocator = ['']
-            let htmlPath = ''
+            let htmlPath = []
             let potentialMatch = []
             let healingTree = '{}'
             let locatorSnapshot = []
@@ -216,7 +222,7 @@ class TestcaseLoader {
                     finalLocator = locatorObj.Locator
                     target = finalLocator[0]
                     targetPicPath = locatorObj.screenshot
-                    htmlPath = ''
+                    htmlPath = []
                     locatorSnapshot = locatorObj.locatorSnapshot
                 }
                 //populate healing information
@@ -227,6 +233,16 @@ class TestcaseLoader {
                     healingTree = path.join(snapshotFolder, healingSnapshotFile)
 
                 }
+                //populate variable assignment information
+                //test if variable has return
+                if (functionAst.returnJsDoc) {
+                    //test if current user perform assignment operamation
+                    let assignmentAncestor = item.ancestors.find(item => item.type == 'AssignmentExpression')
+                    if (assignmentAncestor) {
+                        functionAst.returnJsDoc.value = assignmentAncestor.left.property.value
+                    }
+                }
+
             } catch (error) {
                 //only print out error in the bluestone main console
                 if (process.env.BLUESTONE_VAR_SAVER == null)
@@ -253,8 +269,15 @@ class TestcaseLoader {
         functionParams.forEach((item, index) => {
             if (item.type.name == 'string' || item.type.name == 'number') {
                 item.value = null
-                if (args[index] != null)
-                    item.value = args[index].value
+                if (args[index] != null) {
+                    //this is variable
+                    if (args[index].type == 'MemberExpression')
+                        item.value = `vars:${args[index].property.value}`
+                    else
+                        //this is literal value
+                        item.value = args[index].value
+                }
+
             }
             if (item.type.name == 'ElementSelector') {
                 item.value = args[index].property.value

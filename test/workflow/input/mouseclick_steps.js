@@ -45,49 +45,8 @@ module.exports = [
         timeStamp: null,
     },
     {
-        command: "switchTab",
-        target: "body",
-        iframe: [],
-        potentialMatch: [],
-        framePotentialMatch: [],
-        __htmlPath: null,
-        targetInnerText:
-            "This is header\nThis is a paragrah\nFirst name:\n\nLast name:\n\n\n",
-        targetPicPath: null,
-        timeoutMs: null,
-        meta: {},
-        isRequiredReview: false,
-        isRequiredLocatorUpdate: false,
-        isRequiredNewNameAndLocator: false,
-        finalLocatorName: "",
-        finalLocator: [""],
-        functionAst: {
-            path: "",
-            name: "switchTab",
-            description: "Switch to tab by index",
-            params: [
-                {
-                    title: "param",
-                    description: null,
-                    type: { type: "NameExpression", name: "Browser" },
-                    name: "browser",
-                },
-                {
-                    title: "param",
-                    description: "tab index",
-                    type: { type: "NameExpression", name: "number" },
-                    name: "tabIndex",
-                    value: 1,
-                },
-            ],
-            locators: [{ locator: ["invalid_locator"] }],
-        },
-        result: { isResultPass: false, resultText: "" },
-        timeStamp: null,
-    },
-    {
         command: "waitElementExists",
-        target: "#div1",
+        target: "//*[@id='div1']",
         iframe: [],
         potentialMatch: [],
         framePotentialMatch: [],
@@ -152,7 +111,7 @@ module.exports = [
     },
     {
         command: "click",
-        target: "#div1",
+        target: "//*[@id='div1']",
         iframe: [],
         potentialMatch: [],
         framePotentialMatch: [],
@@ -207,7 +166,7 @@ module.exports = [
     },
     {
         command: "waitElementExists",
-        target: "#header",
+        target: "//*[@id='header']",
         iframe: [],
         potentialMatch: [
             {
@@ -279,7 +238,7 @@ module.exports = [
     },
     {
         command: "click",
-        target: "#header",
+        target: "//*[@id='header']",
         iframe: [],
         potentialMatch: [
             {

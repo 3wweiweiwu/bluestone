@@ -1,9 +1,7 @@
 module.exports = {
-    currentSelector: "#header",
-    selectorPicture:
-        "",
-    selectorHtmlPath:
-        "",
+    currentSelector: "//*[@id='header']",
+    selectorPicture: "",
+    selectorHtmlPath: [],
     currentInnerText: "This is header",
     parentIframe: [],
     x: null,
