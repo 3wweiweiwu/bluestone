@@ -11,7 +11,7 @@ const fsCb = require('fs')
 const path = require('path')
 const assert = require('assert')
 const locator = puppeteerSupport.Locator.Operation
-describe('Smoke Test - Operation Page', () => {
+describe('Smoke Test - Workflow Page', () => {
     const suite = this;
     beforeEach(async function () {
         this.timeout(60000)
@@ -76,6 +76,7 @@ describe('Smoke Test - Operation Page', () => {
 
         const browser = await puppeteer.launch(puppeteerSupport.config);
         const page = await browser.newPage();
+        await page.goto(bluestoneBackend.operationUrl)
         await bluestoneFunc.waitElementExists.func(page, puppeteerSupport.Locator.Operation['tabWorkflow'], 58697);
         await bluestoneFunc.click.func(page, puppeteerSupport.Locator.Operation['tabWorkflow']);
         await new Promise(resolve => setTimeout(resolve, 999999))
