@@ -16,6 +16,11 @@ exports.Locator = {
             locator: ['//input[@querykey=\'txtSelector\']'],
             screenshot: 'componentPic/Label_Batch_Genealogy___Batch_Information.png',
             displayName: 'Selector'
+        },
+        tabWorkflow: {
+            locator: ['//A[text()=\'Workflow\']'],
+            screenshot: 'componentPic/Label_Batch_Genealogy___Batch_Information.png',
+            displayName: 'Tab Workflow'
         }
     }
 }
