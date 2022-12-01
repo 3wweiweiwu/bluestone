@@ -183,7 +183,17 @@ exports.click = async function (frame, elementSelector, x, y) {
      */
     let element = await findElement(frame, elementSelector, 2000)
     // await element._scrollIntoViewIfNeeded() 
-    await element.hover()
+    try {
+        await element.hover()
+    } catch (error) {
+        //in case some developer use some unusal way to deine element, use browser click event directly
+        if (error.message == 'Node is either not clickable or not an HTMLElement') {
+            await element.evaluate(b => b.click());
+            return
+        }
+
+    }
+
     element = await findElement(frame, elementSelector, 1000)
     //handle default value
     if (x < 0 || x == undefined || x > 1) x = null
