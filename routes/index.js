@@ -78,7 +78,7 @@ router.get('/locator-definer', async function (req, res) {
   res.render('locatorDefiner.pug', variables);
 
 })
-router.get('/decide-view', async function (req, res) {  //Daniel Important to redirect
+router.get('/decide-view', async function (req, res) {
   /**
  * @type {import('../controller/record/class/index.js').WorkflowRecord}
  */

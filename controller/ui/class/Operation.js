@@ -1,8 +1,3 @@
-var LocatorD = require("../Entities/Locator")  //Daniel
-var OperationGroupD = require("../Entities/OperationGroup")  //Daniel
-var OperationD = require("../Entities/Operation")  //Daniel
-var CurrentOperationD =  require("../Entities/CurrentOperation")  //Daniel
-
 const FunctionAST = require('../../ast/class/Function')
 const JsDocTag = require('../../ast/class/JsDocTag')
 const { RecordingStep, WorkflowRecord } = require('../../record/class')
@@ -159,7 +154,7 @@ class Operation {
             let currentOperation = this.getCurrentOperation()
             let command = currentOperation.name
 
-            let target = this.backend.operation.browserSelection.currentSelector  
+            let target = this.backend.operation.browserSelection.currentSelector
 
             let targetInnerText = this.backend.operation.browserSelection.currentInnerText
             let targetPicPath = this.backend.operation.browserSelection.selectorPicture
@@ -384,7 +379,7 @@ class Operation {
      * Get argument information for pug
      * @returns {Array<JsDocTag>}
      */
-    getArgumentsInfoForPug() { 
+    getArgumentsInfoForPug() {
         let operation = this.getCurrentOperation()
         if (operation == null) return []
         if (operation.params == null) {
@@ -419,7 +414,7 @@ class Operation {
      * @param {string} picturePath 
      * @returns 
      */
-    getSpySelectorPictureForPug(picturePath = this.backend.operation.browserSelection.selectorPicture) { 
+    getSpySelectorPictureForPug(picturePath = this.backend.operation.browserSelection.selectorPicture) {
         let pictureName = ''
         if (picturePath != '') {
             pictureName = path.basename(picturePath)
@@ -453,41 +448,6 @@ class Operation {
             text = current.description
         }
         return text
-    }
-    get targetInformationDaniel(){  //Daniel, Getter created to get the information of the target
-        var target = new LocatorD('', this.backend.operation.browserSelection.currentSelector, this.backend.operation.browserSelection.selectorPicture)
-        return target
-    }
-    get isCaptureHtml(){ //getter is Captured Html
-        return this.backend.isCaptureHtml
-    }
-    isRecordingHtml(){  //Daniel, change is captured html
-        this.backend.isCaptureHtml = !this.backend.isCaptureHtml
-        return this.backend.isCaptureHtml
-    }
-    getOperationByIndex(index){  //Daniel, function to get the information o the step
-        var step = this.backend.steps[index]
-        let currentGroupKeys = Object.keys(this.backend.operationGroup)
-        var currentOperationInfo = null
-        for (let i = 0; i < currentGroupKeys.length; i++) {
-            let groupKey = currentGroupKeys[i]
-            /** @type {Array<FunctionAST>} */
-            let operations = this.backend.operationGroup[groupKey].operations
-            let currentOperation = operations.find(item => {
-                if (item == null) return false
-                return item.name == step.command
-            })
-            if (currentOperation != null) {
-                var group = new OperationGroupD(groupKey, this.backend.operationGroup[groupKey].text)
-                var operation = new OperationD(step.command, currentOperation.description)
-                operation.getArguments(currentOperation.params)
-                var target = new LocatorD("", step.target, step.targetPicPath)
-                var group = new OperationGroupD(groupKey, this.backend.operationGroup[groupKey].text, operation)
-                currentOperationInfo = new CurrentOperationD(group, target, index)
-                break
-            }
-        }
-        return currentOperationInfo
     }
 }
 module.exports = Operation

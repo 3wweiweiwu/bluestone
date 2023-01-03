@@ -1,7 +1,3 @@
-var OperationGroupD = require("../../ui/Entities/OperationGroup")  //Daniel
-var OperationD = require("../../ui/Entities/Operation")  //Daniel
-var Argument = require("../../ui/Entities/Argument")  //Daniel
-
 const path = require('path')
 const config = require('../../../config')
 const { LocatorManager, Locator } = require('../../locator/index')
@@ -1289,19 +1285,6 @@ class WorkflowRecord {
         } catch (error) {
             console.log('')
         }
-    }
-
-    get getOperations(){  //Daniel, Getter for the list of operations
-        var groupsLst = Object.keys(this.operationGroup)
-        var opGroups = []
-        for (var i = 0; i< groupsLst.length; i++)
-        {
-            var groupId = groupsLst[i]
-            var group = new OperationGroupD(groupId, this.operationGroup[groupId].text)
-            group.getOperations(this.operationGroup[groupId].operations)
-            opGroups.push(group)
-        }
-        return opGroups
     }
 }
 
