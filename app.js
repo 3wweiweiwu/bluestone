@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+var frontend = require('./routes/frontend');  //Daniel
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var diagnosticsRouter = require('./routes/diagnostics')
@@ -36,6 +37,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
+app.use('/daniel', frontend); //Daniel
 app.use('/users', usersRouter);
 app.use('/api/function', functionRouter)
 app.use('/api', recordRouter);

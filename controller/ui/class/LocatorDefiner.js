@@ -1,3 +1,5 @@
+var HtmlCapture = require("../Entities/HtmlCapture")  //Daniel
+var LocatorD = require("../Entities/Locator")  //Daniel
 
 const Locator = require('../../locator/class/Locator')
 const { WorkflowRecord } = require('../../record/class/index')
@@ -45,6 +47,9 @@ class LocatorDefiner {
                 selector: item.Locator[0],
                 pic: item.screenshot,
             }
+        })
+        this.__potentialMatch = potentialMatch.map((item, index) => {  //Daniel used to get the table of the potential match
+            return new LocatorD(item.path, item.Locator[0], item.screenshot, index)
         })
         this.stepIndex = stepIndex
         this.backend = backend
@@ -105,6 +110,23 @@ class LocatorDefiner {
         }
         return locatorHtml
     }
+    getSrcToDisplayInSideBarDaniel() {  //not sure how it works
+        var htmlCapture = new HtmlCapture('/temp/componentPic/locatorDefiner.png')
+        try {
+            //the default value for locator html is empty string.
+            //it doesn't make sense to do it
+            let locatorHtmlFullPath = path.join(__dirname, '../../../public', htmlCapture.htmlPic)
+            if (this.locatorHtml != '') {
+                fs.accessSync(locatorHtmlFullPath)
+                htmlCapture.htmlPic = this.locatorHtml
+            }
+
+        }
+        catch (error) {
+            // console.log(error)
+        }
+        return htmlCapture
+    }
     get locatorName() {
         return this.__locatorName
     }
@@ -123,6 +145,16 @@ class LocatorDefiner {
         let recommendationGroup = groupElements.map(item => {
             let encodedStr = encodeURIComponent(item)
             return { text: item, url: `locator-definer-sidebar?${LocatorDefiner.inBuiltQueryKey.recommendationDropDown}=${encodedStr}` }
+        })
+        return recommendationGroup
+    }
+    //Daniel Create function
+    getRecommendedLocatorDaniel() {
+        //list top 10 locators
+        let groupElements = this.backend.operation.browserSelection.recommendedLocator.slice(0, 10)
+        let recommendationGroup = groupElements.map(item => {
+            let recommendedLocator = new LocatorD("", item)
+            return recommendedLocator
         })
         return recommendationGroup
     }
@@ -156,6 +188,9 @@ class LocatorDefiner {
     get possibleLocators() {
         return this.__possibleLocators
     }
+    get potentialMatchDaniel(){
+        return this.__potentialMatch
+    }
     /**
      * Based on the current inforamtion, generate final locator name and final locator
      * If current condition does not satisfy our need, it will return empty string for 
@@ -175,6 +210,111 @@ class LocatorDefiner {
         }
         return finalSelection
     }
+    chooseLocator(index){  //Daniel Function to choose a locator
+        if (this.__possibleLocators.length > index){
+            this.locatorName = this.possibleLocators[index].name
+            this.locatorSelector = this.possibleLocators[index].selector
+            return (201)
+        }
+        return (204)
+    }
+    async addLocator(body){  //Daniel Function btnConfirm
+        var inputLocator = new LocatorD()
+        inputLocator.fromJson(body)
+        inputLocator.msg = ''
+        this.locatorName = inputLocator.name
+        this.locatorSelector = inputLocator.selector
+        //locatorName  == name
+        //locatorSelector == selector
+        if (this.isReviewMode == true && this.defaultSelector == inputLocator.selector) {
+            console.log('We are in reviwe mode and current locator selection match tested value. We will skip check')
+        }
+        else {
+            //check locator and confirm locator input
+            inputLocator.msg = await this.backend.puppeteer.checkLocatorBasedOnDefiner(this.defaultSelector, inputLocator.selector, this.parentFrame, this.isRequiredLocatorUpdate)
+            //will not update the locator if current locator is not valid
+            //await this.backend.puppeteer.openBluestoneTab("locator-definer") //
+        }
+
+        if (inputLocator.msg != '') return (inputLocator)
+        //add newly added selector to the locator library for future usage
+        var newLocator = await this.backend.locatorManager.updateLocator(inputLocator.name, [inputLocator.selector], this.locatorHtml, this.backend.operation.browserSelection.recommendedLocator)
+
+        //if we are in live locator generation mode, update finalLocator and potentialMatch list of current locator
+        if (this.stepIndex == -1) {
+            //update potential match and current selected index for current element
+            let newLocatorIndex = this.backend.locatorManager.getLocatorIndexByName(inputLocator.name)
+            this.backend.operation.browserSelection.potentialMatch.push(newLocator)
+            this.backend.operation.browserSelection.potentialMatch = [...new Set(this.backend.operation.browserSelection.potentialMatch)].filter(item => item != null)
+            this.backend.operation.browserSelection.currentSelectedIndex = newLocatorIndex
+            //update selector index for current selector
+                this.backend.puppeteer.setSelectorIndexForLocator(this.backend.operation.browserSelection.currentSelector, newLocatorIndex)
+                }
+                //mark currentSelectedIndex in the element to be current locator index
+                //check all steps and replicate same setting for same locator
+                for (let i = 0; i < this.backend.steps.length; i++) {
+                    let item = this.backend.steps[i]
+                    if (item.target == this.defaultSelector) {
+                        this.backend.steps[i].finalLocator = finalSelection.finalLocator
+                        this.backend.steps[i].finalLocatorName = finalSelection.finalLocatorName
+                        this.backend.steps[i].isRequiredReview = false
+                        //specify the locator name in the param
+                        let param = item.functionAst.params.find(item => {
+                            return item.type.name == 'ElementSelector'
+                        })
+                        if (param) {
+                            param.value = finalSelection.finalLocatorName
+                        }
+
+                    }
+                }
+        return inputLocator
+    }
+    async forceLocator(body){
+        var inputLocator = new LocatorD()
+        inputLocator.fromJson(body)
+        this.locatorName = inputLocator.name
+        this.locatorSelector = inputLocator.selector
+        //this doent return an error message
+        if (this.stepIndex != -1) {
+            this.backend.steps[this.stepIndex].finalLocator = [this.locatorSelector]
+            this.backend.steps[this.stepIndex].finalLocatorName = this.locatorName
+
+            param = this.backend.steps[this.stepIndex].functionAst.params.find(item => {
+                return item.type.name == 'ElementSelector'
+            })
+            if (param) {
+                param.value = this.locatorName
+            }
+        }
+
+        //if we are in live locator generation mode, update finalLocator and potentialMatch list of current locator
+        //Daniel, the case doesnt verify od the name and the selector exist, it coul cause problems, "btnOverrideLocator"
+        if (this.stepIndex == -1) {
+            var newLocator = await this.backend.locatorManager.updateLocator(inputLocator.name, [inputLocator.selector], this.locatorHtml, this.backend.operation.browserSelection.recommendedLocator)
+            //update potential match and current selected index for current element
+            let newLocatorIndex = this.backend.locatorManager.getLocatorIndexByName(this.locatorName)
+            this.backend.operation.browserSelection.potentialMatch.push(newLocator)
+            this.backend.operation.browserSelection.potentialMatch = [...new Set(this.backend.operation.browserSelection.potentialMatch)].filter(item => item != null)
+            this.backend.operation.browserSelection.currentSelectedIndex = newLocatorIndex
+            //update selector index for current selector
+            this.backend.puppeteer.setSelectorIndexForLocator(this.backend.operation.browserSelection.currentSelector, newLocatorIndex)
+        }
+
+
+        //specify locator function name in the param
+        //Daniel, I don't know why we need to verify the locator after update the information, if we want to force it don't care if the xpath is right 
+        this.backend.puppeteer.checkLocatorBasedOnDefiner(this.defaultSelector, inputLocator.selector, this.parentFrame, this.isRequiredLocatorUpdate)
+    }
+    revertLocator(){
+        //I thik that this update the selector option so we need to change that
+        this.locatorSelector = this.defaultSelector
+
+        var oldLocator = new LocatorD(this.locatorName, this.locatorSelector)
+        return oldLocator
+    }
+
+
     async update(query) {
         let queryKeys = Object.keys(query)
         let firstKey = queryKeys[0]
@@ -196,7 +336,7 @@ class LocatorDefiner {
                 this.locatorName = firstValue
                 break
 
-            case LocatorDefiner.inBuiltQueryKey.btnLocatorOk:
+            case LocatorDefiner.inBuiltQueryKey.btnLocatorOk: // Daniel, this is the option to choose the right locator, there should be an option to delete the locators
                 this.locatorName = this.possibleLocators[firstValue].name
                 this.locatorSelector = this.possibleLocators[firstValue].selector
                 break
