@@ -1,5 +1,6 @@
 const path = require("path")
 const { WorkflowRecord, RecordingStep } = require('../../record/class')
+const WorkflowPugVue = require("../Entities/WorkflowPugVue")
 class WorkflowStepForPug {
     constructor(command, target, argDic, output) {
         this.command = command
@@ -67,6 +68,34 @@ class WorkFlowPug {
             header: this.workflowHeader,
             info: this.workflowSteps
         }
+    }
+    async getWorkflowForVue(){  //Daniel
+        this.refreshWorkflowForVue(this.backend.steps)
+        return this.workflowSteps
+    }
+    refreshWorkflowForVue(steps) {  //Daniel
+        let workflowInfo = steps.map(step => {
+            let argStr = ''
+            if (step.functionAst != null) {
+                let currentOperation = step.functionAst.generateArgumentNContext()
+                argStr = currentOperation.argDic
+            }
+            let target = step.target
+            if (step.targetPicPath) {
+                target = path.basename(step.targetPicPath)
+            }
+            let description = step.command
+            if (step.functionAst && step.functionAst.description && step.functionAst.description != '') {
+                description = step.functionAst.description
+            }
+            let output = ''
+            if (step.functionAst.returnJsDoc && step.functionAst.returnJsDoc.value) {
+                output = step.functionAst.returnJsDoc.value
+            }
+            let workflowPug = new WorkflowStepForPug(step.command, target, argStr, output)
+            return workflowPug
+        })
+        this.workflowSteps = workflowInfo
     }
     /**
      * 
@@ -219,6 +248,103 @@ class WorkFlowPug {
             this.isValidationPass = true
         }
         return true
+    }
+    /**
+     * Genereate validaton action based on the current validation. If return true, it means no issue is found in current form
+     * @param {boolean} skipExecutionResultCheck 
+     * @param {WorkflowPugVue} wfPug
+     */
+    validateFormVue(wfPug, skipExecutionResultCheck = false) {  //Daniel
+        let steps = this.backend.steps
+        this.txtValidationStatus = ''
+        this.isValidationPass = false
+        if (this.backend.puppeteer.isExecutionOngoing) {
+            wfPug.message = 'Please wait, execution is going on.'
+            wfPug.result = false
+            return wfPug
+        }
+
+        for (let i = 0; i < steps.length; i++) {
+            let stepInfo = steps[i]
+            //skip steps whose function does not need locator
+            let elementSelectorParam = stepInfo.functionAst.params.find(item => item.type.name == 'ElementSelector')
+            if (elementSelectorParam == null) continue
+            if (stepInfo.command != 'goto' && stepInfo.target == 'no target') {
+                this.txtValidationStatus = `<a href="#tr-${i}">Step is invalid. Please delete that and re-record the step. Go to step ${i}</a>`
+                wfPug.message = this.txtValidationStatus
+                wfPug.result = false
+                return wfPug
+            }
+            if (stepInfo.finalLocator == '' || stepInfo.finalLocatorName == '') {
+                this.txtValidationStatus = `<a href="#tr-${i}">Locator Missing. Go to step ${i}</a>`
+                wfPug.message = this.txtValidationStatus
+                wfPug.result = false
+                return wfPug
+            }
+            if (stepInfo.isRequiredReview) {
+                this.txtValidationStatus = `<a href="#tr-${i}">Bluestone has automatically fix a locator change. Go to step ${i} to review proposal</a>`
+                wfPug.message = this.txtValidationStatus
+                wfPug.result = false
+                return wfPug
+            }
+        }
+        if (!skipExecutionResultCheck) {
+            for (let i = 0; i < steps.length; i++) {
+                let stepInfo = steps[i]
+
+                if (!stepInfo.result.isResultPass) {
+                    let updateLocator = `<a href=#tr-${i}>modify locator or edit function </a>`
+                    this.txtValidationStatus = `Step ${i} Failed: ${stepInfo.result.resultText}. Please run workflow again or ${updateLocator}`
+                    wfPug.message = this.txtValidationStatus
+                    wfPug.result = false
+                    return wfPug
+                }
+            }
+            this.isValidationPass = true
+        }
+        wfPug.result = true
+        return wfPug
+    }
+    /**
+     * Function to run all the workflow
+     * @param {WorkflowPugVue} pug 
+     */
+    async runWorkflow(pug){  //Daniel 
+        this.backend.runAllSteps()
+        pug = this.validateFormVue(pug)
+        return pug
+    }
+
+    async abortWorkflow(pug){ //Daniel
+        try {
+            this.backend.puppeteer.StepAbortManager.abortStepExecution()
+            this.backend.mochaDriver.abortScript()
+        } catch (error) {
+        }
+        this.validateFormVue(pug)
+        return pug
+    }
+
+    async navageteToFailure(pug){ //Daniel
+        this.backend.runAllStepsViaBluestone()
+        this.validateFormVue(pug)
+        return pug
+    }
+
+    async moveStepUp(index){  //DAniel I'm not sure what is the input needed
+        this.backend.moveStepInArray(index, -1)
+    }
+
+    async moveStepDown(index){  //DAniel I'm not sure what is the input needed
+        this.backend.moveStepInArray(index, 1)
+    }
+
+    async moveStepToIndex(index, diff){  //Daniel I'm not sure what is the input needed
+        this.backend.moveStepInArray(index, diff)
+    }
+
+    async deleteStep(index){  //DAniel I'm not sure what is the input needed
+        this.backend.steps.splice(index, 1)
     }
 }
 

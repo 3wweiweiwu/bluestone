@@ -1,10 +1,10 @@
 var Argument = require("../../ui/Entities/Argument") 
 
 class Operation{
-    constructor (name, description = null, argmunets = []){
+    constructor (name, description = null, arg = []){
         this.name = name
         this.description = description,
-        this.argmunets = argmunets
+        this.arg = arg
     }
 
     getArguments(params){ //Function to get Arguments in the list of operations
@@ -29,7 +29,19 @@ class Operation{
             }
             return previousValue
         }, [])
-        this.argmunets = operationArguments
+        this.arg = operationArguments
+    }
+
+    getArgumentsFromCurrentOperation(json){
+        Object.assign(this, json);
+        if(json.Argument){
+            let operationArguments = json.map((element) => {
+                var argument = new Argument(element.name)
+                argument.value = element.value
+                return argument
+            })
+            this.arg = operationArguments
+        }
     }
 }
 

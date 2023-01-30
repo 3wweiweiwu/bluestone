@@ -7,13 +7,17 @@ class OperationGroup{
         this.operations = operations
     }
 
-    getOperations(operationsData){  //
+    getOperations(operationsData){ 
         var operations = operationsData.map( element =>{
             var operation = new Operation(element.name, element.description)
             operation.getArguments(element.params)
             return operation
         })
         this.operations = operations
+    }
+
+    getOperationFromCurrentOperation(json){
+        Object.assign(this, json);
     }
 }
 

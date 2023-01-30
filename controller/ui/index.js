@@ -1,3 +1,4 @@
+const WorkflowPugVue = require("./Entities/WorkflowPugVue") //Daniel
 const LocatorDefiner = require('./class/LocatorDefiner')
 const Operation = require('./class/Operation')
 const Workflow = require('./class/Workflow')
@@ -52,14 +53,11 @@ class UI {
                 }
 
                 //write code to disk automatically
-                if (this.workflow.validateForm(true)) {
+                if (this.workflow.validateForm(true)) { //Daniel, I dont urdestand why we have to verify the excecution here
                     this.workflow.validateForm()
                     let finalPath = await this.backend.writeCodeToDisk(this.workflow.textTestSuiteValue, this.workflow.textTestCaseValue)
                     this.workflow.txtValidationStatus += `. Script Path: ${finalPath}`
                 }
-
-
-
                 break
 
             case Workflow.inBuiltQueryKey.btnLocatorWorkflow:
@@ -186,10 +184,43 @@ class UI {
             htmlUrl = this.backend.convertLocalPath2RelativeLink(htmlPath)
         }
 
-
-
         this.locatorDefiner = new LocatorDefiner(browserSelection.currentSelector, [htmlUrl], locatorName, locatorSelector, newPotentialMatch, -1, this.backend, browserSelection.parentIframe)
 
+    }
+    /**
+     * Funtion to add, validate and save script of the workflow
+     * @param {WorkflowPugVue} pug //Object type WorkflowPug for the Front end
+     */
+    async resolveVue(pug){//Daniel 
+        this.workflow.textTestSuiteValue = pug.testSuiteName
+        this.backend.testSuiteName = pug.testSuiteName
+        this.workflow.textTestCaseValue = pug.testName
+        this.backend.testcaseName = pug.testName
+
+        this.backend.resolveExistingLocatorInSteps()
+        // await this.backend.fixHtmlPathIssue(this.backend.htmlCaptureStatus)
+        var targetStep
+        var stepIndex = this.backend.findPendingLocatorInStep()
+        if (stepIndex != -1) {
+            targetStep = this.backend.steps[stepIndex]
+            await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex, targetStep.iframe)
+        }
+
+        stepIndex = this.backend.getFailedOrReviewRequiredStepIndex()
+        if (stepIndex != -1) {
+            targetStep = this.backend.steps[stepIndex]
+            await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex, targetStep.iframe)
+        }
+
+        //write code to disk automatically
+        pug = this.workflow.validateFormVue(pug, true)
+        if (pug.result) {
+            let finalPath = await this.backend.writeCodeToDisk(this.textTestSuiteValue, this.textTestCaseValue)
+            this.workflow.txtValidationStatus += `. Script Path: ${finalPath}`
+            pug.message = this.workflow.txtValidationStatus
+            
+        }
+        return pug
     }
 }
 

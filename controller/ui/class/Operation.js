@@ -465,6 +465,11 @@ class Operation {
         this.backend.isCaptureHtml = !this.backend.isCaptureHtml
         return this.backend.isCaptureHtml
     }
+    isRecording(){ //Daniel
+        this.backend.isRecording = !this.backend.isRecording
+        return this.backend.isRecording
+    }
+    
     getOperationByIndex(index){  //Daniel, function to get the information o the step
         var step = this.backend.steps[index]
         let currentGroupKeys = Object.keys(this.backend.operationGroup)
@@ -478,16 +483,111 @@ class Operation {
                 return item.name == step.command
             })
             if (currentOperation != null) {
+                //Creates the response
                 var group = new OperationGroupD(groupKey, this.backend.operationGroup[groupKey].text)
                 var operation = new OperationD(step.command, currentOperation.description)
-                operation.getArguments(currentOperation.params)
+                operation.getArguments(step.functionAst.params)
                 var target = new LocatorD("", step.target, step.targetPicPath)
                 var group = new OperationGroupD(groupKey, this.backend.operationGroup[groupKey].text, operation)
                 currentOperationInfo = new CurrentOperationD(group, target, index)
+                //Update the information int he Backend
+                this.spy.userSelection.currentGroup = groupKey
+                this.spy.userSelection.currentOperation = step.functionAst.name
+                this.browserSelection.currentInnerText = step.targetInnerText
+                this.browserSelection.currentSelector = step.target
+                this.browserSelection.selectorPicture = step.targetPicPath
+                this.browserSelection.lastOperationTimeoutMs = step.timeoutMs
+                this.browserSelection.parentIframe = step.iframe
                 break
             }
         }
         return currentOperationInfo
+    }
+    async addOrModifyStepDaniel(currentOperationInput){  //Daniel I have questions about the the async function
+        this.spy.userSelection.currentGroup = currentOperationInput.operationGroup.id
+        this.spy.userSelection.currentOperation = currentOperationInput.operationGroup.operations.name
+
+
+        let currentOperation = this.getCurrentOperation()
+        currentOperation = this.__updateArgumentsDaniel(currentOperation, currentOperationInput.operationGroup.operations.arg)
+        let command = currentOperation.name
+
+        let target = this.backend.operation.browserSelection.currentSelector  
+
+        let targetInnerText = this.backend.operation.browserSelection.currentInnerText
+        let targetPicPath = this.backend.operation.browserSelection.selectorPicture
+        let timeoutMs = this.backend.operation.browserSelection.lastOperationTimeoutMs
+        let htmlPath = this.backend.operation.browserSelection.selectorHtmlPath
+        let parentFrame = this.backend.operation.browserSelection.parentIframe
+        let potentialMatch = this.backend.operation.browserSelection.potentialMatch
+        let atomicTree = this.backend.operation.browserSelection.atomicTree
+        let framePotentialMatch = this.backend.operation.browserSelection.framePotentialMatch
+
+        //construct operation step
+        let step = new RecordingStep({ command, target, timeoutMs: timeoutMs, targetPicPath, targetInnerText, functionAst: currentOperation, htmlPath: htmlPath, iframe: parentFrame, potentialMatch: potentialMatch, healingTree: atomicTree, framePotentialMatch })
+
+        //update step if currentLocatorIndex has been specified
+        let currentLocatorIndex = this.backend.operation.browserSelection.currentSelectedIndex
+        if (currentLocatorIndex) {
+            let locator = this.backend.locatorManager.locatorLibrary[currentLocatorIndex]
+            step.finalLocatorName = locator.path
+            step.finalLocator = locator.Locator
+        }
+
+        var stepIndex = currentOperationInput.index
+        if (stepIndex == null)
+            this.backend.addStep(step)
+        else
+            this.backend.modifyStep(stepIndex, step)
+            //refresh active function so that we can point the functionASt to new isntances
+        this.backend.refreshActiveFunc()
+        this.backend.operation.browserSelection.lastOperationTimeoutMs = 0
+        console.log(this.backend.steps)
+        return currentOperationInput
+    }
+    async runOperation(currentOperationInput){  //Daniel I have questions about the the async function
+        this.spy.userSelection.currentGroup = currentOperationInput.operationGroup.id
+        this.spy.userSelection.currentOperation = currentOperationInput.operationGroup.operations.name
+
+        let currentOperation = this.getCurrentOperation()
+        currentOperation = this.__updateArgumentsDaniel(currentOperation, currentOperationInput.operationGroup.operations.arg)
+
+        let elementSelector = new ElementSelector([this.backend.operation.browserSelection.currentSelector], '', 'Current Selector')
+        let result = await this.backend.puppeteer.runCurrentStep(currentOperation, elementSelector, this.backend.operation.browserSelection.parentIframe, this.backend.astManager.runtimeVariable)
+
+        //if current value pass and it comes with return, assign value to the return
+        if (result.isResultPass && currentOperation.returnJsDoc && currentOperation.returnJsDoc.value) {
+            this.backend.astManager.setRuntimeVariable(currentOperation.returnJsDoc.value, result.resultText)
+        }
+        this.backend.operation.spy.result.isPass = result.isResultPass
+        this.backend.operation.spy.result.text = result.resultText
+
+        currentOperationInput.result = result.isResultPass
+        currentOperationInput.resulMsg = result.resultText
+        return currentOperationInput
+    }
+    __updateArgumentsDaniel(operation, arg){
+        let lstArguments = arg.map(element => {
+            return element.name
+        })
+        for (let i = 0; i < operation.params.length; i++) {
+            var name = operation.params[i].name
+            if (lstArguments.includes(name)) {
+                var curArgument = arg.find( element => element.name == name)
+                operation.params[i].value = curArgument.value
+            }
+        }
+        return operation
+    }
+    async resume(){  //Daniel
+        //if we switch it back right away, it will recod the switch tab event
+        //it will be confusing to see so many switch tab events
+        setTimeout(() => {
+            this.backend.isRecording = true
+        }, 300);
+
+        this.backend.spyVisible = false
+        // this.backend.isCaptureHtml = true
     }
 }
 module.exports = Operation

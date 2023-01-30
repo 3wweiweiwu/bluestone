@@ -15,10 +15,10 @@ class Argument {
 }
 
 class Operation{
-    constructor (name, description = null, argmunets = []){
+    constructor (name, description = null, arg = []){
         this.name = name
         this.description = description,
-        this.argmunets = argmunets
+        this.arg = arg
     }
 }
 
@@ -31,11 +31,11 @@ class OperationGroup{
 
 
 class CurrentOperation{
-    constructor(operationGroup, operation, locator, argmunets = [], index = -1, result = null, resulMsg = ""){
+    constructor(operationGroup, operation, locator, arg = [], index = -1, result = null, resulMsg = ""){
         this.operationGroup = operationGroup
         this. operation = operation
         this.locator = locator      //This needs to be a Object Locator, I'm not sure if we need to add a validation or not
-        this. argmunets = argmunets
+        this. arg = arg
         this.index = index
         this.result = result
         this.resulMsg = resulMsg
@@ -47,18 +47,18 @@ class CurrentOperation{
             this.target = new Locator()
             this.target.fromJson(json.target)
         }
-        if (json.argmunets){
-            this.argmunets = []
-            json.argmunets.forEach(element => {
+        if (json.arg){
+            this.arg = []
+            json.arg.forEach(element => {
                 var argument = new Argument()
                 argument.fromJson(element)
-                this.argmunets.push(argument)
+                this.arg.push(argument)
             });
         }
     }
 
     compleat(){
-        if(this.operation != null && this.target != null && this.argmunets.length > 0){
+        if(this.operation != null && this.target != null && this.arg.length > 0){
             return true
         }
         return false

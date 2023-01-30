@@ -3,7 +3,10 @@ var router = express.Router();
 
 //#region Entities
 //import { HtmlCapture, Locator} from "./Enities/LocatorDefiner.js"
-var TitleBtn = require("../controller/ui/Entities/Title")
+var TitleBtn = require("../controller/ui/Entities/Title");
+var CurrentOperation = require("../controller/ui/Entities/CurrentOperation");
+var WorkflowPugVue = require("../controller/ui/Entities/WorkflowPugVue");
+const UI = require('../controller/ui');
 //import {Argument, Operation, OperationGroup, CurrentOperation, OperationStatus, HtmlCaptureStatus} from "./Enities/Operations.js"
 //#endregion
 
@@ -13,7 +16,7 @@ const titleOperation = new TitleBtn("Operation", "/daniel/operation", "GET");
 const titleWorkflow = new TitleBtn("Operation", "/daniel/locatordefiner", "GET");
 
 //#region Endpoints Title
-router.get('/titlemenu',  async function  (req, res) {
+router.get('/titlemenu',  async function  (req, res) {  //Not sure about this, think more in the design of the front
     try 
     {
         let html = [titleLocatorDefiner, titleOperation, titleWorkflow]
@@ -31,6 +34,9 @@ router.get('/titlemenu',  async function  (req, res) {
 //function name getSrcToDisplayInSideBar
 //I can't find the option to retun
 router.get('/locatordefiner/htmlwebpage', async function  (req, res)  {
+    /**
+    * @type {UI}
+    */
     let ui = req.app.locals.ui
     try{
         let htmlCapture = ui.locatorDefiner.getSrcToDisplayInSideBarDaniel()
@@ -59,6 +65,9 @@ router.get('/locatordefiner/htmlwebpage', async function  (req, res)  {
 
 router.get('/locatordefiner/possiblelocator',  async function (req, res) {  //TO DO Missing input
     try {
+        /**
+        * @type {UI}
+        */
         let ui = req.app.locals.ui
         let possiblelocator = ui.locatorDefiner.getRecommendedLocatorDaniel()
         if (possiblelocator.length == 0){
@@ -76,6 +85,9 @@ router.get('/locatordefiner/possiblelocator',  async function (req, res) {  //TO
 
 router.get('/locatordefiner/potentialmatch',  async function (req, res) { 
     try {
+        /**
+        * @type {UI}
+        */
         let ui = req.app.locals.ui
         let potentialMatch = ui.locatorDefiner.potentialMatchDaniel;
         if (potentialMatch.length == 0){
@@ -91,7 +103,7 @@ router.get('/locatordefiner/potentialmatch',  async function (req, res) {
     }
 })
 
-// Not sure if this will be implemented
+// Not sure if this will be implemented, need to ask weiwei, I forgot to do that
 router.delete('/locatordefiner/potentialmatch/:index',  async function (req, res, next) { 
     try {
         // if (delPotentialMatch(req.params.index)){
@@ -115,6 +127,9 @@ router.post('/locatordefiner/potentialmatch/locator/:index',  async function (re
             res.status(400)
             return
         }
+        /**
+        * @type {UI}
+        */
         let ui = req.app.locals.ui
         res.sendStatus(ui.locatorDefiner.chooseLocator(req.params.index))
     }
@@ -125,6 +140,11 @@ router.post('/locatordefiner/potentialmatch/locator/:index',  async function (re
     }
 })
 
+/**
+ * Verify that the body of the request has the parameters name and selector, if there is missing someone of them returns a list with the values
+ * @param {json} locator 
+ * @returns 
+ */
 function filterLocator(locator){
     let missing = []
     let needed = ['name', 'selector']
@@ -189,12 +209,7 @@ router.post('/locatordefiner/locator/revert', async function (req, res) {
 //#endregion
 
 
-//let ui = req.app.locals.ui
-//res.json(ui.operation.browserSelection)
-//let ui = req.app.locals.ui
-//res.json(JSON.stringify(ui.backend.operationGroup))
-//operationGroup[group].operations
-
+//#region Operations Page
 router.get("/operation/operations", (req, res) =>{
     try {
         var ui = req.app.locals.ui
@@ -270,7 +285,10 @@ router.get("/operation/htmlcaptured", (req, res) =>{
 
 router.get("/operation/operationmuted", (req, res) =>{
     try {
-        var ui = req.app.locals.ui
+        /**
+         * @type {UI}
+         */
+        let ui = req.app.locals.ui
         var operationsMuted = ui.operation.getFunctionMuteState()
         if(operationsMuted.length > 0){
             res.json(operationsMuted)
@@ -285,15 +303,111 @@ router.get("/operation/operationmuted", (req, res) =>{
     }
 })
 
-// targetStep = this.backend.steps[firstValue]
-// this.__repopulateOperationUI(targetStep, firstValue)
+function filterCurrentOperation(body){
+    var curOperation = new CurrentOperation()
+    curOperation.fromJson(body)
+    var isCompleate = curOperation.isCompleate()
+    if (isCompleate == true){
+        return curOperation
+    }
+    return isCompleate
+}
+
+router.put('/operation/operation', (req, res) =>{
+    try {
+        var curOp = filterCurrentOperation(req.body)
+        if(typeof(curOp) == 'string'){
+            res.status(400).send(curOp)
+            return
+        }
+        /**
+        * @type {UI}
+        */
+        var status = 200
+        var ui = req.app.locals.ui
+        if (curOp.index >= ui.backend.steps.length || curOp.index < 0){
+            curOp.index = null
+            status = 201
+        }
+        ui.operation.addOrModifyStepDaniel(curOp)
+            .catch(err =>{
+                console.log(`${err}`)
+                res.status(500).send(`Error adding operation`)
+            })
+            .then(value =>{
+                res.status(status).json(value)
+            })
+        
+    }
+    catch (error){
+        console.log(`${error}`)
+        res.status(500).send(`Error adding operation`)
+    }
+});
+
+router.post('/operation/run', (req, res) =>{
+    try {
+        var curOp = filterCurrentOperation(req.body)
+        if(typeof(curOp) == 'string'){
+            res.status(400).send(curOp)
+            return
+        }
+        /**
+        * @type {UI}
+        */
+        var ui = req.app.locals.ui
+        ui.operation.runOperation(curOp)
+            .then(value=>{
+                res.json(value)
+            })
+    }
+    catch (error){
+        console.log(`${error}`)
+        res.status(500).send(`Error adding operation`)
+    }
+});
+
+router.post('/operation/resume', (req, res) =>{ //missing return to the web app
+    /**
+    * @type {UI}
+    */
+    var ui = req.app.locals.ui
+    ui.operation.resume()
+        .then(()=>{
+            res.sendStatus(201)
+        })
+        .catch(err=>{
+            console.log(`${err}`)
+            res.status(500).send(`Error with resume option`)
+        })
+});
+
+router.put('/operation/operationmuted', (req, res) =>{
+    /**
+    * @type {UI}
+    */
+    var ui = req.app.locals.ui
+    ui.backend.updateMutedFunctionForRecordingDaniel(req.query.operation)
+        .then((value)=>{
+            if(value == true){
+                res.sendStatus(201)
+            }
+            else{
+                res.sendStatus(204)
+            }
+        })
+        .catch(err=>{
+            console.log(`${err}`)
+            res.status(500).send(`Error Updating operatin muted for ${req.params.operation}`)
+        })
+});
 
 
-
-
-//its the last one
 router.post('/operation/htmlcaptured', (req, res) =>{
     try {
+        /**
+        * @type {UI}
+        */
         var ui = req.app.locals.ui
         var htmlState = { "isCaptureHtml" : ui.operation.isRecordingHtml()} 
         res.json(htmlState)
@@ -303,5 +417,236 @@ router.post('/operation/htmlcaptured', (req, res) =>{
         res.status(500).send(`Error changing the record operation`)
     }
 });
+
+router.post('/operation/recording', (req, res) =>{
+    try {
+        /**
+        * @type {UI}
+        */
+        var ui = req.app.locals.ui
+        var htmlState = { "isRecording" : ui.operation.isRecording()} 
+        res.json(htmlState)
+    }
+    catch (error){
+        console.log(`${error}`)
+        res.status(500).send(`Error changing the record operation`)
+    }
+});
+//#endregion
+
+
+//#region  Workflow page
+router.get('/workflow/steps', (req, res) =>{
+    /**
+    * @type {UI}
+    */
+    var ui = req.app.locals.ui
+    ui.workflow.getWorkflowForVue()
+        .catch((err)=>{
+            console.log(`${err}`)
+            res.status(500).send(`Error cresuming the excecution`)
+        })
+        .then(value =>{
+            if(value.length >0){
+                res.status(200).json(value)
+            }
+            else{
+                res.sendStatus(204)
+            }
+        })
+})
+
+router.post('/workflow/resolve', (req, res) =>{
+    var wfPugVue = new WorkflowPugVue()
+    wfPugVue.fromJson(req.body)
+    var isCompleate = wfPugVue.isCompleate()
+    if(typeof(isCompleate) == 'string'){
+        res.status(400).send(isCompleate)
+        return
+    }
+    /**
+    * @type {UI}
+    */
+    var ui = req.app.locals.ui
+    ui.resolveVue(wfPugVue)
+        .catch((err)=>{
+            console.log(`${err}`)
+            res.status(500).send(`Error Resolving Workflow Pug ${err}`)
+        })
+        .then(value =>{
+            res.status(201).json(value)
+        })
+})
+
+router.post('/workflow/run', (req, res) =>{
+    var wfPugVue = new WorkflowPugVue()
+    wfPugVue.fromJson(req.body)
+    var isCompleate = wfPugVue.isRunnable()
+    if(typeof(isCompleate) == 'string' || !wfPugVue.result){
+        res.status(400).send(isCompleate)
+        return
+    }
+    /**
+    * @type {UI}
+    */
+    var ui = req.app.locals.ui
+    ui.workflow.runWorkflow(wfPugVue)
+        .catch((err)=>{
+            console.log(`${err}`)
+            res.status(500).send(`Error Running workflow ${err}`)
+        })
+        .then(value =>{
+            res.status(201).json(value)
+        })
+})
+
+router.post('/workflow/abort', (req, res) =>{
+    var wfPugVue = new WorkflowPugVue()
+    wfPugVue.fromJson(req.body)
+    var isCompleate = wfPugVue.isCompleate()
+    if(typeof(isCompleate) == 'string' || !wfPugVue.result){
+        res.status(400).send(isCompleate)
+        return
+    }
+    /**
+    * @type {UI}
+    */
+    var ui = req.app.locals.ui
+    ui.workflow.abortWorkflow(wfPugVue)
+        .catch((err)=>{
+            console.log(`${err}`)
+            res.status(500).send(`Error trying to abort the excecution ${err}`)
+        })
+        .then(value =>{
+            res.status(201).json(value)
+        })
+})
+
+router.post('/workflow/navegatetofailure', (req, res) =>{
+    var wfPugVue = new WorkflowPugVue()
+    wfPugVue.fromJson(req.body)
+    var isCompleate = wfPugVue.isCompleate()
+    if(typeof(isCompleate) == 'string' || !wfPugVue.result){
+        res.status(400).send(isCompleate)
+        return
+    }
+    /**
+    * @type {UI}
+    */
+    var ui = req.app.locals.ui
+    ui.workflow.navageteToFailure(wfPugVue)
+        .catch((err)=>{
+            console.log(`${err}`)
+            res.status(500).send(`Error trying to abort the excecution ${err}`)
+        })
+        .then(value =>{
+            res.status(201).json(value)
+        })
+})
+
+router.delete('/workflow/step/:step', (req, res) =>{    //DAniel I'm not sure what is the input needed
+    var index = req.params.step
+    if(index<0){
+        res.sendStatus(400)
+        return
+    }
+    //filter to validate input
+    /**
+    * @type {UI}
+    */
+    var ui = req.app.locals.ui
+    if(index >= ui.backend.steps.length){
+        res.sendStatus(204)
+        return
+    }
+    ui.workflow.deleteStep(index)
+        .catch((err)=>{
+            console.log(`${err}`)
+            res.status(500).send(`Error deleting step: ${req.params.step} error: ${err}`)
+        })
+        .then(value =>{
+            res.status(201).json(value)
+        })
+})
+
+router.put('/workflow/step/:step/moveup', (req, res) =>{    //DAniel I'm not sure what is the input needed
+    var index = req.params.step
+    if(index<0){
+        res.sendStatus(400)
+        return
+    }
+    //filter to validate input
+    /**
+    * @type {UI}
+    */
+    var ui = req.app.locals.ui
+    if(index >= ui.backend.steps.length){
+        res.sendStatus(204)
+        return
+    }
+    ui.workflow.moveStepUp(index)
+        .catch((err)=>{
+            console.log(`${err}`)
+            res.status(500).send(`Error deleting step: ${req.params.step} error: ${err}`)
+        })
+        .then(value =>{
+            res.status(201).json(value)
+        })
+})
+
+
+router.put('/workflow/step/:step/movedown', (req, res) =>{    //DAniel I'm not sure what is the input needed
+    var index = req.params.step
+    if(index<0){
+        res.sendStatus(400)
+        return
+    }
+    //filter to validate input
+    /**
+    * @type {UI}
+    */
+    var ui = req.app.locals.ui
+    if(index >= ui.backend.steps.length){
+        res.sendStatus(204)
+        return
+    }
+    ui.workflow.moveStepDown(index)
+        .catch((err)=>{
+            console.log(`${err}`)
+            res.status(500).send(`Error deleting step: ${req.params.step} error: ${err}`)
+        })
+        .then(value =>{
+            res.status(201).json(value)
+        })
+})
+
+router.put('/workflow/step/:step/move/:index', (req, res) =>{    //DAniel I'm not sure what is the input needed
+    var step = req.params.step
+    var index = req.params.index
+    if(index<0 || step<0){
+        res.sendStatus(400)
+        return
+    }
+    //filter to validate input
+    /**
+    * @type {UI}
+    */
+    var ui = req.app.locals.ui
+    if(index >= ui.backend.steps.length || step>= ui.backend.steps.length){
+        res.sendStatus(204)
+        return
+    }
+    var diff = index - step
+    ui.workflow.moveStepToIndex(step, diff)
+        .catch((err)=>{
+            console.log(`${err}`)
+            res.status(500).send(`Error deleting step: ${req.params.step} error: ${err}`)
+        })
+        .then(value =>{
+            res.status(201).json(value)
+        })
+})
+
+//#endregion
 
 module.exports = router;

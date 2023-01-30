@@ -1,5 +1,3 @@
-
-
 class WorkflowPug 
 {
     constructor (testSuiteName = null, testName = null, result = null, message = null)

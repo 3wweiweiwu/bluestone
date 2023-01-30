@@ -140,6 +140,19 @@ class WorkflowRecord {
             this.mutedFunctionForRecording.push(funcName)
         }
     }
+    async updateMutedFunctionForRecordingDaniel(funcName) { //Daniel
+        var functionList = this.operationGroup.inbuiltFunction.operations.map(item => {
+            return item.name.toLowerCase()
+            })
+        if (!functionList.includes(funcName)) return false
+        if (this.mutedFunctionForRecording.includes(funcName)) {
+            this.mutedFunctionForRecording = this.mutedFunctionForRecording.filter(item => item != funcName)
+        }
+        else {
+            this.mutedFunctionForRecording.push(funcName)
+        }
+        return true
+    }
     async initializeFunctions() {
         console.log('Initializing Bluestone...')
         await this.astManager.loadFunctions(config.code.funcPath)
