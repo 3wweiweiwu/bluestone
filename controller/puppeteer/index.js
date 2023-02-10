@@ -59,9 +59,21 @@ async function startRecording(record, io, url = null, isCleanSteps = true) {
     record.puppeteer.setIO(io)
     record.puppeteer.setBrowser(browser)
 
-    for (let i = 0; i < url.split(',').length; i++) {
-        let link = url.split(',')[i]
-        page = await browser.newPage();
+    browser.on('targetcreated', async function (target) {
+        //if we are not actively tracking tab creation, we will return
+        //this feature is setup to avoid recording bluestone's tab
+        if (!record.puppeteer.isTrackTabCreation) {
+            return
+        }
+        let startTime = Date.now()
+        page = await target.page()
+        let endTime = Date.now()
+        console.log(endTime - startTime)
+        //as we press ctrl+q, it will trigger target created event. Not quite sure what it means
+        if (page == null) {
+            return
+        }
+        let pageIndex = record.puppeteer.pageList.length + 1
         record.puppeteer.setPage(page)
         record.puppeteer.addPageToPageList(page)
         //initialize alert watcher
@@ -71,7 +83,7 @@ async function startRecording(record, io, url = null, isCleanSteps = true) {
 
         //inject event watcher and expose supporting function
         let eventRecorderPath = path.join(__dirname, './injection/eventRecorder.js')
-        await injectModuleScriptBlock(page, eventRecorderPath, i + 1)
+        await injectModuleScriptBlock(page, eventRecorderPath, pageIndex)
 
         //inject singlepage
         // const injectedScript = await singlefileScript.get(config.puppeteer);
@@ -103,8 +115,12 @@ async function startRecording(record, io, url = null, isCleanSteps = true) {
         await page.setBypassCSP(true)
         let client = await page.target().createCDPSession()
         await client.send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: download.downloadFolder });
+    })
 
 
+    for (let i = 0; i < url.split(',').length; i++) {
+        let link = url.split(',')[i]
+        page = await browser.newPage();
         if (url != null) {
             for (let i = 0; i < 5; i++) {
                 try {

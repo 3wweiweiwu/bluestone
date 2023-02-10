@@ -39,6 +39,7 @@ class PuppeteerControl {
         this.StepAbortManager = StepAbortManager
         /** @type {Page[]} */
         this.pageList = []
+        this.isTrackTabCreation = true
     }
     get isExecutionOngoing() {
         return this.__isExecutionOngoing
@@ -74,7 +75,9 @@ class PuppeteerControl {
      * @param {'spy'|'workflow'|'refresh'} bluestonePath refresh means refresh current page
      */
     async openBluestoneTab(bluestonePath) {
+        this.isTrackTabCreation = false
         let result = await openBluestoneTab(this.browser, bluestonePath)
+        this.isTrackTabCreation = true
         return result
     }
     /**
