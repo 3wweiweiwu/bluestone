@@ -130,6 +130,7 @@ async function startRecording(record, io, url = null, isCleanSteps = true) {
                     console.log('Unable to go to ' + link)
                 }
             }
+            await page.reload()
         }
     }
 
