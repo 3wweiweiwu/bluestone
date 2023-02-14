@@ -66,7 +66,8 @@ async function startRecording(record, io, url = null, isCleanSteps = true) {
             return
         }
         let startTime = Date.now()
-        page = await target.page()
+        /** @type {import('puppeteer').Page} */
+        let page = await target.page()
         let endTime = Date.now()
         console.log(endTime - startTime)
         //as we press ctrl+q, it will trigger target created event. Not quite sure what it means
@@ -115,6 +116,8 @@ async function startRecording(record, io, url = null, isCleanSteps = true) {
         await page.setBypassCSP(true)
         let client = await page.target().createCDPSession()
         await client.send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: download.downloadFolder });
+
+        await page.reload()
     })
 
 
