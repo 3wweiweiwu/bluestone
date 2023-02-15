@@ -117,7 +117,7 @@ async function startRecording(record, io, url = null, isCleanSteps = true) {
         let client = await page.target().createCDPSession()
         await client.send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: download.downloadFolder });
 
-        await page.reload()
+        console.log('new page loaded correctly')
     })
 
 
