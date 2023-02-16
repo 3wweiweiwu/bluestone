@@ -25,10 +25,10 @@ class CurrentOperation{
     }
 
     isCompleate(){
-        if(this.operationGroup.id === null || this.operationGroup.id == ""){
+        if(this.operationGroup.id === null || this.operationGroup.id == "" || !this.operationGroup.id){
             return `Please input group info`
         }
-        if(this.operationGroup.operations == null || this.operationGroup.operations.name == null || this.operationGroup.operations.name == '' ){
+        if(!this.operationGroup.operations || this.operationGroup.operations == null || this.operationGroup.operations.name == null || this.operationGroup.operations.name == '' ){
             return `Please input operation info`
         }
         return true

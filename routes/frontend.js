@@ -136,8 +136,33 @@ router.post('/locatordefiner/potentialmatch/locator/:index',  async function (re
     catch (error)
     {
         console.log(error);
-        res.status(500).send(`Error Deleting element ${req.params.index}`);
+        res.status(500).send(`Error Choosing element ${req.params.index}`);
     }
+})
+
+router.post('/locatordefiner/update/target/:step', (req, res)=>{
+    var index = req.params.step
+    if(index<0){
+        res.sendStatus(400)
+        return
+    }
+    //filter to validate input
+    /**
+    * @type {UI}
+    */
+    var ui = req.app.locals.ui
+    if(index >= ui.backend.steps.length){
+        res.sendStatus(204)
+        return
+    }
+    ui.updateTargetVue(index)
+        .catch((err)=>{
+            console.log(`${err}`)
+            res.status(500).send(`Updating target from step: ${req.params.step} error: ${err}`)
+        })
+        .then(value =>{
+            res.status(201).json(value)
+        })
 })
 
 /**
@@ -162,7 +187,9 @@ router.post('/locatordefiner/locator', async function (req, res) {
             res.status(400).send(`Data missing ${miss}`)
             return
         }
-
+        /**
+        * @type {UI}
+        */
         let ui = req.app.locals.ui
         let locator = await ui.locatorDefiner.addLocator(req.body)
         if (locator.msg == ''){
@@ -173,7 +200,7 @@ router.post('/locatordefiner/locator', async function (req, res) {
     }
     catch (error){
         console.log(`${error}`)
-        res.status(500).send(`Error creating the locator`)
+        res.status(500).send(error.message)
     }
 });
 
@@ -184,7 +211,9 @@ router.post('/locatordefiner/locator/force', async function (req, res) {
             res.status(400).send(`Data missing ${miss}`)
             return
         }
-
+        /**
+        * @type {UI}
+        */
         let ui = req.app.locals.ui
         await ui.locatorDefiner.forceLocator(req.body)  //I think that we can quit the await, and just return a 202, because we don't care about the response
         res.sendStatus(201)
@@ -197,6 +226,9 @@ router.post('/locatordefiner/locator/force', async function (req, res) {
 
 router.post('/locatordefiner/locator/revert', async function (req, res) {
     try {
+        /**
+        * @type {UI}
+        */
         let ui = req.app.locals.ui
         let locator = ui.locatorDefiner.revertLocator()
         res.status(201).json(locator)
@@ -226,7 +258,7 @@ router.get("/operation/operations", (req, res) =>{
     }
 })
 
-router.get("/operation/taget", (req, res) =>{
+router.get("/operation/target", (req, res) =>{
     try {
         var ui = req.app.locals.ui
         var target = ui.operation.targetInformationDaniel
@@ -265,12 +297,15 @@ router.get("/operation/operation/:index", (req, res) =>{
     }
     catch (err){
         console.log(err)
-        res.status(500).send(`Error finding the operation with the index ${req.params.index}`)
+        res.status(500).send(`Error finding the step with the index ${req.params.index}`)
     }
 })
 
 router.get("/operation/htmlcaptured", (req, res) =>{
     try {
+        /**
+         * @type {UI}
+         */
         var ui = req.app.locals.ui
         var htmlState = { "isCaptureHtml" : ui.operation.isCaptureHtml}
         res.json(htmlState)
@@ -282,6 +317,21 @@ router.get("/operation/htmlcaptured", (req, res) =>{
     }
 })
 
+router.get("/operation/recording", (req, res) =>{
+    try {
+        /**
+         * @type {UI}
+         */
+        var ui = req.app.locals.ui
+        var recordingState = { "isRecording" : ui.operation.getIsRecording}
+        res.json(recordingState)
+        
+    }
+    catch (err){
+        console.log(err)
+        res.status(500).send(`Error getting the is captured Html`)
+    }
+})
 
 router.get("/operation/operationmuted", (req, res) =>{
     try {
@@ -289,7 +339,7 @@ router.get("/operation/operationmuted", (req, res) =>{
          * @type {UI}
          */
         let ui = req.app.locals.ui
-        var operationsMuted = ui.operation.getFunctionMuteState()
+        var operationsMuted = ui.operation.getFunctionMuteStateVue()
         if(operationsMuted.length > 0){
             res.json(operationsMuted)
         }
@@ -320,10 +370,10 @@ router.put('/operation/operation', (req, res) =>{
             res.status(400).send(curOp)
             return
         }
+        var status = 200
         /**
         * @type {UI}
         */
-        var status = 200
         var ui = req.app.locals.ui
         if (curOp.index >= ui.backend.steps.length || curOp.index < 0){
             curOp.index = null
@@ -640,7 +690,7 @@ router.put('/workflow/step/:step/move/:index', (req, res) =>{    //DAniel I'm no
     ui.workflow.moveStepToIndex(step, diff)
         .catch((err)=>{
             console.log(`${err}`)
-            res.status(500).send(`Error deleting step: ${req.params.step} error: ${err}`)
+            res.status(500).send(`Error moving step: ${req.params.step} to ${index} error: ${err}`)
         })
         .then(value =>{
             res.status(201).json(value)

@@ -301,6 +301,18 @@ class Operation {
         return functionList
 
     }
+    getFunctionMuteStateVue() {
+        let functionList = []
+        if (this.backend.operationGroup.inbuiltFunction == null) return functionList
+        functionList = this.backend.operationGroup.inbuiltFunction.operations.map(item => {
+            return {
+                caption: item.name.toLowerCase(),
+                isMuted: !this.backend.mutedFunctionForRecording.includes(item.name)
+            }
+        })
+        return functionList
+
+    }
     /**
      * return a list of group info for the pug to consume 
      * @returns {Array<PugDropDownInfo>}
@@ -460,6 +472,9 @@ class Operation {
     }
     get isCaptureHtml(){ //getter is Captured Html
         return this.backend.isCaptureHtml
+    }
+    get getIsRecording(){ //getter is Recording
+        return this.backend.isRecording
     }
     isRecordingHtml(){  //Daniel, change is captured html
         this.backend.isCaptureHtml = !this.backend.isCaptureHtml

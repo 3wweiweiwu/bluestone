@@ -49,7 +49,7 @@ class LocatorDefiner {
             }
         })
         this.__potentialMatch = potentialMatch.map((item, index) => {  //Daniel used to get the table of the potential match
-            return new LocatorD(item.path, item.Locator[0], item.screenshot, index)
+            return new LocatorD(item.path, item.Locator[0], path.join(__dirname, '../../../public', item.screenshot), index)
         })
         this.stepIndex = stepIndex
         this.backend = backend
@@ -118,7 +118,7 @@ class LocatorDefiner {
             let locatorHtmlFullPath = path.join(__dirname, '../../../public', htmlCapture.htmlPic)
             if (this.locatorHtml != '') {
                 fs.accessSync(locatorHtmlFullPath)
-                htmlCapture.htmlPic = this.locatorHtml
+                htmlCapture.htmlPic = this.locatorHtmlFullPath
             }
 
         }
@@ -236,6 +236,7 @@ class LocatorDefiner {
             //await this.backend.puppeteer.openBluestoneTab("locator-definer") //
         }
 
+        let finalSelection = this.getFinalSelection(inputLocator.msg)
         if (inputLocator.msg != '') return (inputLocator)
         //add newly added selector to the locator library for future usage
         var newLocator = await this.backend.locatorManager.updateLocator(inputLocator.name, [inputLocator.selector], this.locatorHtml, this.backend.operation.browserSelection.recommendedLocator)

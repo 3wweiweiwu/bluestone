@@ -1,4 +1,5 @@
 const WorkflowPugVue = require("./Entities/WorkflowPugVue") //Daniel
+var LocatorD = require("./Entities/Locator")  //Daniel
 const LocatorDefiner = require('./class/LocatorDefiner')
 const Operation = require('./class/Operation')
 const Workflow = require('./class/Workflow')
@@ -221,6 +222,13 @@ class UI {
             
         }
         return pug
+    }
+
+    async updateTargetVue(index){
+        var stepIndex = Number.parseInt(index)
+        var targetStep = this.backend.steps[stepIndex]
+        await this.refreshLocatorDefiner(targetStep.target, targetStep.htmlPath, targetStep.finalLocatorName, targetStep.finalLocator, targetStep.potentialMatch, stepIndex, targetStep.iframe, targetStep.isRequiredReview, targetStep.isRequiredLocatorUpdate)
+        return new LocatorD(targetStep.finalLocatorName, targetStep.finalLocator[0])
     }
 }
 
