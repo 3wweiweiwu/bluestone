@@ -16,20 +16,30 @@ module.exports = async function (page, injectionPath, tabIndex) {
     //update tab index
     eventRecorderScript = eventRecorderScript.split('tabIndex: 1').join(`tabIndex: ${tabIndex}`)
     let registerEvent = async function (eventRecorderScript) {
-        while (true) {
-            await new Promise(resolve => setTimeout(resolve, 50))
-            if (document != null) break
-        }
+        let ensureBluestoneInjected = async function () {
+            while (true) {
+                await new Promise(resolve => setTimeout(resolve, 50))
+                if (document != null) break
+            }
+            let scriptId = 'Bluestone-Script-Filler'
 
-        try {
-            //add script block
-            let finderScript = document.createElement("script");
-            finderScript.setAttribute('type', 'module')
-            finderScript.innerHTML = eventRecorderScript
-            document.body.appendChild(finderScript);
-        } catch (error) {
+            //if scripts has been injected, stop
+            if (document.getElementById(scriptId)) {
+                return
+            }
+            try {
+                //add script block
+                let finderScript = document.createElement("script");
+                finderScript.id = scriptId
+                finderScript.setAttribute('type', 'module')
+                finderScript.innerHTML = eventRecorderScript
+                document.body.appendChild(finderScript);
+            } catch (error) {
 
+            }
         }
+        setInterval(ensureBluestoneInjected, 5000)
+
 
     }
     await page.evaluateOnNewDocument(registerEvent, eventRecorderScript)
