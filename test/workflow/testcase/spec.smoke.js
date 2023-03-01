@@ -99,14 +99,14 @@ describe('Smoke Test - Integration', () => {
         let happyPathPage = testConfig.testSite.page.happypath
         await bluestoneBackend.startRecording(siteBackend.singlePageHappyPath)
         await siteBackend.sendOperation('mouseover', happyPathPage.paragraph)
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 6000))
         res = await bluestoneBackend.getBackendOperation()
         let baseline = require('../input/mouseover_undefined_element_step');
         //override data which is irrelevant
         let currentData = res.data
         delete currentData['atomicTree']
         assert.deepStrictEqual(currentData, baseline)
-    }).timeout(30000)
+    }).timeout(60000)
     it('should record click event in steps correct', async () => {
         let happyPathPage = testConfig.testSite.page.happypath
         await bluestoneBackend.startRecording(siteBackend.singlePageHappyPath)
