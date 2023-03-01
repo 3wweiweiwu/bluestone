@@ -38,6 +38,7 @@ module.exports = async function (page, injectionPath, tabIndex) {
 
             }
         }
+        await ensureBluestoneInjected()
         setInterval(ensureBluestoneInjected, 5000)
 
 
