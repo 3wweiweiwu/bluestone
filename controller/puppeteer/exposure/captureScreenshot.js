@@ -7,23 +7,29 @@ const config = require('../../../config')
  * @param {WorkflowRecord} recordRepo
  */
 module.exports = function (page, recordRepo) {
-
+    let id = Math.random()
+    let isCaptureOngoing = false
     return async function (reason) {
-        if (page != null && recordRepo.isRecording && recordRepo.picCapture.getPendingItems() < 1) {
+        if (page != null && recordRepo.isRecording && !isCaptureOngoing) {
+
+            isCaptureOngoing = true
             //capture html
 
             let picPath = recordRepo.getPicPath()
             let index = recordRepo.picCapture.pushOperation('', picPath)
             try {
-                await page.screenshot({ path: picPath, captureBeyondViewport: false })
 
-                recordRepo.picCapture.markCaptureDone(index)
-
+                //stop capturing any screenshot that is current page is not active
+                if (page == recordRepo.puppeteer.page) {
+                    await page.screenshot({ path: picPath, captureBeyondViewport: false })
+                    recordRepo.picCapture.markCaptureDone(index)
+                }
                 recordRepo.picCapture.popOperation()
             } catch (error) {
                 recordRepo.picCapture.popOperation()
             }
-
+            isCaptureOngoing = false
+            // console.log(id)
 
         }
 
