@@ -83,7 +83,7 @@ class PicCapture {
         try {
             pic = await jimp.read(filePath)
         } catch (error) {
-            console.log(error)
+            // console.log(error)
         }
 
         try {
@@ -91,7 +91,7 @@ class PicCapture {
             pic.writeAsync(newPath)
 
         } catch (error) {
-            console.log(error)
+            // console.log(error)
         }
 
     }
