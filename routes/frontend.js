@@ -103,25 +103,8 @@ router.get('/locatordefiner/potentialmatch',  async function (req, res) {
     }
 })
 
-// Not sure if this will be implemented, need to ask weiwei, I forgot to do that
-router.delete('/locatordefiner/potentialmatch/:index',  async function (req, res, next) { 
-    try {
-        // if (delPotentialMatch(req.params.index)){
-        //     res.status(200).send(req.params.index)
-        // }
-        // else {
-        //     res.sendStatus(204)
-        // }
-        next()
-    }
-    catch (error)
-    {
-        console.log(error);
-        res.status(500).send(`Error Deleting element ${req.params.index}`);
-    }
-})
 
-router.post('/locatordefiner/potentialmatch/locator/:index',  async function (req, res) { 
+router.post('/locatordefiner/potentialmatch/:index',  async function (req, res) { 
     try {
         if(req.params.index < 0){
             res.status(400)
@@ -244,6 +227,9 @@ router.post('/locatordefiner/locator/revert', async function (req, res) {
 //#region Operations Page
 router.get("/operation/operations", (req, res) =>{
     try {
+        /**
+        * @type {UI}
+        */
         var ui = req.app.locals.ui
         var operations = ui.backend.getOperations
         if(operations.length > 0){
@@ -260,6 +246,9 @@ router.get("/operation/operations", (req, res) =>{
 
 router.get("/operation/target", (req, res) =>{
     try {
+        /**
+        * @type {UI}
+        */
         var ui = req.app.locals.ui
         var target = ui.operation.targetInformationDaniel
         if (!target.filter().includes(['selector'])){
@@ -301,57 +290,6 @@ router.get("/operation/operation/:index", (req, res) =>{
     }
 })
 
-router.get("/operation/htmlcaptured", (req, res) =>{
-    try {
-        /**
-         * @type {UI}
-         */
-        var ui = req.app.locals.ui
-        var htmlState = { "isCaptureHtml" : ui.operation.isCaptureHtml}
-        res.json(htmlState)
-        
-    }
-    catch (err){
-        console.log(err)
-        res.status(500).send(`Error getting the is captured Html`)
-    }
-})
-
-router.get("/operation/recording", (req, res) =>{
-    try {
-        /**
-         * @type {UI}
-         */
-        var ui = req.app.locals.ui
-        var recordingState = { "isRecording" : ui.operation.getIsRecording}
-        res.json(recordingState)
-        
-    }
-    catch (err){
-        console.log(err)
-        res.status(500).send(`Error getting the is captured Html`)
-    }
-})
-
-router.get("/operation/operationmuted", (req, res) =>{
-    try {
-        /**
-         * @type {UI}
-         */
-        let ui = req.app.locals.ui
-        var operationsMuted = ui.operation.getFunctionMuteStateVue()
-        if(operationsMuted.length > 0){
-            res.json(operationsMuted)
-        }
-        else{
-            res.sendStatus(204)
-        }
-    }
-    catch (err){
-        console.log(err)
-        res.status(500).send(`Error getting the list of operations captured`)
-    }
-})
 
 function filterCurrentOperation(body){
     var curOperation = new CurrentOperation()
@@ -417,71 +355,6 @@ router.post('/operation/run', (req, res) =>{
     }
 });
 
-router.post('/operation/resume', (req, res) =>{ //missing return to the web app
-    /**
-    * @type {UI}
-    */
-    var ui = req.app.locals.ui
-    ui.operation.resume()
-        .then(()=>{
-            res.sendStatus(201)
-        })
-        .catch(err=>{
-            console.log(`${err}`)
-            res.status(500).send(`Error with resume option`)
-        })
-});
-
-router.put('/operation/operationmuted', (req, res) =>{
-    /**
-    * @type {UI}
-    */
-    var ui = req.app.locals.ui
-    ui.backend.updateMutedFunctionForRecordingDaniel(req.query.operation)
-        .then((value)=>{
-            if(value == true){
-                res.sendStatus(201)
-            }
-            else{
-                res.sendStatus(204)
-            }
-        })
-        .catch(err=>{
-            console.log(`${err}`)
-            res.status(500).send(`Error Updating operatin muted for ${req.params.operation}`)
-        })
-});
-
-
-router.post('/operation/htmlcaptured', (req, res) =>{
-    try {
-        /**
-        * @type {UI}
-        */
-        var ui = req.app.locals.ui
-        var htmlState = { "isCaptureHtml" : ui.operation.isRecordingHtml()} 
-        res.json(htmlState)
-    }
-    catch (error){
-        console.log(`${error}`)
-        res.status(500).send(`Error changing the record operation`)
-    }
-});
-
-router.post('/operation/recording', (req, res) =>{
-    try {
-        /**
-        * @type {UI}
-        */
-        var ui = req.app.locals.ui
-        var htmlState = { "isRecording" : ui.operation.isRecording()} 
-        res.json(htmlState)
-    }
-    catch (error){
-        console.log(`${error}`)
-        res.status(500).send(`Error changing the record operation`)
-    }
-});
 //#endregion
 
 
@@ -698,5 +571,127 @@ router.put('/workflow/step/:step/move/:index', (req, res) =>{    //DAniel I'm no
 })
 
 //#endregion
+
+
+//#region Settings Page
+router.get("/operation/htmlcaptured", (req, res) =>{
+    try {
+        /**
+         * @type {UI}
+         */
+        var ui = req.app.locals.ui
+        var htmlState = { "isCaptureHtml" : ui.operation.isCaptureHtml}
+        res.json(htmlState)
+        
+    }
+    catch (err){
+        console.log(err)
+        res.status(500).send(`Error getting the is captured Html`)
+    }
+})
+
+router.get("/operation/recording", (req, res) =>{
+    try {
+        /**
+         * @type {UI}
+         */
+        var ui = req.app.locals.ui
+        var recordingState = { "isRecording" : ui.operation.getIsRecording}
+        res.json(recordingState)
+        
+    }
+    catch (err){
+        console.log(err)
+        res.status(500).send(`Error getting the is captured Html`)
+    }
+})
+
+router.get("/operation/operationmuted", (req, res) =>{
+    try {
+        /**
+         * @type {UI}
+         */
+        let ui = req.app.locals.ui
+        var operationsMuted = ui.operation.getFunctionMuteStateVue()
+        if(operationsMuted.length > 0){
+            res.json(operationsMuted)
+        }
+        else{
+            res.sendStatus(204)
+        }
+    }
+    catch (err){
+        console.log(err)
+        res.status(500).send(`Error getting the list of operations captured`)
+    }
+})
+
+router.post('/operation/resume', (req, res) =>{ //missing return to the web app
+    /**
+    * @type {UI}
+    */
+    var ui = req.app.locals.ui
+    ui.operation.resume()
+        .then(()=>{
+            res.sendStatus(201)
+        })
+        .catch(err=>{
+            console.log(`${err}`)
+            res.status(500).send(`Error with resume option`)
+        })
+});
+
+router.put('/operation/operationmuted', (req, res) =>{
+    /**
+    * @type {UI}
+    */
+    var ui = req.app.locals.ui
+    ui.backend.updateMutedFunctionForRecordingDaniel(req.query.operation)
+        .then((value)=>{
+            if(value == true){
+                res.sendStatus(201)
+            }
+            else{
+                res.sendStatus(204)
+            }
+        })
+        .catch(err=>{
+            console.log(`${err}`)
+            res.status(500).send(`Error Updating operatin muted for ${req.params.operation}`)
+        })
+});
+
+
+router.post('/operation/htmlcaptured', (req, res) =>{
+    try {
+        /**
+        * @type {UI}
+        */
+        var ui = req.app.locals.ui
+        var htmlState = { "isCaptureHtml" : ui.operation.isRecordingHtml()} 
+        res.json(htmlState)
+    }
+    catch (error){
+        console.log(`${error}`)
+        res.status(500).send(`Error changing the record operation`)
+    }
+});
+
+router.post('/operation/recording', (req, res) =>{
+    try {
+        /**
+        * @type {UI}
+        */
+        var ui = req.app.locals.ui
+        var htmlState = { "isRecording" : ui.operation.isRecording()} 
+        res.json(htmlState)
+    }
+    catch (error){
+        console.log(`${error}`)
+        res.status(500).send(`Error changing the record operation`)
+    }
+});
+//#endregion
+
 
 module.exports = router;
