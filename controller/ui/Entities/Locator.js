@@ -7,6 +7,7 @@ class Locator
         this.pic = pic
         this.index = index   
         this.msg = msg
+        this.href = ''
     }
     
     fromJson(json) {

@@ -3,7 +3,6 @@ var router = express.Router();
 
 //#region Entities
 //import { HtmlCapture, Locator} from "./Enities/LocatorDefiner.js"
-var TitleBtn = require("../controller/ui/Entities/Title");
 var CurrentOperation = require("../controller/ui/Entities/CurrentOperation");
 var WorkflowPugVue = require("../controller/ui/Entities/WorkflowPugVue");
 const UI = require('../controller/ui');
@@ -11,23 +10,14 @@ const UI = require('../controller/ui');
 //#endregion
 
 
-const titleLocatorDefiner = new TitleBtn("Operation", "/daniel/locatordefiner", "GET");
-const titleOperation = new TitleBtn("Operation", "/daniel/operation", "GET");
-const titleWorkflow = new TitleBtn("Operation", "/daniel/locatordefiner", "GET");
+const potentialmMatchHref = 'potentialmatch/' // endpoint to choose a potential match in Locator Definer Page
+const runHref = 'run' // endpoint button run in Operaiton page
+const addHref = 'operation' // endpoint button run in Operaiton page
+const moveHref = 'move/' // endpoint move step in Locator Definer Page
+const moveupHref = 'moveup' // endpoint move step up in Locator Definer Page
+const movedownHref = 'movedown' // endpoint move step down in Locator Definer Page
+const deleteHref = 'step/' // endpoint move step in Locator Definer Page
 
-//#region Endpoints Title
-router.get('/titlemenu',  async function  (req, res) {  //Not sure about this, think more in the design of the front
-    try 
-    {
-        let html = [titleLocatorDefiner, titleOperation, titleWorkflow]
-        res.json(html);
-    }
-    catch
-    {
-        res.status(500).send("Problem defining list of titles")
-    }
-})
-//#endregion 
 
 //#region Locator definer
 
@@ -94,7 +84,11 @@ router.get('/locatordefiner/potentialmatch',  async function (req, res) {
             res.sendStatus(204);
             return;
         }
-        res.json(potentialMatch);
+        let pMatchReturn = potentialMatch.map((element) => {
+            element.href = potentialmMatchHref + element.index.toString();
+            return element;
+        })
+        res.json(pMatchReturn);
     }
     catch (error)
     {
@@ -104,7 +98,7 @@ router.get('/locatordefiner/potentialmatch',  async function (req, res) {
 })
 
 
-router.post('/locatordefiner/potentialmatch/:index',  async function (req, res) { 
+router.post(`/locatordefiner/${potentialmMatchHref}:index`,  async function (req, res) { 
     try {
         if(req.params.index < 0){
             res.status(400)
@@ -231,9 +225,17 @@ router.get("/operation/operations", (req, res) =>{
         * @type {UI}
         */
         var ui = req.app.locals.ui
-        var operations = ui.backend.getOperations
-        if(operations.length > 0){
-            res.json(operations)
+        var lstOperations = ui.backend.getOperations
+        if(lstOperations.length > 0){
+            let linksJson = {
+                run : runHref,
+                add : addHref
+            }
+            resp = {
+                operations: lstOperations,
+                links: linksJson
+            }
+            res.json(resp)
             return
         }
         res.sendStatus(204)
@@ -301,7 +303,7 @@ function filterCurrentOperation(body){
     return isCompleate
 }
 
-router.put('/operation/operation', (req, res) =>{
+router.put(`/operation/${addHref}`, (req, res) =>{
     try {
         var curOp = filterCurrentOperation(req.body)
         if(typeof(curOp) == 'string'){
@@ -333,26 +335,24 @@ router.put('/operation/operation', (req, res) =>{
     }
 });
 
-router.post('/operation/run', (req, res) =>{
-    try {
-        var curOp = filterCurrentOperation(req.body)
-        if(typeof(curOp) == 'string'){
-            res.status(400).send(curOp)
-            return
-        }
-        /**
-        * @type {UI}
-        */
-        var ui = req.app.locals.ui
-        ui.operation.runOperation(curOp)
-            .then(value=>{
-                res.json(value)
-            })
+router.post(`/operation/${runHref}`, (req, res) =>{
+    var curOp = filterCurrentOperation(req.body)
+    if(typeof(curOp) == 'string'){
+        res.status(400).send(curOp)
+        return
     }
-    catch (error){
-        console.log(`${error}`)
-        res.status(500).send(`Error adding operation`)
-    }
+    /**
+    * @type {UI}
+    */
+    var ui = req.app.locals.ui
+    ui.operation.runOperation(curOp)
+        .then(value=>{
+            res.json(value)
+        })
+        .catch(err => {
+            console.log(`${err}`)
+            res.status(500).send(`Error adding operation`)
+        })
 });
 
 //#endregion
@@ -371,7 +371,16 @@ router.get('/workflow/steps', (req, res) =>{
         })
         .then(value =>{
             if(value.length >0){
-                res.status(200).json(value)
+                let resp = value.map((val, index) => {
+                    let href = {
+                        move: moveHref,
+                        moveup: moveupHref,
+                        movedown: movedownHref,
+                        deleteHref: deleteHref + index.toString()
+                    }
+                    val.links = href
+                })
+                res.status(200).json(resp)
             }
             else{
                 res.sendStatus(204)
@@ -467,7 +476,7 @@ router.post('/workflow/navegatetofailure', (req, res) =>{
         })
 })
 
-router.delete('/workflow/step/:step', (req, res) =>{    //DAniel I'm not sure what is the input needed
+router.delete(`/workflow/${deleteHref}:step`, (req, res) =>{    //DAniel I'm not sure what is the input needed
     var index = req.params.step
     if(index<0){
         res.sendStatus(400)
@@ -492,7 +501,7 @@ router.delete('/workflow/step/:step', (req, res) =>{    //DAniel I'm not sure wh
         })
 })
 
-router.put('/workflow/step/:step/moveup', (req, res) =>{    //DAniel I'm not sure what is the input needed
+router.put(`/workflow/step/:step/${moveupHref}`, (req, res) =>{    //DAniel I'm not sure what is the input needed
     var index = req.params.step
     if(index<0){
         res.sendStatus(400)
@@ -518,7 +527,7 @@ router.put('/workflow/step/:step/moveup', (req, res) =>{    //DAniel I'm not sur
 })
 
 
-router.put('/workflow/step/:step/movedown', (req, res) =>{    //DAniel I'm not sure what is the input needed
+router.put(`/workflow/step/:step/${movedownHref}`, (req, res) =>{    //DAniel I'm not sure what is the input needed
     var index = req.params.step
     if(index<0){
         res.sendStatus(400)
