@@ -365,26 +365,28 @@ router.get('/workflow/steps', (req, res) =>{
     */
     var ui = req.app.locals.ui
     ui.workflow.getWorkflowForVue()
-        .catch((err)=>{
-            console.log(`${err}`)
-            res.status(500).send(`Error cresuming the excecution`)
-        })
         .then(value =>{
             if(value.length >0){
                 let resp = value.map((val, index) => {
                     let href = {
+                        index: index,
                         move: moveHref,
-                        moveup: moveupHref,
-                        movedown: movedownHref,
+                        moveup: index.toString() + '/' + moveupHref,
+                        movedown: index.toString() + '/' + movedownHref,
                         deleteHref: deleteHref + index.toString()
                     }
                     val.links = href
+                    return val
                 })
                 res.status(200).json(resp)
             }
             else{
                 res.sendStatus(204)
             }
+        })
+        .catch((err)=>{
+            console.log(`${err}`)
+            res.status(500).send(`Error cresuming the excecution`)
         })
 })
 
@@ -552,7 +554,7 @@ router.put(`/workflow/step/:step/${movedownHref}`, (req, res) =>{    //DAniel I'
         })
 })
 
-router.put('/workflow/step/:step/move/:index', (req, res) =>{    //DAniel I'm not sure what is the input needed
+router.put(`/workflow/step/:step/${moveHref}/:index`, (req, res) =>{    //DAniel I'm not sure what is the input needed
     var step = req.params.step
     var index = req.params.index
     if(index<0 || step<0){
@@ -693,7 +695,8 @@ router.post('/operation/recording', (req, res) =>{
         */
         var ui = req.app.locals.ui
         var htmlState = { "isRecording" : ui.operation.isRecording()} 
-        res.json(htmlState)
+        res.statusCode = 204;
+        res.json(htmlState);
     }
     catch (error){
         console.log(`${error}`)

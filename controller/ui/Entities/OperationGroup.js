@@ -5,7 +5,6 @@ class OperationGroup{
         this.id = id
         this.name = name
         this.operations = operations
-        this.links = {}
     }
 
     getOperations(operationsData){ 
