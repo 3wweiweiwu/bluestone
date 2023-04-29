@@ -100,8 +100,8 @@ router.get('/locatordefiner/potentialmatch',  async function (req, res) {
 
 router.post(`/locatordefiner/${potentialmMatchHref}:index`,  async function (req, res) { 
     try {
-        if(req.params.index < 0){
-            res.status(400)
+        if(parseInt(req.params.index) < 0){
+            res.sendStatus(400)
             return
         }
         /**
@@ -253,7 +253,8 @@ router.get("/operation/target", (req, res) =>{
         */
         var ui = req.app.locals.ui
         var target = ui.operation.targetInformationDaniel
-        if (!target.filter().includes(['selector'])){
+        let missing = target.filter()
+        if (!missing.includes('selector')){
             res.json(target)
         }
         else {
@@ -268,14 +269,14 @@ router.get("/operation/target", (req, res) =>{
 
 router.get("/operation/operation/:index", (req, res) =>{
     try {
-        var index = req.params.index
+        var index = parseInt(req.params.index)
         if(index<0){
             res.sendStatus(400)
             return
         }
         var ui = req.app.locals.ui
         if(index >= ui.backend.steps.length){
-            res.sendStatus(400)
+            res.sendStatus(204)
             return
         }
         var operation =  ui.operation.getOperationByIndex(req.params.index)
@@ -305,7 +306,12 @@ function filterCurrentOperation(body){
 
 router.put(`/operation/${addHref}`, (req, res) =>{
     try {
-        var curOp = filterCurrentOperation(req.body)
+        try {
+            var curOp = filterCurrentOperation(req.body)
+        } catch (err){
+            var curOp = "Error in the request"
+            console.log(curOp)
+        }
         if(typeof(curOp) == 'string'){
             res.status(400).send(curOp)
             return
@@ -554,7 +560,7 @@ router.put(`/workflow/step/:step/${movedownHref}`, (req, res) =>{    //DAniel I'
         })
 })
 
-router.put(`/workflow/step/:step/${moveHref}/:index`, (req, res) =>{    //DAniel I'm not sure what is the input needed
+router.put(`/workflow/step/:step/${moveHref}:index`, (req, res) =>{    //DAniel I'm not sure what is the input needed
     var step = req.params.step
     var index = req.params.index
     if(index<0 || step<0){
@@ -585,7 +591,7 @@ router.put(`/workflow/step/:step/${moveHref}/:index`, (req, res) =>{    //DAniel
 
 
 //#region Settings Page
-router.get("/operation/htmlcaptured", (req, res) =>{
+router.get("/settings/htmlcaptured", (req, res) =>{
     try {
         /**
          * @type {UI}
@@ -601,7 +607,7 @@ router.get("/operation/htmlcaptured", (req, res) =>{
     }
 })
 
-router.get("/operation/recording", (req, res) =>{
+router.get("/settings/recording", (req, res) =>{
     try {
         /**
          * @type {UI}
@@ -617,7 +623,7 @@ router.get("/operation/recording", (req, res) =>{
     }
 })
 
-router.get("/operation/operationmuted", (req, res) =>{
+router.get("/settings/operationmuted", (req, res) =>{
     try {
         /**
          * @type {UI}
@@ -637,7 +643,7 @@ router.get("/operation/operationmuted", (req, res) =>{
     }
 })
 
-router.post('/operation/resume', (req, res) =>{ //missing return to the web app
+router.post('/settings/resume', (req, res) =>{ //missing return to the web app
     /**
     * @type {UI}
     */
@@ -652,7 +658,7 @@ router.post('/operation/resume', (req, res) =>{ //missing return to the web app
         })
 });
 
-router.put('/operation/operationmuted', (req, res) =>{
+router.put('/settings/operationmuted', (req, res) =>{
     /**
     * @type {UI}
     */
@@ -673,7 +679,7 @@ router.put('/operation/operationmuted', (req, res) =>{
 });
 
 
-router.post('/operation/htmlcaptured', (req, res) =>{
+router.post('/settings/htmlcaptured', (req, res) =>{
     try {
         /**
         * @type {UI}
@@ -688,14 +694,14 @@ router.post('/operation/htmlcaptured', (req, res) =>{
     }
 });
 
-router.post('/operation/recording', (req, res) =>{
+router.post('/settings/recording', (req, res) =>{
     try {
         /**
         * @type {UI}
         */
         var ui = req.app.locals.ui
         var htmlState = { "isRecording" : ui.operation.isRecording()} 
-        res.statusCode = 204;
+        res.statusCode = 200;
         res.json(htmlState);
     }
     catch (error){

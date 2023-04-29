@@ -18,7 +18,7 @@ class Locator
         let missing = []
         let needed = ['name', 'selector', 'pic']
         needed.forEach(key => {
-            if(!this[key]) { 
+            if(!this[key] || this[key] === '') { 
                 missing.push(key)}
             });
         return missing
