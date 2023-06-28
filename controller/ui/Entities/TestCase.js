@@ -1,4 +1,4 @@
-class WorkflowPugVue
+class TestCase
 {
     constructor (testSuiteName = null, testName = null, result = false, message = null)
     {

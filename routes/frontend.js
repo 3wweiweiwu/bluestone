@@ -4,7 +4,7 @@ var router = express.Router();
 //#region Entities
 //import { HtmlCapture, Locator} from "./Enities/LocatorDefiner.js"
 var CurrentOperation = require("../controller/ui/Entities/CurrentOperation");
-var WorkflowPugVue = require("../controller/ui/Entities/WorkflowPugVue");
+var TestCase = require("../controller/ui/Entities/TestCase");
 const UI = require('../controller/ui');
 //import {Argument, Operation, OperationGroup, CurrentOperation, OperationStatus, HtmlCaptureStatus} from "./Enities/Operations.js"
 //#endregion
@@ -397,9 +397,9 @@ router.get('/workflow/steps', (req, res) =>{
 })
 
 router.post('/workflow/resolve', (req, res) =>{
-    var wfPugVue = new WorkflowPugVue()
-    wfPugVue.fromJson(req.body)
-    var isCompleate = wfPugVue.isCompleate()
+    var tc = new TestCase()
+    tc.fromJson(req.body)
+    var isCompleate = tc.isCompleate()
     if(typeof(isCompleate) == 'string'){
         res.status(400).send(isCompleate)
         return
@@ -408,7 +408,7 @@ router.post('/workflow/resolve', (req, res) =>{
     * @type {UI}
     */
     var ui = req.app.locals.ui
-    ui.resolveVue(wfPugVue)
+    ui.resolveVue(tc)
         .catch((err)=>{
             console.log(`${err}`)
             res.status(500).send(`Error Resolving Workflow Pug ${err}`)
@@ -419,10 +419,10 @@ router.post('/workflow/resolve', (req, res) =>{
 })
 
 router.post('/workflow/run', (req, res) =>{
-    var wfPugVue = new WorkflowPugVue()
-    wfPugVue.fromJson(req.body)
-    var isCompleate = wfPugVue.isRunnable()
-    if(typeof(isCompleate) == 'string' || !wfPugVue.result){
+    var tc = new TestCase()
+    tc.fromJson(req.body)
+    var isCompleate = tc.isRunnable()
+    if(typeof(isCompleate) == 'string' || !tc.result){
         res.status(400).send(isCompleate)
         return
     }
@@ -430,7 +430,7 @@ router.post('/workflow/run', (req, res) =>{
     * @type {UI}
     */
     var ui = req.app.locals.ui
-    ui.workflow.runWorkflow(wfPugVue)
+    ui.workflow.runWorkflow(tc)
         .catch((err)=>{
             console.log(`${err}`)
             res.status(500).send(`Error Running workflow ${err}`)
@@ -441,10 +441,10 @@ router.post('/workflow/run', (req, res) =>{
 })
 
 router.post('/workflow/abort', (req, res) =>{
-    var wfPugVue = new WorkflowPugVue()
-    wfPugVue.fromJson(req.body)
-    var isCompleate = wfPugVue.isCompleate()
-    if(typeof(isCompleate) == 'string' || !wfPugVue.result){
+    var tc = new TestCase()
+    tc.fromJson(req.body)
+    var isCompleate = tc.isCompleate()
+    if(typeof(isCompleate) == 'string' || !tc.result){
         res.status(400).send(isCompleate)
         return
     }
@@ -452,7 +452,7 @@ router.post('/workflow/abort', (req, res) =>{
     * @type {UI}
     */
     var ui = req.app.locals.ui
-    ui.workflow.abortWorkflow(wfPugVue)
+    ui.workflow.abortWorkflow(tc)
         .catch((err)=>{
             console.log(`${err}`)
             res.status(500).send(`Error trying to abort the excecution ${err}`)
@@ -463,10 +463,10 @@ router.post('/workflow/abort', (req, res) =>{
 })
 
 router.post('/workflow/navegatetofailure', (req, res) =>{
-    var wfPugVue = new WorkflowPugVue()
-    wfPugVue.fromJson(req.body)
-    var isCompleate = wfPugVue.isCompleate()
-    if(typeof(isCompleate) == 'string' || !wfPugVue.result){
+    var tc = new TestCase()
+    tc.fromJson(req.body)
+    var isCompleate = tc.isCompleate()
+    if(typeof(isCompleate) == 'string' || !tc.result){
         res.status(400).send(isCompleate)
         return
     }
@@ -474,7 +474,7 @@ router.post('/workflow/navegatetofailure', (req, res) =>{
     * @type {UI}
     */
     var ui = req.app.locals.ui
-    ui.workflow.navageteToFailure(wfPugVue)
+    ui.workflow.navageteToFailure(tc)
         .catch((err)=>{
             console.log(`${err}`)
             res.status(500).send(`Error trying to abort the excecution ${err}`)

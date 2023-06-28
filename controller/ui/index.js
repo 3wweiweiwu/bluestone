@@ -1,4 +1,4 @@
-const WorkflowPugVue = require("./Entities/WorkflowPugVue") //Daniel
+const TestCase = require("./Entities/TestCase") //Daniel
 var LocatorD = require("./Entities/Locator")  //Daniel
 const LocatorDefiner = require('./class/LocatorDefiner')
 const Operation = require('./class/Operation')
@@ -190,13 +190,13 @@ class UI {
     }
     /**
      * Funtion to add, validate and save script of the workflow
-     * @param {WorkflowPugVue} pug //Object type WorkflowPug for the Front end
+     * @param {TestCase} tc //Object type TestCase for the Front end
      */
-    async resolveVue(pug){//Daniel 
-        this.workflow.textTestSuiteValue = pug.testSuiteName
-        this.backend.testSuiteName = pug.testSuiteName
-        this.workflow.textTestCaseValue = pug.testName
-        this.backend.testcaseName = pug.testName
+    async resolveVue(tc){//Daniel 
+        this.workflow.textTestSuiteValue = tc.testSuiteName
+        this.backend.testSuiteName = tc.testSuiteName
+        this.workflow.textTestCaseValue = tc.testName
+        this.backend.testcaseName = tc.testName
 
         this.backend.resolveExistingLocatorInSteps()
         // await this.backend.fixHtmlPathIssue(this.backend.htmlCaptureStatus)
@@ -214,14 +214,14 @@ class UI {
         }
 
         //write code to disk automatically
-        pug = this.workflow.validateFormVue(pug, true)
-        if (pug.result) {
+        tc = this.workflow.validateFormVue(tc, true)
+        if (tc.result) {
             let finalPath = await this.backend.writeCodeToDisk(this.textTestSuiteValue, this.textTestCaseValue)
             this.workflow.txtValidationStatus += `. Script Path: ${finalPath}`
-            pug.message = this.workflow.txtValidationStatus
+            tc.message = this.workflow.txtValidationStatus
             
         }
-        return pug
+        return tc
     }
 
     async updateTargetVue(index){
