@@ -462,7 +462,7 @@ router.post('/workflow/abort', (req, res) =>{
         })
 })
 
-router.post('/workflow/navegatetofailure', (req, res) =>{
+router.post('/workflow/navigatetofailure', (req, res) =>{
     var tc = new TestCase()
     tc.fromJson(req.body)
     var isCompleate = tc.isCompleate()
