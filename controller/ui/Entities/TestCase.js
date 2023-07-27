@@ -36,4 +36,4 @@ class TestCase
     }
 }
 
-module.exports = WorkflowPugVue
+module.exports = TestCase
